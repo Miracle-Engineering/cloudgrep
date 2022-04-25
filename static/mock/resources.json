@@ -1,0 +1,213 @@
+[
+  {
+    "Type": "ElasticLoadBalancingV2-LoadBalancer",
+    "Id": "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6",
+    "Region": "us-east-1",
+    "Properties": [
+      {
+        "Name": "LoadBalancerArn",
+        "Value": "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6"
+      },
+      {
+        "Name": "DNSName",
+        "Value": "opta-staging-ingress-14522ba1bd959dd6.elb.us-east-1.amazonaws.com"
+      },
+      {
+        "Name": "CanonicalHostedZoneId",
+        "Value": "Z26RNL4JYFTOTI"
+      },
+      {
+        "Name": "CreatedTime",
+        "Value": "2022-04-07T22:27:39.350000+00:00"
+      },
+      {
+        "Name": "LoadBalancerName",
+        "Value": "opta-staging-ingress"
+      },
+      {
+        "Name": "Scheme",
+        "Value": "internet-facing"
+      },
+      {
+        "Name": "VpcId",
+        "Value": "vpc-0c0919dddbbd3bede"
+      }
+    ],
+    "Tags": [
+      {
+        "Key": "service.k8s.aws/stack",
+        "Value": "ingress-nginx/ingress-nginx-controller"
+      },
+      {
+        "Key": "service.k8s.aws/resource",
+        "Value": "LoadBalancer"
+      },
+      {
+        "Key": "elbv2.k8s.aws/cluster",
+        "Value": "opta-staging"
+      }
+    ]
+  },
+  {
+    "Type": "EC2-Instance",
+    "Id": "i-046b8584f97edce25",
+    "Region": "us-east-1",
+    "Properties": [
+      {
+        "Name": "ImageId",
+        "Value": "ami-07e1afa2446472f15"
+      },
+      {
+        "Name": "InstanceId",
+        "Value": "i-046b8584f97edce25"
+      },
+      {
+        "Name": "InstanceType",
+        "Value": "t3.medium"
+      },
+      {
+        "Name": "LaunchTime",
+        "Value": "2022-03-01T01:16:17+00:00"
+      },
+      {
+        "Name": "PrivateDnsName",
+        "Value": "ip-10-0-136-165.ec2.internal"
+      },
+      {
+        "Name": "PrivateIpAddress",
+        "Value": "10.0.136.165"
+      },
+      {
+        "Name": "SubnetId",
+        "Value": "subnet-0bfabdfac832495d7"
+      },
+      {
+        "Name": "Status",
+        "Value": "in-use"
+      },
+      {
+        "Name": "VpcId",
+        "Value": "vpc-0c0919dddbbd3bede"
+      }
+    ],
+    "Tags": [
+      {
+        "Key": "eks:cluster-name",
+        "Value": "opta-staging"
+      },
+      {
+        "Key": "kubernetes.io/cluster/opta-staging",
+        "Value": "owned"
+      },
+      {
+        "Key": "aws:autoscaling:groupName",
+        "Value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
+      },
+      {
+        "Key": "k8s.io/cluster-autoscaler/opta-staging",
+        "Value": "owned"
+      },
+      {
+        "Key": "aws:ec2launchtemplate:id",
+        "Value": "lt-0330c4c2536531e3b"
+      },
+      {
+        "Key": "aws:ec2launchtemplate:version",
+        "Value": "1"
+      },
+      {
+        "Key": "k8s.io/cluster-autoscaler/enabled",
+        "Value": "true"
+      },
+      {
+        "Key": "aws:ec2:fleet-id",
+        "Value": "fleet-38dc45d7-2b57-ad53-26b0-a120b80d203a"
+      },
+      {
+        "Key": "eks:nodegroup-name",
+        "Value": "opta-staging-default-0f40b67a876a6e47"
+      }
+    ]
+  },
+  {
+    "Type": "EC2-Instance",
+    "Id": "i-0ce5fd258122ee34b",
+    "Region": "us-east-1",
+    "Properties2": [
+      {
+        "Name": "ImageId",
+        "Value": "ami-07e1afa2446472f15"
+      },
+      {
+        "Name": "InstanceId",
+        "Value": "i-0ce5fd258122ee34b"
+      },
+      {
+        "Name": "InstanceType",
+        "Value": "t3.medium"
+      },
+      {
+        "Name": "LaunchTime",
+        "Value": "2022-03-01T01:16:17+00:00"
+      },
+      {
+        "Name": "PrivateDnsName",
+        "Value": "ip-10-0-130-88.ec2.internal"
+      },
+      {
+        "Name": "PrivateIpAddress",
+        "Value": "10.0.130.88"
+      },
+      {
+        "Name": "Status",
+        "Value": "in-use"
+      },
+      {
+        "Name": "SubnetId",
+        "Value": "subnet-0d4a35f8ddd594ad0"
+      },
+      {
+        "Name": "VpcId",
+        "Value": "vpc-0c0919dddbbd3bede"
+      }
+    ],
+    "Tags": [
+      {
+        "Key": "aws:ec2launchtemplate:version",
+        "Value": "1"
+      },
+      {
+        "Key": "k8s.io/cluster-autoscaler/opta-staging",
+        "Value": "owned"
+      },
+      {
+        "Key": "aws:autoscaling:groupName",
+        "Value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
+      },
+      {
+        "Key": "kubernetes.io/cluster/opta-staging",
+        "Value": "owned"
+      },
+      {
+        "Key": "eks:nodegroup-name",
+        "Value": "opta-staging-default-0f40b67a876a6e47"
+      },
+      {
+        "Key": "aws:ec2:fleet-id",
+        "Value": "fleet-10d6ef75-0bd7-857b-84b2-ab82fad1d8b8"
+      },
+      {
+        "Key": "k8s.io/cluster-autoscaler/enabled",
+        "Value": "true"
+      },
+      {
+        "Key": "aws:ec2launchtemplate:id",
+        "Value": "lt-0330c4c2536531e3b"
+      },
+      {
+        "Key": "eks:cluster-name",
+        "Value": "opta-staging"
+      }
+    ]
+  }
+]
