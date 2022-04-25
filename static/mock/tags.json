@@ -1,0 +1,40 @@
+{
+  "Tags": [
+    {
+      "Key": "eks:cluster-name",
+      "Value": "opta-staging",
+      "Count": 2,
+      "ResourceIds": [
+        "i-046b8584f97edce25",
+        "i-0ce5fd258122ee34b"
+      ]
+    },
+    {
+      "Key": "VpcId",
+      "Value": "vpc-0c0919dddbbd3bede",
+      "Count": 3,
+      "ResourceIds": [
+        "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6",
+        "i-046b8584f97edce25",
+        "i-0ce5fd258122ee34b"
+      ]
+    }
+  ],
+  "Resources": [
+    {
+      "Type": "ElasticLoadBalancingV2-LoadBalancer",
+      "Id": "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6",
+      "Region": "us-east-1"
+    },
+    {
+      "Type": "EC2-Instance",
+      "Id": "i-046b8584f97edce25",
+      "Region": "us-east-1"
+    },
+    {
+      "Type": "EC2-Instance",
+      "Id": "i-0ce5fd258122ee34b",
+      "Region": "us-east-1"
+    }
+  ]
+}
