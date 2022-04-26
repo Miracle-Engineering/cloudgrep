@@ -11,22 +11,28 @@ usage:
 	@echo "-----------------    : -------------------"
 	@echo "make clean           : Remove all build files and reset assets"
 	@echo "make build           : Generate build for current OS"
-	@echo "make bootstrap       : Install cross-compilation toolchain"
 	@echo "make format      	: Format code"
 	@echo "make release         : Generate binaries for all supported OSes"
 	@echo "make run           	: Run using local code"
 	@echo "make setup           : Install all necessary dependencies"
 	@echo "make test            : Execute test suite"
+	@echo "make version         : Show version"
 	@echo ""
 
 format:
 	go fmt github.com/run-x/...
+
+lint:
+	golangci-lint run ./...
 
 test:
 	go test -race -cover ./pkg/...
 
 run:
 	go run main.go
+
+version:
+	@go run main.go --version
 
 build:
 	go build
@@ -35,6 +41,7 @@ build:
 release: LDFLAGS += -X $(PKG)/pkg/command.GitCommit=$(GIT_COMMIT)
 release: LDFLAGS += -X $(PKG)/pkg/command.BuildTime=$(BUILD_TIME)
 release: LDFLAGS += -X $(PKG)/pkg/command.GoVersion=$(GO_VERSION)
+release: LDFLAGS += -X $(PKG)/pkg/command.Version=$(VERSION)
 release:
 	@echo "Building binaries..."
 	@gox \
@@ -51,11 +58,9 @@ release:
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh
 
-bootstrap:
-	gox -build-toolchain
-
 setup:
 	go install github.com/mitchellh/gox@v1.0.1
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
 
 clean:
 	@rm -f ./cloudgrep

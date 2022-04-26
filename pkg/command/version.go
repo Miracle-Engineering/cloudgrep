@@ -1,11 +1,9 @@
 package command
 
-const (
-	// Version is the current application version
-	Version = "0.0.1"
-)
-
 var (
+	// Version is the current application version
+	Version = "dev"
+
 	// GitCommit contains the Git commit SHA for the binary
 	GitCommit string
 

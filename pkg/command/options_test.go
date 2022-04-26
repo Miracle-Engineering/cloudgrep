@@ -23,6 +23,6 @@ func TestParseOptions(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "cloudgrep/", opts.Prefix)
 
-	opts, err = ParseOptions([]string{"--debug", "--bind", "0.0.0.0", "--listen", "8082", "--skip-open"})
+	opts, err = ParseOptions([]string{"--debug", "--bind", "0.0.0.0", "--listen", "8082", "--skip-open", "--version"})
 	assert.NoError(t, err)
 }
