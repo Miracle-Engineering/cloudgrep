@@ -7,7 +7,7 @@ The release process is automated when merging a Pull Request.
 
 1. Create a Pull Request.
 1. Attach a label [`bump:patch`, `bump:minor`, or `bump:major`]. Cloudgrep uses [haya14busa/action-bumpr](https://github.com/haya14busa/action-bumpr).
-1. [The release workflow](./workflows/release.yml) automatically tags a
+1. [The release workflow](.github/workflows/release.yml) automatically tags a
    new version depending on the label and create a new release on merging the
    Pull Request.
 
