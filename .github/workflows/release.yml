@@ -32,7 +32,7 @@ jobs:
         run: |
           # remove slashes since they aren't valid in filenames
           no_slash_ref_name=$(echo $GITHUB_REF_NAME | sed -E 's/\//-/g')
-          echo "release_name=release-${{ no_slash_ref_name }}" >> $GITHUB_ENV
+          echo "release_name=$no_slash_ref_name" >> $GITHUB_ENV
 
       - uses: actions/upload-artifact@v2
         with:
