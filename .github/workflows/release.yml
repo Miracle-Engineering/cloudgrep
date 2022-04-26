@@ -28,8 +28,8 @@ jobs:
       - name: Build Release Artifacts
         run: make release
 
-      # - uses: actions/upload-artifact@v2
-      #   with:
-      #     name: release-${{ github.ref_name }}
-      #     name: Binaries
-      #     path: bin/*.zip
+      - uses: actions/upload-artifact@v2
+        with:
+          name: release-${{ github.ref_name }}
+          name: Binaries
+          path: bin/*.zip
