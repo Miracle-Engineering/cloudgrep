@@ -32,16 +32,19 @@ The backend exposes an API at `http://localhost:8080/api`.
 
 ### Routes
 
-| Route  | Description |
-| ------------- | ------------- |
-| /info  | API information  |
+| Route | Method |  Description |  Status |
+| ------------- | ------------- | ------------- | ------------- |
+| [/info](http://localhost:8080/api/info)  | GET  | API information |  :white_check_mark: |
+| [/resources](http://localhost:8080/api/resources)  | GET  | Return list of cloud resources |  :x: |
+| [/tags](http://localhost:8080/api/tags)  | GET  | Return list of tags |  :x: |
 
 ### Mocked data
 
-There is also a mocked API at `http://localhost:8080/mock/api`.
+There is also a mocked API at `http://localhost:8080/mock/api`.  
 The mocked api serves static data, it doesn't handle any query parameters.
 
-| Route  | Description |
-| ------------- | ------------- |
-| /resources  | Example of resources ressponse  |
-| /tags  | Example of tags ressponse  |
+| Route | Method |  Description |  Status |
+| ------------- | ------------- | ------------- | ------------- |
+| [/resources](http://localhost:8080/mock/api/resources)  | GET  |  Example of "resources" reponse | :white_check_mark: |
+| [/tags](http://localhost:8080/mock/api/tags)  | GET  |  Example of "tags" ressponse |  :white_check_mark: |
+
