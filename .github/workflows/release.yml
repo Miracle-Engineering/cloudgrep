@@ -45,25 +45,17 @@ jobs:
         id: build
         run: |
           make setup
-          make release
+          VERSION=${{ steps.tag.outputs.value }} make release
 
       - name: Create Release
         if: "!steps.bumpr.outputs.skip"
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.bumpr.outputs.next_version }}
+          tag_name: ${{ steps.tag.outputs.value }}
           generate_release_notes: true
           files: |
             ./bin/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    
-      - name: Update version file
-        if: "!steps.bumpr.outputs.skip"
-        uses: pocket-apps/action-update-version@v1
-        with:
-          files: 'pkg/command/version.go'
-          version-regexp: '\d+.\d+.\d+'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}

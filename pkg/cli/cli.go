@@ -36,26 +36,6 @@ func initOptions() {
 	}
 	command.Opts = opts
 	options = opts
-
-	printVersion()
-}
-
-func printVersion() {
-	chunks := []string{fmt.Sprintf("Cloudgrep v%s", command.Version)}
-
-	if command.GitCommit != "" {
-		chunks = append(chunks, fmt.Sprintf("(git: %s)", command.GitCommit))
-	}
-
-	if command.GoVersion != "" {
-		chunks = append(chunks, fmt.Sprintf("(go: %s)", command.GoVersion))
-	}
-
-	if command.BuildTime != "" {
-		chunks = append(chunks, fmt.Sprintf("(build time: %s)", command.BuildTime))
-	}
-
-	fmt.Println(strings.Join(chunks, " "))
 }
 
 func startServer() {
@@ -104,6 +84,12 @@ func openPage() {
 
 func Run() {
 	initOptions()
+
+	if options.Version {
+		print(command.Version)
+		os.Exit(0)
+	}
+
 	initClient()
 
 	if options.Debug {
