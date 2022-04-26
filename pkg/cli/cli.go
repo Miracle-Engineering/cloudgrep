@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
@@ -17,11 +18,6 @@ import (
 var (
 	options command.Options
 )
-
-func exitWithMessage(message string) {
-	fmt.Println("Error:", message)
-	os.Exit(1)
-}
 
 func initClient() {
 	//TODO init AWS client
@@ -82,7 +78,7 @@ func startServer() {
 
 func handleSignals() {
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, os.Kill)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
 }
 
@@ -99,7 +95,11 @@ func openPage() {
 		return
 	}
 
-	exec.Command("open", url).Output()
+	err = exec.Command("open", url).Run()
+	if err != nil {
+		return
+	}
+
 }
 
 func Run() {

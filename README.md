@@ -24,10 +24,15 @@ operating systems are available.
 
 ## Usage
 
-Start cloudgrep:
+Start cloudgrep locally:
 
 ```
 cloudgrep
+```
+
+See more options:
+```
+./cloudgrep --help
 ```
 
 ## License

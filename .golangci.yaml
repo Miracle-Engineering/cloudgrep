@@ -1,0 +1,4 @@
+# some linters don't work with generics, golangci-lint disable those linters automatically with go1.18.
+# follow https://github.com/golangci/golangci-lint/issues/2649
+run:
+  go: '1.17'
