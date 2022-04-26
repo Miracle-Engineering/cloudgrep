@@ -1,9 +1,12 @@
 TARGETS = darwin/amd64 darwin/arm64 linux/amd64 linux/386 windows/amd64 windows/386
-GIT_COMMIT = $(shell git rev-parse HEAD)
+GITHUB_SHA ?= $(shell git rev-parse HEAD)
 BUILD_TIME = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n')
 GO_VERSION = $(shell go version | awk {'print $$3'})
 LDFLAGS = -s -w
 PKG = github.com/run-x/cloudgrep
+
+DOCKER_RELEASE_TAG = "ghcr.io/run-x/cloudgrep:$(VERSION)"
+DOCKER_LATEST_TAG = "ghcr.io/run-x/cloudgrep:main"
 
 usage:
 	@echo ""
@@ -38,7 +41,7 @@ build:
 	go build
 	@echo "You can now execute ./cloudgrep"
 
-release: LDFLAGS += -X $(PKG)/pkg/command.GitCommit=$(GIT_COMMIT)
+release: LDFLAGS += -X $(PKG)/pkg/command.GitCommit=$(GITHUB_SHA)
 release: LDFLAGS += -X $(PKG)/pkg/command.BuildTime=$(BUILD_TIME)
 release: LDFLAGS += -X $(PKG)/pkg/command.GoVersion=$(GO_VERSION)
 release: LDFLAGS += -X $(PKG)/pkg/command.Version=$(VERSION)
@@ -57,6 +60,25 @@ release:
 
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh
+
+
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/command.GitCommit=$(GIT_COMMIT)
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/command.BuildTime=$(BUILD_TIME)
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/command.GoVersion=$(GO_VERSION)
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/command.Version=$(VERSION)
+release-linux-amd64:
+	@echo "Building Linux binaries..."
+	GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_amd64"
+
+
+docker-build:
+	docker build --no-cache -t $(DOCKER_RELEASE_TAG) .
+	docker tag $(DOCKER_RELEASE_TAG) $(DOCKER_LATEST_TAG)
+	docker images $(DOCKER_RELEASE_TAG)
+
+docker-push:
+	docker push $(DOCKER_RELEASE_TAG)
+	docker push $(DOCKER_LATEST_TAG)
 
 setup:
 	go install github.com/mitchellh/gox@v1.0.1
