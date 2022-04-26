@@ -6,7 +6,7 @@ LDFLAGS = -s -w
 PKG = github.com/run-x/cloudgrep
 
 DOCKER_RELEASE_TAG = "ghcr.io/run-x/cloudgrep:$(VERSION)"
-DOCKER_RELEASE_TAG = "ghcr.io/run-x/cloudgrep:main"
+DOCKER_LATEST_TAG = "ghcr.io/run-x/cloudgrep:main"
 
 usage:
 	@echo ""
@@ -71,7 +71,7 @@ release-linux-amd64:
 	GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_amd64"
 
 
-docker-release:
+docker-build:
 	docker build --no-cache -t $(DOCKER_RELEASE_TAG) .
 	docker tag $(DOCKER_RELEASE_TAG) $(DOCKER_LATEST_TAG)
 	docker images $(DOCKER_RELEASE_TAG)
