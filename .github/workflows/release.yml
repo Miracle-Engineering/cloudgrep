@@ -7,12 +7,15 @@ on:
     #   - "v*.*.*"
 
 jobs:
-  build:
+  release:
+    name: Create release
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # - name: Log into GitHub Container Registry
       #   run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${GITHUB_ACTOR,,} --password-stdin
@@ -26,15 +29,44 @@ jobs:
         run: make setup
 
       - name: Build Release Artifacts
-        run: make release
-
-      - name: set release name
+        id: build
         run: |
-          # remove slashes since they aren't valid in filenames
-          no_slash_ref_name=$(echo $GITHUB_REF_NAME | sed -E 's/\//-/g')
-          echo "release_name=$no_slash_ref_name" >> $GITHUB_ENV
+          make release
+          VERSION=$(make echo-version)
+          echo ::set-output name=VERSION::${VERSION}
 
-      - uses: actions/upload-artifact@v2
+      # - uses: rickstaa/action-create-tag@v1
+      #   with:
+      #     tag: ${{ steps.build.outputs.VERSION }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: ${{ env.release_name }}
-          path: bin/*.zip
+          tag_name: ${{ steps.build.outputs.VERSION }}
+          prerelease: true
+          generate_release_notes: true
+          files: |
+            ./bin/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: set release name
+      #   run: |
+      #     # remove slashes since they aren't valid in filenames
+      #     no_slash_ref_name=$(echo $GITHUB_REF_NAME | sed -E 's/\//-/g')
+      #     echo "release_name=$no_slash_ref_name" >> $GITHUB_ENV
+
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ env.release_name }}
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     release_name: Fortio ${{ steps.build.outputs.VERSION }}
+      #     draft: true
+
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: ${{ env.release_name }}
+      #     path: bin/*.zip
