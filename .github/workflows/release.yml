@@ -28,7 +28,13 @@ jobs:
       - name: Build Release Artifacts
         run: make release
 
+      - name: set release name
+        run: |
+          # remove slashes since they aren't valid in filenames
+          no_slash_ref_name=$(echo $GITHUB_REF_NAME | sed -E 's/\//-/g')
+          echo "release_name=release-${{ github.ref_name }}" >> $GITHUB_ENV
+
       - uses: actions/upload-artifact@v2
         with:
-          name: release-${{ github.ref_name }}
+          name: ${{ env.release_name }}
           path: bin/*.zip
