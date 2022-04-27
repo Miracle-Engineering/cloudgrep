@@ -1,0 +1,52 @@
+{
+	"extends": [
+		"eslint:recommended",
+		"plugin:react/recommended",
+		"plugin:@typescript-eslint/recommended",
+		"prettier",
+		"plugin:jest/recommended",
+		"plugin:react-hooks/recommended"
+	],
+	"plugins": ["react", "@typescript-eslint", "prettier", "react-hooks", "simple-import-sort", "jest"],
+	"env": {
+		"es6": true,
+		"browser": true,
+		"node": true,
+		"jest/globals": true
+	},
+	"rules": {
+		"prettier/prettier": [
+			"warn",
+			{
+				"singleQuote": true
+			}
+		],
+		"no-console": "warn",
+		"simple-import-sort/imports": "warn",
+		"simple-import-sort/exports": "warn",
+		"@typescript-eslint/camelcase": "off",
+		"@typescript-eslint/no-unused-vars": "warn",
+		"no-redeclare": "off",
+		"@typescript-eslint/no-redeclare": ["error"],
+		"no-unused-vars": "warn",
+		"@typescript-eslint/ban-types": "off",
+		"no-mixed-spaces-and-tabs": ["error", "smart-tabs"],
+		"no-nested-ternary": "error"
+	},
+	"settings": {
+		"react": {
+			"pragma": "React",
+			"version": "detect"
+		}
+	},
+	"parser": "@typescript-eslint/parser",
+	"overrides": [
+		{
+			"files": ["**/*.tsx"],
+			"rules": {
+				"react/prop-types": "off",
+				"react/display-name": "off"
+			}
+		}
+	]
+}
