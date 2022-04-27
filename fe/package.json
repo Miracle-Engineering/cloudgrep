@@ -1,0 +1,90 @@
+{
+  "name": "fe",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "11.9.0",
+    "@emotion/styled": "11.8.1",
+    "@mui/icons-material": "5.6.2",
+    "@mui/lab": "5.0.0-alpha.79",
+    "@mui/material": "5.6.3",
+    "@mui/x-data-grid": "5.10.0",
+    "@reduxjs/toolkit": "1.8.1",
+    "axios": "0.27.2",
+    "date-fns": "2.28.0",
+    "i18next": "21.6.16",
+    "react": "18.1.0",
+    "react-dom": "18.1.0",
+    "react-i18next": "11.16.7",
+    "react-redux": "8.0.1",
+    "react-router-dom": "6.3.0",
+    "react-scripts": "5.0.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.1.1",
+    "@testing-library/user-event": "^14.1.1",
+    "@types/jest": "^27.4.1",
+    "@types/node": "^17.0.29",
+    "@types/react": "^18.0.8",
+    "@types/react-dom": "^18.0.0",
+    "@types/react-redux": "^7.1.24",
+    "@types/react-router-dom": "^5.3.3",
+    "@typescript-eslint/eslint-plugin": "^5.21.0",
+    "@typescript-eslint/parser": "^5.21.0",
+    "env-cmd": "^10.1.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.29.4",
+    "eslint-plugin-react-hooks": "^4.5.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "husky": "^7.0.4",
+    "prettier": "^2.6.2",
+    "stylelint": "^14.8.0",
+    "stylelint-config-prettier": "^9.0.3",
+    "stylelint-config-standard": "^25.0.0",
+    "stylelint-prettier": "^2.0.0",
+    "typescript": "^4.6.3"
+  },
+  "scripts": {
+    "start": "env-cmd -f .env.development react-scripts start",
+    "start:local": "env-cmd -f .env.development.local react-scripts start",
+    "build": "react-scripts build",
+    "build:production": "env-cmd -f .env.production react-scripts build",
+    "test": "react-scripts test",
+    "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "eject": "react-scripts eject",
+    "prepare": "cd .. && husky install fe/.husky",
+    "lint": "eslint './src/**/*.{ts,tsx}' --fix"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "src/index.tsx",
+      "src/setupTests.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 0,
+        "lines": 0
+      }
+    }
+  }
+}
