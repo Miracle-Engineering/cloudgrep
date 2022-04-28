@@ -4,7 +4,7 @@ import { ErrorContainer, TextPlaceholder } from 'pages/ErrorScreen/styles';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { LOGIN } from 'routes/routePaths';
+import { HOME } from 'routes/routePaths';
 
 const ErrorScreen: FC = () => {
 	const navigate = useNavigate();
@@ -13,7 +13,7 @@ const ErrorScreen: FC = () => {
 	return (
 		<ErrorContainer data-testid={ERROR_PAGE_TEST_ID}>
 			<TextPlaceholder>{t('SOMETHING_WENT_WRONG')}</TextPlaceholder>
-			<button style={{ background: BACKGROUND_COLOR }} onClick={(): void => navigate(LOGIN)}>
+			<button style={{ background: BACKGROUND_COLOR }} onClick={(): void => navigate(HOME)}>
 				{t('TRY_AGAIN')}
 			</button>
 		</ErrorContainer>

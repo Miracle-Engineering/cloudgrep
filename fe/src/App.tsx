@@ -1,5 +1,6 @@
 import './App.css';
 
+import Insights from 'pages/Insights';
 import React from 'react';
 
 import logo from './logo.svg';
@@ -13,6 +14,7 @@ function App() {
 					<span>CloudGrep</span>
 				</span>
 			</header>
+			<Insights />
 		</div>
 	);
 }
