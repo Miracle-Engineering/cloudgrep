@@ -6,7 +6,6 @@
     "@emotion/react": "11.9.0",
     "@emotion/styled": "11.8.1",
     "@mui/icons-material": "5.6.2",
-    "@mui/lab": "5.0.0-alpha.79",
     "@mui/material": "5.6.3",
     "@mui/x-data-grid": "5.10.0",
     "@reduxjs/toolkit": "1.8.1",
@@ -17,8 +16,7 @@
     "react-dom": "18.1.0",
     "react-i18next": "11.16.7",
     "react-redux": "8.0.1",
-    "react-router-dom": "6.3.0",
-    "react-scripts": "5.0.1"
+    "react-router-dom": "6.3.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.4",
@@ -40,6 +38,7 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "husky": "^7.0.4",
     "prettier": "^2.6.2",
+    "react-scripts": "^5.0.1",
     "stylelint": "^14.8.0",
     "stylelint-config-prettier": "^9.0.3",
     "stylelint-config-standard": "^25.0.0",
