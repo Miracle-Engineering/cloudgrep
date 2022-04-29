@@ -1,6 +1,6 @@
 export interface Tag {
 	Key: string;
 	Value: string;
-	Count: number;
-	ResourceIds: string[];
+	Count?: number;
+	ResourceIds?: string[];
 }
