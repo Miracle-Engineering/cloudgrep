@@ -37,8 +37,10 @@ const InsightTable: FC = () => {
 					</TableHead>
 					<TableBody>
 						{resources.map(row =>
-							row.Properties?.map((resource: Property) => (
-								<TableRow key={row.Id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+							row.Properties?.map((resource: Property, index: number) => (
+								<TableRow
+									key={row.Id + resource.Name + index}
+									sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
 									<TableCell component="th" scope="row">
 										{row.Type}
 									</TableCell>
