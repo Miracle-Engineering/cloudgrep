@@ -9,7 +9,7 @@ import (
 )
 
 func Test_Init_Default(t *testing.T) {
-	config, err := New(context.Background(), options.Options{})
+	config, err := Init(context.Background(), options.Options{})
 
 	if err != nil {
 		t.Error(err)

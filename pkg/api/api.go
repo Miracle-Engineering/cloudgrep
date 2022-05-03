@@ -13,7 +13,12 @@ import (
 	"github.com/run-x/cloudgrep/static"
 )
 
-func StartWebServer(ctx context.Context, cfg config.Config, ds datastore.Datastore) {
+var (
+	// Datastore represents the active datastore connection
+	Datastore datastore.Datastore
+)
+
+func StartServer(ctx context.Context, cfg config.Config, datastore datastore.Datastore) error {
 	router := gin.Default()
 
 	if cfg.Logging.IsDev() {
@@ -22,7 +27,8 @@ func StartWebServer(ctx context.Context, cfg config.Config, ds datastore.Datasto
 		gin.SetMode("release")
 	}
 
-	SetupRoutes(router, cfg, ds)
+	Datastore = datastore
+	SetupRoutes(router, cfg)
 
 	fmt.Println("Starting server...")
 	go func() {
@@ -32,6 +38,7 @@ func StartWebServer(ctx context.Context, cfg config.Config, ds datastore.Datasto
 			os.Exit(1)
 		}
 	}()
+	return nil
 }
 
 // GetHome renderes the home page
@@ -63,8 +70,7 @@ func GetInfo(c *gin.Context) {
 
 // GetResources retrieves the cloud resources matching the query parameters
 func GetResources(c *gin.Context) {
-	datastore := c.MustGet("datastore").(datastore.Datastore)
-	resources, err := datastore.GetResources(c, model.NoFilter{})
+	resources, err := Datastore.GetResources(c, model.NoFilter{})
 	if err != nil {
 		badRequest(c, err)
 		return

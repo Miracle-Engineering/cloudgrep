@@ -3,7 +3,6 @@ package mapper
 import (
 	"context"
 	"fmt"
-	"path"
 	"reflect"
 	"strings"
 
@@ -12,9 +11,6 @@ import (
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
-
-// limit the depth when using reflection to generate the property list
-const maxRecursion = 5
 
 //Mapper defines rules on how to map a Go Type to a model.Resource
 type Mapper struct {
@@ -35,8 +31,6 @@ type Mapping struct {
 	IgnoredFields []string `yaml:"ignoredFields"`
 	//method implementating fetching the resources, the provider must implement it
 	Impl string `yaml:"impl"`
-	//the method is found at runtime using Impl
-	Method reflect.Value
 }
 
 type Config struct {
@@ -55,16 +49,16 @@ type TagField struct {
 	Value string `yaml:"value"`
 }
 
-func New(config []byte, logger zap.Logger, providerValue reflect.Value) (Mapper, error) {
-	var configStruct Config
-	err := yaml.Unmarshal(config, &configStruct)
+func LoadConfig(data []byte) (Config, error) {
+	var config Config
+	err := yaml.Unmarshal(data, &config)
 	if err != nil {
-		return Mapper{}, err
+		return Config{}, err
 	}
-	return new(configStruct, logger, providerValue)
+	return config, nil
 }
 
-func new(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper, error) {
+func New(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper, error) {
 	logger.Sugar().Infow("Loading Mappings", zap.String("provider", fmt.Sprintf("%T", providerValue.Interface())))
 	tagField := config.TagField
 	ignoredFields := config.IgnoredFields
@@ -88,10 +82,13 @@ func new(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 			//use top level config
 			mapping.IgnoredFields = ignoredFields
 		}
-		//always ignore Tags - they have their own model
-		mapping.IgnoredFields = append(mapping.IgnoredFields, mapping.TagField.Name)
+		logger.Sugar().Debugf("Loading Mapping %+v", mapping)
 		//find the implementation method
-		mapping.Method = findImplMethod(providerValue, mapping.Impl)
+		method := providerValue.MethodByName(mapping.Impl)
+		if reflect.ValueOf(method).IsZero() {
+			return Mapper{}, fmt.Errorf("could not find a method called '%v' on '%T'", mapping.Impl, providerValue.Interface())
+		}
+
 		mapper.Mappings[mapping.Type] = mapping
 
 	}
@@ -101,30 +98,17 @@ func new(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 	return mapper, nil
 }
 
-func findImplMethod(v reflect.Value, impl string) reflect.Value {
-	//find the implementation method
-	method := v.MethodByName(impl)
-	if reflect.ValueOf(method).IsZero() {
-		panic(fmt.Errorf("could not find a method called '%v' on '%T'", impl, v.Interface()))
-	}
-	//check return type is (slice, error)
-	if t := method.Type(); t.NumOut() != 2 || t.Out(0).Kind().String() != "slice" || t.Out(1).Name() != "error" {
-		panic(fmt.Errorf("method %v has invalid return type, expecting ([]any, error)", impl))
-	}
-	return method
-}
-
-//ToResource generate a Resource by using reflection
+//ToRessource generate a Resource by using reflection
 // all fields will become properties
 // if there is a Tags field, this will become Tags
-func (m Mapper) ToResource(x any, region string) (model.Resource, error) {
+func (m Mapper) ToRessource(x any, region string) (model.Resource, error) {
 
 	t := reflect.TypeOf(x)
-	// key is package name + Type.name to prevent duplicated keys
-	key := fmt.Sprintf("%v/%v", path.Dir(t.PkgPath()), t.String())
-	mapping, found := m.Mappings[key]
+	//TODO remove
+	println("t.String()", t.String())
+	mapping, found := m.Mappings[t.String()]
 	if !found {
-		return model.Resource{}, fmt.Errorf("could not find a mapping definition for type '%v'", t.String())
+		return model.Resource{}, fmt.Errorf("could not find a mapping definition for type '%T'", t)
 	}
 
 	var properties []model.Property
@@ -132,9 +116,8 @@ func (m Mapper) ToResource(x any, region string) (model.Resource, error) {
 		field := t.Field(i)
 		name := field.Name
 		value := reflect.ValueOf(x).FieldByName(name)
-		if field.IsExported() {
-			properties = append(properties, getProperties(name, value, mapping.IgnoredFields, maxRecursion)...)
-		}
+		//always ignore Tags - they have their own model
+		properties = append(properties, getProperties(name, value, append(mapping.IgnoredFields, mapping.TagField.Name), 3)...)
 	}
 
 	// generate id field
@@ -142,7 +125,6 @@ func (m Mapper) ToResource(x any, region string) (model.Resource, error) {
 	for _, p := range properties {
 		if p.Name == mapping.IdField {
 			id = p.Value
-			break
 		}
 	}
 	if id == "" {
@@ -150,8 +132,9 @@ func (m Mapper) ToResource(x any, region string) (model.Resource, error) {
 	}
 
 	// generate tags field
+	var tags []model.Tag
 	tagsValue := reflect.ValueOf(x).FieldByName(mapping.TagField.Name)
-	tags := getTags(tagsValue, mapping.TagField)
+	tags = append(tags, getTags(tagsValue, mapping.TagField)...)
 
 	return model.Resource{
 		Id:         id,
@@ -162,37 +145,29 @@ func (m Mapper) ToResource(x any, region string) (model.Resource, error) {
 	}, nil
 }
 
-//FetchResources calls the implementation method on each Mapping and returns the resources
-func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Resource, error) {
-	var resources []*model.Resource
-	for _, mapping := range m.Mappings {
-		new_resources, err := m.fetchResources(ctx, mapping, region)
-		if err != nil {
-			return nil, err
-		}
-		resources = append(resources, new_resources...)
-	}
-	return resources, nil
-}
+//FetchResources calls the implementation method on the Mapping and returns the resources
+func (m Mapper) FetchResources(ctx context.Context, mapping Mapping, providerValue reflect.Value, region string) ([]*model.Resource, error) {
 
-func (m Mapper) fetchResources(ctx context.Context, mapping Mapping, region string) ([]*model.Resource, error) {
 	m.logger.Sugar().Infow("Fetching resources",
+		zap.String("provider", fmt.Sprintf("%T", providerValue.Interface())),
 		zap.String("ResourceType", mapping.ResourceType),
 		zap.String("Region", region),
 	)
 	var resources []*model.Resource
 	// call the method to fetch the resources
-	result := mapping.Method.Call([]reflect.Value{reflect.ValueOf(ctx)})
+	method := providerValue.MethodByName(mapping.Impl)
+	result := method.Call([]reflect.Value{reflect.ValueOf(ctx)})
 	//generate a error message to avoid duplication in code below
+	errorMessage := fmt.Sprintf("Method '%T%v' has the wrong return type", providerValue.Interface(), mapping.Impl)
 	for _, v := range result {
 		switch v.Kind() {
 		case reflect.Slice:
 			//convert all slice elements to resources
 			for i := 0; i < v.Len(); i++ {
 				any := v.Index(i).Interface()
-				resource, err := m.ToResource(any, region)
+				resource, err := m.ToRessource(any, region)
 				if err != nil {
-					return nil, fmt.Errorf("error converting %v result slice to resource: %w", mapping.Impl, err)
+					return []*model.Resource{}, err
 				}
 				resources = append(resources, &resource)
 			}
@@ -200,14 +175,15 @@ func (m Mapper) fetchResources(ctx context.Context, mapping Mapping, region stri
 			// an error was returned
 			err, ok := v.Interface().(error)
 			if ok {
-				return nil, err
+				return []*model.Resource{}, err
 			}
 		default:
-			return nil, fmt.Errorf("method '%v' has the wrong return type", mapping.Impl)
+			return []*model.Resource{}, fmt.Errorf(errorMessage)
 		}
 	}
 
 	m.logger.Sugar().Infow("Fetched resources",
+		zap.String("provider", fmt.Sprintf("%T", providerValue.Interface())),
 		zap.String("ResourceType", mapping.ResourceType),
 		zap.String("Region", region),
 		zap.Int("Count", len(resources)),
@@ -219,7 +195,7 @@ func getProperties(name string, v reflect.Value, ignoredFields []string, maxRecu
 
 	if util.Contains(ignoredFields, name) || maxRecursion <= 0 {
 		//ignore this field
-		return nil
+		return []model.Property{}
 	}
 
 	emptyProp := []model.Property{{Name: name, Value: ""}}
@@ -227,7 +203,7 @@ func getProperties(name string, v reflect.Value, ignoredFields []string, maxRecu
 	switch v.Kind() {
 	case reflect.Invalid:
 		//ignore this field
-		return nil
+		return []model.Property{}
 	case reflect.Interface, reflect.Ptr:
 		if v.IsZero() {
 			//empty pointer
@@ -273,20 +249,22 @@ func getProperties(name string, v reflect.Value, ignoredFields []string, maxRecu
 }
 
 func getTags(v reflect.Value, tagField TagField) []model.Tag {
+	noTags := []model.Tag{}
+
 	switch v.Kind() {
 	case reflect.Invalid:
-		return nil
+		return noTags
 	case reflect.Interface, reflect.Ptr:
 		if v.IsZero() {
 			//empty pointer
-			return nil
+			return noTags
 		}
 		//display pointer value
 		return getTags(v.Elem(), tagField)
 	case reflect.Slice:
 		if v.IsZero() {
 			//empty slice
-			return nil
+			return noTags
 		}
 		//return a distinct Tag for each slice element
 		//ex: Tags=[a,b] -> Tag=a Tag=b
@@ -305,7 +283,7 @@ func getTags(v reflect.Value, tagField TagField) []model.Tag {
 		// we have a tag
 		return []model.Tag{{Key: keyStr, Value: valStr}}
 	default:
-		return nil
+		return noTags
 	}
 
 }

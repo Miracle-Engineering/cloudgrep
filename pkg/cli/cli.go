@@ -21,16 +21,16 @@ func Run() error {
 
 	opts, err := options.ParseOptions(os.Args)
 	if err != nil {
-		return fmt.Errorf("failed to parse cli options: %w", err)
+		return err
 	}
 	if opts.Version {
-		fmt.Println(api.Version)
+		print(api.Version)
 		os.Exit(0)
 	}
 
-	cfg, err := config.New(ctx, opts)
+	cfg, err := config.Init(ctx, opts)
 	if err != nil {
-		return fmt.Errorf("failed to load config: %w", err)
+		return err
 	}
 
 	if cfg.Logging.IsDev() {
@@ -40,19 +40,19 @@ func Run() error {
 	//init the storage to contain cloud data
 	datastore, err := datastore.NewDatastore(ctx, cfg)
 	if err != nil {
-		return fmt.Errorf("failed to setup datastore: %w", err)
-	}
-
-	//start the providers to collect cloud data
-	engine, err := provider.NewEngine(ctx, cfg, datastore)
-	if err != nil {
-		return fmt.Errorf("failed to start engine: %w", err)
-	}
-	if err = engine.Run(ctx); err != nil {
 		return err
 	}
 
-	api.StartWebServer(ctx, cfg, datastore)
+	//start the providers to collect cloud data
+	err = provider.Run(ctx, cfg, datastore)
+	if err != nil {
+		return err
+	}
+
+	err = api.StartServer(ctx, cfg, datastore)
+	if err != nil {
+		return err
+	}
 
 	//TODO replace this URL with homepage when ready
 	url := fmt.Sprintf("http://%v:%v/%v%v", cfg.Web.Host, cfg.Web.Port, cfg.Web.Prefix, "api/resources")

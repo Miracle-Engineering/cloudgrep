@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/run-x/cloudgrep/pkg/cli"
 )
@@ -10,7 +9,6 @@ import (
 func main() {
 
 	if err := cli.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		fmt.Println(err)
 	}
 }

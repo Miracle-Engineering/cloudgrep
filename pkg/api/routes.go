@@ -9,24 +9,22 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/datastore"
 )
 
-func SetupMiddlewares(group *gin.RouterGroup, cfg config.Config, ds datastore.Datastore) {
+func SetupMiddlewares(group *gin.RouterGroup, cfg config.Config) {
 	if cfg.Logging.IsDev() {
 		group.Use(logAllQueryParams(cfg), logAllRequests(cfg))
 	}
-	group.Use(setDatastore(ds))
 }
 
-func SetupRoutes(router *gin.Engine, cfg config.Config, ds datastore.Datastore) {
+func SetupRoutes(router *gin.Engine, cfg config.Config) {
 	root := router.Group(cfg.Web.Prefix)
 
 	root.GET("/", gin.WrapH(GetHome(cfg.Web.Prefix)))
 	root.GET("/static/*path", gin.WrapH(GetAssets(cfg.Web.Prefix)))
 
 	api := root.Group("/api")
-	SetupMiddlewares(api, cfg, ds)
+	SetupMiddlewares(api, cfg)
 
 	api.GET("/info", GetInfo)
 	api.GET("/resources", GetResources)

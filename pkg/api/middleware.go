@@ -6,7 +6,6 @@ import (
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/datastore"
 )
 
 // Middleware to print out request parameters and body for debugging
@@ -23,11 +22,4 @@ func logAllRequests(cfg config.Config) gin.HandlerFunc {
 	//   - Logs to stdout.
 	//   - RFC3339 with UTC time format.
 	return ginzap.Ginzap(cfg.Logging.Logger, time.RFC3339, true)
-}
-
-func setDatastore(ds datastore.Datastore) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set("datastore", ds)
-		c.Next()
-	}
 }

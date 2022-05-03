@@ -11,15 +11,24 @@ import (
 
 //Datastore provides an interface to read/write/update to a store
 type Datastore interface {
+	init(context.Context, config.Config) error
 	GetResources(context.Context, model.Filter) ([]*model.Resource, error)
 	WriteResources(context.Context, []*model.Resource) error
 }
 
 func NewDatastore(ctx context.Context, cfg config.Config) (Datastore, error) {
-	cfg.Logging.Logger.Sugar().Infow("Creating a datastore", zap.String("type", cfg.Datastore.Type))
+	var datastore Datastore
 	if cfg.Datastore.Type == "memory" {
-		return NewMemoryStore(ctx, cfg), nil
-	} else {
+		datastore = &MemoryStore{}
+	}
+	if datastore == nil {
 		return nil, fmt.Errorf("unknown datastore type '%v'", cfg.Datastore.Type)
 	}
+	cfg.Logging.Logger.Sugar().Infow("Creating a datastore",
+		zap.String("type", cfg.Datastore.Type))
+	err := datastore.init(ctx, cfg)
+	if err != nil {
+		return nil, err
+	}
+	return datastore, nil
 }

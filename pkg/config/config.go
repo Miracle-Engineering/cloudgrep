@@ -2,7 +2,7 @@ package config
 
 import (
 	"context"
-	_ "embed"
+	"embed"
 	"fmt"
 	"io/ioutil"
 
@@ -12,7 +12,7 @@ import (
 )
 
 //go:embed config.yaml
-var embedConfig []byte
+var embedConfig embed.FS
 
 type Config struct {
 	Providers []Provider `yaml:"providers"`
@@ -44,14 +44,14 @@ type Logging struct {
 	Logger *zap.Logger
 }
 
-//New creates a new configuration
-func New(ctx context.Context, options options.Options) (Config, error) {
+//Init the configuration - set path to empty to use default value
+func Init(ctx context.Context, options options.Options) (Config, error) {
 	var data []byte
 	var err error
 
 	if options.Config == "" {
 		//Read the default configuration
-		data = embedConfig
+		data, err = embedConfig.ReadFile("config.yaml")
 	} else {
 		data, err = ioutil.ReadFile(options.Config)
 	}
@@ -89,6 +89,7 @@ func New(ctx context.Context, options options.Options) (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
+	defer logger.Sync() // nolint: errcheck
 	config.Logging.Logger = logger
 
 	return config, nil

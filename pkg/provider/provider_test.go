@@ -2,7 +2,7 @@ package provider
 
 import (
 	"context"
-	_ "embed"
+	"embed"
 	"reflect"
 	"testing"
 
@@ -18,8 +18,15 @@ func TestMapper(t *testing.T) {
 
 	ctx := context.Background()
 	logger := zaptest.NewLogger(t)
+	provider := &TestProvider{}
 
-	provider, err := NewTestProvider(ctx, config.Provider{}, logger)
+	config, err := provider.Init(ctx, config.Provider{}, logger)
+	if err != nil {
+		t.Error(err)
+	}
+
+	//create a mapper
+	mapper, err := mapper.New(config, *logger, reflect.ValueOf(provider))
 	if err != nil {
 		t.Error(err)
 	}
@@ -31,7 +38,6 @@ func TestMapper(t *testing.T) {
 		Architecture:   &architecture,
 		SomeTags:       []TestTag{{Name: "enabled", Val: "true"}, {Name: "eks:nodegroup", Val: "staging-default"}},
 		NeverReturned:  "should not see this",
-		unexported:     "not exported",
 		SecurityGroups: []string{"sg-1", "sg-2"},
 		Limit:          Limit{CPU: MinMax{Min: 1, Max: 3}, Memory: MinMax{Min: 256, Max: 512}},
 	}
@@ -72,14 +78,14 @@ func TestMapper(t *testing.T) {
 	}
 
 	// test conversion
-	_r1, err := provider.GetMapper().ToResource(tr1, "us-east-1")
+	_r1, err := mapper.ToRessource(tr1, "us-east-1")
 	if err != nil {
 		t.Error(err)
 	}
 	assert.Equal(t, r1, _r1)
 
 	// fetch the resources
-	resources, err := fetchResources(context.WithValue(ctx, Return("FetchTestResources"), []TestResource{tr1, tr2}), provider)
+	resources, err := FetchResources(context.WithValue(ctx, Return("FetchTestResources"), []TestResource{tr1, tr2}), provider, mapper)
 	if err != nil {
 		t.Error(err)
 	}
@@ -92,11 +98,10 @@ func TestMapper(t *testing.T) {
 }
 
 //go:embed mapper_test.yaml
-var embedConfig []byte
+var embedConfig embed.FS
 
 type TestProvider struct {
-	*zap.Logger
-	mapper.Mapper
+	logger *zap.Logger
 }
 
 type TestResource struct {
@@ -104,7 +109,6 @@ type TestResource struct {
 	Architecture   *string
 	SomeTags       []TestTag
 	NeverReturned  string
-	unexported     string
 	SecurityGroups []string
 	Limit          Limit
 }
@@ -123,26 +127,26 @@ type MinMax struct {
 	Max int
 }
 
-func NewTestProvider(ctx context.Context, cfg config.Provider, logger *zap.Logger) (Provider, error) {
-	p := TestProvider{}
-	p.Logger = logger
-	var err error
-	p.Mapper, err = mapper.New(embedConfig, *logger, reflect.ValueOf(p))
-	if err != nil {
-		return nil, err
-	}
-	return p, nil
-}
-func (p TestProvider) GetMapper() mapper.Mapper {
-	return p.Mapper
+func (p *TestProvider) Region() string {
+	return "us-east-1"
 }
 
-func (p TestProvider) Region() string {
-	return "us-east-1"
+func (p *TestProvider) Init(ctx context.Context, cfg config.Provider, logger *zap.Logger) (mapper.Config, error) {
+	p.logger = logger
+	data, err := embedConfig.ReadFile("mapper_test.yaml")
+	if err != nil {
+		return mapper.Config{}, err
+	}
+	var config mapper.Config
+	config, err = mapper.LoadConfig(data)
+	if err != nil {
+		return mapper.Config{}, err
+	}
+	return config, nil
 }
 
 type Return string
 
-func (TestProvider) FetchTestResources(ctx context.Context) ([]TestResource, error) {
+func (*TestProvider) FetchTestResources(ctx context.Context) ([]TestResource, error) {
 	return ctx.Value(Return("FetchTestResources")).([]TestResource), nil
 }
