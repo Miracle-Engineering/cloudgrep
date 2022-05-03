@@ -5,10 +5,6 @@ tagField:
   key: Key
   value: Value
 
-ignoredFields:
-  # large parts of the GO SDK V2 are generated out of AWS Smithy, not relevant for end user
-  - noSmithyDocumentSerde
-
 mappings:
   # the Go type that is returned by the cloud provider
   - type: "types.Instance"
