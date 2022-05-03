@@ -1,4 +1,4 @@
-package command
+package options
 
 import (
 	"os"
@@ -8,12 +8,12 @@ import (
 )
 
 type Options struct {
-	Debug    bool   `short:"d" long:"debug" description:"Enable debugging mode"`
 	Version  bool   `short:"v" long:"version" description:"Show version"`
-	HTTPHost string `long:"bind" description:"HTTP server host" default:"localhost"`
-	HTTPPort uint   `long:"listen" description:"HTTP server listen port" default:"8080"`
+	HTTPHost string `long:"bind" description:"HTTP server host"`
+	HTTPPort uint   `long:"listen" description:"HTTP server listen port"`
 	Prefix   string `long:"prefix" description:"Add a url prefix"`
 	SkipOpen bool   `short:"s" long:"skip-open" description:"Skip browser open on start"`
+	Config   string `short:"c" long:"config" description:"Configuration file"`
 }
 
 var Opts Options

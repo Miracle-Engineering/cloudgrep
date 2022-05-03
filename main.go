@@ -1,7 +1,14 @@
 package main
 
-import "github.com/run-x/cloudgrep/pkg/cli"
+import (
+	"fmt"
+
+	"github.com/run-x/cloudgrep/pkg/cli"
+)
 
 func main() {
-	cli.Run()
+
+	if err := cli.Run(); err != nil {
+		fmt.Println(err)
+	}
 }

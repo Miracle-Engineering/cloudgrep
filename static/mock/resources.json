@@ -133,7 +133,7 @@
     "Type": "EC2-Instance",
     "Id": "i-0ce5fd258122ee34b",
     "Region": "us-east-1",
-    "Properties2": [
+    "Properties": [
       {
         "Name": "ImageId",
         "Value": "ami-07e1afa2446472f15"

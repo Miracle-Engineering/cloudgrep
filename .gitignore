@@ -18,3 +18,5 @@ bin
 tmp/
 TMP.md
 
+# visual studio
+.vscode

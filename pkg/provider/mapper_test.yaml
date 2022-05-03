@@ -1,0 +1,16 @@
+
+tagField:
+  name: SomeTags
+  key: Name
+  value: Val
+
+ignoredFields:
+  - NeverReturned
+
+mappings:
+  - type: "provider.TestResource"
+    resourceType: "test.Instance"
+    idField: InstanceId
+    impl: FetchTestResources
+
+

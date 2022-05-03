@@ -1,0 +1,16 @@
+
+# expect a field named "Tags" which contains a slice of struct{Key, Value}
+tagField:
+  name: Tags
+  key: Key
+  value: Value
+
+ignoredFields:
+  # large parts of the GO SDK V2 are generated out of AWS Smithy, not relevant for end user
+  - noSmithyDocumentSerde
+
+mappings:
+  - type: "types.Instance"
+    resourceType: "ec2.Instance"
+    idField: InstanceId
+    impl: FetchEC2Instances
