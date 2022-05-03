@@ -10,7 +10,11 @@ ignoredFields:
   - noSmithyDocumentSerde
 
 mappings:
+  # the Go type that is returned by the cloud provider
   - type: "types.Instance"
+    # the resource type as displayed by cloudgrep
     resourceType: "ec2.Instance"
+    # the name of the id field
     idField: InstanceId
+    # the method to call to fetch the resources, it must be implemented
     impl: FetchEC2Instances

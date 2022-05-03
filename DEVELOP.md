@@ -12,20 +12,6 @@ The project structure is inspired by https://github.com/sosedoff/pgweb
     └── main.go                              # Executable main function
     └── Makefile                             # Defines the tasks to be executed - for local or CI run
 
-## Design
-
-![design diagram](img/cloudgrep-design.png)
-
-- **cli**: this the application entry point, starts all the various components
-- **provider**: the provider is responsible for fetching the resource data from the cloud and write it to the datastore. The implementation specific to a cloud provider is done in their own package.
-- **datastore**: the datastore provides an interface to read/write/update the collected data. The storage is done in a database.
-- **api**: the api is the Gin HTTP server. It defines the routes and implements the api endpoints.
-- **config**: all the application configuration is defined in this package. The user can provide a `config.yaml` file or use the default values.
-- **model**: these are the base objects to contain *resources* and *tags*.
-- **UI**: this is the frontend layer.
-
-All of these boxes are implemented as distinct Go packages, except for UI which is a JS app.
-
 ## Start the server
 
 ```shell
@@ -80,14 +66,14 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
 1. Define a mapping in the corresponding provider `mapping.yaml`
     ```yaml
     mappings:
-      # the Go type that is returned by the cloud provider
-      - type: "github.com/aws/aws-sdk-go-v2/service/ec2/types.Instance"
-        # the resource type as displayed by cloudgrep
-        resourceType: "ec2.Instance"
-        # the name of the id field
-        idField: InstanceId
-        # the method to call to fetch the resources, it must be implemented
-        impl: FetchEC2Instances
+    # the Go type that is returned by the cloud provider
+    - type: "types.Instance"
+     # the resource type as displayed by cloudgrep
+     resourceType: "ec2.Instance"
+     # the name of the id field
+     idField: InstanceId
+     # the method to call to fetch the resources, it must be implemented
+     impl: FetchEC2Instances
     ```
 1. Implement the method define in the mapping
     ```go
