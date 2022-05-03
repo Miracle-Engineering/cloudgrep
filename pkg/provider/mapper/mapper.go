@@ -82,6 +82,9 @@ func New(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 			//use top level config
 			mapping.IgnoredFields = ignoredFields
 		}
+		//always ignore Tags - they have their own model
+		mapping.IgnoredFields = append(mapping.IgnoredFields, mapping.TagField.Name)
+
 		logger.Sugar().Debugf("Loading Mapping %+v", mapping)
 		//find the implementation method
 		method := providerValue.MethodByName(mapping.Impl)
@@ -104,8 +107,6 @@ func New(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 func (m Mapper) ToRessource(x any, region string) (model.Resource, error) {
 
 	t := reflect.TypeOf(x)
-	//TODO remove
-	println("t.String()", t.String())
 	mapping, found := m.Mappings[t.String()]
 	if !found {
 		return model.Resource{}, fmt.Errorf("could not find a mapping definition for type '%T'", t)
@@ -116,8 +117,9 @@ func (m Mapper) ToRessource(x any, region string) (model.Resource, error) {
 		field := t.Field(i)
 		name := field.Name
 		value := reflect.ValueOf(x).FieldByName(name)
-		//always ignore Tags - they have their own model
-		properties = append(properties, getProperties(name, value, append(mapping.IgnoredFields, mapping.TagField.Name), 3)...)
+		if field.IsExported() {
+			properties = append(properties, getProperties(name, value, mapping.IgnoredFields, 3)...)
+		}
 	}
 
 	// generate id field

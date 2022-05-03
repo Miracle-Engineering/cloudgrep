@@ -38,6 +38,7 @@ func TestMapper(t *testing.T) {
 		Architecture:   &architecture,
 		SomeTags:       []TestTag{{Name: "enabled", Val: "true"}, {Name: "eks:nodegroup", Val: "staging-default"}},
 		NeverReturned:  "should not see this",
+		unexported:     "not exported",
 		SecurityGroups: []string{"sg-1", "sg-2"},
 		Limit:          Limit{CPU: MinMax{Min: 1, Max: 3}, Memory: MinMax{Min: 256, Max: 512}},
 	}
@@ -109,6 +110,7 @@ type TestResource struct {
 	Architecture   *string
 	SomeTags       []TestTag
 	NeverReturned  string
+	unexported     string
 	SecurityGroups []string
 	Limit          Limit
 }
