@@ -12,6 +12,8 @@ jobs:
   golangci:
     name: lint
     runs-on: ubuntu-latest
+    env:
+      CGO_ENABLED: 0
     steps:
       - uses: actions/setup-go@v3
         with:
