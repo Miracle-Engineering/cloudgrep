@@ -17,7 +17,6 @@ jobs:
     steps:
       - uses: actions/setup-go@v3
         with:
-          # some lint packages don't support generic
           go-version: 1.18
       - uses: actions/checkout@v3
       - name: golangci-lint
