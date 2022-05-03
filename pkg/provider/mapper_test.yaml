@@ -8,7 +8,7 @@ ignoredFields:
   - NeverReturned
 
 mappings:
-  - type: "provider.TestResource"
+  - type: "github.com/run-x/cloudgrep/pkg/provider.TestResource"
     resourceType: "test.Instance"
     idField: InstanceId
     impl: FetchTestResources
