@@ -66,14 +66,14 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
 1. Define a mapping in the corresponding provider `mapping.yaml`
     ```yaml
     mappings:
-    # the Go type that is returned by the cloud provider
-    - type: "types.Instance"
-     # the resource type as displayed by cloudgrep
-     resourceType: "ec2.Instance"
-     # the name of the id field
-     idField: InstanceId
-     # the method to call to fetch the resources, it must be implemented
-     impl: FetchEC2Instances
+      # the Go type that is returned by the cloud provider
+      - type: "github.com/aws/aws-sdk-go-v2/service/ec2/types.Instance"
+        # the resource type as displayed by cloudgrep
+        resourceType: "ec2.Instance"
+        # the name of the id field
+        idField: InstanceId
+        # the method to call to fetch the resources, it must be implemented
+        impl: FetchEC2Instances
     ```
 1. Implement the method define in the mapping
     ```go

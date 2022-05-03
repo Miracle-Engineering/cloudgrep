@@ -3,6 +3,7 @@ package mapper
 import (
 	"context"
 	"fmt"
+	"path"
 	"reflect"
 	"strings"
 
@@ -107,9 +108,11 @@ func New(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 func (m Mapper) ToRessource(x any, region string) (model.Resource, error) {
 
 	t := reflect.TypeOf(x)
-	mapping, found := m.Mappings[t.String()]
+	// key is package name + Type.name to prevent duplicated keys
+	key := fmt.Sprintf("%v/%v", path.Dir(t.PkgPath()), t.String())
+	mapping, found := m.Mappings[key]
 	if !found {
-		return model.Resource{}, fmt.Errorf("could not find a mapping definition for type '%T'", t)
+		return model.Resource{}, fmt.Errorf("could not find a mapping definition for type '%v'", t.String())
 	}
 
 	var properties []model.Property
