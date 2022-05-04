@@ -46,7 +46,7 @@ func Run() error {
 	//start the providers to collect cloud data
 	err = provider.Run(ctx, cfg, datastore)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to start providers: %w", err)
 	}
 
 	err = api.StartServer(ctx, cfg, datastore)
