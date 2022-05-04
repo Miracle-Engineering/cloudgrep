@@ -17,6 +17,7 @@ cloudgrep
 bin
 tmp/
 TMP.md
+__debug_bin
 
 # visual studio
 .vscode
