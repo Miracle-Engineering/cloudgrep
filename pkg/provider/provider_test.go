@@ -2,7 +2,7 @@ package provider
 
 import (
 	"context"
-	"embed"
+	_ "embed"
 	"reflect"
 	"testing"
 
@@ -98,7 +98,7 @@ func TestMapper(t *testing.T) {
 }
 
 //go:embed mapper_test.yaml
-var embedConfig embed.FS
+var embedConfig []byte
 
 type TestProvider struct {
 	*zap.Logger
@@ -132,12 +132,8 @@ type MinMax struct {
 func NewTestProvider(ctx context.Context, cfg config.Provider, logger *zap.Logger) (Provider, error) {
 	p := TestProvider{}
 	p.Logger = logger
-	data, err := embedConfig.ReadFile("mapper_test.yaml")
-	if err != nil {
-		return nil, err
-	}
 	var config mapper.Config
-	config, err = mapper.LoadConfig(data)
+	config, err := mapper.LoadConfig(embedConfig)
 	if err != nil {
 		return nil, err
 	}

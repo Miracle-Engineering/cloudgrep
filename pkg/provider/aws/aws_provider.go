@@ -2,7 +2,7 @@ package aws
 
 import (
 	"context"
-	"embed"
+	_ "embed"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -22,7 +22,7 @@ type AWSProvider struct {
 }
 
 //go:embed mapping.yaml
-var embedConfig embed.FS
+var embedConfig []byte
 
 func NewAWSProvider(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) (*AWSProvider, error) {
 	provider := AWSProvider{}
@@ -38,11 +38,7 @@ func NewAWSProvider(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) (
 	logger.Sugar().Infow("AWS", "region", provider.Region())
 
 	//load the mapping configuration
-	data, err := embedConfig.ReadFile("mapping.yaml")
-	if err != nil {
-		return nil, err
-	}
-	provider.mapperConfig, err = mapper.LoadConfig(data)
+	provider.mapperConfig, err = mapper.LoadConfig(embedConfig)
 	if err != nil {
 		return nil, err
 	}
