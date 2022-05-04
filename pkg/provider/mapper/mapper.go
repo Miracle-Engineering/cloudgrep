@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/util"
 	"go.uber.org/zap"
-	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v2"
 )
 
@@ -198,7 +198,7 @@ func (m Mapper) FetchResources(ctx context.Context, mapping Mapping, providerVal
 
 func getProperties(name string, v reflect.Value, ignoredFields []string, maxRecursion int) []model.Property {
 
-	if slices.Contains(ignoredFields, name) || maxRecursion <= 0 {
+	if util.Contains(ignoredFields, name) || maxRecursion <= 0 {
 		//ignore this field
 		return []model.Property{}
 	}
