@@ -24,7 +24,7 @@ func Run() error {
 		return err
 	}
 	if opts.Version {
-		print(api.Version)
+		fmt.Println(api.Version)
 		os.Exit(0)
 	}
 
