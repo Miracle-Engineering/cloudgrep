@@ -1,5 +1,6 @@
 package model
 
+//TODO store provider info in resource (needed when we can have more than one provider)
 type Resource struct {
 	Id         string     `json:"id"`
 	Region     string     `json:"region"`
