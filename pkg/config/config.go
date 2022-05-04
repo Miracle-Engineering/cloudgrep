@@ -44,8 +44,8 @@ type Logging struct {
 	Logger *zap.Logger
 }
 
-//Init the configuration - set path to empty to use default value
-func Init(ctx context.Context, options options.Options) (Config, error) {
+//New creates a new configuration
+func New(ctx context.Context, options options.Options) (Config, error) {
 	var data []byte
 	var err error
 
