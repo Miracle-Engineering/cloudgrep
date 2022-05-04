@@ -7,9 +7,15 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
+import { Tag } from 'models/Tag';
 import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAppSelector } from 'store/hooks';
 
 const InsightFilter: FC = () => {
+	const { tags } = useAppSelector(state => state.tags);
+	const { t } = useTranslation();
+
 	return (
 		<Box
 			sx={{
@@ -22,53 +28,14 @@ const InsightFilter: FC = () => {
 			}}>
 			<Accordion>
 				<AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-					<Typography>Source</Typography>
+					<Typography>{t('TAGS')}</Typography>
 				</AccordionSummary>
 				<AccordionDetails>
 					<Typography>
 						<FormGroup>
-							<FormControlLabel control={<Checkbox defaultChecked />} label="Source 1" />
-							<FormControlLabel control={<Checkbox />} label="Source 2" />
-						</FormGroup>
-					</Typography>
-				</AccordionDetails>
-			</Accordion>
-			<Accordion>
-				<AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel2a-content" id="panel2a-header">
-					<Typography>Host</Typography>
-				</AccordionSummary>
-				<AccordionDetails>
-					<Typography>
-						<FormGroup>
-							<FormControlLabel control={<Checkbox defaultChecked />} label="Host 1" />
-							<FormControlLabel control={<Checkbox />} label="Host 2" />
-						</FormGroup>
-					</Typography>
-				</AccordionDetails>
-			</Accordion>
-			<Accordion>
-				<AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel3a-content" id="panel3a-header">
-					<Typography>Service</Typography>
-				</AccordionSummary>
-				<AccordionDetails>
-					<Typography>
-						<FormGroup>
-							<FormControlLabel control={<Checkbox defaultChecked />} label="Service 1" />
-							<FormControlLabel control={<Checkbox />} label="Service 2" />
-						</FormGroup>
-					</Typography>
-				</AccordionDetails>
-			</Accordion>
-			<Accordion>
-				<AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel3a-content" id="panel3a-header">
-					<Typography>Status</Typography>
-				</AccordionSummary>
-				<AccordionDetails>
-					<Typography>
-						<FormGroup>
-							<FormControlLabel control={<Checkbox defaultChecked />} label="Error" />
-							<FormControlLabel control={<Checkbox />} label="Warn" />
-							<FormControlLabel control={<Checkbox />} label="Info" />
+							{tags.map((tag: Tag) => (
+								<FormControlLabel key={tag.Key} control={<Checkbox defaultChecked />} label={tag.Key} />
+							))}
 						</FormGroup>
 					</Typography>
 				</AccordionDetails>

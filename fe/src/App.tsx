@@ -1,4 +1,5 @@
 import './App.css';
+import 'utils/localisation/index';
 
 import ErrorBoundary from 'components/ErrorHandling/ErrorBoundary';
 import Insights from 'pages/Insights';

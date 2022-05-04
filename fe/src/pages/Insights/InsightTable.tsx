@@ -6,12 +6,11 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { Property } from 'models/Resource';
+import { Resource } from 'models/Resource';
 import React, { FC } from 'react';
 import { useAppSelector } from 'store/hooks';
 
 const InsightTable: FC = () => {
-	const { tags } = useAppSelector(state => state.tags);
 	const { resources } = useAppSelector(state => state.resources);
 
 	return (
@@ -31,26 +30,20 @@ const InsightTable: FC = () => {
 							<TableCell>Type </TableCell>
 							<TableCell align="right">Id</TableCell>
 							<TableCell align="right">Region</TableCell>
-							<TableCell align="right">Name</TableCell>
-							<TableCell align="right">Value</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{resources.map(row =>
-							row.Properties?.map((resource: Property, index: number) => (
-								<TableRow
-									key={row.Id + resource.Name + index}
-									sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-									<TableCell component="th" scope="row">
-										{row.Type}
-									</TableCell>
-									<TableCell align="right">{row.Id}</TableCell>
-									<TableCell align="right">{row.Region}</TableCell>
-									<TableCell align="right">{resource.Name}</TableCell>
-									<TableCell align="right">{resource.Value}</TableCell>
-								</TableRow>
-							))
-						)}
+						{resources.map((row: Resource, index: number) => (
+							<TableRow
+								key={row.Id + row.Type + index}
+								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+								<TableCell component="th" scope="row">
+									{row.Type}
+								</TableCell>
+								<TableCell align="right">{row.Id}</TableCell>
+								<TableCell align="right">{row.Region}</TableCell>
+							</TableRow>
+						))}
 					</TableBody>
 				</Table>
 			</TableContainer>
