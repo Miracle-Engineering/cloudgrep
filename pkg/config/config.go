@@ -12,7 +12,7 @@ import (
 )
 
 //go:embed config.yaml
-var embedConfig embed.FS
+var embedConfig []byte
 
 type Config struct {
 	Providers []Provider `yaml:"providers"`
