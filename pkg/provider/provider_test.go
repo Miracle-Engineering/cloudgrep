@@ -18,15 +18,14 @@ func TestMapper(t *testing.T) {
 
 	ctx := context.Background()
 	logger := zaptest.NewLogger(t)
-	provider := &TestProvider{}
 
-	config, err := provider.Init(ctx, config.Provider{}, logger)
+	provider, err := NewTestProvider(ctx, config.Provider{}, logger)
 	if err != nil {
 		t.Error(err)
 	}
 
 	//create a mapper
-	mapper, err := mapper.New(config, *logger, reflect.ValueOf(provider))
+	mapper, err := mapper.New(provider.GetMapperConfig(), *logger, reflect.ValueOf(provider))
 	if err != nil {
 		t.Error(err)
 	}
@@ -102,7 +101,8 @@ func TestMapper(t *testing.T) {
 var embedConfig embed.FS
 
 type TestProvider struct {
-	logger *zap.Logger
+	*zap.Logger
+	mapper.Config
 }
 
 type TestResource struct {
@@ -129,26 +129,31 @@ type MinMax struct {
 	Max int
 }
 
-func (p *TestProvider) Region() string {
-	return "us-east-1"
-}
-
-func (p *TestProvider) Init(ctx context.Context, cfg config.Provider, logger *zap.Logger) (mapper.Config, error) {
-	p.logger = logger
+func NewTestProvider(ctx context.Context, cfg config.Provider, logger *zap.Logger) (Provider, error) {
+	p := TestProvider{}
+	p.Logger = logger
 	data, err := embedConfig.ReadFile("mapper_test.yaml")
 	if err != nil {
-		return mapper.Config{}, err
+		return nil, err
 	}
 	var config mapper.Config
 	config, err = mapper.LoadConfig(data)
 	if err != nil {
-		return mapper.Config{}, err
+		return nil, err
 	}
-	return config, nil
+	p.Config = config
+	return p, nil
+}
+func (p TestProvider) GetMapperConfig() mapper.Config {
+	return p.Config
+}
+
+func (p TestProvider) Region() string {
+	return "us-east-1"
 }
 
 type Return string
 
-func (*TestProvider) FetchTestResources(ctx context.Context) ([]TestResource, error) {
+func (TestProvider) FetchTestResources(ctx context.Context) ([]TestResource, error) {
 	return ctx.Value(Return("FetchTestResources")).([]TestResource), nil
 }

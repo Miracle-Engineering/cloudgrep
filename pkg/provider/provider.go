@@ -17,8 +17,7 @@ import (
 //The provider must provide a mapping configuration which references the methods to fetch the resources.
 //These methods need to be implemented and they will be called by a Mapper using reflection.
 type Provider interface {
-	//Init intializes the provider and return the mapping configuration
-	Init(context.Context, config.Provider, *zap.Logger) (mapper.Config, error)
+	GetMapperConfig() mapper.Config
 	Region() string
 }
 
@@ -28,16 +27,12 @@ func Run(ctx context.Context, cfg config.Config, datastore datastore.Datastore) 
 	//TODO use go routine to start the provider, review error handling to continue on error
 	for _, config := range cfg.Providers {
 		// create a provider
-		provider, err := NewProvider(ctx, config)
+		provider, err := NewProvider(ctx, config, cfg.Logging.Logger)
 		if err != nil {
 			return err
 		}
-		mapperConfig, err := provider.Init(ctx, config, cfg.Logging.Logger)
-		if err != nil {
-			return err
-		}
-
 		//create a mapper
+		mapperConfig := provider.GetMapperConfig()
 		mapper, err := mapper.New(mapperConfig, *cfg.Logging.Logger, reflect.ValueOf(provider))
 		if err != nil {
 			return err
@@ -73,14 +68,9 @@ func FetchResources(ctx context.Context, provider Provider, mapper mapper.Mapper
 	return resources, nil
 }
 
-func NewProvider(ctx context.Context, config config.Provider) (Provider, error) {
-
-	var provider Provider
+func NewProvider(ctx context.Context, config config.Provider, logger *zap.Logger) (Provider, error) {
 	if config.Cloud == "aws" {
-		provider = &aws.AWSProvider{}
+		return aws.NewAWSProvider(ctx, config, logger)
 	}
-	if provider == nil {
-		return nil, fmt.Errorf("unknown provider cloud '%v'", config.Cloud)
-	}
-	return provider, nil
+	return nil, fmt.Errorf("unknown provider cloud '%v'", config.Cloud)
 }

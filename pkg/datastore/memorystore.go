@@ -15,12 +15,13 @@ type MemoryStore struct {
 	resources []*model.Resource
 }
 
-func (m *MemoryStore) init(ctx context.Context, cfg config.Config) error {
+func NewMemoryStore(ctx context.Context, cfg config.Config) *MemoryStore {
 	if !cfg.Logging.IsDev() {
 		cfg.Logging.Logger.Warn("MemoryStore should not be used for production")
 	}
-	m.logger = cfg.Logging.Logger
-	return nil
+	datastore := MemoryStore{}
+	datastore.logger = cfg.Logging.Logger
+	return &datastore
 }
 
 func (m *MemoryStore) GetResources(ctx context.Context, filter model.Filter) ([]*model.Resource, error) {
