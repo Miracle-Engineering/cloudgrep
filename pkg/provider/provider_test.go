@@ -78,7 +78,7 @@ func TestMapper(t *testing.T) {
 	}
 
 	// test conversion
-	_r1, err := mapper.ToRessource(tr1, "us-east-1")
+	_r1, err := mapper.ToResource(tr1, "us-east-1")
 	if err != nil {
 		t.Error(err)
 	}

@@ -105,10 +105,10 @@ func New(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 	return mapper, nil
 }
 
-//ToRessource generate a Resource by using reflection
+//ToResource generate a Resource by using reflection
 // all fields will become properties
 // if there is a Tags field, this will become Tags
-func (m Mapper) ToRessource(x any, region string) (model.Resource, error) {
+func (m Mapper) ToResource(x any, region string) (model.Resource, error) {
 
 	t := reflect.TypeOf(x)
 	// key is package name + Type.name to prevent duplicated keys
@@ -173,7 +173,7 @@ func (m Mapper) FetchResources(ctx context.Context, mapping Mapping, providerVal
 			//convert all slice elements to resources
 			for i := 0; i < v.Len(); i++ {
 				any := v.Index(i).Interface()
-				resource, err := m.ToRessource(any, region)
+				resource, err := m.ToResource(any, region)
 				if err != nil {
 					return nil, fmt.Errorf("error converting %v result slice to resource: %w", mapping.Impl, err)
 				}
