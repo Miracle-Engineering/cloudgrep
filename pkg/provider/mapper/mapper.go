@@ -180,10 +180,10 @@ func (m Mapper) FetchResources(ctx context.Context, mapping Mapping, providerVal
 			// an error was returned
 			err, ok := v.Interface().(error)
 			if ok {
-				return []*model.Resource{}, err
+				return nil, err
 			}
 		default:
-			return []*model.Resource{}, fmt.Errorf(errorMessage)
+			return nil, fmt.Errorf(errorMessage)
 		}
 	}
 
@@ -200,7 +200,7 @@ func getProperties(name string, v reflect.Value, ignoredFields []string, maxRecu
 
 	if util.Contains(ignoredFields, name) || maxRecursion <= 0 {
 		//ignore this field
-		return []model.Property{}
+		return nil
 	}
 
 	emptyProp := []model.Property{{Name: name, Value: ""}}
@@ -208,7 +208,7 @@ func getProperties(name string, v reflect.Value, ignoredFields []string, maxRecu
 	switch v.Kind() {
 	case reflect.Invalid:
 		//ignore this field
-		return []model.Property{}
+		return nil
 	case reflect.Interface, reflect.Ptr:
 		if v.IsZero() {
 			//empty pointer
@@ -254,22 +254,20 @@ func getProperties(name string, v reflect.Value, ignoredFields []string, maxRecu
 }
 
 func getTags(v reflect.Value, tagField TagField) []model.Tag {
-	noTags := []model.Tag{}
-
 	switch v.Kind() {
 	case reflect.Invalid:
-		return noTags
+		return nil
 	case reflect.Interface, reflect.Ptr:
 		if v.IsZero() {
 			//empty pointer
-			return noTags
+			return nil
 		}
 		//display pointer value
 		return getTags(v.Elem(), tagField)
 	case reflect.Slice:
 		if v.IsZero() {
 			//empty slice
-			return noTags
+			return nil
 		}
 		//return a distinct Tag for each slice element
 		//ex: Tags=[a,b] -> Tag=a Tag=b
@@ -288,7 +286,7 @@ func getTags(v reflect.Value, tagField TagField) []model.Tag {
 		// we have a tag
 		return []model.Tag{{Key: keyStr, Value: valStr}}
 	default:
-		return noTags
+		return nil
 	}
 
 }

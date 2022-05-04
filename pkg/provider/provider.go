@@ -65,7 +65,7 @@ func FetchResources(ctx context.Context, provider Provider, mapper mapper.Mapper
 	for _, mapping := range mapper.Mappings {
 		newResources, err := mapper.FetchResources(ctx, mapping, reflect.ValueOf(provider), provider.Region())
 		if err != nil {
-			return []*model.Resource{}, err
+			return nil, err
 		}
 		resources = append(resources, newResources...)
 	}
