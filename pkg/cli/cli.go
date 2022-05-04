@@ -40,7 +40,7 @@ func Run() error {
 	//init the storage to contain cloud data
 	datastore, err := datastore.NewDatastore(ctx, cfg)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to setup datastore: %w", err)
 	}
 
 	//start the providers to collect cloud data
