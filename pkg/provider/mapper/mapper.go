@@ -172,7 +172,7 @@ func (m Mapper) FetchResources(ctx context.Context, mapping Mapping, providerVal
 				any := v.Index(i).Interface()
 				resource, err := m.ToRessource(any, region)
 				if err != nil {
-					return []*model.Resource{}, err
+					return nil, fmt.Errorf("error converting %v result slice to resource: %w", mapping.Impl, err)
 				}
 				resources = append(resources, &resource)
 			}
