@@ -38,7 +38,6 @@ func StartServer(ctx context.Context, cfg config.Config, datastore datastore.Dat
 			os.Exit(1)
 		}
 	}()
-	return nil
 }
 
 // GetHome renderes the home page
