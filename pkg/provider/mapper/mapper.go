@@ -130,6 +130,7 @@ func (m Mapper) ToRessource(x any, region string) (model.Resource, error) {
 	for _, p := range properties {
 		if p.Name == mapping.IdField {
 			id = p.Value
+			break
 		}
 	}
 	if id == "" {
