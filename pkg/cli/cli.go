@@ -28,7 +28,7 @@ func Run() error {
 		os.Exit(0)
 	}
 
-	cfg, err := config.Init(ctx, opts)
+	cfg, err := config.New(ctx, opts)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
