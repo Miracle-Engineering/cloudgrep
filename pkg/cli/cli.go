@@ -51,7 +51,7 @@ func Run() error {
 
 	err = api.StartServer(ctx, cfg, datastore)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to start API server: %w", err)
 	}
 
 	//TODO replace this URL with homepage when ready
