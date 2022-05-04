@@ -51,7 +51,7 @@ func Init(ctx context.Context, options options.Options) (Config, error) {
 
 	if options.Config == "" {
 		//Read the default configuration
-		data, err = embedConfig.ReadFile("config.yaml")
+		data = embedConfig
 	} else {
 		data, err = ioutil.ReadFile(options.Config)
 	}
