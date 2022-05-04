@@ -33,7 +33,7 @@ func (p *AWSProvider) Init(ctx context.Context, cfg cfg.Provider, logger *zap.Lo
 	logger.Info("Connecting to AWS account")
 	p.config, err = config.LoadDefaultConfig(ctx)
 	if err != nil {
-		return mapper.Config{}, err
+		return mapper.Config{}, fmt.Errorf("cannot load default config: %w", err)
 	}
 	p.ec2Client = ec2.NewFromConfig(p.config)
 	logger.Sugar().Infow("AWS", "region", p.Region())
