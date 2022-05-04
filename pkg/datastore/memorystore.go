@@ -34,9 +34,9 @@ func (m *MemoryStore) GetResources(ctx context.Context, filter model.Filter) ([]
 }
 
 func (m *MemoryStore) WriteResources(ctx context.Context, resources []*model.Resource) error {
-	m.resources = resources
 	m.logger.Sugar().Infow("Writting resources: ",
 		zap.Int("count", len(resources)),
 	)
+	m.resources = resources
 	return nil
 }

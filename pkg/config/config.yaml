@@ -6,9 +6,10 @@ web:
   # Add a url prefix
   # prefix: 
 
-
 datastore:
-  type: memory
+  type: sqlite
+  # TODO once we support updating existing resources switch to disk
+  dataSourceName: file::memory:?cache=shared
 
 providers:
   - cloud: aws

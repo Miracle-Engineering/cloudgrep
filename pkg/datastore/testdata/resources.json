@@ -1,0 +1,87 @@
+[
+    {
+        "id": "i-123",
+        "region": "us-east-1",
+        "type": "test.Instance",
+        "tags": [
+            {
+                "key": "enabled",
+                "value": "true"
+            },
+            {
+                "key": "eks:nodegroup",
+                "value": "staging-default"
+            }
+        ],
+        "properties": [
+            {
+                "name": "InstanceId",
+                "value": "i-123"
+            },
+            {
+                "name": "Architecture",
+                "value": "x86_64"
+            },
+            {
+                "name": "SecurityGroups[0]",
+                "value": "sg-1"
+            },
+            {
+                "name": "SecurityGroups[1]",
+                "value": "sg-2"
+            },
+            {
+                "name": "Limit[CPU][Min]",
+                "value": "1"
+            },
+            {
+                "name": "Limit[CPU][Max]",
+                "value": "3"
+            },
+            {
+                "name": "Limit[Memory][Min]",
+                "value": "256"
+            },
+            {
+                "name": "Limit[Memory][Max]",
+                "value": "512"
+            }
+        ]
+    },
+    {
+        "id": "i-124",
+        "region": "us-east-1",
+        "type": "test.Instance",
+        "tags": null,
+        "properties": [
+            {
+                "name": "InstanceId",
+                "value": "i-124"
+            },
+            {
+                "name": "Architecture",
+                "value": ""
+            },
+            {
+                "name": "SecurityGroups",
+                "value": ""
+            },
+            {
+                "name": "Limit[CPU][Min]",
+                "value": "0"
+            },
+            {
+                "name": "Limit[CPU][Max]",
+                "value": "0"
+            },
+            {
+                "name": "Limit[Memory][Min]",
+                "value": "0"
+            },
+            {
+                "name": "Limit[Memory][Max]",
+                "value": "0"
+            }
+        ]
+    }
+]

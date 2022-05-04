@@ -26,7 +26,8 @@ type Provider struct {
 }
 
 type Datastore struct {
-	Type string `yaml:"type"`
+	Type           string `yaml:"type"`
+	DataSourceName string `yaml:"dataSourceName"`
 }
 
 type Web struct {
@@ -60,6 +61,9 @@ func New(ctx context.Context, options options.Options) (Config, error) {
 		return Config{}, err
 	}
 	var config Config
+	if err != nil {
+		return Config{}, err
+	}
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		return Config{}, err
