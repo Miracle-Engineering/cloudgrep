@@ -89,7 +89,6 @@ func Init(ctx context.Context, options options.Options) (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
-	defer logger.Sync() // nolint: errcheck
 	config.Logging.Logger = logger
 
 	return config, nil
