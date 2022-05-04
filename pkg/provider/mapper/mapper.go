@@ -13,6 +13,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// limit the depth when using reflection to generate the property list
+const maxRecursion = 5
+
 //Mapper defines rules on how to map a Go Type to a model.Resource
 type Mapper struct {
 	logger *zap.Logger
@@ -121,7 +124,7 @@ func (m Mapper) ToRessource(x any, region string) (model.Resource, error) {
 		name := field.Name
 		value := reflect.ValueOf(x).FieldByName(name)
 		if field.IsExported() {
-			properties = append(properties, getProperties(name, value, mapping.IgnoredFields, 3)...)
+			properties = append(properties, getProperties(name, value, mapping.IgnoredFields, maxRecursion)...)
 		}
 	}
 
