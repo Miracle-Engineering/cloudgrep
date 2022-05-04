@@ -2,7 +2,7 @@ package config
 
 import (
 	"context"
-	"embed"
+	_ "embed"
 	"fmt"
 	"io/ioutil"
 
