@@ -21,7 +21,7 @@ func Run() error {
 
 	opts, err := options.ParseOptions(os.Args)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse cli options: %w", err)
 	}
 	if opts.Version {
 		fmt.Println(api.Version)
