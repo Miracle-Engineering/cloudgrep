@@ -30,7 +30,7 @@ func Run() error {
 
 	cfg, err := config.Init(ctx, opts)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to load config: %w", err)
 	}
 
 	if cfg.Logging.IsDev() {
