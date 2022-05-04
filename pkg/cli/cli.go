@@ -49,10 +49,7 @@ func Run() error {
 		return fmt.Errorf("failed to start providers: %w", err)
 	}
 
-	err = api.StartServer(ctx, cfg, datastore)
-	if err != nil {
-		return fmt.Errorf("failed to start API server: %w", err)
-	}
+	api.StartServer(ctx, cfg, datastore)
 
 	//TODO replace this URL with homepage when ready
 	url := fmt.Sprintf("http://%v:%v/%v%v", cfg.Web.Host, cfg.Web.Port, cfg.Web.Prefix, "api/resources")

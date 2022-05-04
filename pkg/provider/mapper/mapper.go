@@ -139,7 +139,7 @@ func (m Mapper) ToRessource(x any, region string) (model.Resource, error) {
 
 	// generate tags field
 	tagsValue := reflect.ValueOf(x).FieldByName(mapping.TagField.Name)
-	tags := append(tags, getTags(tagsValue, mapping.TagField)...)
+	tags := getTags(tagsValue, mapping.TagField)
 
 	return model.Resource{
 		Id:         id,
