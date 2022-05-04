@@ -4,7 +4,7 @@
 
 ## Query on flatten properties name/value
 Flatten the property values might create some limitations when filtering on resources. Here are a few examples below.
-```json
+```js
 //a user might want to search on SecurityGroups or SecurityGroups.GroupId
 "name": "SecurityGroups[0][GroupId]",
 "value": "sg-0c87bc57b6e994081"
@@ -13,13 +13,13 @@ Flatten the property values might create some limitations when filtering on reso
 "value": "sg-0c87bc57b6e994081"
 ```
 
-```json
+```js
 //a user might want to search on IamInstanceProfile[Id] or IamInstanceProfile.Id but not Id
 "name": "IamInstanceProfile[Id]",
 "value": "AIPATTS7AQXJUXEPIKDD7"
 ```
 
-```json
+```js
 //a user might want to search on Placement[AvailabilityZone] or AvailabilityZone
 "name": "Placement[AvailabilityZone]",
 "value": "us-east-1b"
