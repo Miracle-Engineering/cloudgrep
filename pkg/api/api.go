@@ -18,7 +18,7 @@ var (
 	Datastore datastore.Datastore
 )
 
-func StartServer(ctx context.Context, cfg config.Config, datastore datastore.Datastore) error {
+func StartServer(ctx context.Context, cfg config.Config, datastore datastore.Datastore) {
 	router := gin.Default()
 
 	if cfg.Logging.IsDev() {
