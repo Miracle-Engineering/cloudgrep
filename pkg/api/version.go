@@ -1,4 +1,4 @@
-package command
+package api
 
 var (
 	// Version is the current application version

@@ -8,26 +8,28 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/run-x/cloudgrep/pkg/command"
+	"github.com/run-x/cloudgrep/pkg/config"
+	"github.com/run-x/cloudgrep/pkg/datastore"
 )
 
-func SetupMiddlewares(group *gin.RouterGroup) {
-	if command.Opts.Debug {
-		group.Use(requestInspectMiddleware())
+func SetupMiddlewares(group *gin.RouterGroup, cfg config.Config, ds datastore.Datastore) {
+	if cfg.Logging.IsDev() {
+		group.Use(logAllQueryParams(cfg), logAllRequests(cfg))
 	}
-
+	group.Use(setDatastore(ds))
 }
 
-func SetupRoutes(router *gin.Engine) {
-	root := router.Group(command.Opts.Prefix)
+func SetupRoutes(router *gin.Engine, cfg config.Config, ds datastore.Datastore) {
+	root := router.Group(cfg.Web.Prefix)
 
-	root.GET("/", gin.WrapH(GetHome(command.Opts.Prefix)))
-	root.GET("/static/*path", gin.WrapH(GetAssets(command.Opts.Prefix)))
+	root.GET("/", gin.WrapH(GetHome(cfg.Web.Prefix)))
+	root.GET("/static/*path", gin.WrapH(GetAssets(cfg.Web.Prefix)))
 
 	api := root.Group("/api")
-	SetupMiddlewares(api)
+	SetupMiddlewares(api, cfg, ds)
 
 	api.GET("/info", GetInfo)
+	api.GET("/resources", GetResources)
 
 	// mock api serving static files (temporary)
 	mock_files, err := ioutil.ReadDir("./static/mock")

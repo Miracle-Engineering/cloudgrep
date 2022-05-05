@@ -1,59 +1,68 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"os/signal"
-	"strings"
 	"syscall"
 
-	"github.com/gin-gonic/gin"
-	"github.com/jessevdk/go-flags"
 	"github.com/run-x/cloudgrep/pkg/api"
-	"github.com/run-x/cloudgrep/pkg/command"
+	"github.com/run-x/cloudgrep/pkg/config"
+	"github.com/run-x/cloudgrep/pkg/datastore"
+	"github.com/run-x/cloudgrep/pkg/options"
+	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/run-x/cloudgrep/pkg/util"
 )
 
-var (
-	options command.Options
-)
+func Run() error {
+	ctx := context.Background()
 
-func initClient() {
-	//TODO init AWS client
-}
-
-func initOptions() {
-	opts, err := command.ParseOptions(os.Args)
+	opts, err := options.ParseOptions(os.Args)
 	if err != nil {
-		switch err.(type) {
-		case *flags.Error:
-			// no need to print error, flags package already does that
-		default:
-			fmt.Println(err.Error())
-		}
-		os.Exit(1)
+		return fmt.Errorf("failed to parse cli options: %w", err)
 	}
-	command.Opts = opts
-	options = opts
-}
+	if opts.Version {
+		fmt.Println(api.Version)
+		os.Exit(0)
+	}
 
-func startServer() {
-	router := gin.Default()
+	cfg, err := config.New(ctx, opts)
+	if err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
+	}
 
-	api.SetupRoutes(router)
+	if cfg.Logging.IsDev() {
+		util.StartProfiler()
+	}
 
-	fmt.Println("Starting server...")
-	go func() {
-		err := router.Run(fmt.Sprintf("%v:%v", options.HTTPHost, options.HTTPPort))
-		if err != nil {
-			fmt.Println("Cant start server:", err)
-			if strings.Contains(err.Error(), "address already in use") {
-				openPage()
-			}
-			os.Exit(1)
-		}
-	}()
+	//init the storage to contain cloud data
+	datastore, err := datastore.NewDatastore(ctx, cfg)
+	if err != nil {
+		return fmt.Errorf("failed to setup datastore: %w", err)
+	}
+
+	//start the providers to collect cloud data
+	engine, err := provider.NewEngine(ctx, cfg, datastore)
+	if err != nil {
+		return fmt.Errorf("failed to start engine: %w", err)
+	}
+	if err = engine.Run(ctx); err != nil {
+		return err
+	}
+
+	api.StartWebServer(ctx, cfg, datastore)
+
+	//TODO replace this URL with homepage when ready
+	url := fmt.Sprintf("http://%v:%v/%v%v", cfg.Web.Host, cfg.Web.Port, cfg.Web.Prefix, "api/resources")
+	fmt.Println("To view Cloudgrep UI, open ", url, "in browser")
+
+	if !opts.SkipOpen {
+		openPage(url)
+	}
+	handleSignals()
+	return nil
 }
 
 func handleSignals() {
@@ -62,14 +71,7 @@ func handleSignals() {
 	<-c
 }
 
-func openPage() {
-	url := fmt.Sprintf("http://%v:%v", options.HTTPHost, options.HTTPPort)
-	fmt.Println("To view Cloudgrep UI", url, "in browser")
-
-	if options.SkipOpen {
-		return
-	}
-
+func openPage(url string) {
 	_, err := exec.Command("which", "open").Output()
 	if err != nil {
 		return
@@ -80,29 +82,4 @@ func openPage() {
 		return
 	}
 
-}
-
-func Run() {
-	initOptions()
-
-	if options.Version {
-		print(command.Version)
-		os.Exit(0)
-	}
-
-	initClient()
-
-	if options.Debug {
-		gin.SetMode("debug")
-	} else {
-		gin.SetMode("release")
-	}
-	// Print memory usage every 30 seconds with debug flag
-	if options.Debug {
-		util.StartProfiler()
-	}
-
-	startServer()
-	openPage()
-	handleSignals()
 }

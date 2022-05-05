@@ -1,0 +1,20 @@
+# this is the default configuration
+
+web:
+  host: localhost
+  port: 8080
+  # Add a url prefix
+  # prefix: 
+
+datastore:
+  type: sqlite
+  # TODO once we support updating existing resources switch to disk
+  dataSourceName: file::memory:?cache=shared
+
+providers:
+  - cloud: aws
+
+logging:
+  # prod: https://pkg.go.dev/go.uber.org/zap#NewProduction
+  # dev: https://pkg.go.dev/go.uber.org/zap#NewDevelopment
+  mode: dev

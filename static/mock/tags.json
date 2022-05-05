@@ -5,8 +5,8 @@
       "Value": "opta-staging",
       "Count": 2,
       "ResourceIds": [
-        "i-046b8584f97edce25",
-        "i-0ce5fd258122ee34b"
+        "i-024c4971f7f510c8f",
+        "i-046b8584f97edce25"
       ]
     },
     {
@@ -15,25 +15,25 @@
       "Count": 3,
       "ResourceIds": [
         "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6",
-        "i-046b8584f97edce25",
-        "i-0ce5fd258122ee34b"
+        "i-024c4971f7f510c8f",
+        "i-046b8584f97edce25"
       ]
     }
   ],
   "Resources": [
     {
-      "Type": "ElasticLoadBalancingV2-LoadBalancer",
+      "Type": "elasticLoadBalancingV2.LoadBalancer",
       "Id": "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6",
       "Region": "us-east-1"
     },
     {
-      "Type": "EC2-Instance",
-      "Id": "i-046b8584f97edce25",
+      "Type": "ec2.Instance",
+      "Id": "i-024c4971f7f510c8f",
       "Region": "us-east-1"
     },
     {
-      "Type": "EC2-Instance",
-      "Id": "i-0ce5fd258122ee34b",
+      "Type": "ec2.Instance",
+      "Id": "i-046b8584f97edce25",
       "Region": "us-east-1"
     }
   ]
