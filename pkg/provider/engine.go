@@ -40,7 +40,7 @@ func (e *Engine) Run(ctx context.Context) error {
 			return err
 		}
 		// save to store
-		err = e.Datastore.WriteResources(ctx, resources)
+		err = e.WriteResources(ctx, resources)
 		if err != nil {
 			return err
 		}
