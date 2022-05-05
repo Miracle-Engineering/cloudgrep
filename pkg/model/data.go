@@ -10,13 +10,13 @@ type Resource struct {
 }
 
 type Tag struct {
-	ResourceId string `gorm:"primaryKey"`
+	ResourceId string `json:"-" gorm:"primaryKey"`
 	Key        string `json:"key" gorm:"primaryKey"`
 	Value      string `json:"value"`
 }
 
 type Property struct {
-	ResourceId string `gorm:"primaryKey"`
+	ResourceId string `json:"-" gorm:"primaryKey"`
 	Name       string `json:"name" gorm:"primaryKey"`
 	Value      string `json:"value"`
 }
