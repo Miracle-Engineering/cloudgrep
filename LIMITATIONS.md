@@ -33,7 +33,7 @@ Flatten the property values might create some limitations when filtering on reso
 
 Options:
 - We could store key alias names so these fields could be searched with alternate names.
-- We could store this information as JSON and use [PostgreSQL JSON Functions](https://www.postgresql.org/docs/12/functions-json.html)
+- We could store expose and store the properties as a JSON object and use [PostgreSQL JSON Functions](https://www.postgresql.org/docs/12/functions-json.html)
 
 
 ## No pagination when fetching resources
