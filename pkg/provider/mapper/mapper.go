@@ -35,6 +35,8 @@ type Mapping struct {
 	IgnoredFields []string `yaml:"ignoredFields"`
 	//method implementating fetching the resources, the provider must implement it
 	Impl string `yaml:"impl"`
+	//the method is found at runtime using Impl
+	Method reflect.Value
 }
 
 type Config struct {
@@ -88,12 +90,11 @@ func New(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 		}
 		//always ignore Tags - they have their own model
 		mapping.IgnoredFields = append(mapping.IgnoredFields, mapping.TagField.Name)
-
-		logger.Sugar().Debugf("Loading Mapping %+v", mapping)
 		//find the implementation method
-		method := providerValue.MethodByName(mapping.Impl)
-		if reflect.ValueOf(method).IsZero() {
-			return Mapper{}, fmt.Errorf("could not find a method called '%v' on '%T'", mapping.Impl, providerValue.Interface())
+		var err error
+		mapping.Method, err = findImplMethod(providerValue, mapping.Impl)
+		if err != nil {
+			return Mapper{}, err
 		}
 
 		mapper.Mappings[mapping.Type] = mapping
@@ -103,6 +104,19 @@ func New(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 		return Mapper{}, fmt.Errorf("no mapping loaded for '%T'", providerValue.Interface())
 	}
 	return mapper, nil
+}
+
+func findImplMethod(v reflect.Value, impl string) (reflect.Value, error) {
+	//find the implementation method
+	method := v.MethodByName(impl)
+	if reflect.ValueOf(method).IsZero() {
+		return reflect.Value{}, fmt.Errorf("could not find a method called '%v' on '%T'", impl, v.Interface())
+	}
+	//check return type is (slice, error)
+	if t := method.Type(); t.NumOut() != 2 || t.Out(0).Kind().String() != "slice" || t.Out(1).Name() != "error" {
+		return reflect.Value{}, fmt.Errorf("method %v has invalid return type, expecting ([]any, error)", impl)
+	}
+	return method, nil
 }
 
 //ToResource generate a Resource by using reflection
@@ -163,10 +177,8 @@ func (m Mapper) FetchResources(ctx context.Context, mapping Mapping, providerVal
 	)
 	var resources []*model.Resource
 	// call the method to fetch the resources
-	method := providerValue.MethodByName(mapping.Impl)
-	result := method.Call([]reflect.Value{reflect.ValueOf(ctx)})
+	result := mapping.Method.Call([]reflect.Value{reflect.ValueOf(ctx)})
 	//generate a error message to avoid duplication in code below
-	errorMessage := fmt.Sprintf("Method '%T%v' has the wrong return type", providerValue.Interface(), mapping.Impl)
 	for _, v := range result {
 		switch v.Kind() {
 		case reflect.Slice:
@@ -186,7 +198,7 @@ func (m Mapper) FetchResources(ctx context.Context, mapping Mapping, providerVal
 				return nil, err
 			}
 		default:
-			return nil, fmt.Errorf(errorMessage)
+			return nil, fmt.Errorf("method '%T%v' has the wrong return type", providerValue.Interface(), mapping.Impl)
 		}
 	}
 

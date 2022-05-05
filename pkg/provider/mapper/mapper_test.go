@@ -29,8 +29,8 @@ func TestNewMapperOk(t *testing.T) {
 			},
 		},
 	}
-	provider := TestProvider{}
-	mapper, err := new(cfg, *logger, reflect.ValueOf(provider))
+	provider := NewTestProvider(cfg)
+	mapper, err := New(cfg, *logger, reflect.ValueOf(provider))
 	assert.NoError(t, err)
 
 	instances, err := provider.FetchTestInstances(ctx)
@@ -69,12 +69,9 @@ func TestNewMapperError(t *testing.T) {
 			},
 		},
 	}
-	assert.PanicsWithError(t,
-		"could not find a method called 'Unknown' on 'mapper.TestProvider'",
-		func() {
-			new(cfg, *logger, reflect.ValueOf(TestProvider{})) //nolint
-		},
-	)
+	provider := NewTestProvider(cfg)
+	_, err := New(cfg, *logger, reflect.ValueOf(provider))
+	assert.ErrorContains(t, err, "could not find a method called 'Unknown' on 'mapper.TestProvider'")
 
 	cfg = Config{
 		Mappings: []Mapping{
@@ -91,16 +88,13 @@ func TestNewMapperError(t *testing.T) {
 			},
 		},
 	}
-	assert.PanicsWithError(t,
-		"method WrongReturnType has invalid return type, expecting ([]any, error)",
-		func() {
-			new(cfg, *logger, reflect.ValueOf(TestProvider{})) //nolint
-		},
-	)
+	provider = NewTestProvider(cfg)
+	_, err = New(cfg, *logger, reflect.ValueOf(provider))
+	assert.ErrorContains(t, err, "method WrongReturnType has invalid return type, expecting ([]any, error)")
 }
 
 type TestProvider struct {
-	// Config
+	Config
 }
 
 type TestInstance struct {
@@ -111,6 +105,21 @@ type TestInstance struct {
 type TestTag struct {
 	Name string
 	Val  string
+}
+
+func NewTestProvider(c Config) TestProvider {
+	p := TestProvider{
+		Config: c,
+	}
+	return p
+}
+
+func (p TestProvider) GetMapperConfig() Config {
+	return p.Config
+}
+
+func (p TestProvider) Region() string {
+	return "us-east-1"
 }
 
 type Return string
