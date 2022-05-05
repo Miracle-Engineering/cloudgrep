@@ -1,4 +1,5 @@
 TARGETS = darwin/amd64 darwin/arm64 linux/amd64 linux/386 windows/amd64 windows/386
+VERSION ?= dev
 GITHUB_SHA ?= $(shell git rev-parse HEAD)
 BUILD_TIME = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n')
 GO_VERSION = $(shell go version | awk {'print $$3'})
@@ -37,14 +38,19 @@ run:
 version:
 	@go run main.go --version
 
+
+build: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GITHUB_SHA)
+build: LDFLAGS += -X $(PKG)/pkg/api.BuildTime=$(BUILD_TIME)
+build: LDFLAGS += -X $(PKG)/pkg/api.GoVersion=$(GO_VERSION)
+build: LDFLAGS += -X $(PKG)/pkg/api.Version=$(VERSION)
 build:
-	go build
+	go build -ldflags "$(LDFLAGS)"
 	@echo "You can now execute ./cloudgrep"
 
-release: LDFLAGS += -X $(PKG)/pkg/command.GitCommit=$(GITHUB_SHA)
-release: LDFLAGS += -X $(PKG)/pkg/command.BuildTime=$(BUILD_TIME)
-release: LDFLAGS += -X $(PKG)/pkg/command.GoVersion=$(GO_VERSION)
-release: LDFLAGS += -X $(PKG)/pkg/command.Version=$(VERSION)
+release: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GITHUB_SHA)
+release: LDFLAGS += -X $(PKG)/pkg/api.BuildTime=$(BUILD_TIME)
+release: LDFLAGS += -X $(PKG)/pkg/api.GoVersion=$(GO_VERSION)
+release: LDFLAGS += -X $(PKG)/pkg/api.Version=$(VERSION)
 release:
 	@echo "Building binaries..."
 	@gox \
@@ -62,10 +68,10 @@ release:
 	@./script/package.sh
 
 
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/command.GitCommit=$(GIT_COMMIT)
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/command.BuildTime=$(BUILD_TIME)
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/command.GoVersion=$(GO_VERSION)
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/command.Version=$(VERSION)
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GIT_COMMIT)
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.BuildTime=$(BUILD_TIME)
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.GoVersion=$(GO_VERSION)
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.Version=$(VERSION)
 release-linux-amd64:
 	@echo "Building Linux binaries..."
 	GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_amd64"

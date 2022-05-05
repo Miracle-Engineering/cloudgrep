@@ -1,0 +1,19 @@
+# this is the default configuration
+
+web:
+  host: localhost
+  port: 8080
+  # Add a url prefix
+  # prefix: 
+
+
+datastore:
+  type: memory
+
+providers:
+  - cloud: aws
+
+logging:
+  # prod: https://pkg.go.dev/go.uber.org/zap#NewProduction
+  # dev: https://pkg.go.dev/go.uber.org/zap#NewDevelopment
+  mode: dev
