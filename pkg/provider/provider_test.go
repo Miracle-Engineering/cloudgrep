@@ -24,12 +24,6 @@ func TestMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	//create a mapper
-	mapper, err := mapper.New(provider.GetMapperConfig(), *logger, reflect.ValueOf(provider))
-	if err != nil {
-		t.Error(err)
-	}
-
 	//define some test data
 	architecture := "x86_64"
 	tr1 := TestResource{
@@ -78,14 +72,14 @@ func TestMapper(t *testing.T) {
 	}
 
 	// test conversion
-	_r1, err := mapper.ToResource(tr1, "us-east-1")
+	_r1, err := provider.GetMapper().ToResource(tr1, "us-east-1")
 	if err != nil {
 		t.Error(err)
 	}
 	assert.Equal(t, r1, _r1)
 
 	// fetch the resources
-	resources, err := FetchResources(context.WithValue(ctx, Return("FetchTestResources"), []TestResource{tr1, tr2}), provider, mapper)
+	resources, err := fetchResources(context.WithValue(ctx, Return("FetchTestResources"), []TestResource{tr1, tr2}), provider)
 	if err != nil {
 		t.Error(err)
 	}
@@ -102,7 +96,7 @@ var embedConfig []byte
 
 type TestProvider struct {
 	*zap.Logger
-	mapper.Config
+	mapper.Mapper
 }
 
 type TestResource struct {
@@ -132,16 +126,15 @@ type MinMax struct {
 func NewTestProvider(ctx context.Context, cfg config.Provider, logger *zap.Logger) (Provider, error) {
 	p := TestProvider{}
 	p.Logger = logger
-	var config mapper.Config
-	config, err := mapper.LoadConfig(embedConfig)
+	var err error
+	p.Mapper, err = mapper.New(embedConfig, *logger, reflect.ValueOf(p))
 	if err != nil {
 		return nil, err
 	}
-	p.Config = config
 	return p, nil
 }
-func (p TestProvider) GetMapperConfig() mapper.Config {
-	return p.Config
+func (p TestProvider) GetMapper() mapper.Mapper {
+	return p.Mapper
 }
 
 func (p TestProvider) Region() string {

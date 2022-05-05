@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"reflect"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -15,10 +16,10 @@ import (
 )
 
 type AWSProvider struct {
-	logger       *zap.Logger
-	config       aws.Config
-	ec2Client    *ec2.Client
-	mapperConfig mapper.Config
+	logger    *zap.Logger
+	config    aws.Config
+	ec2Client *ec2.Client
+	mapper    mapper.Mapper
 }
 
 //go:embed mapping.yaml
@@ -37,8 +38,8 @@ func NewAWSProvider(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) (
 	provider.ec2Client = ec2.NewFromConfig(provider.config)
 	logger.Sugar().Infow("AWS", "region", provider.Region())
 
-	//load the mapping configuration
-	provider.mapperConfig, err = mapper.LoadConfig(embedConfig)
+	//create the mapper for this provider
+	provider.mapper, err = mapper.New(embedConfig, *logger, reflect.ValueOf(&provider))
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +50,6 @@ func (p AWSProvider) Region() string {
 	return p.config.Region
 }
 
-func (p AWSProvider) GetMapperConfig() mapper.Config {
-	return p.mapperConfig
+func (p AWSProvider) GetMapper() mapper.Mapper {
+	return p.mapper
 }

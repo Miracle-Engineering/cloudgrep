@@ -13,7 +13,7 @@ import (
 	"github.com/run-x/cloudgrep/static"
 )
 
-func StartServer(ctx context.Context, cfg config.Config, ds datastore.Datastore) {
+func StartWebServer(ctx context.Context, cfg config.Config, ds datastore.Datastore) {
 	router := gin.Default()
 
 	if cfg.Logging.IsDev() {
