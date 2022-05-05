@@ -55,16 +55,16 @@ type TagField struct {
 	Value string `yaml:"value"`
 }
 
-func LoadConfig(data []byte) (Config, error) {
-	var config Config
-	err := yaml.Unmarshal(data, &config)
+func New(config []byte, logger zap.Logger, providerValue reflect.Value) (Mapper, error) {
+	var configStruct Config
+	err := yaml.Unmarshal(config, &configStruct)
 	if err != nil {
-		return Config{}, err
+		return Mapper{}, err
 	}
-	return config, nil
+	return new(configStruct, logger, providerValue)
 }
 
-func New(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper, error) {
+func new(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper, error) {
 	logger.Sugar().Infow("Loading Mappings", zap.String("provider", fmt.Sprintf("%T", providerValue.Interface())))
 	tagField := config.TagField
 	ignoredFields := config.IgnoredFields
@@ -162,11 +162,21 @@ func (m Mapper) ToResource(x any, region string) (model.Resource, error) {
 	}, nil
 }
 
-//FetchResources calls the implementation method on the Mapping and returns the resources
-func (m Mapper) FetchResources(ctx context.Context, mapping Mapping, providerValue reflect.Value, region string) ([]*model.Resource, error) {
+//FetchResources calls the implementation method on each Mapping and returns the resources
+func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Resource, error) {
+	var resources []*model.Resource
+	for _, mapping := range m.Mappings {
+		new_resources, err := m.fetchResources(ctx, mapping, region)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, new_resources...)
+	}
+	return resources, nil
+}
 
+func (m Mapper) fetchResources(ctx context.Context, mapping Mapping, region string) ([]*model.Resource, error) {
 	m.logger.Sugar().Infow("Fetching resources",
-		zap.String("provider", fmt.Sprintf("%T", providerValue.Interface())),
 		zap.String("ResourceType", mapping.ResourceType),
 		zap.String("Region", region),
 	)
@@ -193,12 +203,11 @@ func (m Mapper) FetchResources(ctx context.Context, mapping Mapping, providerVal
 				return nil, err
 			}
 		default:
-			return nil, fmt.Errorf("method '%T%v' has the wrong return type", providerValue.Interface(), mapping.Impl)
+			return nil, fmt.Errorf("method '%v' has the wrong return type", mapping.Impl)
 		}
 	}
 
 	m.logger.Sugar().Infow("Fetched resources",
-		zap.String("provider", fmt.Sprintf("%T", providerValue.Interface())),
 		zap.String("ResourceType", mapping.ResourceType),
 		zap.String("Region", region),
 		zap.Int("Count", len(resources)),

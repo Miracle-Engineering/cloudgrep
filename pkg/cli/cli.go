@@ -44,12 +44,15 @@ func Run() error {
 	}
 
 	//start the providers to collect cloud data
-	err = provider.Run(ctx, cfg, datastore)
+	engine, err := provider.NewEngine(ctx, cfg, datastore)
 	if err != nil {
-		return fmt.Errorf("failed to start providers: %w", err)
+		return fmt.Errorf("failed to start engine: %w", err)
+	}
+	if err = engine.Run(ctx); err != nil {
+		return err
 	}
 
-	api.StartServer(ctx, cfg, datastore)
+	api.StartWebServer(ctx, cfg, datastore)
 
 	//TODO replace this URL with homepage when ready
 	url := fmt.Sprintf("http://%v:%v/%v%v", cfg.Web.Host, cfg.Web.Port, cfg.Web.Prefix, "api/resources")
