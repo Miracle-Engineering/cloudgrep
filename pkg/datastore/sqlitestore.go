@@ -19,8 +19,8 @@ type SQLiteStore struct {
 	db     *gorm.DB
 }
 
-func (s *SQLiteStore) init(ctx context.Context, cfg config.Config) error {
-
+func NewSQLiteStore(ctx context.Context, cfg config.Config) (*SQLiteStore, error) {
+	s := SQLiteStore{}
 	logLevel := logger.Error
 	if cfg.Logging.IsDev() {
 		//log all SQL queries
@@ -42,15 +42,15 @@ func (s *SQLiteStore) init(ctx context.Context, cfg config.Config) error {
 		Logger: gormLogger,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	// Migrate the schema
 	err = s.db.AutoMigrate(&model.Resource{}, &model.Property{}, &model.Tag{})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &s, nil
 }
 
 func (s *SQLiteStore) GetResources(ctx context.Context, filter model.Filter) ([]*model.Resource, error) {
