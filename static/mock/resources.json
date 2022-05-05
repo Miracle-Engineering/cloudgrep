@@ -123,9 +123,16 @@
         "value": "false"
       },
       {
-        "name": "Hypervisor",
-        "value": "xen"
-      },
+        "Key": "eks:nodegroup-name",
+        "Value": "opta-staging-default-0f40b67a876a6e47"
+      }
+    ]
+  },
+  {
+    "Type": "EC2-Instance",
+    "Id": "i-0ce5fd258122ee34b",
+    "Region": "us-east-1",
+    "Properties": [
       {
         "name": "IamInstanceProfile[Arn]",
         "value": "arn:aws:iam::248233625043:instance-profile/eks-48bfa186-1f3b-f6b7-735a-f0cb611e6148"

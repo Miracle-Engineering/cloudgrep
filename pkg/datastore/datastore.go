@@ -17,9 +17,11 @@ type Datastore interface {
 
 func NewDatastore(ctx context.Context, cfg config.Config) (Datastore, error) {
 	cfg.Logging.Logger.Sugar().Infow("Creating a datastore", zap.String("type", cfg.Datastore.Type))
-	if cfg.Datastore.Type == "memory" {
+	switch cfg.Datastore.Type {
+	case "memory":
 		return NewMemoryStore(ctx, cfg), nil
-	} else {
-		return nil, fmt.Errorf("unknown datastore type '%v'", cfg.Datastore.Type)
+	case "sqlite":
+		return NewSQLiteStore(ctx, cfg)
 	}
+	return nil, fmt.Errorf("unknown datastore type '%v'", cfg.Datastore.Type)
 }
