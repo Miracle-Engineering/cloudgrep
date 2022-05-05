@@ -91,12 +91,7 @@ func New(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 		//always ignore Tags - they have their own model
 		mapping.IgnoredFields = append(mapping.IgnoredFields, mapping.TagField.Name)
 		//find the implementation method
-		var err error
-		mapping.Method, err = findImplMethod(providerValue, mapping.Impl)
-		if err != nil {
-			return Mapper{}, err
-		}
-
+		mapping.Method = findImplMethod(providerValue, mapping.Impl)
 		mapper.Mappings[mapping.Type] = mapping
 
 	}
@@ -106,17 +101,17 @@ func New(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 	return mapper, nil
 }
 
-func findImplMethod(v reflect.Value, impl string) (reflect.Value, error) {
+func findImplMethod(v reflect.Value, impl string) reflect.Value {
 	//find the implementation method
 	method := v.MethodByName(impl)
 	if reflect.ValueOf(method).IsZero() {
-		return reflect.Value{}, fmt.Errorf("could not find a method called '%v' on '%T'", impl, v.Interface())
+		panic(fmt.Errorf("could not find a method called '%v' on '%T'", impl, v.Interface()))
 	}
 	//check return type is (slice, error)
 	if t := method.Type(); t.NumOut() != 2 || t.Out(0).Kind().String() != "slice" || t.Out(1).Name() != "error" {
-		return reflect.Value{}, fmt.Errorf("method %v has invalid return type, expecting ([]any, error)", impl)
+		panic(fmt.Errorf("method %v has invalid return type, expecting ([]any, error)", impl))
 	}
-	return method, nil
+	return method
 }
 
 //ToResource generate a Resource by using reflection
