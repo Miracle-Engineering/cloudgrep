@@ -15,9 +15,7 @@ var embedResources []byte
 func GetResources(t *testing.T) []*model.Resource {
 	resources := []*model.Resource{}
 	err := json.Unmarshal(embedResources, &resources)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 	assert.Positive(t, len(resources))
 	return resources
 }

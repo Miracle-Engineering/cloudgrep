@@ -9,6 +9,7 @@ import (
 	"github.com/run-x/cloudgrep/pkg/datastore/testdata"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/util"
+	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest"
 )
 
@@ -34,22 +35,16 @@ func TestDatastore(t *testing.T) {
 				},
 			}
 			dataStore, err := NewDatastore(ctx, cfg)
-			if err != nil {
-				t.Error(err)
-			}
+			assert.NoError(t, err)
 
 			resources := testdata.GetResources(t)
 
 			err = dataStore.WriteResources(ctx, resources)
-			if err != nil {
-				t.Error(err)
-			}
+			assert.NoError(t, err)
 
 			var resourcesRead []*model.Resource
 			resourcesRead, err = dataStore.GetResources(ctx, model.NoFilter{})
-			if err != nil {
-				t.Error(err)
-			}
+			assert.NoError(t, err)
 			util.AssertEqualsResources(t, resources, resourcesRead)
 		})
 	}

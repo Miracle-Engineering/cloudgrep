@@ -11,9 +11,7 @@ import (
 func Test_Init_Default(t *testing.T) {
 	config, err := New(context.Background(), options.Options{})
 
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(config.Providers))
 	assert.Equal(t, "aws", config.Providers[0].Cloud)
 
