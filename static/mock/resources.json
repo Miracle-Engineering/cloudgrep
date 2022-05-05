@@ -1,212 +1,2140 @@
 [
   {
-    "Type": "ElasticLoadBalancingV2-LoadBalancer",
-    "Id": "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6",
-    "Region": "us-east-1",
-    "Properties": [
+    "id": "i-024c4971f7f510c8f",
+    "region": "us-east-1",
+    "type": "ec2.Instance",
+    "tags": [
       {
-        "Name": "LoadBalancerArn",
-        "Value": "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6"
+        "key": "k8s.io/cluster-autoscaler/opta-staging",
+        "value": "owned"
       },
       {
-        "Name": "DNSName",
-        "Value": "opta-staging-ingress-14522ba1bd959dd6.elb.us-east-1.amazonaws.com"
+        "key": "aws:autoscaling:groupName",
+        "value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
       },
       {
-        "Name": "CanonicalHostedZoneId",
-        "Value": "Z26RNL4JYFTOTI"
+        "key": "k8s.io/cluster-autoscaler/enabled",
+        "value": "true"
       },
       {
-        "Name": "CreatedTime",
-        "Value": "2022-04-07T22:27:39.350000+00:00"
+        "key": "aws:ec2launchtemplate:version",
+        "value": "1"
       },
       {
-        "Name": "LoadBalancerName",
-        "Value": "opta-staging-ingress"
+        "key": "eks:cluster-name",
+        "value": "opta-staging"
       },
       {
-        "Name": "Scheme",
-        "Value": "internet-facing"
+        "key": "eks:nodegroup-name",
+        "value": "opta-staging-default-0f40b67a876a6e47"
       },
       {
-        "Name": "VpcId",
-        "Value": "vpc-0c0919dddbbd3bede"
+        "key": "aws:ec2:fleet-id",
+        "value": "fleet-bafee5d7-215d-addb-2632-290ab09da4e7"
+      },
+      {
+        "key": "kubernetes.io/cluster/opta-staging",
+        "value": "owned"
+      },
+      {
+        "key": "aws:ec2launchtemplate:id",
+        "value": "lt-0330c4c2536531e3b"
       }
     ],
-    "Tags": [
+    "properties": [
       {
-        "Key": "service.k8s.aws/stack",
-        "Value": "ingress-nginx/ingress-nginx-controller"
+        "name": "AmiLaunchIndex",
+        "value": "0"
       },
       {
-        "Key": "service.k8s.aws/resource",
-        "Value": "LoadBalancer"
+        "name": "Architecture",
+        "value": "x86_64"
       },
       {
-        "Key": "elbv2.k8s.aws/cluster",
-        "Value": "opta-staging"
+        "name": "BlockDeviceMappings[0][DeviceName]",
+        "value": "/dev/xvda"
+      },
+      {
+        "name": "BlockDeviceMappings[0][Ebs][AttachTime]",
+        "value": "2022-04-03 15:16:27 +0000 UTC"
+      },
+      {
+        "name": "BlockDeviceMappings[0][Ebs][DeleteOnTermination]",
+        "value": "true"
+      },
+      {
+        "name": "BlockDeviceMappings[0][Ebs][Status]",
+        "value": "attached"
+      },
+      {
+        "name": "BlockDeviceMappings[0][Ebs][VolumeId]",
+        "value": "vol-01379b142ed08224f"
+      },
+      {
+        "name": "BootMode",
+        "value": ""
+      },
+      {
+        "name": "CapacityReservationId",
+        "value": ""
+      },
+      {
+        "name": "CapacityReservationSpecification[CapacityReservationPreference]",
+        "value": "open"
+      },
+      {
+        "name": "CapacityReservationSpecification[CapacityReservationTarget]",
+        "value": ""
+      },
+      {
+        "name": "ClientToken",
+        "value": "fleet-bafee5d7-215d-addb-2632-290ab09da4e7-0"
+      },
+      {
+        "name": "CpuOptions[CoreCount]",
+        "value": "1"
+      },
+      {
+        "name": "CpuOptions[ThreadsPerCore]",
+        "value": "2"
+      },
+      {
+        "name": "EbsOptimized",
+        "value": "false"
+      },
+      {
+        "name": "ElasticGpuAssociations",
+        "value": ""
+      },
+      {
+        "name": "ElasticInferenceAcceleratorAssociations",
+        "value": ""
+      },
+      {
+        "name": "EnaSupport",
+        "value": "true"
+      },
+      {
+        "name": "EnclaveOptions[Enabled]",
+        "value": "false"
+      },
+      {
+        "name": "HibernationOptions[Configured]",
+        "value": "false"
+      },
+      {
+        "name": "Hypervisor",
+        "value": "xen"
+      },
+      {
+        "name": "IamInstanceProfile[Arn]",
+        "value": "arn:aws:iam::248233625043:instance-profile/eks-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
+      },
+      {
+        "name": "IamInstanceProfile[Id]",
+        "value": "AIPATTS7AQXJUXEPIKDD7"
+      },
+      {
+        "name": "ImageId",
+        "value": "ami-07e1afa2446472f15"
+      },
+      {
+        "name": "InstanceId",
+        "value": "i-024c4971f7f510c8f"
+      },
+      {
+        "name": "InstanceLifecycle",
+        "value": ""
+      },
+      {
+        "name": "InstanceType",
+        "value": "t3.medium"
+      },
+      {
+        "name": "Ipv6Address",
+        "value": ""
+      },
+      {
+        "name": "KernelId",
+        "value": ""
+      },
+      {
+        "name": "KeyName",
+        "value": ""
+      },
+      {
+        "name": "LaunchTime",
+        "value": "2022-04-03 15:16:27 +0000 UTC"
+      },
+      {
+        "name": "Licenses",
+        "value": ""
+      },
+      {
+        "name": "MaintenanceOptions[AutoRecovery]",
+        "value": "default"
+      },
+      {
+        "name": "MetadataOptions[HttpEndpoint]",
+        "value": "enabled"
+      },
+      {
+        "name": "MetadataOptions[HttpProtocolIpv6]",
+        "value": "disabled"
+      },
+      {
+        "name": "MetadataOptions[HttpPutResponseHopLimit]",
+        "value": "2"
+      },
+      {
+        "name": "MetadataOptions[HttpTokens]",
+        "value": "optional"
+      },
+      {
+        "name": "MetadataOptions[InstanceMetadataTags]",
+        "value": "disabled"
+      },
+      {
+        "name": "MetadataOptions[State]",
+        "value": "applied"
+      },
+      {
+        "name": "Monitoring[State]",
+        "value": "disabled"
+      },
+      {
+        "name": "NetworkInterfaces[0][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][AttachTime]",
+        "value": "2022-04-03 15:16:27 +0000 UTC"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][AttachmentId]",
+        "value": "eni-attach-02e5c26436ac28e84"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][DeleteOnTermination]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][DeviceIndex]",
+        "value": "0"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][NetworkCardIndex]",
+        "value": "0"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][Status]",
+        "value": "attached"
+      },
+      {
+        "name": "NetworkInterfaces[0][Description]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][Groups][0][GroupId]",
+        "value": "sg-0c87bc57b6e994081"
+      },
+      {
+        "name": "NetworkInterfaces[0][Groups][0][GroupName]",
+        "value": "eks-cluster-sg-opta-staging-717567356"
+      },
+      {
+        "name": "NetworkInterfaces[0][InterfaceType]",
+        "value": "interface"
+      },
+      {
+        "name": "NetworkInterfaces[0][Ipv4Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][Ipv6Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][MacAddress]",
+        "value": "0a:6b:05:00:fe:99"
+      },
+      {
+        "name": "NetworkInterfaces[0][NetworkInterfaceId]",
+        "value": "eni-0c491b4d73ac30fa7"
+      },
+      {
+        "name": "NetworkInterfaces[0][OwnerId]",
+        "value": "248233625043"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateDnsName]",
+        "value": "ip-10-0-149-110.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddress]",
+        "value": "10.0.149.110"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][Primary]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][PrivateDnsName]",
+        "value": "ip-10-0-149-110.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][PrivateIpAddress]",
+        "value": "10.0.149.110"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][PrivateDnsName]",
+        "value": "ip-10-0-149-241.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][PrivateIpAddress]",
+        "value": "10.0.149.241"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][PrivateDnsName]",
+        "value": "ip-10-0-144-163.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][PrivateIpAddress]",
+        "value": "10.0.144.163"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][PrivateDnsName]",
+        "value": "ip-10-0-150-214.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][PrivateIpAddress]",
+        "value": "10.0.150.214"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][PrivateDnsName]",
+        "value": "ip-10-0-148-121.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][PrivateIpAddress]",
+        "value": "10.0.148.121"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][PrivateDnsName]",
+        "value": "ip-10-0-147-14.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][PrivateIpAddress]",
+        "value": "10.0.147.14"
+      },
+      {
+        "name": "NetworkInterfaces[0][SourceDestCheck]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[0][Status]",
+        "value": "in-use"
+      },
+      {
+        "name": "NetworkInterfaces[0][SubnetId]",
+        "value": "subnet-0dc8bb5db41c585bf"
+      },
+      {
+        "name": "NetworkInterfaces[0][VpcId]",
+        "value": "vpc-0c0919dddbbd3bede"
+      },
+      {
+        "name": "NetworkInterfaces[1][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][AttachTime]",
+        "value": "2022-04-06 00:20:38 +0000 UTC"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][AttachmentId]",
+        "value": "eni-attach-049063d62f8554dd2"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][DeleteOnTermination]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][DeviceIndex]",
+        "value": "1"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][NetworkCardIndex]",
+        "value": "0"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][Status]",
+        "value": "attached"
+      },
+      {
+        "name": "NetworkInterfaces[1][Description]",
+        "value": "aws-K8S-i-024c4971f7f510c8f"
+      },
+      {
+        "name": "NetworkInterfaces[1][Groups][0][GroupId]",
+        "value": "sg-0c87bc57b6e994081"
+      },
+      {
+        "name": "NetworkInterfaces[1][Groups][0][GroupName]",
+        "value": "eks-cluster-sg-opta-staging-717567356"
+      },
+      {
+        "name": "NetworkInterfaces[1][InterfaceType]",
+        "value": "interface"
+      },
+      {
+        "name": "NetworkInterfaces[1][Ipv4Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][Ipv6Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][MacAddress]",
+        "value": "0a:a2:31:5a:1b:21"
+      },
+      {
+        "name": "NetworkInterfaces[1][NetworkInterfaceId]",
+        "value": "eni-0e79803929ff67306"
+      },
+      {
+        "name": "NetworkInterfaces[1][OwnerId]",
+        "value": "248233625043"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateDnsName]",
+        "value": "ip-10-0-150-169.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddress]",
+        "value": "10.0.150.169"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][Primary]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][PrivateDnsName]",
+        "value": "ip-10-0-150-169.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][PrivateIpAddress]",
+        "value": "10.0.150.169"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][PrivateDnsName]",
+        "value": "ip-10-0-149-65.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][PrivateIpAddress]",
+        "value": "10.0.149.65"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][PrivateDnsName]",
+        "value": "ip-10-0-149-17.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][PrivateIpAddress]",
+        "value": "10.0.149.17"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][PrivateDnsName]",
+        "value": "ip-10-0-144-22.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][PrivateIpAddress]",
+        "value": "10.0.144.22"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][PrivateDnsName]",
+        "value": "ip-10-0-145-151.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][PrivateIpAddress]",
+        "value": "10.0.145.151"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][PrivateDnsName]",
+        "value": "ip-10-0-146-11.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][PrivateIpAddress]",
+        "value": "10.0.146.11"
+      },
+      {
+        "name": "NetworkInterfaces[1][SourceDestCheck]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[1][Status]",
+        "value": "in-use"
+      },
+      {
+        "name": "NetworkInterfaces[1][SubnetId]",
+        "value": "subnet-0dc8bb5db41c585bf"
+      },
+      {
+        "name": "NetworkInterfaces[1][VpcId]",
+        "value": "vpc-0c0919dddbbd3bede"
+      },
+      {
+        "name": "OutpostArn",
+        "value": ""
+      },
+      {
+        "name": "Placement[Affinity]",
+        "value": ""
+      },
+      {
+        "name": "Placement[AvailabilityZone]",
+        "value": "us-east-1c"
+      },
+      {
+        "name": "Placement[GroupName]",
+        "value": ""
+      },
+      {
+        "name": "Placement[HostId]",
+        "value": ""
+      },
+      {
+        "name": "Placement[HostResourceGroupArn]",
+        "value": ""
+      },
+      {
+        "name": "Placement[PartitionNumber]",
+        "value": ""
+      },
+      {
+        "name": "Placement[SpreadDomain]",
+        "value": ""
+      },
+      {
+        "name": "Placement[Tenancy]",
+        "value": "default"
+      },
+      {
+        "name": "Platform",
+        "value": ""
+      },
+      {
+        "name": "PlatformDetails",
+        "value": "Linux/UNIX"
+      },
+      {
+        "name": "PrivateDnsName",
+        "value": "ip-10-0-149-110.ec2.internal"
+      },
+      {
+        "name": "PrivateDnsNameOptions[EnableResourceNameDnsAAAARecord]",
+        "value": "false"
+      },
+      {
+        "name": "PrivateDnsNameOptions[EnableResourceNameDnsARecord]",
+        "value": "false"
+      },
+      {
+        "name": "PrivateDnsNameOptions[HostnameType]",
+        "value": "ip-name"
+      },
+      {
+        "name": "PrivateIpAddress",
+        "value": "10.0.149.110"
+      },
+      {
+        "name": "PublicDnsName",
+        "value": ""
+      },
+      {
+        "name": "PublicIpAddress",
+        "value": ""
+      },
+      {
+        "name": "RamdiskId",
+        "value": ""
+      },
+      {
+        "name": "RootDeviceName",
+        "value": "/dev/xvda"
+      },
+      {
+        "name": "RootDeviceType",
+        "value": "ebs"
+      },
+      {
+        "name": "SecurityGroups[0][GroupId]",
+        "value": "sg-0c87bc57b6e994081"
+      },
+      {
+        "name": "SecurityGroups[0][GroupName]",
+        "value": "eks-cluster-sg-opta-staging-717567356"
+      },
+      {
+        "name": "SourceDestCheck",
+        "value": "true"
+      },
+      {
+        "name": "SpotInstanceRequestId",
+        "value": ""
+      },
+      {
+        "name": "SriovNetSupport",
+        "value": ""
+      },
+      {
+        "name": "State[Code]",
+        "value": "16"
+      },
+      {
+        "name": "State[Name]",
+        "value": "running"
+      },
+      {
+        "name": "StateReason",
+        "value": ""
+      },
+      {
+        "name": "StateTransitionReason",
+        "value": ""
+      },
+      {
+        "name": "SubnetId",
+        "value": "subnet-0dc8bb5db41c585bf"
+      },
+      {
+        "name": "UsageOperation",
+        "value": "RunInstances"
+      },
+      {
+        "name": "UsageOperationUpdateTime",
+        "value": "2022-04-03 15:16:27 +0000 UTC"
+      },
+      {
+        "name": "VirtualizationType",
+        "value": "hvm"
+      },
+      {
+        "name": "VpcId",
+        "value": "vpc-0c0919dddbbd3bede"
       }
     ]
   },
   {
-    "Type": "EC2-Instance",
-    "Id": "i-046b8584f97edce25",
-    "Region": "us-east-1",
-    "Properties": [
+    "id": "i-046b8584f97edce25",
+    "region": "us-east-1",
+    "type": "ec2.Instance",
+    "tags": [
       {
-        "Name": "ImageId",
-        "Value": "ami-07e1afa2446472f15"
+        "key": "eks:cluster-name",
+        "value": "opta-staging"
       },
       {
-        "Name": "InstanceId",
-        "Value": "i-046b8584f97edce25"
+        "key": "kubernetes.io/cluster/opta-staging",
+        "value": "owned"
       },
       {
-        "Name": "InstanceType",
-        "Value": "t3.medium"
+        "key": "aws:autoscaling:groupName",
+        "value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
       },
       {
-        "Name": "LaunchTime",
-        "Value": "2022-03-01T01:16:17+00:00"
+        "key": "k8s.io/cluster-autoscaler/opta-staging",
+        "value": "owned"
       },
       {
-        "Name": "PrivateDnsName",
-        "Value": "ip-10-0-136-165.ec2.internal"
+        "key": "aws:ec2launchtemplate:id",
+        "value": "lt-0330c4c2536531e3b"
       },
       {
-        "Name": "PrivateIpAddress",
-        "Value": "10.0.136.165"
+        "key": "aws:ec2launchtemplate:version",
+        "value": "1"
       },
       {
-        "Name": "SubnetId",
-        "Value": "subnet-0bfabdfac832495d7"
+        "key": "k8s.io/cluster-autoscaler/enabled",
+        "value": "true"
       },
       {
-        "Name": "Status",
-        "Value": "in-use"
+        "key": "aws:ec2:fleet-id",
+        "value": "fleet-38dc45d7-2b57-ad53-26b0-a120b80d203a"
       },
       {
-        "Name": "VpcId",
-        "Value": "vpc-0c0919dddbbd3bede"
+        "key": "eks:nodegroup-name",
+        "value": "opta-staging-default-0f40b67a876a6e47"
       }
     ],
-    "Tags": [
+    "properties": [
       {
-        "Key": "eks:cluster-name",
-        "Value": "opta-staging"
+        "name": "AmiLaunchIndex",
+        "value": "0"
       },
       {
-        "Key": "kubernetes.io/cluster/opta-staging",
-        "Value": "owned"
+        "name": "Architecture",
+        "value": "x86_64"
       },
       {
-        "Key": "aws:autoscaling:groupName",
-        "Value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
+        "name": "BlockDeviceMappings[0][DeviceName]",
+        "value": "/dev/xvda"
       },
       {
-        "Key": "k8s.io/cluster-autoscaler/opta-staging",
-        "Value": "owned"
+        "name": "BlockDeviceMappings[0][Ebs][AttachTime]",
+        "value": "2022-03-01 01:16:18 +0000 UTC"
       },
       {
-        "Key": "aws:ec2launchtemplate:id",
-        "Value": "lt-0330c4c2536531e3b"
+        "name": "BlockDeviceMappings[0][Ebs][DeleteOnTermination]",
+        "value": "true"
       },
       {
-        "Key": "aws:ec2launchtemplate:version",
-        "Value": "1"
+        "name": "BlockDeviceMappings[0][Ebs][Status]",
+        "value": "attached"
       },
       {
-        "Key": "k8s.io/cluster-autoscaler/enabled",
-        "Value": "true"
+        "name": "BlockDeviceMappings[0][Ebs][VolumeId]",
+        "value": "vol-01e758b04bcafcd2a"
       },
       {
-        "Key": "aws:ec2:fleet-id",
-        "Value": "fleet-38dc45d7-2b57-ad53-26b0-a120b80d203a"
+        "name": "BootMode",
+        "value": ""
       },
       {
-        "Key": "eks:nodegroup-name",
-        "Value": "opta-staging-default-0f40b67a876a6e47"
+        "name": "CapacityReservationId",
+        "value": ""
+      },
+      {
+        "name": "CapacityReservationSpecification[CapacityReservationPreference]",
+        "value": "open"
+      },
+      {
+        "name": "CapacityReservationSpecification[CapacityReservationTarget]",
+        "value": ""
+      },
+      {
+        "name": "ClientToken",
+        "value": "fleet-38dc45d7-2b57-ad53-26b0-a120b80d203a-0"
+      },
+      {
+        "name": "CpuOptions[CoreCount]",
+        "value": "1"
+      },
+      {
+        "name": "CpuOptions[ThreadsPerCore]",
+        "value": "2"
+      },
+      {
+        "name": "EbsOptimized",
+        "value": "false"
+      },
+      {
+        "name": "ElasticGpuAssociations",
+        "value": ""
+      },
+      {
+        "name": "ElasticInferenceAcceleratorAssociations",
+        "value": ""
+      },
+      {
+        "name": "EnaSupport",
+        "value": "true"
+      },
+      {
+        "name": "EnclaveOptions[Enabled]",
+        "value": "false"
+      },
+      {
+        "name": "HibernationOptions[Configured]",
+        "value": "false"
+      },
+      {
+        "name": "Hypervisor",
+        "value": "xen"
+      },
+      {
+        "name": "IamInstanceProfile[Arn]",
+        "value": "arn:aws:iam::248233625043:instance-profile/eks-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
+      },
+      {
+        "name": "IamInstanceProfile[Id]",
+        "value": "AIPATTS7AQXJUXEPIKDD7"
+      },
+      {
+        "name": "ImageId",
+        "value": "ami-07e1afa2446472f15"
+      },
+      {
+        "name": "InstanceId",
+        "value": "i-046b8584f97edce25"
+      },
+      {
+        "name": "InstanceLifecycle",
+        "value": ""
+      },
+      {
+        "name": "InstanceType",
+        "value": "t3.medium"
+      },
+      {
+        "name": "Ipv6Address",
+        "value": ""
+      },
+      {
+        "name": "KernelId",
+        "value": ""
+      },
+      {
+        "name": "KeyName",
+        "value": ""
+      },
+      {
+        "name": "LaunchTime",
+        "value": "2022-03-01 01:16:17 +0000 UTC"
+      },
+      {
+        "name": "Licenses",
+        "value": ""
+      },
+      {
+        "name": "MaintenanceOptions[AutoRecovery]",
+        "value": "default"
+      },
+      {
+        "name": "MetadataOptions[HttpEndpoint]",
+        "value": "enabled"
+      },
+      {
+        "name": "MetadataOptions[HttpProtocolIpv6]",
+        "value": "disabled"
+      },
+      {
+        "name": "MetadataOptions[HttpPutResponseHopLimit]",
+        "value": "2"
+      },
+      {
+        "name": "MetadataOptions[HttpTokens]",
+        "value": "optional"
+      },
+      {
+        "name": "MetadataOptions[InstanceMetadataTags]",
+        "value": "disabled"
+      },
+      {
+        "name": "MetadataOptions[State]",
+        "value": "applied"
+      },
+      {
+        "name": "Monitoring[State]",
+        "value": "disabled"
+      },
+      {
+        "name": "NetworkInterfaces[0][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][AttachTime]",
+        "value": "2022-03-01 01:16:17 +0000 UTC"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][AttachmentId]",
+        "value": "eni-attach-04dfdf615bc612cba"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][DeleteOnTermination]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][DeviceIndex]",
+        "value": "0"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][NetworkCardIndex]",
+        "value": "0"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][Status]",
+        "value": "attached"
+      },
+      {
+        "name": "NetworkInterfaces[0][Description]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][Groups][0][GroupId]",
+        "value": "sg-0c87bc57b6e994081"
+      },
+      {
+        "name": "NetworkInterfaces[0][Groups][0][GroupName]",
+        "value": "eks-cluster-sg-opta-staging-717567356"
+      },
+      {
+        "name": "NetworkInterfaces[0][InterfaceType]",
+        "value": "interface"
+      },
+      {
+        "name": "NetworkInterfaces[0][Ipv4Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][Ipv6Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][MacAddress]",
+        "value": "12:cb:db:ff:1e:59"
+      },
+      {
+        "name": "NetworkInterfaces[0][NetworkInterfaceId]",
+        "value": "eni-0169072ec35f326b1"
+      },
+      {
+        "name": "NetworkInterfaces[0][OwnerId]",
+        "value": "248233625043"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateDnsName]",
+        "value": "ip-10-0-136-165.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddress]",
+        "value": "10.0.136.165"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][Primary]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][PrivateDnsName]",
+        "value": "ip-10-0-136-165.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][PrivateIpAddress]",
+        "value": "10.0.136.165"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][PrivateDnsName]",
+        "value": "ip-10-0-136-240.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][PrivateIpAddress]",
+        "value": "10.0.136.240"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][PrivateDnsName]",
+        "value": "ip-10-0-137-211.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][PrivateIpAddress]",
+        "value": "10.0.137.211"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][PrivateDnsName]",
+        "value": "ip-10-0-136-105.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][PrivateIpAddress]",
+        "value": "10.0.136.105"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][PrivateDnsName]",
+        "value": "ip-10-0-143-203.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][PrivateIpAddress]",
+        "value": "10.0.143.203"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][PrivateDnsName]",
+        "value": "ip-10-0-136-238.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][PrivateIpAddress]",
+        "value": "10.0.136.238"
+      },
+      {
+        "name": "NetworkInterfaces[0][SourceDestCheck]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[0][Status]",
+        "value": "in-use"
+      },
+      {
+        "name": "NetworkInterfaces[0][SubnetId]",
+        "value": "subnet-0bfabdfac832495d7"
+      },
+      {
+        "name": "NetworkInterfaces[0][VpcId]",
+        "value": "vpc-0c0919dddbbd3bede"
+      },
+      {
+        "name": "NetworkInterfaces[1][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][AttachTime]",
+        "value": "2022-04-01 22:54:53 +0000 UTC"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][AttachmentId]",
+        "value": "eni-attach-0cb198c2446a01612"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][DeleteOnTermination]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][DeviceIndex]",
+        "value": "2"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][NetworkCardIndex]",
+        "value": "0"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][Status]",
+        "value": "attached"
+      },
+      {
+        "name": "NetworkInterfaces[1][Description]",
+        "value": "aws-K8S-i-046b8584f97edce25"
+      },
+      {
+        "name": "NetworkInterfaces[1][Groups][0][GroupId]",
+        "value": "sg-0c87bc57b6e994081"
+      },
+      {
+        "name": "NetworkInterfaces[1][Groups][0][GroupName]",
+        "value": "eks-cluster-sg-opta-staging-717567356"
+      },
+      {
+        "name": "NetworkInterfaces[1][InterfaceType]",
+        "value": "interface"
+      },
+      {
+        "name": "NetworkInterfaces[1][Ipv4Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][Ipv6Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][MacAddress]",
+        "value": "12:fe:08:ab:4b:07"
+      },
+      {
+        "name": "NetworkInterfaces[1][NetworkInterfaceId]",
+        "value": "eni-073d852ae724fa388"
+      },
+      {
+        "name": "NetworkInterfaces[1][OwnerId]",
+        "value": "248233625043"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateDnsName]",
+        "value": "ip-10-0-140-29.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddress]",
+        "value": "10.0.140.29"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][Primary]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][PrivateDnsName]",
+        "value": "ip-10-0-140-29.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][PrivateIpAddress]",
+        "value": "10.0.140.29"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][PrivateDnsName]",
+        "value": "ip-10-0-139-150.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][PrivateIpAddress]",
+        "value": "10.0.139.150"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][PrivateDnsName]",
+        "value": "ip-10-0-138-248.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][PrivateIpAddress]",
+        "value": "10.0.138.248"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][PrivateDnsName]",
+        "value": "ip-10-0-138-29.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][PrivateIpAddress]",
+        "value": "10.0.138.29"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][PrivateDnsName]",
+        "value": "ip-10-0-139-62.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][PrivateIpAddress]",
+        "value": "10.0.139.62"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][PrivateDnsName]",
+        "value": "ip-10-0-142-78.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][PrivateIpAddress]",
+        "value": "10.0.142.78"
+      },
+      {
+        "name": "NetworkInterfaces[1][SourceDestCheck]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[1][Status]",
+        "value": "in-use"
+      },
+      {
+        "name": "NetworkInterfaces[1][SubnetId]",
+        "value": "subnet-0bfabdfac832495d7"
+      },
+      {
+        "name": "NetworkInterfaces[1][VpcId]",
+        "value": "vpc-0c0919dddbbd3bede"
+      },
+      {
+        "name": "OutpostArn",
+        "value": ""
+      },
+      {
+        "name": "Placement[Affinity]",
+        "value": ""
+      },
+      {
+        "name": "Placement[AvailabilityZone]",
+        "value": "us-east-1b"
+      },
+      {
+        "name": "Placement[GroupName]",
+        "value": ""
+      },
+      {
+        "name": "Placement[HostId]",
+        "value": ""
+      },
+      {
+        "name": "Placement[HostResourceGroupArn]",
+        "value": ""
+      },
+      {
+        "name": "Placement[PartitionNumber]",
+        "value": ""
+      },
+      {
+        "name": "Placement[SpreadDomain]",
+        "value": ""
+      },
+      {
+        "name": "Placement[Tenancy]",
+        "value": "default"
+      },
+      {
+        "name": "Platform",
+        "value": ""
+      },
+      {
+        "name": "PlatformDetails",
+        "value": "Linux/UNIX"
+      },
+      {
+        "name": "PrivateDnsName",
+        "value": "ip-10-0-136-165.ec2.internal"
+      },
+      {
+        "name": "PrivateDnsNameOptions[EnableResourceNameDnsAAAARecord]",
+        "value": "false"
+      },
+      {
+        "name": "PrivateDnsNameOptions[EnableResourceNameDnsARecord]",
+        "value": "false"
+      },
+      {
+        "name": "PrivateDnsNameOptions[HostnameType]",
+        "value": "ip-name"
+      },
+      {
+        "name": "PrivateIpAddress",
+        "value": "10.0.136.165"
+      },
+      {
+        "name": "PublicDnsName",
+        "value": ""
+      },
+      {
+        "name": "PublicIpAddress",
+        "value": ""
+      },
+      {
+        "name": "RamdiskId",
+        "value": ""
+      },
+      {
+        "name": "RootDeviceName",
+        "value": "/dev/xvda"
+      },
+      {
+        "name": "RootDeviceType",
+        "value": "ebs"
+      },
+      {
+        "name": "SecurityGroups[0][GroupId]",
+        "value": "sg-0c87bc57b6e994081"
+      },
+      {
+        "name": "SecurityGroups[0][GroupName]",
+        "value": "eks-cluster-sg-opta-staging-717567356"
+      },
+      {
+        "name": "SourceDestCheck",
+        "value": "true"
+      },
+      {
+        "name": "SpotInstanceRequestId",
+        "value": ""
+      },
+      {
+        "name": "SriovNetSupport",
+        "value": ""
+      },
+      {
+        "name": "State[Code]",
+        "value": "16"
+      },
+      {
+        "name": "State[Name]",
+        "value": "running"
+      },
+      {
+        "name": "StateReason",
+        "value": ""
+      },
+      {
+        "name": "StateTransitionReason",
+        "value": ""
+      },
+      {
+        "name": "SubnetId",
+        "value": "subnet-0bfabdfac832495d7"
+      },
+      {
+        "name": "UsageOperation",
+        "value": "RunInstances"
+      },
+      {
+        "name": "UsageOperationUpdateTime",
+        "value": "2022-03-01 01:16:17 +0000 UTC"
+      },
+      {
+        "name": "VirtualizationType",
+        "value": "hvm"
+      },
+      {
+        "name": "VpcId",
+        "value": "vpc-0c0919dddbbd3bede"
       }
     ]
   },
   {
-    "Type": "EC2-Instance",
-    "Id": "i-0ce5fd258122ee34b",
-    "Region": "us-east-1",
-    "Properties": [
+    "id": "i-0ce5fd258122ee34b",
+    "region": "us-east-1",
+    "type": "ec2.Instance",
+    "tags": [
       {
-        "Name": "ImageId",
-        "Value": "ami-07e1afa2446472f15"
+        "key": "aws:ec2launchtemplate:version",
+        "value": "1"
       },
       {
-        "Name": "InstanceId",
-        "Value": "i-0ce5fd258122ee34b"
+        "key": "k8s.io/cluster-autoscaler/opta-staging",
+        "value": "owned"
       },
       {
-        "Name": "InstanceType",
-        "Value": "t3.medium"
+        "key": "aws:autoscaling:groupName",
+        "value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
       },
       {
-        "Name": "LaunchTime",
-        "Value": "2022-03-01T01:16:17+00:00"
+        "key": "kubernetes.io/cluster/opta-staging",
+        "value": "owned"
       },
       {
-        "Name": "PrivateDnsName",
-        "Value": "ip-10-0-130-88.ec2.internal"
+        "key": "eks:nodegroup-name",
+        "value": "opta-staging-default-0f40b67a876a6e47"
       },
       {
-        "Name": "PrivateIpAddress",
-        "Value": "10.0.130.88"
+        "key": "aws:ec2:fleet-id",
+        "value": "fleet-10d6ef75-0bd7-857b-84b2-ab82fad1d8b8"
       },
       {
-        "Name": "Status",
-        "Value": "in-use"
+        "key": "k8s.io/cluster-autoscaler/enabled",
+        "value": "true"
       },
       {
-        "Name": "SubnetId",
-        "Value": "subnet-0d4a35f8ddd594ad0"
+        "key": "aws:ec2launchtemplate:id",
+        "value": "lt-0330c4c2536531e3b"
       },
       {
-        "Name": "VpcId",
-        "Value": "vpc-0c0919dddbbd3bede"
+        "key": "eks:cluster-name",
+        "value": "opta-staging"
       }
     ],
-    "Tags": [
+    "properties": [
       {
-        "Key": "aws:ec2launchtemplate:version",
-        "Value": "1"
+        "name": "AmiLaunchIndex",
+        "value": "0"
       },
       {
-        "Key": "k8s.io/cluster-autoscaler/opta-staging",
-        "Value": "owned"
+        "name": "Architecture",
+        "value": "x86_64"
       },
       {
-        "Key": "aws:autoscaling:groupName",
-        "Value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
+        "name": "BlockDeviceMappings[0][DeviceName]",
+        "value": "/dev/xvda"
       },
       {
-        "Key": "kubernetes.io/cluster/opta-staging",
-        "Value": "owned"
+        "name": "BlockDeviceMappings[0][Ebs][AttachTime]",
+        "value": "2022-03-01 01:16:17 +0000 UTC"
       },
       {
-        "Key": "eks:nodegroup-name",
-        "Value": "opta-staging-default-0f40b67a876a6e47"
+        "name": "BlockDeviceMappings[0][Ebs][DeleteOnTermination]",
+        "value": "true"
       },
       {
-        "Key": "aws:ec2:fleet-id",
-        "Value": "fleet-10d6ef75-0bd7-857b-84b2-ab82fad1d8b8"
+        "name": "BlockDeviceMappings[0][Ebs][Status]",
+        "value": "attached"
       },
       {
-        "Key": "k8s.io/cluster-autoscaler/enabled",
-        "Value": "true"
+        "name": "BlockDeviceMappings[0][Ebs][VolumeId]",
+        "value": "vol-0b6addac7886d485f"
       },
       {
-        "Key": "aws:ec2launchtemplate:id",
-        "Value": "lt-0330c4c2536531e3b"
+        "name": "BootMode",
+        "value": ""
       },
       {
-        "Key": "eks:cluster-name",
-        "Value": "opta-staging"
+        "name": "CapacityReservationId",
+        "value": ""
+      },
+      {
+        "name": "CapacityReservationSpecification[CapacityReservationPreference]",
+        "value": "open"
+      },
+      {
+        "name": "CapacityReservationSpecification[CapacityReservationTarget]",
+        "value": ""
+      },
+      {
+        "name": "ClientToken",
+        "value": "fleet-10d6ef75-0bd7-857b-84b2-ab82fad1d8b8-0"
+      },
+      {
+        "name": "CpuOptions[CoreCount]",
+        "value": "1"
+      },
+      {
+        "name": "CpuOptions[ThreadsPerCore]",
+        "value": "2"
+      },
+      {
+        "name": "EbsOptimized",
+        "value": "false"
+      },
+      {
+        "name": "ElasticGpuAssociations",
+        "value": ""
+      },
+      {
+        "name": "ElasticInferenceAcceleratorAssociations",
+        "value": ""
+      },
+      {
+        "name": "EnaSupport",
+        "value": "true"
+      },
+      {
+        "name": "EnclaveOptions[Enabled]",
+        "value": "false"
+      },
+      {
+        "name": "HibernationOptions[Configured]",
+        "value": "false"
+      },
+      {
+        "name": "Hypervisor",
+        "value": "xen"
+      },
+      {
+        "name": "IamInstanceProfile[Arn]",
+        "value": "arn:aws:iam::248233625043:instance-profile/eks-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
+      },
+      {
+        "name": "IamInstanceProfile[Id]",
+        "value": "AIPATTS7AQXJUXEPIKDD7"
+      },
+      {
+        "name": "ImageId",
+        "value": "ami-07e1afa2446472f15"
+      },
+      {
+        "name": "InstanceId",
+        "value": "i-0ce5fd258122ee34b"
+      },
+      {
+        "name": "InstanceLifecycle",
+        "value": ""
+      },
+      {
+        "name": "InstanceType",
+        "value": "t3.medium"
+      },
+      {
+        "name": "Ipv6Address",
+        "value": ""
+      },
+      {
+        "name": "KernelId",
+        "value": ""
+      },
+      {
+        "name": "KeyName",
+        "value": ""
+      },
+      {
+        "name": "LaunchTime",
+        "value": "2022-03-01 01:16:17 +0000 UTC"
+      },
+      {
+        "name": "Licenses",
+        "value": ""
+      },
+      {
+        "name": "MaintenanceOptions[AutoRecovery]",
+        "value": "default"
+      },
+      {
+        "name": "MetadataOptions[HttpEndpoint]",
+        "value": "enabled"
+      },
+      {
+        "name": "MetadataOptions[HttpProtocolIpv6]",
+        "value": "disabled"
+      },
+      {
+        "name": "MetadataOptions[HttpPutResponseHopLimit]",
+        "value": "2"
+      },
+      {
+        "name": "MetadataOptions[HttpTokens]",
+        "value": "optional"
+      },
+      {
+        "name": "MetadataOptions[InstanceMetadataTags]",
+        "value": "disabled"
+      },
+      {
+        "name": "MetadataOptions[State]",
+        "value": "applied"
+      },
+      {
+        "name": "Monitoring[State]",
+        "value": "disabled"
+      },
+      {
+        "name": "NetworkInterfaces[0][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][AttachTime]",
+        "value": "2022-03-01 01:16:17 +0000 UTC"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][AttachmentId]",
+        "value": "eni-attach-0ccee3b6e6b74aa64"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][DeleteOnTermination]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][DeviceIndex]",
+        "value": "0"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][NetworkCardIndex]",
+        "value": "0"
+      },
+      {
+        "name": "NetworkInterfaces[0][Attachment][Status]",
+        "value": "attached"
+      },
+      {
+        "name": "NetworkInterfaces[0][Description]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][Groups][0][GroupId]",
+        "value": "sg-0c87bc57b6e994081"
+      },
+      {
+        "name": "NetworkInterfaces[0][Groups][0][GroupName]",
+        "value": "eks-cluster-sg-opta-staging-717567356"
+      },
+      {
+        "name": "NetworkInterfaces[0][InterfaceType]",
+        "value": "interface"
+      },
+      {
+        "name": "NetworkInterfaces[0][Ipv4Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][Ipv6Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][MacAddress]",
+        "value": "02:3e:39:7a:6f:8f"
+      },
+      {
+        "name": "NetworkInterfaces[0][NetworkInterfaceId]",
+        "value": "eni-006c0ddb982c1f0f4"
+      },
+      {
+        "name": "NetworkInterfaces[0][OwnerId]",
+        "value": "248233625043"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateDnsName]",
+        "value": "ip-10-0-130-88.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddress]",
+        "value": "10.0.130.88"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][Primary]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][PrivateDnsName]",
+        "value": "ip-10-0-130-88.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][0][PrivateIpAddress]",
+        "value": "10.0.130.88"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][PrivateDnsName]",
+        "value": "ip-10-0-129-114.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][1][PrivateIpAddress]",
+        "value": "10.0.129.114"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][PrivateDnsName]",
+        "value": "ip-10-0-128-178.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][2][PrivateIpAddress]",
+        "value": "10.0.128.178"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][PrivateDnsName]",
+        "value": "ip-10-0-134-186.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][3][PrivateIpAddress]",
+        "value": "10.0.134.186"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][PrivateDnsName]",
+        "value": "ip-10-0-134-204.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][4][PrivateIpAddress]",
+        "value": "10.0.134.204"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][PrivateDnsName]",
+        "value": "ip-10-0-128-255.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[0][PrivateIpAddresses][5][PrivateIpAddress]",
+        "value": "10.0.128.255"
+      },
+      {
+        "name": "NetworkInterfaces[0][SourceDestCheck]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[0][Status]",
+        "value": "in-use"
+      },
+      {
+        "name": "NetworkInterfaces[0][SubnetId]",
+        "value": "subnet-0d4a35f8ddd594ad0"
+      },
+      {
+        "name": "NetworkInterfaces[0][VpcId]",
+        "value": "vpc-0c0919dddbbd3bede"
+      },
+      {
+        "name": "NetworkInterfaces[1][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][AttachTime]",
+        "value": "2022-04-04 22:34:47 +0000 UTC"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][AttachmentId]",
+        "value": "eni-attach-0e70b3d59b802a49d"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][DeleteOnTermination]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][DeviceIndex]",
+        "value": "1"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][NetworkCardIndex]",
+        "value": "0"
+      },
+      {
+        "name": "NetworkInterfaces[1][Attachment][Status]",
+        "value": "attached"
+      },
+      {
+        "name": "NetworkInterfaces[1][Description]",
+        "value": "aws-K8S-i-0ce5fd258122ee34b"
+      },
+      {
+        "name": "NetworkInterfaces[1][Groups][0][GroupId]",
+        "value": "sg-0c87bc57b6e994081"
+      },
+      {
+        "name": "NetworkInterfaces[1][Groups][0][GroupName]",
+        "value": "eks-cluster-sg-opta-staging-717567356"
+      },
+      {
+        "name": "NetworkInterfaces[1][InterfaceType]",
+        "value": "interface"
+      },
+      {
+        "name": "NetworkInterfaces[1][Ipv4Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][Ipv6Prefixes]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][MacAddress]",
+        "value": "02:94:51:30:9d:a5"
+      },
+      {
+        "name": "NetworkInterfaces[1][NetworkInterfaceId]",
+        "value": "eni-065d1907e7a32c5bf"
+      },
+      {
+        "name": "NetworkInterfaces[1][OwnerId]",
+        "value": "248233625043"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateDnsName]",
+        "value": "ip-10-0-129-167.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddress]",
+        "value": "10.0.129.167"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][Primary]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][PrivateDnsName]",
+        "value": "ip-10-0-129-167.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][0][PrivateIpAddress]",
+        "value": "10.0.129.167"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][PrivateDnsName]",
+        "value": "ip-10-0-131-176.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][1][PrivateIpAddress]",
+        "value": "10.0.131.176"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][PrivateDnsName]",
+        "value": "ip-10-0-128-195.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][2][PrivateIpAddress]",
+        "value": "10.0.128.195"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][PrivateDnsName]",
+        "value": "ip-10-0-133-150.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][3][PrivateIpAddress]",
+        "value": "10.0.133.150"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][PrivateDnsName]",
+        "value": "ip-10-0-135-137.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][4][PrivateIpAddress]",
+        "value": "10.0.135.137"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][Association]",
+        "value": ""
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][Primary]",
+        "value": "false"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][PrivateDnsName]",
+        "value": "ip-10-0-135-61.ec2.internal"
+      },
+      {
+        "name": "NetworkInterfaces[1][PrivateIpAddresses][5][PrivateIpAddress]",
+        "value": "10.0.135.61"
+      },
+      {
+        "name": "NetworkInterfaces[1][SourceDestCheck]",
+        "value": "true"
+      },
+      {
+        "name": "NetworkInterfaces[1][Status]",
+        "value": "in-use"
+      },
+      {
+        "name": "NetworkInterfaces[1][SubnetId]",
+        "value": "subnet-0d4a35f8ddd594ad0"
+      },
+      {
+        "name": "NetworkInterfaces[1][VpcId]",
+        "value": "vpc-0c0919dddbbd3bede"
+      },
+      {
+        "name": "OutpostArn",
+        "value": ""
+      },
+      {
+        "name": "Placement[Affinity]",
+        "value": ""
+      },
+      {
+        "name": "Placement[AvailabilityZone]",
+        "value": "us-east-1a"
+      },
+      {
+        "name": "Placement[GroupName]",
+        "value": ""
+      },
+      {
+        "name": "Placement[HostId]",
+        "value": ""
+      },
+      {
+        "name": "Placement[HostResourceGroupArn]",
+        "value": ""
+      },
+      {
+        "name": "Placement[PartitionNumber]",
+        "value": ""
+      },
+      {
+        "name": "Placement[SpreadDomain]",
+        "value": ""
+      },
+      {
+        "name": "Placement[Tenancy]",
+        "value": "default"
+      },
+      {
+        "name": "Platform",
+        "value": ""
+      },
+      {
+        "name": "PlatformDetails",
+        "value": "Linux/UNIX"
+      },
+      {
+        "name": "PrivateDnsName",
+        "value": "ip-10-0-130-88.ec2.internal"
+      },
+      {
+        "name": "PrivateDnsNameOptions[EnableResourceNameDnsAAAARecord]",
+        "value": "false"
+      },
+      {
+        "name": "PrivateDnsNameOptions[EnableResourceNameDnsARecord]",
+        "value": "false"
+      },
+      {
+        "name": "PrivateDnsNameOptions[HostnameType]",
+        "value": "ip-name"
+      },
+      {
+        "name": "PrivateIpAddress",
+        "value": "10.0.130.88"
+      },
+      {
+        "name": "PublicDnsName",
+        "value": ""
+      },
+      {
+        "name": "PublicIpAddress",
+        "value": ""
+      },
+      {
+        "name": "RamdiskId",
+        "value": ""
+      },
+      {
+        "name": "RootDeviceName",
+        "value": "/dev/xvda"
+      },
+      {
+        "name": "RootDeviceType",
+        "value": "ebs"
+      },
+      {
+        "name": "SecurityGroups[0][GroupId]",
+        "value": "sg-0c87bc57b6e994081"
+      },
+      {
+        "name": "SecurityGroups[0][GroupName]",
+        "value": "eks-cluster-sg-opta-staging-717567356"
+      },
+      {
+        "name": "SourceDestCheck",
+        "value": "true"
+      },
+      {
+        "name": "SpotInstanceRequestId",
+        "value": ""
+      },
+      {
+        "name": "SriovNetSupport",
+        "value": ""
+      },
+      {
+        "name": "State[Code]",
+        "value": "16"
+      },
+      {
+        "name": "State[Name]",
+        "value": "running"
+      },
+      {
+        "name": "StateReason",
+        "value": ""
+      },
+      {
+        "name": "StateTransitionReason",
+        "value": ""
+      },
+      {
+        "name": "SubnetId",
+        "value": "subnet-0d4a35f8ddd594ad0"
+      },
+      {
+        "name": "UsageOperation",
+        "value": "RunInstances"
+      },
+      {
+        "name": "UsageOperationUpdateTime",
+        "value": "2022-03-01 01:16:17 +0000 UTC"
+      },
+      {
+        "name": "VirtualizationType",
+        "value": "hvm"
+      },
+      {
+        "name": "VpcId",
+        "value": "vpc-0c0919dddbbd3bede"
       }
     ]
   }
