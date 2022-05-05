@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -38,16 +39,15 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config) (*SQLiteStore, error
 	)
 	s.logger = cfg.Logging.Logger
 	var err error
-	s.db, err = gorm.Open(sqlite.Open(cfg.Datastore.DataSourceName), &gorm.Config{
-		Logger: gormLogger,
-	})
-	if err != nil {
-		return nil, err
+	//create the DB client
+	if s.db, err = gorm.Open(sqlite.Open(cfg.Datastore.DataSourceName),
+		&gorm.Config{Logger: gormLogger}); err != nil {
+		return nil, fmt.Errorf("can't create the SQLite database: %w", err)
 	}
+
 	// Migrate the schema
-	err = s.db.AutoMigrate(&model.Resource{}, &model.Property{}, &model.Tag{})
-	if err != nil {
-		return nil, err
+	if err = s.db.AutoMigrate(&model.Resource{}, &model.Property{}, &model.Tag{}); err != nil {
+		return nil, fmt.Errorf("can't create the SQLite data model: %w", err)
 	}
 
 	return &s, nil
@@ -60,6 +60,9 @@ func (s *SQLiteStore) GetResources(ctx context.Context, filter model.Filter) ([]
 		zap.String("filter", filter.String()),
 		zap.Int("count", int(result.RowsAffected)),
 	)
+	if result.Error != nil {
+		return nil, fmt.Errorf("can't get resources from database: %w", result.Error)
+	}
 	return resources, nil
 }
 
@@ -68,5 +71,8 @@ func (s *SQLiteStore) WriteResources(ctx context.Context, resources []*model.Res
 	s.logger.Sugar().Infow("Writting resources: ",
 		zap.Int("count", int(result.RowsAffected)),
 	)
-	return result.Error
+	if result.Error != nil {
+		return fmt.Errorf("can't write resources to database: %w", result.Error)
+	}
+	return nil
 }
