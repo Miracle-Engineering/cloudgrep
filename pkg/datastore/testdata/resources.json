@@ -11,6 +11,22 @@
             {
                 "key": "eks:nodegroup",
                 "value": "staging-default"
+            },
+            {
+                "key": "team",
+                "value": "infra"
+            },
+            {
+                "key": "env",
+                "value": "prod"
+            },
+            {
+                "key": "vpc",
+                "value": "vpc-123"
+            },
+            {
+                "key": "release",
+                "value": "v1"
             }
         ],
         "properties": [
@@ -52,7 +68,28 @@
         "id": "i-124",
         "region": "us-east-1",
         "type": "test.Instance",
-        "tags": null,
+        "tags": [
+            {
+                "key": "enabled",
+                "value": "false"
+            },
+            {
+                "key": "eks:nodegroup",
+                "value": "staging-default"
+            },
+            {
+                "key": "team",
+                "value": "dev"
+            },
+            {
+                "key": "env",
+                "value": "dev"
+            },
+            {
+                "key": "vpc",
+                "value": "vpc-123"
+            }
+        ],
         "properties": [
             {
                 "name": "InstanceId",
