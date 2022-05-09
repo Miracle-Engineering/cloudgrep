@@ -1,3 +1,5 @@
+import './Insights.css';
+
 import Box from '@mui/material/Box';
 import React, { FC, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';

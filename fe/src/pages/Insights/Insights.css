@@ -1,0 +1,9 @@
+.summary_content {
+    height: 15px;
+    max-height: 15px;
+    min-height: 15px;
+    margin: 0px 0px !important;
+    padding: 4px 4px;
+    font-size: 11px;
+    font-weight: 400;
+}

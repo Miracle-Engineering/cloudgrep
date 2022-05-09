@@ -24,6 +24,13 @@ i18n.use(initReactI18next).init({
 
 				// Application specific
 				TAGS: 'Tags',
+
+				// Resources
+				TYPE: 'Type',
+				ID: 'Id',
+				REGION: 'Region',
+				REGIONS: 'REGIONS',
+				TYPES: 'TYPES',
 			},
 		},
 	},
