@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"context"
+	"errors"
 
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -26,8 +27,11 @@ func NewMemoryStore(ctx context.Context, cfg config.Config) *MemoryStore {
 
 func (m *MemoryStore) GetResources(ctx context.Context, filter model.Filter) ([]*model.Resource, error) {
 	result := m.resources
+	if !filter.IsEmpty() {
+		return nil, errors.New("not implemented")
+	}
 	m.logger.Sugar().Infow("Getting resources: ",
-		zap.String("filter", filter.String()),
+		zap.Object("filter", filter),
 		zap.Int("count", len(result)),
 	)
 	return result, nil
