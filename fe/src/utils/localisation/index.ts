@@ -5,7 +5,8 @@ i18n.use(initReactI18next).init({
 	resources: {
 		en: {
 			translation: {
-				APP_NAME: 'Cloud grep',
+				APP_NAME: 'Cloudgrep',
+				APP_HEADER: 'CloudGrep',
 
 				// GENERAL
 				ADD: 'Add',

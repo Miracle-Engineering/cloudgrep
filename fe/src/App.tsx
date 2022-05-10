@@ -5,13 +5,13 @@ import ErrorBoundary from 'components/ErrorHandling/ErrorBoundary';
 import Insights from 'pages/Insights';
 import React from 'react';
 
+import Header from './components/Header/Header';
+
 function App() {
 	return (
 		<div className="App">
 			<ErrorBoundary>
-				<span>
-					<span>CloudGrep</span>
-				</span>
+				<Header />
 				<Insights />
 			</ErrorBoundary>
 		</div>
