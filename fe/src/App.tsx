@@ -5,7 +5,7 @@ import ErrorBoundary from 'components/ErrorHandling/ErrorBoundary';
 import Insights from 'pages/Insights';
 import React from 'react';
 
-import Header from './components/Header/Header';
+import Header from './components/Header';
 
 function App() {
 	return (
