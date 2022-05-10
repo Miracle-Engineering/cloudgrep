@@ -1,35 +1,35 @@
 import { CSSProperties } from 'react';
 
 const headerStyle: CSSProperties = {
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
+	fontWeight: 'bold',
+	textTransform: 'uppercase',
 };
 
 const hoverStyle: CSSProperties = {
-    cursor: 'pointer',
-    backgroundColor: '#8FCAF9',
+	cursor: 'pointer',
+	backgroundColor: '#8FCAF9',
 };
 
 export const tableStyles = { hoverStyle, headerStyle };
 
 export const overrideSummaryClasses = {
-    content: 'summary_content',
-    root: 'summary_root',
+	content: 'summary_content',
+	root: 'summary_root',
 };
 
 const accordionHeader: CSSProperties = {
-    fontWeight: '400',
-    fontSize: '11px',
-    textTransform: 'uppercase',
-    marginBottom: '4px',
+	fontWeight: '400',
+	fontSize: '11px',
+	textTransform: 'uppercase',
+	marginBottom: '4px',
 };
 
 const accordionDetails: CSSProperties = {
-    overflow: 'hidden',
+	overflow: 'hidden',
 };
 
 export const accordionStyles = { accordionHeader, accordionDetails };
 
 export const labelClasses = {
-    label: 'label_label',
+	label: 'label_label',
 };
