@@ -7,7 +7,7 @@ import { store } from 'store/store';
 import { initAmplitude } from 'utils/amplitude/amplitude';
 
 // Add Amplitude integration
-if (process.env.REACT_APP_ENABLE_AMPLITUDE === 'true') {
+if (process.env.REACT_APP_ENABLE_AMPLITUDE === 'true' && process.env.NODE_ENV !== 'development') {
 	initAmplitude();
 }
 
