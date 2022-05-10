@@ -1,5 +1,3 @@
-import { AccordionDetailsClasses } from '@mui/material/AccordionDetails/accordionDetailsClasses';
-import { AccordionSummaryClasses } from '@mui/material/AccordionSummary/accordionSummaryClasses';
 import { CSSProperties } from 'react';
 
 const headerStyle: CSSProperties = {
@@ -14,15 +12,9 @@ const hoverStyle: CSSProperties = {
 
 export const tableStyles = { hoverStyle, headerStyle };
 
-export const overrideSummaryClasses: AccordionSummaryClasses = {
+export const overrideSummaryClasses = {
     content: 'summary_content',
-    root: '',
-    expanded: '',
-    focusVisible: '',
-    disabled: '',
-    gutters: '',
-    contentGutters: '',
-    expandIconWrapper: '',
+    root: 'summary_root',
 };
 
 const accordionHeader: CSSProperties = {
@@ -33,11 +25,11 @@ const accordionHeader: CSSProperties = {
 };
 
 const accordionDetails: CSSProperties = {
-    fontWeight: '400',
-    fontSize: '13px',
-    color: 'rgba(28, 43, 52, 0.98)',
-    fontFamily: 'NotoSans,Lucida Grande,Lucida Sans Unicode,sans-serif!important',
     overflow: 'hidden',
 };
 
 export const accordionStyles = { accordionHeader, accordionDetails };
+
+export const labelClasses = {
+    label: 'label_label',
+};

@@ -12,16 +12,11 @@ import React, { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from 'store/hooks';
 
-import { accordionStyles, overrideSummaryClasses } from './style';
+import { accordionStyles, labelClasses, overrideSummaryClasses } from './style';
 
 const InsightFilter: FC = () => {
 	const { tags, tagResource } = useAppSelector(state => state.tags);
 	const { t } = useTranslation();
-	const [expanded, setExpanded] = React.useState<string | false>('tagsPanel');
-
-	const handleChange = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
-		setExpanded(newExpanded ? panel : false);
-	};
 
 	const regions = useMemo((): Set<string> => {
 		return new Set(tagResource?.Resources?.map(resource => resource.Region) || ['']);
@@ -36,12 +31,8 @@ const InsightFilter: FC = () => {
 			sx={{
 				width: '20%',
 				height: '100%',
-				'&:hover': {
-					backgroundColor: 'primary.main',
-					opacity: [0.9, 0.8, 0.7],
-				},
 			}}>
-			<Accordion expanded={expanded === 'tagsPanel'} onChange={handleChange('tagsPanel')}>
+			<Accordion>
 				<AccordionSummary
 					sx={{ backgroundColor: 'rgb(226, 229, 237)', borderRadius: '4px', minHeight: '14px !important' }}
 					expandIcon={<ExpandMoreIcon />}
@@ -50,14 +41,14 @@ const InsightFilter: FC = () => {
 					classes={overrideSummaryClasses}>
 					<Typography sx={accordionStyles.accordionHeader}>{t('TAGS')}</Typography>
 				</AccordionSummary>
-				<AccordionDetails sx={accordionStyles.accordionDetails}>
-					<Typography sx={accordionStyles.accordionDetails}>
-						<FormGroup sx={accordionStyles.accordionDetails}>
+				<AccordionDetails>
+					<Typography>
+						<FormGroup>
 							{tags.map((tag: Tag) => (
 								<FormControlLabel
-									sx={accordionStyles.accordionDetails}
+									classes={labelClasses}
 									key={tag.Key}
-									control={<Checkbox defaultChecked />}
+									control={<Checkbox size={'small'} defaultChecked />}
 									label={tag.Key}
 								/>
 							))}
@@ -65,7 +56,7 @@ const InsightFilter: FC = () => {
 					</Typography>
 				</AccordionDetails>
 			</Accordion>
-			<Accordion expanded={expanded === 'regionPanel'} onChange={handleChange('regionPanel')}>
+			<Accordion>
 				<AccordionSummary
 					sx={{ backgroundColor: 'rgb(226, 229, 237)', borderRadius: '4px', minHeight: '14px !important' }}
 					expandIcon={<ExpandMoreIcon />}
@@ -74,15 +65,15 @@ const InsightFilter: FC = () => {
 					classes={overrideSummaryClasses}>
 					<Typography sx={accordionStyles.accordionHeader}>{t('REGIONS')}</Typography>
 				</AccordionSummary>
-				<AccordionDetails sx={accordionStyles.accordionDetails}>
-					<Typography sx={accordionStyles.accordionDetails}>
-						<FormGroup sx={accordionStyles.accordionDetails}>
+				<AccordionDetails>
+					<Typography>
+						<FormGroup>
 							{regions &&
 								Array.from(regions).map((region: string) => (
 									<FormControlLabel
-										sx={accordionStyles.accordionDetails}
+										classes={labelClasses}
 										key={region}
-										control={<Checkbox defaultChecked />}
+										control={<Checkbox size={'small'} defaultChecked />}
 										label={region}
 									/>
 								))}
@@ -90,7 +81,7 @@ const InsightFilter: FC = () => {
 					</Typography>
 				</AccordionDetails>
 			</Accordion>
-			<Accordion expanded={expanded === 'typePanel'} onChange={handleChange('typePanel')}>
+			<Accordion>
 				<AccordionSummary
 					sx={{ backgroundColor: 'rgb(226, 229, 237)', borderRadius: '4px', minHeight: '14px !important' }}
 					expandIcon={<ExpandMoreIcon />}
@@ -99,15 +90,15 @@ const InsightFilter: FC = () => {
 					classes={overrideSummaryClasses}>
 					<Typography sx={accordionStyles.accordionHeader}>{t('TYPES')}</Typography>
 				</AccordionSummary>
-				<AccordionDetails sx={accordionStyles.accordionDetails}>
-					<Typography sx={accordionStyles.accordionDetails}>
+				<AccordionDetails>
+					<Typography>
 						<FormGroup sx={accordionStyles.accordionDetails}>
 							{types &&
 								Array.from(types).map((type: string) => (
 									<FormControlLabel
-										sx={accordionStyles.accordionDetails}
+										classes={labelClasses}
 										key={type}
-										control={<Checkbox defaultChecked />}
+										control={<Checkbox size={'small'} defaultChecked />}
 										label={type}
 									/>
 								))}
