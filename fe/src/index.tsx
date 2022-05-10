@@ -1,19 +1,27 @@
 import './index.css';
 
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
+import { store } from 'store/store';
+import { initAmplitude } from 'utils/amplitude/amplitude';
+
+// Add Amplitude integration
+if (process.env.REACT_APP_ENABLE_AMPLITUDE === 'true' && process.env.NODE_ENV !== 'development') {
+	initAmplitude();
+}
 
 import App from './App';
-import { store } from './app/store';
 
-ReactDOM.render(
+const container = document.getElementById('root');
+const root = createRoot(container!);
+
+root.render(
 	<React.StrictMode>
 		<Provider store={store}>
 			<App />
 		</Provider>
-	</React.StrictMode>,
-	document.getElementById('root')
+	</React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -1,18 +1,19 @@
 import './App.css';
+import 'utils/localisation/index';
 
+import ErrorBoundary from 'components/ErrorHandling/ErrorBoundary';
+import Insights from 'pages/Insights';
 import React from 'react';
 
-import logo from './logo.svg';
+import Header from './components/Header';
 
 function App() {
 	return (
 		<div className="App">
-			<header className="App-header">
-				<img src={logo} className="App-logo" alt="logo" />
-				<span>
-					<span>CloudGrep</span>
-				</span>
-			</header>
+			<ErrorBoundary>
+				<Header />
+				<Insights />
+			</ErrorBoundary>
 		</div>
 	);
 }

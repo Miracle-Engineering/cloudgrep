@@ -5,7 +5,8 @@ i18n.use(initReactI18next).init({
 	resources: {
 		en: {
 			translation: {
-				APP_NAME: 'Cloud grep',
+				APP_NAME: 'Cloudgrep',
+				APP_HEADER: 'CloudGrep',
 
 				// GENERAL
 				ADD: 'Add',
@@ -21,6 +22,16 @@ i18n.use(initReactI18next).init({
 				REGISTER: 'Register',
 				EXISTING_ACCOUNT: 'Already have an account?',
 				NOT_FOUND: 'Not Found',
+
+				// Application specific
+				TAGS: 'Tags',
+
+				// Resources
+				TYPE: 'Type',
+				ID: 'Id',
+				REGION: 'Region',
+				REGIONS: 'REGIONS',
+				TYPES: 'TYPES',
 			},
 		},
 	},
