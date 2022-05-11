@@ -88,6 +88,10 @@
             {
                 "key": "vpc",
                 "value": "vpc-123"
+            },
+            {
+                "key": "debug:info",
+                "value": "breakpoint-123"
             }
         ],
         "properties": [

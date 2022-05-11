@@ -25,28 +25,6 @@ make build
 ./cloudgrep
 ```
 
-## API
-
-The backend exposes an API at `http://localhost:8080/api`.
-
-### Routes
-
-| Route | Method |  Description |  Status |
-| ------------- | ------------- | ------------- | ------------- |
-| [/info](http://localhost:8080/api/info)  | GET  | API information |  :white_check_mark: |
-| [/resources](http://localhost:8080/api/resources)  | GET  | Return list of cloud resources |  :white_check_mark: |
-| [/tags](http://localhost:8080/api/tags)  | GET  | Return list of tags |  :x: |
-
-### Example queries
-
-#### Resource filtering
-
-- `/resources` return all resources
-- `/resources?tags[team]=infra` return resources with the tag `team=infra`, meaning "team" with value "infra".
-- `/resources?tags[team]=infra&tags[env]=prod` return resources with the tags `team=infra` and `env=dev`
-- `/resources?tags[env]=prod,dev` return resources with the tags `env=prod` and `env=dev`
-- `/resources?tags[team]=*` return all the resources with the tag `team` defined
-
 ### AWS Resource supported
 
 | Type |  Status |
@@ -56,17 +34,6 @@ The backend exposes an API at `http://localhost:8080/api`.
 | S3 Bucket |  :x: |
 | EBS |  :x: |
 | RDS |  :x: |
-
-
-### Mocked data
-
-There is also a mocked API at `http://localhost:8080/mock/api`.  
-The mocked api serves static data, it doesn't handle any query parameters.
-
-| Route | Method |  Description |  Status |
-| ------------- | ------------- | ------------- | ------------- |
-| [/resources](http://localhost:8080/mock/api/resources)  | GET  |  Example of "resources" reponse | :white_check_mark: |
-| [/tags](http://localhost:8080/mock/api/tags)  | GET  |  Example of "tags" ressponse |  :white_check_mark: |
 
 ## Design
 

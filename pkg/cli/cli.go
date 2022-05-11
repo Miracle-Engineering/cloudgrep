@@ -49,7 +49,13 @@ func Run() error {
 		return fmt.Errorf("failed to start engine: %w", err)
 	}
 	if err = engine.Run(ctx); err != nil {
-		return err
+		stats, err := datastore.Stats(ctx)
+		if err == nil && stats.ResourcesCount >= 0 {
+			//log the error but the api can still server with the datastore
+			cfg.Logging.Logger.Sugar().Errorw("can't run engine", err)
+		} else {
+			return err
+		}
 	}
 
 	api.StartWebServer(ctx, cfg, datastore)

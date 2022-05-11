@@ -10,6 +10,8 @@ type Tag struct {
 	ResourceId string `json:"-" gorm:"primaryKey"`
 	Key        string `json:"key" gorm:"primaryKey"`
 	Value      string `json:"value"`
+	//when used as a filter indicates to look for resources without this tag
+	Exclude bool `json:"-"`
 }
 
 type Tags []Tag
@@ -63,4 +65,8 @@ func (t Tags) Clean() Tags {
 		tags = append(tags, tag.clean())
 	}
 	return tags
+}
+
+func (t Tags) Empty() bool {
+	return len(t) == 0
 }
