@@ -2,6 +2,8 @@ import { CSSProperties } from 'react';
 
 export const sideMenuStyle: CSSProperties = {
     height: '100%',
+    maxHeight: '100%',
+    overflow: 'scroll',
     width: '50%',
     border: '1px solid black',
     position: 'absolute',

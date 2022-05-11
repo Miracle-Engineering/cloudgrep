@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
+import { Property } from 'models/Resource';
 import { Tag } from 'models/Tag';
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -85,7 +86,17 @@ const SideMenu = () => {
 							</Box>
 						</TabPanel>
 						<TabPanel value={value} index={1}>
-							<Box>{currentResource.properties?.toString()}</Box>
+							<Box>
+								{currentResource.properties ? (
+									currentResource.properties.map((item: Property, index: number) => (
+										<Box key={index} sx={{ display: 'flex' }}>
+											<Typography> {`${item.name} : ${item.value}`} </Typography>
+										</Box>
+									))
+								) : (
+									<></>
+								)}
+							</Box>
 						</TabPanel>
 					</Box>
 				</Box>
