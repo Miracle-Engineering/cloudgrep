@@ -7,7 +7,7 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
-import { Tag } from 'models/Tag';
+import { MockTag } from 'models/Tag';
 import React, { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from 'store/hooks';
@@ -44,7 +44,7 @@ const InsightFilter: FC = () => {
 				<AccordionDetails>
 					<Typography>
 						<FormGroup>
-							{tags.map((tag: Tag) => (
+							{tags.map((tag: MockTag) => (
 								<FormControlLabel
 									classes={labelClasses}
 									key={tag.Key}

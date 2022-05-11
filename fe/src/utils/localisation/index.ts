@@ -25,6 +25,7 @@ i18n.use(initReactI18next).init({
 
 				// Application specific
 				TAGS: 'Tags',
+				PROPERTIES: 'Properties',
 
 				// Resources
 				TYPE: 'Type',

@@ -8,11 +8,12 @@ import { getTags } from 'store/tags/thunks';
 
 import InsightFilter from './InsightFilter';
 import InsightTable from './InsightTable';
+import SideMenu from './SideMenu';
 
 const Insights: FC = () => {
 	const dispatch = useAppDispatch();
 	const { tags } = useAppSelector(state => state.tags);
-	const { resources } = useAppSelector(state => state.resources);
+	const { resources, sideMenuVisible } = useAppSelector(state => state.resources);
 
 	useEffect(() => {
 		if (!tags?.length) {
@@ -30,6 +31,7 @@ const Insights: FC = () => {
 		<Box sx={{ display: 'flex' }}>
 			<InsightFilter />
 			<InsightTable />
+			{sideMenuVisible ? <SideMenu /> : <></>}
 		</Box>
 	);
 };

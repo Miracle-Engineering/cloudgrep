@@ -1,7 +1,7 @@
 import { MockResource } from './Resource';
-import { Tag } from './Tag';
+import { MockTag } from './Tag';
 
 export interface TagResource {
-	Tags: Tag[];
+	Tags: MockTag[];
 	Resources: MockResource[];
 }

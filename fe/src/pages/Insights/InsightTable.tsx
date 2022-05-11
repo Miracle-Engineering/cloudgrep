@@ -9,13 +9,20 @@ import TableRow from '@mui/material/TableRow';
 import { Resource } from 'models/Resource';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from 'store/hooks';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { setCurrentResource, toggleMenuVisible } from 'store/resources/slice';
 
 import { tableStyles } from './style';
 
 const InsightTable: FC = () => {
 	const { resources } = useAppSelector(state => state.resources);
 	const { t } = useTranslation();
+	const dispatch = useAppDispatch();
+
+	const handleClick = (resource: Resource) => {
+		dispatch(setCurrentResource(resource));
+		dispatch(toggleMenuVisible());
+	};
 
 	return (
 		<Box
@@ -39,6 +46,7 @@ const InsightTable: FC = () => {
 					<TableBody>
 						{resources.map((row: Resource, index: number) => (
 							<TableRow
+								onClick={() => handleClick(row)}
 								key={row.id + row.type + index}
 								sx={{
 									'&:last-child td, &:last-child th': { border: 0 },
