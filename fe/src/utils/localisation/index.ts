@@ -22,6 +22,8 @@ i18n.use(initReactI18next).init({
 				REGISTER: 'Register',
 				EXISTING_ACCOUNT: 'Already have an account?',
 				NOT_FOUND: 'Not Found',
+				SEARCH: 'Search',
+				SEARCH_TERM: 'Search term',
 
 				// Application specific
 				TAGS: 'Tags',

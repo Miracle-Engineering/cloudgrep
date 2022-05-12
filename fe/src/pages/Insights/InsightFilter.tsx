@@ -7,8 +7,9 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
+import SearchInput from 'components/SearchInput/SearchInput';
 import { MockTag } from 'models/Tag';
-import React, { FC, useMemo } from 'react';
+import React, { ChangeEvent, FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from 'store/hooks';
 
@@ -17,14 +18,28 @@ import { accordionStyles, labelClasses, overrideSummaryClasses } from './style';
 const InsightFilter: FC = () => {
 	const { tags, tagResource } = useAppSelector(state => state.tags);
 	const { t } = useTranslation();
+	const [searchTerm, setSearchTerm] = useState('');
+	const [searchTypeTerm, setSearchTypeTerm] = useState('');
 
 	const regions = useMemo((): Set<string> => {
 		return new Set(tagResource?.Resources?.map(resource => resource.Region) || ['']);
 	}, [tagResource.Resources?.length]);
 
 	const types = useMemo((): Set<string> => {
-		return new Set(tagResource?.Resources?.map(resource => resource.Type) || ['']);
-	}, [tagResource.Resources?.length]);
+		return new Set(
+			tagResource?.Resources?.filter(resource =>
+				resource.Type.toUpperCase().includes(searchTypeTerm.toUpperCase())
+			)?.map(resource => resource.Type) || ['']
+		);
+	}, [tagResource.Resources?.length, searchTypeTerm]);
+
+	const handleSearchTags = (e: ChangeEvent<HTMLInputElement>): void => {
+		setSearchTerm(e.target.value);
+	};
+
+	const handleSearchTypes = (e: ChangeEvent<HTMLInputElement>): void => {
+		setSearchTypeTerm(e.target.value);
+	};
 
 	return (
 		<Box
@@ -42,16 +57,19 @@ const InsightFilter: FC = () => {
 					<Typography sx={accordionStyles.accordionHeader}>{t('TAGS')}</Typography>
 				</AccordionSummary>
 				<AccordionDetails>
-					<Typography>
+					<SearchInput onChange={handleSearchTags} />
+					<Typography mt={1}>
 						<FormGroup>
-							{tags.map((tag: MockTag) => (
-								<FormControlLabel
-									classes={labelClasses}
-									key={tag.Key}
-									control={<Checkbox size={'small'} defaultChecked />}
-									label={tag.Key}
-								/>
-							))}
+							{tags
+								.filter(tag => tag.Key.toUpperCase().includes(searchTerm.toUpperCase()))
+								.map((tag: MockTag) => (
+									<FormControlLabel
+										classes={labelClasses}
+										key={tag.Key}
+										control={<Checkbox size={'small'} defaultChecked />}
+										label={tag.Key}
+									/>
+								))}
 						</FormGroup>
 					</Typography>
 				</AccordionDetails>
@@ -91,7 +109,8 @@ const InsightFilter: FC = () => {
 					<Typography sx={accordionStyles.accordionHeader}>{t('TYPES')}</Typography>
 				</AccordionSummary>
 				<AccordionDetails>
-					<Typography>
+					<SearchInput onChange={handleSearchTypes} />
+					<Typography mt={1}>
 						<FormGroup sx={accordionStyles.accordionDetails}>
 							{types &&
 								Array.from(types).map((type: string) => (
