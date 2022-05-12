@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { toggleMenuVisible } from 'store/resources/slice';
 
-import { sideMenuStyle } from './style';
+import { boxFirstLine, boxSecondLine, boxStyle, sideMenuLeftText, sideMenuRightText, sideMenuStyle } from './style';
 import TabPanel from './TabPanel';
 
 const SideMenu = () => {
@@ -22,7 +22,7 @@ const SideMenu = () => {
 	const { currentResource, sideMenuVisible } = useAppSelector(state => state.resources);
 	const [value, setValue] = React.useState(0);
 
-	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+	const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
 	};
 
@@ -57,12 +57,14 @@ const SideMenu = () => {
 					<Box sx={{ display: 'flex', justifyContent: 'end' }}>
 						<CloseIcon onClick={handleClose} sx={{ margin: '20px', cursor: 'pointer' }} />
 					</Box>
-					<Box sx={{ display: 'flex', flexDirection: 'column' }}>
-						<Box ml={2} sx={{ display: 'flex' }}>
-							<Typography> {`${t('ID')} : ${currentResource.id}`} </Typography>
+					<Box sx={{ display: 'flex', flexDirection: 'row' }}>
+						<Box ml={2} p={1} sx={boxStyle}>
+							<Typography {...boxFirstLine}>{`${t('ID')}`.toUpperCase()}</Typography>
+							<Typography {...boxSecondLine}> {`${currentResource.id}`} </Typography>
 						</Box>
-						<Box ml={2} sx={{ display: 'flex' }}>
-							<Typography> {`${t('REGION')} : ${currentResource.region}`} </Typography>
+						<Box ml={2} p={1} sx={boxStyle}>
+							<Typography {...boxFirstLine}> {`${t('REGION')}`.toUpperCase()} </Typography>
+							<Typography {...boxSecondLine}> {`${currentResource.region}`} </Typography>
 						</Box>
 					</Box>
 					<Box sx={{ width: '100%' }}>
@@ -77,7 +79,8 @@ const SideMenu = () => {
 								{currentResource.tags ? (
 									currentResource.tags.map((item: Tag, index: number) => (
 										<Box key={index} sx={{ display: 'flex' }}>
-											<Typography> {`${item.key} : ${item.value}`} </Typography>
+											<Typography mr={2} {...sideMenuLeftText}>{`${item.key} `}</Typography>
+											<Typography {...sideMenuRightText}>{` ${item.value}`}</Typography>
 										</Box>
 									))
 								) : (
@@ -90,7 +93,8 @@ const SideMenu = () => {
 								{currentResource.properties ? (
 									currentResource.properties.map((item: Property, index: number) => (
 										<Box key={index} sx={{ display: 'flex' }}>
-											<Typography> {`${item.name} : ${item.value}`} </Typography>
+											<Typography mr={2} {...sideMenuLeftText}>{`${item.name} `}</Typography>
+											<Typography {...sideMenuRightText}>{` ${item.value}`}</Typography>
 										</Box>
 									))
 								) : (
