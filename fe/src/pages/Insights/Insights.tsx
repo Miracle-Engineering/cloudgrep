@@ -28,7 +28,7 @@ const Insights: FC = () => {
 	}, [resources?.length]);
 
 	return (
-		<Box sx={{ display: 'flex' }}>
+		<Box sx={{ display: 'flex', height: '100%' }}>
 			<InsightFilter />
 			<InsightTable />
 			{sideMenuVisible ? <SideMenu /> : <></>}

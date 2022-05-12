@@ -29,6 +29,7 @@ const InsightTable: FC = () => {
 			sx={{
 				width: '80%',
 				height: '100%',
+				backgroundColor: '#F8F9FD',
 			}}>
 			<TableContainer component={Paper}>
 				<Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
