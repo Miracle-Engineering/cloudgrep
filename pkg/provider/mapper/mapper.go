@@ -127,6 +127,7 @@ func (m Mapper) ToResource(x any, region string) (model.Resource, error) {
 		return model.Resource{}, fmt.Errorf("could not find a mapping definition for type '%v'", t.String())
 	}
 
+	//generate properties
 	var properties []model.Property
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)

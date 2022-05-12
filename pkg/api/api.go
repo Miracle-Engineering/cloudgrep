@@ -64,7 +64,11 @@ func GetInfo(c *gin.Context) {
 // GetResources retrieves the cloud resources matching the query parameters
 func GetResources(c *gin.Context) {
 	datastore := c.MustGet("datastore").(datastore.Datastore)
-	resources, err := datastore.GetResources(c, model.NoFilter{})
+	filter := model.EmptyFilter()
+	if f, ok := c.Get("filter"); ok {
+		filter = f.(model.Filter)
+	}
+	resources, err := datastore.GetResources(c, filter)
 	if err != nil {
 		badRequest(c, err)
 		return

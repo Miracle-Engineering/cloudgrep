@@ -7,13 +7,23 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
+	"github.com/run-x/cloudgrep/pkg/model"
+	"go.uber.org/zap"
 )
+
+func setupMiddlewares(group *gin.RouterGroup, cfg config.Config, ds datastore.Datastore) {
+	if cfg.Logging.IsDev() {
+		group.Use(logAllQueryParams(cfg), logAllRequests(cfg))
+	}
+	group.Use(setDatastore(ds))
+	group.Use(setFilter(cfg))
+}
 
 // Middleware to print out request parameters and body for debugging
 func logAllQueryParams(cfg config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		err := c.Request.ParseForm()
-		cfg.Logging.Logger.Sugar().Infow("Request params:", "error", err, "params", c.Request.Form)
+		cfg.Logging.Logger.Sugar().Debug("Request params:", "error", err, "params", c.Request.Form)
 	}
 }
 
@@ -29,5 +39,16 @@ func setDatastore(ds datastore.Datastore) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("datastore", ds)
 		c.Next()
+	}
+}
+
+func setFilter(cfg config.Config) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tags := c.QueryMap("tags")
+		if len(tags) > 0 {
+			filter := model.NewFilter(tags)
+			cfg.Logging.Logger.Sugar().Debugw("Request filter:", zap.Object("filter", filter))
+			c.Set("filter", filter)
+		}
 	}
 }

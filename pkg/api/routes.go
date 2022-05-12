@@ -12,13 +12,6 @@ import (
 	"github.com/run-x/cloudgrep/pkg/datastore"
 )
 
-func SetupMiddlewares(group *gin.RouterGroup, cfg config.Config, ds datastore.Datastore) {
-	if cfg.Logging.IsDev() {
-		group.Use(logAllQueryParams(cfg), logAllRequests(cfg))
-	}
-	group.Use(setDatastore(ds))
-}
-
 func SetupRoutes(router *gin.Engine, cfg config.Config, ds datastore.Datastore) {
 	root := router.Group(cfg.Web.Prefix)
 
@@ -26,7 +19,7 @@ func SetupRoutes(router *gin.Engine, cfg config.Config, ds datastore.Datastore) 
 	root.GET("/static/*path", gin.WrapH(GetAssets(cfg.Web.Prefix)))
 
 	api := root.Group("/api")
-	SetupMiddlewares(api, cfg, ds)
+	setupMiddlewares(api, cfg, ds)
 
 	api.GET("/info", GetInfo)
 	api.GET("/resources", GetResources)
