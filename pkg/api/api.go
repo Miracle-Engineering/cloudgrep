@@ -75,3 +75,14 @@ func GetResources(c *gin.Context) {
 	}
 	c.JSON(200, resources)
 }
+
+// Stats provides stats about stored data
+func Stats(c *gin.Context) {
+	datastore := c.MustGet("datastore").(datastore.Datastore)
+	stats, err := datastore.Stats(c)
+	if err != nil {
+		badRequest(c, err)
+		return
+	}
+	c.JSON(200, stats)
+}

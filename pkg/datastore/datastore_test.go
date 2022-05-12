@@ -66,7 +66,8 @@ func TestFiltering(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 
 			resources := testdata.GetResources(t)
-			r1 := resources[0] //team:infra
+			r1 := resources[0] //team:infra, release tag
+			r2 := resources[1] //team:dev, no release tag
 
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
@@ -131,6 +132,63 @@ func TestFiltering(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, 2, len(resourcesRead))
 			util.AssertEqualsResources(t, resources, resourcesRead)
+
+			//test exclude - returns the resource without the tag release
+			filter = model.Filter{
+				Tags: []model.Tag{
+					{Key: "release", Value: "*", Exclude: true},
+				},
+			}
+			resourcesRead, err = datastore.GetResources(ctx, filter)
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(resourcesRead))
+			util.AssertEqualsResourcePter(t, r2, resourcesRead[0])
+
+			//test 2 exclusions - each resource has 1 tag but not both, kept them
+			filter = model.Filter{
+				Tags: []model.Tag{
+					{Key: "release", Value: "*", Exclude: true},
+					{Key: "debug:info", Value: "*", Exclude: true},
+				},
+			}
+			resourcesRead, err = datastore.GetResources(ctx, filter)
+			assert.NoError(t, err)
+			assert.Equal(t, 2, len(resourcesRead))
+			util.AssertEqualsResources(t, resources, resourcesRead)
+
+			//mix include and exclude filters
+			filter = model.Filter{
+				Tags: []model.Tag{
+					{Key: "release", Value: "*", Exclude: true},
+					{Key: "vpc", Value: "vpc-123"},
+				},
+			}
+			resourcesRead, err = datastore.GetResources(ctx, filter)
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(resourcesRead))
+			util.AssertEqualsResourcePter(t, r2, resourcesRead[0])
+
+		})
+	}
+}
+
+func TestStats(t *testing.T) {
+	ctx := context.Background()
+	for _, datastore := range newDatastores(t, ctx) {
+		name := fmt.Sprintf("%T", datastore)
+		t.Run(name, func(t *testing.T) {
+
+			resources := testdata.GetResources(t)
+			assert.NoError(t, datastore.WriteResources(ctx, resources))
+
+			stats, err := datastore.Stats(ctx)
+			//do not test result if not implemented
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+			//check stats
+			assert.NoError(t, err)
+			assert.Equal(t, model.Stats{ResourcesCount: 2}, stats)
 
 		})
 	}

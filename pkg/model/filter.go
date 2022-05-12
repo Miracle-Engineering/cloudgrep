@@ -23,3 +23,25 @@ func (f Filter) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 func NewFilter(tags map[string]string) Filter {
 	return Filter{Tags: newTags(tags)}
 }
+
+//TagIncludes returns the tags to include
+func (f Filter) TagsInclude() Tags {
+	var tags Tags
+	for _, tag := range f.Tags {
+		if !tag.Exclude {
+			tags = append(tags, tag)
+		}
+	}
+	return tags
+}
+
+//TagsExclude returns the tags to exclude
+func (f Filter) TagsExclude() Tags {
+	var tags Tags
+	for _, tag := range f.Tags {
+		if tag.Exclude {
+			tags = append(tags, tag)
+		}
+	}
+	return tags
+}
