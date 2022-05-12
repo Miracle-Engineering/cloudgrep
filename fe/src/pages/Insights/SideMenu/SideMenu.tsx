@@ -66,8 +66,12 @@ const SideMenu = () => {
 							<Typography {...boxFirstLine}> {`${t('REGION')}`.toUpperCase()} </Typography>
 							<Typography {...boxSecondLine}> {`${currentResource.region}`} </Typography>
 						</Box>
+						<Box ml={2} p={1} sx={boxStyle}>
+							<Typography {...boxFirstLine}> {`${t('TYPE')}`.toUpperCase()} </Typography>
+							<Typography {...boxSecondLine}> {`${currentResource.type}`} </Typography>
+						</Box>
 					</Box>
-					<Box sx={{ width: '100%' }}>
+					<Box sx={{ width: '100%' }} mt={2}>
 						<Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
 							<Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
 								<Tab label={t('TAGS')} {...commonTabProps(0)} />
