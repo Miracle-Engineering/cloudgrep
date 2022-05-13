@@ -51,6 +51,7 @@ require (
 )
 
 require (
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.18.4
 	github.com/gin-gonic/gin v1.7.7
 	github.com/stretchr/testify v1.7.1
 	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect

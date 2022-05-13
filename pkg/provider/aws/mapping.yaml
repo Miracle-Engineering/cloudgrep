@@ -14,3 +14,8 @@ mappings:
     idField: InstanceId
     # the method to call to fetch the resources, it must be implemented
     impl: FetchEC2Instances
+  - type: "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types.LoadBalancer"
+    resourceType: "elb.LoadBalancer"
+    idField: LoadBalancerArn
+    impl: FetchLoadBalancers
+    tagImpl: FetchLoadBalancerTag

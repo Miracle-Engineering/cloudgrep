@@ -36,7 +36,11 @@ type Mapping struct {
 	//method implementating fetching the resources, the provider must implement it
 	Impl string `yaml:"impl"`
 	//the method is found at runtime using Impl
-	Method reflect.Value
+	Method *reflect.Value
+	//optional: method implementating fetching the tags, only needed if there is not a field containing tags
+	TagImpl string `yaml:"tagImpl"`
+	//the method is found at runtime using TagImpl
+	TagMethod *reflect.Value
 }
 
 type Config struct {
@@ -92,6 +96,10 @@ func new(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 		mapping.IgnoredFields = append(mapping.IgnoredFields, mapping.TagField.Name)
 		//find the implementation method
 		mapping.Method = findImplMethod(providerValue, mapping.Impl)
+		//find the implementation method for tags
+		if mapping.TagImpl != "" {
+			mapping.TagMethod = findImplMethod(providerValue, mapping.TagImpl)
+		}
 		mapper.Mappings[mapping.Type] = mapping
 
 	}
@@ -101,7 +109,7 @@ func new(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 	return mapper, nil
 }
 
-func findImplMethod(v reflect.Value, impl string) reflect.Value {
+func findImplMethod(v reflect.Value, impl string) *reflect.Value {
 	//find the implementation method
 	method := v.MethodByName(impl)
 	if reflect.ValueOf(method).IsZero() {
@@ -111,20 +119,20 @@ func findImplMethod(v reflect.Value, impl string) reflect.Value {
 	if t := method.Type(); t.NumOut() != 2 || t.Out(0).Kind().String() != "slice" || t.Out(1).Name() != "error" {
 		panic(fmt.Errorf("method %v has invalid return type, expecting ([]any, error)", impl))
 	}
-	return method
+	return &method
 }
 
 //ToResource generate a Resource by using reflection
 // all fields will become properties
 // if there is a Tags field, this will become Tags
-func (m Mapper) ToResource(x any, region string) (model.Resource, error) {
+func (m Mapper) ToResource(ctx context.Context, x any, region string) (model.Resource, error) {
 
 	t := reflect.TypeOf(x)
 	// key is package name + Type.name to prevent duplicated keys
 	key := fmt.Sprintf("%v/%v", path.Dir(t.PkgPath()), t.String())
 	mapping, found := m.Mappings[key]
 	if !found {
-		return model.Resource{}, fmt.Errorf("could not find a mapping definition for type '%v'", t.String())
+		return model.Resource{}, fmt.Errorf("could not find a mapping definition for type '%v'", key)
 	}
 
 	//generate properties
@@ -147,12 +155,37 @@ func (m Mapper) ToResource(x any, region string) (model.Resource, error) {
 		}
 	}
 	if id == "" {
-		return model.Resource{}, fmt.Errorf("could not find id field '%v' for type '%T", mapping.IdField, t)
+		return model.Resource{}, fmt.Errorf("could not find id field '%v' for type '%v", mapping.IdField, key)
 	}
 
 	// generate tags field
-	tagsValue := reflect.ValueOf(x).FieldByName(mapping.TagField.Name)
-	tags := getTags(tagsValue, mapping.TagField)
+	var tags model.Tags
+	if mapping.TagMethod == nil {
+		//use field
+		tagsValue := reflect.ValueOf(x).FieldByName(mapping.TagField.Name)
+		tags = getTags(tagsValue, mapping.TagField)
+	} else {
+		//call the defined method
+		result := mapping.TagMethod.Call([]reflect.Value{reflect.ValueOf(ctx), reflect.ValueOf(x)})
+		for _, v := range result {
+			switch v.Kind() {
+			case reflect.Slice:
+				// got the tags
+				for i := 0; i < v.Len(); i++ {
+					tag := v.Index(i).Interface().(model.Tag)
+					tags = append(tags, tag)
+				}
+			case reflect.Interface:
+				// check if an error was returned
+				err, ok := v.Interface().(error)
+				if ok {
+					return model.Resource{}, err
+				}
+			default:
+				return model.Resource{}, fmt.Errorf("method '%v' has the wrong return type", mapping.TagImpl)
+			}
+		}
+	}
 
 	return model.Resource{
 		Id:         id,
@@ -191,7 +224,7 @@ func (m Mapper) fetchResources(ctx context.Context, mapping Mapping, region stri
 			//convert all slice elements to resources
 			for i := 0; i < v.Len(); i++ {
 				any := v.Index(i).Interface()
-				resource, err := m.ToResource(any, region)
+				resource, err := m.ToResource(ctx, any, region)
 				if err != nil {
 					return nil, fmt.Errorf("error converting %v result slice to resource: %w", mapping.Impl, err)
 				}
