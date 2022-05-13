@@ -13,7 +13,7 @@ func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context) ([]types.Insta
 	//TODO use pagination (consider returning a channel?)
 	result, err := awsPrv.ec2Client.DescribeInstances(ctx, input)
 	if err != nil {
-		return []types.Instance{}, err
+		return nil, err
 	}
 
 	for _, r := range result.Reservations {
