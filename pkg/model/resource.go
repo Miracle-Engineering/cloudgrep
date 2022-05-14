@@ -11,10 +11,22 @@ type Resource struct {
 	Properties Properties `json:"properties"`
 }
 
+type Resources []*Resource
+
 func (r Resource) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddString("id", r.Id)
 	enc.AddString("region", r.Region)
 	enc.AddString("type", r.Type)
 	//do not display tags and regions by default - too verbose
+	return nil
+}
+
+//FindById finds a resource by ID, return nil if not found
+func (rs Resources) FindById(id string) *Resource {
+	for _, r := range rs {
+		if r.Id == id {
+			return r
+		}
+	}
 	return nil
 }

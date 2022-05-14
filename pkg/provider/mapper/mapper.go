@@ -179,7 +179,11 @@ func (m Mapper) ToResource(ctx context.Context, x any, region string) (model.Res
 				// check if an error was returned
 				err, ok := v.Interface().(error)
 				if ok {
-					return model.Resource{}, err
+					//an error getting tags is not blocking, return the resource without tags
+					if !strings.Contains(err.Error(), "404") {
+						//404 means no tags - ignore this error code
+						m.logger.Sugar().Error(err)
+					}
 				}
 			default:
 				return model.Resource{}, fmt.Errorf("method '%v' has the wrong return type", mapping.TagImpl)

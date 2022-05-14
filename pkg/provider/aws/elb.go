@@ -23,7 +23,7 @@ func (p *AWSProvider) FetchLoadBalancerTag(ctx context.Context, lb types.LoadBal
 		&elbv2.DescribeTagsInput{ResourceArns: []string{*lb.LoadBalancerArn}},
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch tags for load balancer %v: %w", &lb.LoadBalancerArn, err)
+		return nil, fmt.Errorf("failed to fetch tags for load balancer %v: %w", *lb.LoadBalancerArn, err)
 	}
 	var tags model.Tags
 	for _, tagDescription := range tagsResponse.TagDescriptions {
