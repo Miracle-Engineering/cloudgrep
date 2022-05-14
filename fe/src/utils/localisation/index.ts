@@ -24,6 +24,13 @@ i18n.use(initReactI18next).init({
 				NOT_FOUND: 'Not Found',
 				SEARCH: 'Search',
 				SEARCH_TERM: 'Search term',
+				REFRESH: 'Refresh',
+
+				// HEADER:
+				HOME: 'Home',
+				SLACK: 'Slack',
+				GITHUB: 'Github',
+				CONTACT: 'Contact',
 
 				// Application specific
 				TAGS: 'Tags',
