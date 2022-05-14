@@ -9,8 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"go.uber.org/zap"
 
 	cfg "github.com/run-x/cloudgrep/pkg/config"
@@ -21,7 +21,8 @@ type AWSProvider struct {
 	logger    *zap.Logger
 	config    aws.Config
 	ec2Client *ec2.Client
-	elbClient *elasticloadbalancingv2.Client
+	elbClient *elbv2.Client
+	s3Client  *s3.Client
 	mapper    mapper.Mapper
 }
 
@@ -42,6 +43,7 @@ func NewAWSProvider(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) (
 	//create the clients
 	provider.ec2Client = ec2.NewFromConfig(provider.config)
 	provider.elbClient = elbv2.NewFromConfig(provider.config)
+	provider.s3Client = s3.NewFromConfig(provider.config)
 
 	//create the mapper for this provider
 	provider.mapper, err = mapper.New(embedConfig, *logger, reflect.ValueOf(&provider))

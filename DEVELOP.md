@@ -73,7 +73,7 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
         var instances []types.Instance
         result, err := awsPrv.ec2Client.DescribeInstances(ctx, input)
         if err != nil {
-            return nil, err
+		    return nil, fmt.Errorf("failed to fetch EC2 Instances: %w", err)
         }
 
         for _, r := range result.Reservations {
@@ -82,7 +82,7 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
         return instances, nil
     }
     ```
-1. Implement the method to return the tags. Unless there is already a `Tags` field, this method would need to be implemented. Here is an example for Load Balancer.
+1. [Optional] Implement the method to return the tags. Unless there is already a `Tags` field, this method would need to be implemented. Here is an example for Load Balancer.
     ```go
     // this method is named after the mapping.tagImpl value and return some model.Tags
     // The ELB doesn't have a Tags field so this method calls `elasticloadbalancingv2.DescribeTags`

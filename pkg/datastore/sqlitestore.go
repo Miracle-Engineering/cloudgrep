@@ -56,6 +56,15 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config) (*SQLiteStore, error
 	return &s, nil
 }
 
+func (s *SQLiteStore) getAllResourceIds(ctx context.Context) ([]resourceId, error) {
+	var resourceIds []resourceId
+	result := s.db.Model(&model.Resource{}).Select("id").Distinct().Find(&resourceIds)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return resourceIds, nil
+}
+
 func (s *SQLiteStore) getResourceIdsByTag(ctx context.Context, tags model.Tags) ([]resourceId, error) {
 	var resourceIds []resourceId
 	db := s.db.Model(&model.Tag{}).Select("resource_id").Distinct()
@@ -122,10 +131,19 @@ func (s *SQLiteStore) GetResources(ctx context.Context, filter model.Filter) ([]
 	var resources []*model.Resource
 
 	//apply filter tags:include
-	idsInclude, err := s.getResourceIdsByTag(ctx, filter.TagsInclude())
+	includeTags := filter.TagsInclude()
+	var err error
+	var idsInclude []resourceId
+	if includeTags.Empty() {
+		//no include filter set - include all
+		idsInclude, err = s.getAllResourceIds(ctx)
+	} else {
+		idsInclude, err = s.getResourceIdsByTag(ctx, includeTags)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("can't get resources from database: %w", err)
 	}
+
 	//apply filter tags:exclude
 	var idsExclude []resourceId
 	if tagsExclude := filter.TagsExclude(); !tagsExclude.Empty() {

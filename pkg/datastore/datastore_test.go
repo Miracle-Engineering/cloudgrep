@@ -55,6 +55,7 @@ func TestReadWrite(t *testing.T) {
 			var resourcesRead []*model.Resource
 			resourcesRead, err := datastore.GetResources(ctx, model.EmptyFilter())
 			assert.NoError(t, err)
+			assert.Equal(t, len(resources), len(resourcesRead))
 			util.AssertEqualsResources(t, resources, resourcesRead)
 		})
 	}
@@ -65,11 +66,12 @@ func TestFiltering(t *testing.T) {
 		name := fmt.Sprintf("%T", datastore)
 		t.Run(name, func(t *testing.T) {
 
-			resources := testdata.GetResources(t)
-			r1 := resources[0] //team:infra, release tag
-			r2 := resources[1] //team:dev, no release tag
+			all_resources := testdata.GetResources(t)
+			resourceInst1 := all_resources[0]  //team:infra, release tag
+			resourceInst2 := all_resources[1]  //team:dev, no release tag
+			resourceBucket := all_resources[2] //s3 bucket without tags
 
-			assert.NoError(t, datastore.WriteResources(ctx, resources))
+			assert.NoError(t, datastore.WriteResources(ctx, all_resources))
 
 			var resourcesRead []*model.Resource
 
@@ -85,7 +87,7 @@ func TestFiltering(t *testing.T) {
 			//check 1 result returned
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(resourcesRead))
-			util.AssertEqualsResourcePter(t, r1, resourcesRead[0])
+			util.AssertEqualsResourcePter(t, resourceInst1, resourcesRead[0])
 
 			//check 2 tags filter: both resources have both tags - 2 results
 			filter = model.Filter{
@@ -97,7 +99,7 @@ func TestFiltering(t *testing.T) {
 			resourcesRead, err = datastore.GetResources(ctx, filter)
 			assert.NoError(t, err)
 			assert.Equal(t, 2, len(resourcesRead))
-			util.AssertEqualsResources(t, resources, resourcesRead)
+			util.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, resourcesRead)
 
 			//check 2 tags filter on same key - 2 results
 			filter = model.Filter{
@@ -109,7 +111,7 @@ func TestFiltering(t *testing.T) {
 			resourcesRead, err = datastore.GetResources(ctx, filter)
 			assert.NoError(t, err)
 			assert.Equal(t, 2, len(resourcesRead))
-			util.AssertEqualsResources(t, resources, resourcesRead)
+			util.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, resourcesRead)
 
 			//check 2 distinct tags - but no resource has both - 0 results
 			filter = model.Filter{
@@ -131,9 +133,9 @@ func TestFiltering(t *testing.T) {
 			resourcesRead, err = datastore.GetResources(ctx, filter)
 			assert.NoError(t, err)
 			assert.Equal(t, 2, len(resourcesRead))
-			util.AssertEqualsResources(t, resources, resourcesRead)
+			util.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, resourcesRead)
 
-			//test exclude - returns the resource without the tag release
+			//test exclude - returns the resources without the tag release
 			filter = model.Filter{
 				Tags: []model.Tag{
 					{Key: "release", Value: "*", Exclude: true},
@@ -141,10 +143,10 @@ func TestFiltering(t *testing.T) {
 			}
 			resourcesRead, err = datastore.GetResources(ctx, filter)
 			assert.NoError(t, err)
-			assert.Equal(t, 1, len(resourcesRead))
-			util.AssertEqualsResourcePter(t, r2, resourcesRead[0])
+			assert.Equal(t, 2, len(resourcesRead))
+			util.AssertEqualsResources(t, model.Resources{resourceInst2, resourceBucket}, resourcesRead)
 
-			//test 2 exclusions - each resource has 1 tag but not both, kept them
+			//test 2 exclusions - each instance resource has 1 tag but not both, kept them
 			filter = model.Filter{
 				Tags: []model.Tag{
 					{Key: "release", Value: "*", Exclude: true},
@@ -153,8 +155,7 @@ func TestFiltering(t *testing.T) {
 			}
 			resourcesRead, err = datastore.GetResources(ctx, filter)
 			assert.NoError(t, err)
-			assert.Equal(t, 2, len(resourcesRead))
-			util.AssertEqualsResources(t, resources, resourcesRead)
+			util.AssertEqualsResources(t, all_resources, resourcesRead)
 
 			//mix include and exclude filters
 			filter = model.Filter{
@@ -166,7 +167,7 @@ func TestFiltering(t *testing.T) {
 			resourcesRead, err = datastore.GetResources(ctx, filter)
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(resourcesRead))
-			util.AssertEqualsResourcePter(t, r2, resourcesRead[0])
+			util.AssertEqualsResourcePter(t, resourceInst2, resourcesRead[0])
 
 		})
 	}
@@ -188,7 +189,7 @@ func TestStats(t *testing.T) {
 			}
 			//check stats
 			assert.NoError(t, err)
-			assert.Equal(t, model.Stats{ResourcesCount: 2}, stats)
+			assert.Equal(t, model.Stats{ResourcesCount: 3}, stats)
 
 		})
 	}

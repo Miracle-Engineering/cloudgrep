@@ -7,10 +7,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func AssertEqualsResources(t *testing.T, a, b []*model.Resource) {
+func AssertEqualsResources(t *testing.T, a, b model.Resources) {
 	assert.Equal(t, len(a), len(b))
-	for i, v := range a {
-		AssertEqualsResource(t, *v, *b[i])
+	for _, resourceA := range a {
+		resourceB := b.FindById(resourceA.Id)
+		if resourceB == nil {
+			t.Errorf("can't find a resource with id %v", resourceA.Id)
+			return
+		}
+		AssertEqualsResource(t, *resourceA, *resourceB)
 	}
 }
 

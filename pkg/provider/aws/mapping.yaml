@@ -19,3 +19,8 @@ mappings:
     idField: LoadBalancerArn
     impl: FetchLoadBalancers
     tagImpl: FetchLoadBalancerTag
+  - type: "github.com/aws/aws-sdk-go-v2/service/s3/types.Bucket"
+    resourceType: "s3.Bucket"
+    idField: Name
+    impl: FetchS3Buckets
+    tagImpl: FetchS3BucketsTag
