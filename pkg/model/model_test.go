@@ -1,7 +1,6 @@
 package model
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,13 +12,10 @@ func TestNewTags(t *testing.T) {
 		"region":  "us-east-1",
 	}
 	tags := newTags(values)
-	assert.True(t, reflect.DeepEqual(
-		Tags{
-			{Key: "cluster", Value: "stagging"},
-			{Key: "region", Value: "us-east-1"},
-		},
-		tags,
-	))
+	assert.ElementsMatch(t, Tags{
+		{Key: "cluster", Value: "stagging"},
+		{Key: "region", Value: "us-east-1"},
+	}, tags)
 	assert.Equal(t, 2, tags.DistinctKeys())
 
 	//same tag multiple values
@@ -28,14 +24,11 @@ func TestNewTags(t *testing.T) {
 		"regions": "us-east-1,us-east2",
 	}
 	tags = newTags(values)
-	assert.True(t, reflect.DeepEqual(
-		Tags{
-			{Key: "cluster", Value: "stagging"},
-			{Key: "regions", Value: "us-east-1"},
-			{Key: "regions", Value: "us-east2"},
-		},
-		tags,
-	))
+	assert.ElementsMatch(t, Tags{
+		{Key: "cluster", Value: "stagging"},
+		{Key: "regions", Value: "us-east-1"},
+		{Key: "regions", Value: "us-east2"},
+	}, tags)
 	assert.Equal(t, 2, tags.DistinctKeys())
 }
 
