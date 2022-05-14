@@ -1,6 +1,8 @@
 import './Insights.css';
 
 import Box from '@mui/material/Box';
+import SearchInput from 'components/SearchInput/SearchInput';
+import { BACKGROUND_COLOR } from 'constants/colors';
 import React, { FC, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getResources } from 'store/resources/thunks';
@@ -27,12 +29,28 @@ const Insights: FC = () => {
 		}
 	}, [resources?.length]);
 
+	const handleChange = () => {
+		// TODO
+	};
+
 	return (
-		<Box sx={{ display: 'flex', height: '100%' }}>
-			<InsightFilter />
-			<InsightTable />
-			{sideMenuVisible ? <SideMenu /> : <></>}
-		</Box>
+		<>
+			<Box
+				sx={{
+					backgroundColor: BACKGROUND_COLOR,
+					display: 'flex',
+					justifyContent: 'end',
+					paddingRight: '44px',
+				}}
+				p={2}>
+				<SearchInput width={'400px'} height={'32px'} onChange={handleChange} />
+			</Box>
+			<Box sx={{ display: 'flex', height: '100%' }}>
+				<InsightFilter />
+				<InsightTable />
+				{sideMenuVisible ? <SideMenu /> : <></>}
+			</Box>
+		</>
 	);
 };
 

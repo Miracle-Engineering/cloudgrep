@@ -13,7 +13,7 @@ import React, { ChangeEvent, FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from 'store/hooks';
 
-import { accordionStyles, labelClasses, overrideSummaryClasses } from './style';
+import { accordionStyles, filterHeader, labelClasses, overrideSummaryClasses } from './style';
 
 const InsightFilter: FC = () => {
 	const { tags, tagResource } = useAppSelector(state => state.tags);
@@ -44,13 +44,14 @@ const InsightFilter: FC = () => {
 	return (
 		<Box
 			sx={{
-				width: '20%',
+				width: '15%',
 				height: '100%',
+				backgroundColor: '#F9F7F6',
 			}}>
 			<Accordion>
 				<AccordionSummary
-					sx={{ backgroundColor: 'rgb(226, 229, 237)', borderRadius: '4px', minHeight: '14px !important' }}
-					expandIcon={<ExpandMoreIcon />}
+					sx={filterHeader}
+					expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
 					aria-controls="panel1a-content"
 					id="panel1a-header"
 					classes={overrideSummaryClasses}>
@@ -76,8 +77,8 @@ const InsightFilter: FC = () => {
 			</Accordion>
 			<Accordion>
 				<AccordionSummary
-					sx={{ backgroundColor: 'rgb(226, 229, 237)', borderRadius: '4px', minHeight: '14px !important' }}
-					expandIcon={<ExpandMoreIcon />}
+					sx={filterHeader}
+					expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
 					aria-controls="panel2a-content"
 					id="panel2a-header"
 					classes={overrideSummaryClasses}>
@@ -101,8 +102,8 @@ const InsightFilter: FC = () => {
 			</Accordion>
 			<Accordion>
 				<AccordionSummary
-					sx={{ backgroundColor: 'rgb(226, 229, 237)', borderRadius: '4px', minHeight: '14px !important' }}
-					expandIcon={<ExpandMoreIcon />}
+					sx={filterHeader}
+					expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
 					aria-controls="panel2a-content"
 					id="panel2a-header"
 					classes={overrideSummaryClasses}>

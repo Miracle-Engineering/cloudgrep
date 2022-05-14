@@ -27,9 +27,11 @@ const InsightTable: FC = () => {
 	return (
 		<Box
 			sx={{
-				width: '80%',
+				width: '85%',
 				height: '100%',
-				backgroundColor: '#F8F9FD',
+				backgroundColor: '#F9F7F6',
+				paddingLeft: '28px',
+				paddingRight: '44px',
 			}}>
 			<TableContainer component={Paper}>
 				<Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
@@ -50,6 +52,7 @@ const InsightTable: FC = () => {
 								onClick={() => handleClick(row)}
 								key={row.id + row.type + index}
 								sx={{
+									height: '77px',
 									'&:last-child td, &:last-child th': { border: 0 },
 									'&:hover': tableStyles.hoverStyle,
 								}}>
