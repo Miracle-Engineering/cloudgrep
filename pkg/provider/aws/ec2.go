@@ -22,3 +22,13 @@ func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context) ([]types.Insta
 	}
 	return instances, nil
 }
+
+func (p *AWSProvider) FetchEBSVolumes(ctx context.Context) ([]types.Volume, error) {
+	input := &ec2.DescribeVolumesInput{}
+
+	result, err := p.ec2Client.DescribeVolumes(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch EC2 EBS Volumes: %w", err)
+	}
+	return result.Volumes, nil
+}
