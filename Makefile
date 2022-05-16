@@ -67,11 +67,11 @@ release: LDFLAGS += -X $(PKG)/pkg/api.BuildTime=$(BUILD_TIME)
 release: LDFLAGS += -X $(PKG)/pkg/api.GoVersion=$(GO_VERSION)
 release: LDFLAGS += -X $(PKG)/pkg/api.Version=$(VERSION)
 release:
-	@echo "Building binaries..."
-	@CGO_ENABLED=1 gox \
-		-osarch "$(TARGETS)" \
-		-ldflags "$(LDFLAGS)" \
-		-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
+	# @echo "Building binaries..."
+	# @CGO_ENABLED=1 gox \
+	# 	-osarch "$(TARGETS)" \
+	# 	-ldflags "$(LDFLAGS)" \
+	# 	-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
 
 	@echo "Building ARM binaries..."
 	CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=5 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm_v5"
