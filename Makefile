@@ -74,10 +74,10 @@ release:
 	# 	-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
 
 	@echo "Building ARM binaries..."
-	CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=5 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm_v5"
+	CC=arm-linux-gnueabi-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=5 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm_v5"
 
 	@echo "Building ARM64 binaries..."
-	CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm64_v7"
+	CC=arm-linux-gnueabi-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm64_v7"
 
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh
