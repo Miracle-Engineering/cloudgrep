@@ -1,3 +1,4 @@
+name: frontend-asset
 on:
   push:
     # branches:
@@ -20,6 +21,9 @@ jobs:
       run: npm ci
     - name: Builds the app for production
       working-directory: ./fe
+      env:
+        # TODO remove when warnings have been addressed
+        CI: false
       run: npm run build
     - name: Replace the static assets
       working-directory: ./static
