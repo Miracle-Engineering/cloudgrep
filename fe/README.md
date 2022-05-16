@@ -39,6 +39,10 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
+## Continuous Integration
+
+When creating a PR with changes in the `./fe` directory, a github action called [frontend-asset](/.github/workflows/frontend-asset.yml) is triggered to build the app for production and update the assets used by the Go app in `./static`. This action will create a commit to the existing PR to update the assets.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
