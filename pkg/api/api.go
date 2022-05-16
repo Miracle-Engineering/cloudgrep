@@ -66,12 +66,15 @@ func Resource(c *gin.Context) {
 	datastore := c.MustGet("datastore").(datastore.Datastore)
 	id := c.GetString("id")
 	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing required parameter 'id'"})
+		badRequest(c, fmt.Errorf("missing required parameter 'id'"))
 		return
 	}
 	resource, err := datastore.GetResource(c, id)
-	if err != nil || resource == nil {
-		notFoundf(c, "can't find resource with id '%v': %w", id, err)
+	if err != nil {
+		badRequest(c, err)
+	}
+	if resource == nil {
+		notFoundf(c, "can't find resource with id '%v'", id)
 		return
 	}
 	c.JSON(200, resource)
