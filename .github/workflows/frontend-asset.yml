@@ -1,8 +1,10 @@
+# build the frontend asset and commit the changes to the current branch
 name: frontend-asset
 on:
-  push:
-    # branches:
-    # - main
+  # trigger when the frontend files are changed
+  pull_request:
+    paths:
+      - 'fe/**'
 
 jobs:
   build:
