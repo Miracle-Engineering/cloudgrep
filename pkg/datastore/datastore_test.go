@@ -49,6 +49,7 @@ func TestReadWrite(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 
 			resources := testdata.GetResources(t)
+			assert.NotZero(t, len(resources))
 
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
@@ -57,6 +58,14 @@ func TestReadWrite(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, len(resources), len(resourcesRead))
 			util.AssertEqualsResources(t, resources, resourcesRead)
+
+			//test getting a specific resource
+			for _, r := range resources {
+				resource, err := datastore.GetResource(ctx, r.Id)
+				assert.NoError(t, err)
+				util.AssertEqualsResourcePter(t, r, resource)
+			}
+
 		})
 	}
 }

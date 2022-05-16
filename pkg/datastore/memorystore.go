@@ -25,6 +25,16 @@ func NewMemoryStore(ctx context.Context, cfg config.Config) *MemoryStore {
 	return &datastore
 }
 
+func (m *MemoryStore) GetResource(ctx context.Context, id string) (*model.Resource, error) {
+	for _, r := range m.resources {
+		if r.Id == id {
+			return r, nil
+		}
+	}
+	//not found
+	return nil, nil
+}
+
 func (m *MemoryStore) GetResources(ctx context.Context, filter model.Filter) ([]*model.Resource, error) {
 	result := m.resources
 	if !filter.IsEmpty() {

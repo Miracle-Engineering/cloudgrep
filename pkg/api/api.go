@@ -51,8 +51,8 @@ func GetAssets(prefix string) http.Handler {
 	return http.StripPrefix(prefix, http.FileServer(http.FS(static.Static)))
 }
 
-// GetInfo renders the system information
-func GetInfo(c *gin.Context) {
+// Info renders the system information
+func Info(c *gin.Context) {
 	successResponse(c, gin.H{
 		"version":    Version,
 		"go_version": GoVersion,
@@ -61,8 +61,24 @@ func GetInfo(c *gin.Context) {
 	})
 }
 
-// GetResources retrieves the cloud resources matching the query parameters
-func GetResources(c *gin.Context) {
+// Resource retrieves a resource by its id
+func Resource(c *gin.Context) {
+	datastore := c.MustGet("datastore").(datastore.Datastore)
+	id := c.GetString("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing required parameter 'id'"})
+		return
+	}
+	resource, err := datastore.GetResource(c, id)
+	if err != nil || resource == nil {
+		notFoundf(c, "can't find resource with id '%v': %w", id, err)
+		return
+	}
+	c.JSON(200, resource)
+}
+
+// Resources retrieves the cloud resources matching the query parameters
+func Resources(c *gin.Context) {
 	datastore := c.MustGet("datastore").(datastore.Datastore)
 	filter := model.EmptyFilter()
 	if f, ok := c.Get("filter"); ok {
