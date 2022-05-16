@@ -23,6 +23,9 @@ jobs:
     - name: Install project dependencies
       working-directory: ./fe
       run: npm ci
+    - name: Run tests
+      working-directory: ./fe
+      run: npm test
     - name: Builds the app for production
       working-directory: ./fe
       env:
@@ -30,21 +33,15 @@ jobs:
         CI: false
       run: npm run build
     - name: Replace the static assets
-      working-directory: ./static
       run: |
-        rm -rf ./css ./js *.ico *.html *.txt *.json *.png
-        cp -r ../fe/build/static/css .
-        cp -r ../fe/build/static/js .
-        cp ../fe/build/*.ico .
-        cp ../fe/build/*.html .
-        cp ../fe/build/*.txt .
-        cp ../fe/build/*.json .
-        cp ../fe/build/*.png .
+        make frontend-deploy
     - name: Commit the static assets
       # this will commit the changes to the static assets in the current branch 
       run: |
         git config --global user.name 'Cloudgrep'
         git config --global user.email 'cloudgrep@users.noreply.github.com'
         git add ./static
-        git commit -am "Update static assets"
-        git push
+        if ! git diff-index --quiet HEAD; then
+          git commit -am "Update static assets"
+          git push
+        fi
