@@ -30,16 +30,8 @@ jobs:
         CI: false
       run: npm run build
     - name: Replace the static assets
-      working-directory: ./static
       run: |
-        rm -rf ./css ./js *.ico *.html *.txt *.json *.png
-        cp -r ../fe/build/static/css .
-        cp -r ../fe/build/static/js .
-        cp ../fe/build/*.ico .
-        cp ../fe/build/*.html .
-        cp ../fe/build/*.txt .
-        cp ../fe/build/*.json .
-        cp ../fe/build/*.png .
+        make frontend-deploy
     - name: Commit the static assets
       # this will commit the changes to the static assets in the current branch 
       run: |
