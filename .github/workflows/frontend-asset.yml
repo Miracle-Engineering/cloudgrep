@@ -5,11 +5,11 @@ on:
     # - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Node
       uses: actions/setup-node@v2
       with:
@@ -36,3 +36,11 @@ jobs:
         cp ../fe/build/*.txt .
         cp ../fe/build/*.json .
         cp ../fe/build/*.png .
+    - name: Commit the static assets
+      # this will commit the changes to the static assets in the current branch 
+      run: |
+        git config --global user.name 'Cloudgrep'
+        git config --global user.email 'cloudgrep@users.noreply.github.com'
+        git add ./static
+        git commit -am "Update static assets"
+        git push
