@@ -20,6 +20,12 @@ jobs:
         with:
           go-version: 1.18
 
+      - name: Install GCC and SQLite for Arm64
+        uses: ryankurte/action-apt@v0.3.0
+        with:
+          arch: arm64
+          packages: "gcc-10-aarch64-linux-gnu gcc-aarch64-linux-gnu libsqlite3-dev:arm64"
+          
       - name: Build Release Artifacts
         if: "!steps.bumpr.outputs.skip"
         id: build
