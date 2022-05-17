@@ -1,4 +1,4 @@
-TARGETS = darwin/amd64 darwin/arm64 linux/amd64 linux/386 windows/amd64 windows/386
+TARGETS = darwin/amd64 linux/amd64 linux/386 windows/amd64 windows/386
 VERSION ?= dev
 GITHUB_SHA ?= $(shell git rev-parse HEAD)
 BUILD_TIME = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n')
@@ -78,6 +78,11 @@ release:
 
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh
+
+release-darwin-arm64:
+	@echo "Building Darwin ARM64 binaries (require Mac OS)..."
+	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin \
+		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_arm64"
 
 
 release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GIT_COMMIT)
