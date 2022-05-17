@@ -83,7 +83,9 @@ release-darwin-arm64:
 	@echo "Building Darwin ARM64 binaries (require Mac OS)..."
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin \
 		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_arm64"
-
+		
+	@echo "\nPackaging binaries...\n"
+	@./script/package.sh
 
 release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GIT_COMMIT)
 release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.BuildTime=$(BUILD_TIME)
