@@ -2,13 +2,20 @@ import './index.css';
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import ReactGA from 'react-ga';
 import { Provider } from 'react-redux';
 import { store } from 'store/store';
 import { initAmplitude } from 'utils/amplitude/amplitude';
 
 // Add Amplitude integration
-if (process.env.REACT_APP_ENABLE_AMPLITUDE === 'true' && process.env.NODE_ENV !== 'development') {
+if (process.env.REACT_APP_ENABLE_AMPLITUDE === 'true') {
 	initAmplitude();
+}
+
+// Add Google Analytics integration
+if (process.env.REACT_APP_ENABLE_GA === 'true') {
+	ReactGA.initialize('UA-228613342');
+	ReactGA.pageview(window.location.pathname + window.location.search);
 }
 
 import App from './App';
