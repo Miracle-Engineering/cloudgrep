@@ -79,7 +79,7 @@ release:
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh
 
-release-darwin-arm64:
+release-darwin:
 	@echo "Building Darwin ARM64 binaries..."
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=arm64 GOOS=darwin \
 		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_arm64"
