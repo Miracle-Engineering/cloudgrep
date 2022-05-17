@@ -1,4 +1,4 @@
-TARGETS = darwin/amd64 darwin/arm64 linux/386 windows/amd64 windows/386
+TARGETS = darwin/amd64 darwin/arm64 linux/amd64 linux/386 windows/amd64 windows/386
 VERSION ?= dev
 GITHUB_SHA ?= $(shell git rev-parse HEAD)
 BUILD_TIME = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n')
@@ -73,8 +73,8 @@ release:
 		-ldflags "$(LDFLAGS)" \
 		-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
 
-	@echo "Building Linux AMD64 binaries..."
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 GOARM=5 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_amd64"
+	# @echo "Building Linux AMD64 binaries..."
+	# CGO_ENABLED=1 GOOS=linux GOARCH=amd64 GOARM=5 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_amd64"
 
 	@echo "Building Linux ARM64 binaries..."
 	CC="/usr/bin/aarch64-linux-gnu-gcc" CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm64_v7"
