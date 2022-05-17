@@ -80,9 +80,13 @@ release:
 	@./script/package.sh
 
 release-darwin-arm64:
-	@echo "Building Darwin ARM64 binaries (require Mac OS)..."
-	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin \
+	@echo "Building Darwin ARM64 binaries..."
+	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=arm64 GOOS=darwin \
 		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_arm64"
+
+	@echo "Building Darwin AMD64 binaries (require Mac OS)..."
+	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin \
+		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_amd64"
 		
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh
