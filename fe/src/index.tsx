@@ -16,7 +16,7 @@ if (process.env.REACT_APP_ENABLE_GA === 'true' && process.env.NODE_ENV !== 'deve
 	const gtagScript = document.createElement('script'); // Make a script DOM node
 
 	// Google Analytics (ga) script is added to public folder
-	gtagScript.src = `${process.env.PUBLIC_URL?.toString() || ''}/ga.js`; // Set it's src to the provided URL
+	gtagScript.src = `${process.env.PUBLIC_URL?.toString() || ''}/static/js/ga.js`; // Set it's src to the provided URL
 
 	const gaScript = document.createElement('script');
 	gaScript.async = true;

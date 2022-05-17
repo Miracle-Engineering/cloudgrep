@@ -50,6 +50,7 @@ frontend-deploy:
 	cp -r ./fe/build/static/js ./static
 	cp ./fe/build/*.ico ./static
 	cp ./fe/build/*.html ./static
+	cp ./fe/build/*.js ./static/js
 	cp ./fe/build/*.txt ./static
 	cp ./fe/build/*.json ./static
 	cp ./fe/build/*.png ./static

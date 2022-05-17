@@ -2,18 +2,21 @@ import './App.css';
 import 'utils/localisation/index';
 
 import ErrorBoundary from 'components/ErrorHandling/ErrorBoundary';
-import Insights from 'pages/Insights';
 import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import Routes from 'routes/Routes';
 
 import Header from './components/Header';
 
 function App() {
 	return (
 		<div className="App">
-			<ErrorBoundary>
-				<Header />
-				<Insights />
-			</ErrorBoundary>
+			<Router>
+				<ErrorBoundary>
+					<Header />
+					<Routes />
+				</ErrorBoundary>
+			</Router>
 		</div>
 	);
 }
