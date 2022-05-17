@@ -36,6 +36,7 @@ jobs:
         path: ./bin/cloudgrep_darwin_arm64
 
   build-ubuntu:
+    needs: [build-macos]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
