@@ -32,7 +32,6 @@ jobs:
 
     - name: Build Mac OS ARM64
       if: "!steps.bumpr.outputs.skip"
-      if: "!steps.bumpr.outputs.skip"
       id: build
       run: |
         make release-darwin-arm64
@@ -98,9 +97,9 @@ jobs:
       if: "!steps.bumpr.outputs.skip"
       with:
         name: cloudgrep_darwin_arm64
-    - run: |
-        if: "!steps.bumpr.outputs.skip"
-        cp cloudgrep_darwin_arm64 ./bin/
+    - if: "!steps.bumpr.outputs.skip"
+      run: |
+          cp cloudgrep_darwin_arm64 ./bin/
 
     - name: Create Release
       if: "!steps.bumpr.outputs.skip"
