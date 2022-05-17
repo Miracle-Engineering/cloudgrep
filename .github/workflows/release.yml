@@ -85,7 +85,7 @@ jobs:
         arch: arm64
         packages: "gcc-10-aarch64-linux-gnu gcc-aarch64-linux-gnu libsqlite3-dev:arm64"
 
-    - name: Build Release Artifacts
+    - name: Build Release Artifacts Windows and Linux
       id: build
       run: |
         make setup

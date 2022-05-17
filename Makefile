@@ -1,4 +1,4 @@
-TARGETS = darwin/amd64 linux/amd64 linux/386 windows/amd64 windows/386
+TARGETS = linux/amd64 linux/386 windows/amd64 windows/386
 VERSION ?= dev
 GITHUB_SHA ?= $(shell git rev-parse HEAD)
 BUILD_TIME = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n')
@@ -18,7 +18,8 @@ usage:
 	@echo "make format      	: Format code"
 	@echo "make frontend-build  : Build the frontend assets"
 	@echo "make frontend-deploy : Deploy the frontend assets"
-	@echo "make release         : Generate binaries for all supported OSes"
+	@echo "make release         : Generate binaries for Linux, Windows"
+	@echo "make release-darwin  : Generate binaries for macOS"
 	@echo "make run           	: Run using local code"
 	@echo "make setup           : Install all necessary dependencies"
 	@echo "make test            : Execute test suite"
