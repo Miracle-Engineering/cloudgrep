@@ -49,7 +49,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: cloudgrep_darwin_arm64
-        path: ./bin/cloudgrep_darwin_arm64
+        path: ./bin/cloudgrep_darwin_arm64.zip
   
   release:
     name: Create release
@@ -96,7 +96,7 @@ jobs:
       with:
         name: cloudgrep_darwin_arm64
     - run: |
-          cp cloudgrep_darwin_arm64 ./bin/
+          cp cloudgrep_darwin_arm64.zip ./bin/
 
     - name: Create Release
       id: create_release
