@@ -22,7 +22,7 @@ jobs:
       if: "!steps.bumpr.outputs.skip"
       id: build
       run: |
-        release-darwin-arm64
+        make release-darwin-arm64
     - name: Upload binary
       uses: actions/upload-artifact@v3
       with:
@@ -39,3 +39,4 @@ jobs:
       with:
         name: cloudgrep_darwin_arm64
     - run: ls -lh .
+
