@@ -2,7 +2,6 @@ import './index.css';
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import ReactGA from 'react-ga';
 import { Provider } from 'react-redux';
 import { store } from 'store/store';
 import { initAmplitude } from 'utils/amplitude/amplitude';
@@ -14,8 +13,19 @@ if (process.env.REACT_APP_ENABLE_AMPLITUDE === 'true' && process.env.NODE_ENV !=
 
 // Add Google Analytics integration
 if (process.env.REACT_APP_ENABLE_GA === 'true' && process.env.NODE_ENV !== 'development') {
-	ReactGA.initialize('UA-228613342');
-	ReactGA.pageview(window.location.pathname + window.location.search);
+	const gtagScript = document.createElement('script'); // Make a script DOM node
+
+	// Google Analytics (ga) script is added to public folder
+	gtagScript.src = `${process.env.PUBLIC_URL?.toString() || ''}/ga.js`; // Set it's src to the provided URL
+
+	const gaScript = document.createElement('script');
+	gaScript.async = true;
+	gaScript.src = 'https://www.google-analytics.com/analytics.js';
+
+	if (document.head) {
+		document.head.appendChild(gtagScript);
+		document.head.appendChild(gaScript);
+	}
 }
 
 import App from './App';
