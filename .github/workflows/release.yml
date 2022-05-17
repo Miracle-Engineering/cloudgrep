@@ -130,6 +130,7 @@ jobs:
         name: cloudgrep_darwin
 
     - run: |
+          mkdir ./bin/
           cp *.zip ./bin/
           ls -lh ./bin/
 
