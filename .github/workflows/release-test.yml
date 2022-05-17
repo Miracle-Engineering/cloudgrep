@@ -18,11 +18,11 @@ jobs:
         sudo mv /usr/local/go/bin/go /usr/local/bin/go
         sudo mv /usr/local/go/bin/gofmt /usr/local/bin/gofmt
 
-    - name: Install GCC and SQLite for Arm64
-      uses: ryankurte/action-apt@v0.3.0
-      with:
-        arch: arm64
-        packages: "gcc-10-aarch64-linux-gnu gcc-aarch64-linux-gnu libsqlite3-dev:arm64"
+    # - name: Install GCC and SQLite for Arm64
+    #   uses: ryankurte/action-apt@v0.3.0
+    #   with:
+    #     arch: arm64
+    #     packages: "gcc-10-aarch64-linux-gnu gcc-aarch64-linux-gnu libsqlite3-dev:arm64"
 
     - name: Build Release Artifacts
       if: "!steps.bumpr.outputs.skip"
