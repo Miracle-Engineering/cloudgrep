@@ -13,8 +13,17 @@ The backend exposes an API at `http://localhost:8080/api`.
 | Parameters | Description |  Examples |
 | ------------- | ------------- | ------------- |
 | tags  | return resource(s) with the provided tag  | `tags[team]=infra` return resources with the tag `team=infra`, meaning "team" with value "infra" <br />`tags[team]=infra&tags[env]=prod` return resources with the tags `team=infra` **and** `env=dev` <br />`tags[env]=prod,dev` return resources with the tags `env=prod` **and** `env=dev` <br />`tags[team]=*` return all the resources with the tag `team` defined|
-| tags  | return resource(s) without the provided tag  | `exclude-tags=team` return resources without the tag `team`<br />`exclude-tags=team,env` return resources without the tag `team` **and** `env`
+| exclude-tags  | return resource(s) without the provided tag  | `exclude-tags=team` return resources without the tag `team`<br />`exclude-tags=team,env` return resources without the tag `team` **and** `env`
 
+## Get a resource
+
+| Route | Method |  Description |  Status |
+| ------------- | ------------- | ------------- | ------------- |
+| [/resource](http://localhost:8080/api/resource)  | GET  | Return a resource |  :white_check_mark: |
+
+| Parameters | Description |  Examples |
+| ------------- | ------------- | ------------- |
+| id  | the resource id  | `id=i-024c4971f7f510c8f` return resource with the id `i-024c4971f7f510c8f`
 
 ## Mocked data
 
