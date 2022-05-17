@@ -29,4 +29,22 @@ jobs:
       with:
         name: cloudgrep_darwin
         path: ./bin/*.zip
-  
+
+  release:
+    name: Create release
+    needs: [macos-latest]
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # retrieve the darwin arm64 binary build in previous job
+    - uses: actions/download-artifact@v2
+      with:
+        name: cloudgrep_darwin
+    - run: |
+          tar xvf cloudgrep_darwin.zip
+          mkdir ./bin
+          cp *.zip ./bin/
+          ls -l ./bin/
