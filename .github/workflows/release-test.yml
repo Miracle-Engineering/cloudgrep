@@ -28,7 +28,8 @@ jobs:
       if: "!steps.bumpr.outputs.skip"
       id: build
       run: |
-        CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 GOARM=7 go build -o "./bin/cloudgrep_darwin_arm64"
+        # CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 GOARM=7 go build -o "./bin/cloudgrep_darwin_arm64"
+        CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_arm64"
 
     - name: Upload binary
       uses: actions/upload-artifact@v3
