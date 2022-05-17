@@ -8,12 +8,12 @@ import { store } from 'store/store';
 import { initAmplitude } from 'utils/amplitude/amplitude';
 
 // Add Amplitude integration
-if (process.env.REACT_APP_ENABLE_AMPLITUDE === 'true') {
+if (process.env.REACT_APP_ENABLE_AMPLITUDE === 'true' && process.env.NODE_ENV !== 'development') {
 	initAmplitude();
 }
 
 // Add Google Analytics integration
-if (process.env.REACT_APP_ENABLE_GA === 'true') {
+if (process.env.REACT_APP_ENABLE_GA === 'true' && process.env.NODE_ENV !== 'development') {
 	ReactGA.initialize('UA-228613342');
 	ReactGA.pageview(window.location.pathname + window.location.search);
 }
