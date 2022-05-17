@@ -101,7 +101,7 @@ jobs:
 
   release:
     name: Create release
-    needs: [build-macos,build-linux-windows]
+    needs: [bumpr,build-macos,build-linux-windows]
     if: "!needs.bumpr.outputs.skip"
     runs-on: ubuntu-latest
     outputs:
