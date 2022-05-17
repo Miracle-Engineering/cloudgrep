@@ -4,10 +4,8 @@ on:
   push:
 
 jobs:
-  build-macos-arm64:
-    name: Build macOS ARM 64
-    needs: [bumpr]
-    if: "!needs.bumpr.outputs.skip"
+  build-macos:
+    name: Build macOS
     runs-on: macos-latest
     steps:
     - name: Checkout
