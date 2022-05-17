@@ -1,0 +1,31 @@
+name: Test-Release
+
+on:
+  push:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      run: |
+        sudo curl -LO https://go.dev/dl/go1.18.darwin-amd64.tar.gz
+        sudo rm -rf /usr/local/go
+        sudo tar -C /usr/local -xzf go1.18.darwin-amd64.tar.gz
+        sudo mv /usr/local/go/bin/go /usr/local/bin/go
+        sudo mv /usr/local/go/bin/gofmt /usr/local/bin/gofmt
+
+    - name: Build Release Artifacts
+      if: "!steps.bumpr.outputs.skip"
+      id: build
+      run: |
+        CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -o "./bin/cloudgrep_darwin_arm64"
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: cloudgrep_darwin_arm64
+        path: ./bin/cloudgrep_darwin_arm64
