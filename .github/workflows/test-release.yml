@@ -116,17 +116,12 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: cloudgrep_lin_win
-    - run: |
-          tar xvf cloudgrep_lin_win.zip
-          cp *.zip ./bin/
 
     # retrieve the darwin binaries built in the mac-os job
     - uses: actions/download-artifact@v2
       with:
         name: cloudgrep_darwin
-    - run: |
-          tar xvf cloudgrep_darwin.zip
-          cp *.zip ./bin/
 
     - run: |
+          cp *.zip ./bin/
           ls -lh ./bin/
