@@ -1,11 +1,7 @@
-name: Release
+name: Test-Release
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - "v*.*.*"
 
 jobs:
   bumpr:
@@ -26,7 +22,6 @@ jobs:
   build-macos:
     name: Build macOS Binaries
     needs: [bumpr]
-    if: "!needs.bumpr.outputs.skip"
     runs-on: macos-latest
     steps:
     - name: Checkout
@@ -62,7 +57,6 @@ jobs:
   build-linux-windows:
     name: Build Linux and Windows Binaries
     needs: [bumpr]
-    if: "!needs.bumpr.outputs.skip"
     runs-on: macos-latest
     steps:
     - name: Checkout
@@ -102,7 +96,6 @@ jobs:
   release:
     name: Create release
     needs: [build-macos,build-linux-windows]
-    if: "!needs.bumpr.outputs.skip"
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.url }}
@@ -135,14 +128,5 @@ jobs:
           tar xvf cloudgrep_darwin.zip
           cp *.zip ./bin/
 
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ steps.tag.outputs.value }}
-        generate_release_notes: true
-        files: |
-          ./bin/*.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+    - run: |
+          ls -lh ./bin/
