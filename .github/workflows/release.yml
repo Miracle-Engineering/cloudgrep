@@ -40,10 +40,10 @@ jobs:
         sudo mv /usr/local/go/bin/go /usr/local/bin/go
         sudo mv /usr/local/go/bin/gofmt /usr/local/bin/gofmt
 
-    - name: Build Mac OS ARM64
+    - name: Build Mac OS
       id: build
       run: |
-        make release-darwin-arm64
+        make release-darwin
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
