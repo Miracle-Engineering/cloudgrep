@@ -5,7 +5,8 @@ on:
 
 jobs:
   build-macos:
-    runs-on: macos-latest
+    # runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
