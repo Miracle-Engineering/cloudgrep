@@ -49,13 +49,18 @@ func Run() error {
 		return fmt.Errorf("failed to start engine: %w", err)
 	}
 	if err = engine.Run(ctx); err != nil {
-		return err
+		stats, _ := datastore.Stats(ctx)
+		if stats.ResourcesCount >= 0 {
+			//log the error but the api can still server with the datastore
+			cfg.Logging.Logger.Sugar().Errorw("can't run engine", "error", err)
+		} else {
+			return err
+		}
 	}
 
 	api.StartWebServer(ctx, cfg, datastore)
 
-	//TODO replace this URL with homepage when ready
-	url := fmt.Sprintf("http://%v:%v/%v%v", cfg.Web.Host, cfg.Web.Port, cfg.Web.Prefix, "api/resources")
+	url := fmt.Sprintf("http://%v:%v/%v", cfg.Web.Host, cfg.Web.Port, cfg.Web.Prefix)
 	fmt.Println("To view Cloudgrep UI, open ", url, "in browser")
 
 	if !opts.SkipOpen {

@@ -56,11 +56,20 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config) (*SQLiteStore, error
 	return &s, nil
 }
 
-func (s *SQLiteStore) getResourceIds(ctx context.Context, filter model.Filter) ([]resourceId, error) {
+func (s *SQLiteStore) getAllResourceIds(ctx context.Context) ([]resourceId, error) {
 	var resourceIds []resourceId
-	db := s.db.Model(&model.Tag{}).Select("resource_id")
-	if !filter.IsEmpty() {
-		for _, tag := range filter.Tags {
+	result := s.db.Model(&model.Resource{}).Select("id").Distinct().Find(&resourceIds)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return resourceIds, nil
+}
+
+func (s *SQLiteStore) getResourceIdsByTag(ctx context.Context, tags model.Tags) ([]resourceId, error) {
+	var resourceIds []resourceId
+	db := s.db.Model(&model.Tag{}).Select("resource_id").Distinct()
+	if !tags.Empty() {
+		for _, tag := range tags {
 			if tag.Value == "*" {
 				//wild card - check for any value
 				db = db.Or("key=? and value like ?", tag.Key, "%")
@@ -69,6 +78,7 @@ func (s *SQLiteStore) getResourceIds(ctx context.Context, filter model.Filter) (
 				db = db.Or("key=? and value=?", tag.Key, tag.Value)
 			}
 		}
+
 		// our data model has one row per tag, we need a group by to only keep the results matching all tags
 		/* table tags
 		//original data, tag filter = team=infra and cluster=staging
@@ -87,25 +97,31 @@ func (s *SQLiteStore) getResourceIds(ctx context.Context, filter model.Filter) (
 		2. i-124	1
 		*/
 		db = db.Group("resource_id").
-			Having("count(resource_id)=?", filter.Tags.DistinctKeys())
+			Having("count(resource_id)=?", tags.DistinctKeys())
 	}
-
 	result := db.Find(&resourceIds)
 	if result.Error != nil {
 		return nil, result.Error
 	}
+
 	return resourceIds, nil
 }
 
-func (s *SQLiteStore) getResourcesById(ctx context.Context, ids []resourceId) ([]*model.Resource, error) {
+func (s *SQLiteStore) getResourcesById(ctx context.Context, idsInclude []resourceId, idsExclude []resourceId) ([]*model.Resource, error) {
 	var resources []*model.Resource
-	if len(ids) == 0 {
+	if len(idsInclude) == 0 {
 		return resources, nil
 	}
-	result := s.db.Preload("Tags").Preload("Properties").Find(&resources, ids)
+	db := s.db
+	if len(idsExclude) != 0 {
+		// exlucde these ids
+		db = db.Where("id not in ?", idsExclude)
+	}
+	db = db.
+		Preload("Tags").Preload("Properties").Find(&resources, idsInclude)
 
-	if result.Error != nil {
-		return nil, result.Error
+	if db.Error != nil {
+		return nil, db.Error
 	}
 	return resources, nil
 
@@ -114,11 +130,30 @@ func (s *SQLiteStore) getResourcesById(ctx context.Context, ids []resourceId) ([
 func (s *SQLiteStore) GetResources(ctx context.Context, filter model.Filter) ([]*model.Resource, error) {
 	var resources []*model.Resource
 
-	ids, err := s.getResourceIds(ctx, filter)
+	//apply filter tags:include
+	includeTags := filter.TagsInclude()
+	var err error
+	var idsInclude []resourceId
+	if includeTags.Empty() {
+		//no include filter set - include all
+		idsInclude, err = s.getAllResourceIds(ctx)
+	} else {
+		idsInclude, err = s.getResourceIdsByTag(ctx, includeTags)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("can't get resources from database: %w", err)
 	}
-	resources, err = s.getResourcesById(ctx, ids)
+
+	//apply filter tags:exclude
+	var idsExclude []resourceId
+	if tagsExclude := filter.TagsExclude(); !tagsExclude.Empty() {
+		idsExclude, err = s.getResourceIdsByTag(ctx, filter.TagsExclude())
+		if err != nil {
+			return nil, fmt.Errorf("can't get resources from database: %w", err)
+		}
+	}
+
+	resources, err = s.getResourcesById(ctx, idsInclude, idsExclude)
 	if err != nil {
 		return nil, fmt.Errorf("can't get resources from database: %w", err)
 	}
@@ -138,4 +173,13 @@ func (s *SQLiteStore) WriteResources(ctx context.Context, resources []*model.Res
 		return fmt.Errorf("can't write resources to database: %w", result.Error)
 	}
 	return nil
+}
+
+func (s *SQLiteStore) Stats(context.Context) (model.Stats, error) {
+	var count int64
+	result := s.db.Table("resources").Count(&count)
+	if result.Error != nil {
+		return model.Stats{}, fmt.Errorf("can't read resources count from database: %w", result.Error)
+	}
+	return model.Stats{ResourcesCount: int(count)}, nil
 }

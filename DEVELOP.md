@@ -25,48 +25,15 @@ make build
 ./cloudgrep
 ```
 
-## API
-
-The backend exposes an API at `http://localhost:8080/api`.
-
-### Routes
-
-| Route | Method |  Description |  Status |
-| ------------- | ------------- | ------------- | ------------- |
-| [/info](http://localhost:8080/api/info)  | GET  | API information |  :white_check_mark: |
-| [/resources](http://localhost:8080/api/resources)  | GET  | Return list of cloud resources |  :white_check_mark: |
-| [/tags](http://localhost:8080/api/tags)  | GET  | Return list of tags |  :x: |
-
-### Example queries
-
-#### Resource filtering
-
-- `/resources` return all resources
-- `/resources?tags[team]=infra` return resources with the tag `team=infra`, meaning "team" with value "infra".
-- `/resources?tags[team]=infra&tags[env]=prod` return resources with the tags `team=infra` and `env=dev`
-- `/resources?tags[env]=prod,dev` return resources with the tags `env=prod` and `env=dev`
-- `/resources?tags[team]=*` return all the resources with the tag `team` defined
-
 ### AWS Resource supported
 
 | Type |  Status |
 | ------------- | ------------- |
 | EC2 Instance |  :white_check_mark: |
-| Load Balancer |  :x: |
+| Load Balancer |  :white_check_mark: |
 | S3 Bucket |  :x: |
 | EBS |  :x: |
 | RDS |  :x: |
-
-
-### Mocked data
-
-There is also a mocked API at `http://localhost:8080/mock/api`.  
-The mocked api serves static data, it doesn't handle any query parameters.
-
-| Route | Method |  Description |  Status |
-| ------------- | ------------- | ------------- | ------------- |
-| [/resources](http://localhost:8080/mock/api/resources)  | GET  |  Example of "resources" reponse | :white_check_mark: |
-| [/tags](http://localhost:8080/mock/api/tags)  | GET  |  Example of "tags" ressponse |  :white_check_mark: |
 
 ## Design
 
@@ -95,6 +62,8 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
         idField: InstanceId
         # the method to call to fetch the resources, it must be implemented
         impl: FetchEC2Instances
+        # the method to call to generate the tags only needed if there is not already a "Tags" field
+        #tagImpl: FetchEC2Tags
     ```
 1. Implement the method define in the mapping
     ```go
@@ -104,7 +73,7 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
         var instances []types.Instance
         result, err := awsPrv.ec2Client.DescribeInstances(ctx, input)
         if err != nil {
-            return []types.Instance{}, err
+		    return nil, fmt.Errorf("failed to fetch EC2 Instances: %w", err)
         }
 
         for _, r := range result.Reservations {
@@ -113,5 +82,28 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
         return instances, nil
     }
     ```
+1. [Optional] Implement the method to return the tags. Unless there is already a `Tags` field, this method would need to be implemented. Here is an example for Load Balancer.
+    ```go
+    // this method is named after the mapping.tagImpl value and return some model.Tags
+    // The ELB doesn't have a Tags field so this method calls `elasticloadbalancingv2.DescribeTags`
+    func (p *AWSProvider) FetchLoadBalancerTag(ctx context.Context, lb types.LoadBalancer) (model.Tags, error) {
+        tagsResponse, err := p.elbClient.DescribeTags(
+            ctx,
+            &elbv2.DescribeTagsInput{ResourceArns: []string{*lb.LoadBalancerArn}},
+        )
+        if err != nil {
+            return nil, fmt.Errorf("failed to fetch tags for load balancer %v: %w", &lb.LoadBalancerArn, err)
+        }
+        var tags model.Tags
+        for _, tagDescription := range tagsResponse.TagDescriptions {
+            for _, tag := range tagDescription.Tags {
+                tags = append(tags, model.Tag{Key: *tag.Key, Value: *tag.Value})
+            }
+        }
+        return tags, nil
+    }
+    ```
+
+
 This method will be automatically called at startup.  
 The mapping definition will be used to convert the returned type to some `model.Resource` objects.

@@ -29,3 +29,10 @@ Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
 The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+## Continuous Integration
+
+When creating a PR with changes in the `./fe` directory, a github action called [frontend-asset](/.github/workflows/frontend-asset.yml) is triggered to build the app for production and update the assets used by the Go app in `./static`. This action will create a commit to the existing PR to update the assets.

@@ -14,3 +14,17 @@ mappings:
     idField: InstanceId
     # the method to call to fetch the resources, it must be implemented
     impl: FetchEC2Instances
+  - type: "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types.LoadBalancer"
+    resourceType: "elb.LoadBalancer"
+    idField: LoadBalancerArn
+    impl: FetchLoadBalancers
+    tagImpl: FetchLoadBalancerTag
+  - type: "github.com/aws/aws-sdk-go-v2/service/s3/types.Bucket"
+    resourceType: "s3.Bucket"
+    idField: Name
+    impl: FetchS3Buckets
+    tagImpl: FetchS3BucketsTag
+  - type: "github.com/aws/aws-sdk-go-v2/service/ec2/types.Volume"
+    resourceType: "ec2.Volume"
+    idField: VolumeId
+    impl: FetchEBSVolumes

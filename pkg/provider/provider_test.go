@@ -71,7 +71,7 @@ func TestMapper(t *testing.T) {
 	}
 
 	// test conversion
-	_r1, err := provider.GetMapper().ToResource(tr1, "us-east-1")
+	_r1, err := provider.GetMapper().ToResource(ctx, tr1, "us-east-1")
 	assert.NoError(t, err)
 	util.AssertEqualsResource(t, r1, _r1)
 

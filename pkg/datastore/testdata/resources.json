@@ -88,6 +88,10 @@
             {
                 "key": "vpc",
                 "value": "vpc-123"
+            },
+            {
+                "key": "debug:info",
+                "value": "breakpoint-123"
             }
         ],
         "properties": [
@@ -118,6 +122,22 @@
             {
                 "name": "Limit[Memory][Max]",
                 "value": "0"
+            }
+        ]
+    },
+    {
+        "id": "a-bucket-123",
+        "region": "us-east-1",
+        "type": "s3.Bucket",
+        "tags": [],
+        "properties": [
+            {
+                "name": "CreationDate",
+                "value": "2022-02-04 22:26:51 +0000 UTC"
+            },
+            {
+                "name": "Name",
+                "value": "a-bucket-123"
             }
         ]
     }

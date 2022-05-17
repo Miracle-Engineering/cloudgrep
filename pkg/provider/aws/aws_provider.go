@@ -9,6 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"go.uber.org/zap"
 
 	cfg "github.com/run-x/cloudgrep/pkg/config"
@@ -19,6 +21,8 @@ type AWSProvider struct {
 	logger    *zap.Logger
 	config    aws.Config
 	ec2Client *ec2.Client
+	elbClient *elbv2.Client
+	s3Client  *s3.Client
 	mapper    mapper.Mapper
 }
 
@@ -28,15 +32,18 @@ var embedConfig []byte
 func NewAWSProvider(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) (*AWSProvider, error) {
 	provider := AWSProvider{}
 	provider.logger = logger
-	//create the clients
 	var err error
 	logger.Info("Connecting to AWS account")
 	provider.config, err = config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load default config: %w", err)
 	}
-	provider.ec2Client = ec2.NewFromConfig(provider.config)
 	logger.Sugar().Infow("AWS", "region", provider.Region())
+
+	//create the clients
+	provider.ec2Client = ec2.NewFromConfig(provider.config)
+	provider.elbClient = elbv2.NewFromConfig(provider.config)
+	provider.s3Client = s3.NewFromConfig(provider.config)
 
 	//create the mapper for this provider
 	provider.mapper, err = mapper.New(embedConfig, *logger, reflect.ValueOf(&provider))

@@ -16,6 +16,8 @@ usage:
 	@echo "make clean           : Remove all build files and reset assets"
 	@echo "make build           : Generate build for current OS"
 	@echo "make format      	: Format code"
+	@echo "make frontend-build  : Build the frontend assets"
+	@echo "make frontend-deploy : Deploy the frontend assets"
 	@echo "make release         : Generate binaries for all supported OSes"
 	@echo "make run           	: Run using local code"
 	@echo "make setup           : Install all necessary dependencies"
@@ -38,6 +40,19 @@ run:
 version:
 	@go run main.go --version
 
+frontend-build:
+	docker run -v "$(PWD)/fe":/usr/src/app -w /usr/src/app node:18 npm install
+	docker run -v "$(PWD)/fe":/usr/src/app -w /usr/src/app node:18 npm run build
+
+frontend-deploy:
+	rm -rf ./static/css ./static/js ./static/*.ico ./static/*.html ./static/*.txt ./static/*.json ./static/*.png
+	cp -r ./fe/build/static/css ./static
+	cp -r ./fe/build/static/js ./static
+	cp ./fe/build/*.ico ./static
+	cp ./fe/build/*.html ./static
+	cp ./fe/build/*.txt ./static
+	cp ./fe/build/*.json ./static
+	cp ./fe/build/*.png ./static
 
 build: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GITHUB_SHA)
 build: LDFLAGS += -X $(PKG)/pkg/api.BuildTime=$(BUILD_TIME)
@@ -53,16 +68,13 @@ release: LDFLAGS += -X $(PKG)/pkg/api.GoVersion=$(GO_VERSION)
 release: LDFLAGS += -X $(PKG)/pkg/api.Version=$(VERSION)
 release:
 	@echo "Building binaries..."
-	@gox \
+	@CGO_ENABLED=1 gox \
 		-osarch "$(TARGETS)" \
 		-ldflags "$(LDFLAGS)" \
 		-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
 
-	@echo "Building ARM binaries..."
-	GOOS=linux GOARCH=arm GOARM=5 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm_v5"
-
-	@echo "Building ARM64 binaries..."
-	GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm64_v7"
+	@echo "Building Linux ARM64 binaries..."
+	CC="/usr/bin/aarch64-linux-gnu-gcc" CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm64_v7"
 
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh

@@ -16,6 +16,7 @@ func TestNewMapperOk(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	cfg := Config{
 		Mappings: []Mapping{
+			//most common case - use fields for id, properties, tags
 			{
 				Type:         "github.com/run-x/cloudgrep/pkg/provider/mapper.TestInstance",
 				ResourceType: "mapper.Instance",
@@ -27,6 +28,14 @@ func TestNewMapperOk(t *testing.T) {
 					Value: "Val",
 				},
 			},
+			//this test has a custom method to generate tags
+			{
+				Type:         "github.com/run-x/cloudgrep/pkg/provider/mapper.TestLoadBalancer",
+				ResourceType: "mapper.LoadBalancer",
+				IdField:      "Arn",
+				Impl:         "FetchTestLoadBalancers",
+				TagImpl:      "FetchTestLoadBalancerTags",
+			},
 		},
 	}
 	provider := TestProvider{}
@@ -35,8 +44,9 @@ func TestNewMapperOk(t *testing.T) {
 
 	instances, err := provider.FetchTestInstances(ctx)
 	assert.NoError(t, err)
+
 	//test expected resource
-	r1 := model.Resource{
+	expectedInstance := model.Resource{
 		Id: "i-1", Region: "us-west-2", Type: "mapper.Instance",
 		Tags: []model.Tag{
 			{Key: "tag1", Value: "val1"},
@@ -47,13 +57,34 @@ func TestNewMapperOk(t *testing.T) {
 			{Name: "Value", Value: "abc"},
 		},
 	}
-	_r1, err := mapper.ToResource(instances[0], "us-west-2")
+	instance, err := mapper.ToResource(ctx, instances[0], "us-west-2")
 	assert.NoError(t, err)
-	util.AssertEqualsResource(t, r1, _r1)
+	util.AssertEqualsResource(t, expectedInstance, instance)
+
+	expectedLB := model.Resource{
+		Id:     "arn:aws:elasticloadbalancing:us-east-1:0123456789:loadbalancer/net/my-load-balancer/14522ba1bd959dd6",
+		Region: "us-west-2",
+		Type:   "mapper.LoadBalancer",
+		Tags: []model.Tag{
+			{Key: "tag1", Value: "val1"},
+			{Key: "tag2", Value: "val2"},
+		},
+		Properties: []model.Property{
+			{Name: "Arn", Value: "arn:aws:elasticloadbalancing:us-east-1:0123456789:loadbalancer/net/my-load-balancer/14522ba1bd959dd6"},
+			{Name: "DNSName", Value: "my-load-balancer-14522ba1bd959dd6.elb.us-east-1.amazonaws.com"},
+		},
+	}
+	loadBalancers, err := provider.FetchTestLoadBalancers(ctx)
+	assert.NoError(t, err)
+	resourceLB, err := mapper.ToResource(ctx, loadBalancers[0], "us-west-2")
+	assert.NoError(t, err)
+	util.AssertEqualsResource(t, expectedLB, resourceLB)
 }
 
 func TestNewMapperError(t *testing.T) {
 	logger := zaptest.NewLogger(t)
+
+	//Impl references an unknown method
 	cfg := Config{
 		Mappings: []Mapping{
 			{
@@ -76,6 +107,7 @@ func TestNewMapperError(t *testing.T) {
 		},
 	)
 
+	//Impl references a method with wrong return type
 	cfg = Config{
 		Mappings: []Mapping{
 			{
@@ -97,6 +129,25 @@ func TestNewMapperError(t *testing.T) {
 			new(cfg, *logger, reflect.ValueOf(TestProvider{})) //nolint
 		},
 	)
+
+	//Impl references an unknown method for tag
+	cfg = Config{
+		Mappings: []Mapping{
+			{
+				Type:         "github.com/run-x/cloudgrep/pkg/provider/mapper.TestLoadBalancer",
+				ResourceType: "mapper.LoadBalancer",
+				IdField:      "Arn",
+				Impl:         "FetchTestLoadBalancers",
+				TagImpl:      "Unknown",
+			},
+		},
+	}
+	assert.PanicsWithError(t,
+		"could not find a method called 'Unknown' on 'mapper.TestProvider'",
+		func() {
+			new(cfg, *logger, reflect.ValueOf(TestProvider{})) //nolint
+		},
+	)
 }
 
 type TestProvider struct {
@@ -111,6 +162,11 @@ type TestInstance struct {
 type TestTag struct {
 	Name string
 	Val  string
+}
+
+type TestLoadBalancer struct {
+	Arn     string
+	DNSName string
 }
 
 type Return string
@@ -128,6 +184,22 @@ func (TestProvider) FetchTestInstances(ctx context.Context) ([]TestInstance, err
 			Id:    "i-2",
 			Value: "edf",
 		},
+	}, nil
+}
+
+func (TestProvider) FetchTestLoadBalancers(ctx context.Context) ([]TestLoadBalancer, error) {
+	return []TestLoadBalancer{
+		{
+			Arn:     "arn:aws:elasticloadbalancing:us-east-1:0123456789:loadbalancer/net/my-load-balancer/14522ba1bd959dd6",
+			DNSName: "my-load-balancer-14522ba1bd959dd6.elb.us-east-1.amazonaws.com",
+		},
+	}, nil
+}
+
+func (TestProvider) FetchTestLoadBalancerTags(ctx context.Context, lb TestLoadBalancer) (model.Tags, error) {
+	return model.Tags{
+		model.Tag{Key: "tag1", Value: "val1"},
+		model.Tag{Key: "tag2", Value: "val2"},
 	}, nil
 }
 
