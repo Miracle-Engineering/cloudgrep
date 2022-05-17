@@ -23,8 +23,8 @@ jobs:
       id: bumpr
       uses: haya14busa/action-bumpr@v1
 
-  build-macos-arm64:
-    name: Build macOS ARM 64
+  build-macos:
+    name: Build macOS Binaries
     needs: [bumpr]
     if: "!needs.bumpr.outputs.skip"
     runs-on: macos-latest
@@ -45,18 +45,18 @@ jobs:
       run: |
         make release-darwin-arm64
 
-    - name: Upload binary
+    - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: cloudgrep_darwin_arm64
-        path: ./bin/cloudgrep_darwin_arm64.zip
+        name: cloudgrep_darwin
+        path: ./bin/*.zip
   
   release:
     name: Create release
     needs: [bumpr]
-    # The step "Build Release Artifacts" should take longer than "build-macos-arm64"
+    # The step "Build Release Artifacts" should take longer than "build-macos"
     # commented out to run in parallel to save time
-    # needs: [build-macos-arm64]
+    # needs: [build-macos]
     if: "!needs.bumpr.outputs.skip"
     runs-on: ubuntu-latest
     outputs:
@@ -91,12 +91,14 @@ jobs:
         make setup
         VERSION=${{ steps.tag.outputs.value }} make release
 
-    # retrieve the darwin arm64 binary build in previous job
+    # retrieve the darwin binaries built in the mac-os job
     - uses: actions/download-artifact@v2
       with:
-        name: cloudgrep_darwin_arm64
+        name: cloudgrep_darwin
     - run: |
-          cp cloudgrep_darwin_arm64.zip ./bin/
+          tar xvf cloudgrep_darwin.zip
+          cp *.zip ./bin/
+          ls -l ./bin/
 
     - name: Create Release
       id: create_release
