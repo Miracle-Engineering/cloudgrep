@@ -32,7 +32,7 @@ jobs:
 
   release:
     name: Create release
-    needs: [macos-latest]
+    needs: [build-macos]
     runs-on: ubuntu-latest
     steps:
 
