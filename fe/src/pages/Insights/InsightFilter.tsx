@@ -126,6 +126,33 @@ const InsightFilter: FC = () => {
 					</Typography>
 				</AccordionDetails>
 			</Accordion>
+			{tags
+				.filter(tag => tag.Key.toUpperCase().includes(searchTerm.toUpperCase()))
+				.map((tag: MockTag, index: number) => (
+					<Accordion key={`${tag.Key}${index}`}>
+						<AccordionSummary
+							sx={filterHeader}
+							expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+							aria-controls={`accordion${tag.Key}${index}`}
+							id={`accordion${tag.Key}${index}`}
+							classes={overrideSummaryClasses}>
+							<Typography sx={accordionStyles.accordionHeader}>{tag.Key}</Typography>
+						</AccordionSummary>
+						<AccordionDetails>
+							<SearchInput onChange={handleSearchTags} />
+							<Typography mt={1}>
+								<FormGroup>
+									<FormControlLabel
+										classes={labelClasses}
+										key={tag.Value}
+										control={<Checkbox size={'small'} defaultChecked />}
+										label={tag.Value}
+									/>
+								</FormGroup>
+							</Typography>
+						</AccordionDetails>
+					</Accordion>
+				))}
 		</Box>
 	);
 };
