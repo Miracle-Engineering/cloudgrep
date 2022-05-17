@@ -8,60 +8,109 @@ on:
       - "v*.*.*"
 
 jobs:
+  build-macos-arm64:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Bump version on merging Pull Requests with specific labels.
+    # (bump:major,bump:minor,bump:patch)
+    - name: Bump version on merging PR
+      id: bumpr
+      if: "!startsWith(github.ref, 'refs/tags/')"
+      uses: haya14busa/action-bumpr@v1
+
+    - name: Set up Go
+      if: "!steps.bumpr.outputs.skip"
+      run: |
+        sudo curl -LO https://go.dev/dl/go1.18.darwin-amd64.tar.gz
+        sudo rm -rf /usr/local/go
+        sudo tar -C /usr/local -xzf go1.18.darwin-amd64.tar.gz
+        sudo mv /usr/local/go/bin/go /usr/local/bin/go
+        sudo mv /usr/local/go/bin/gofmt /usr/local/bin/gofmt
+
+    - name: Build Mac OS ARM64
+      if: "!steps.bumpr.outputs.skip"
+      if: "!steps.bumpr.outputs.skip"
+      id: build
+      run: |
+        make release-darwin-arm64
+
+    - name: Upload binary
+      if: "!steps.bumpr.outputs.skip"
+      uses: actions/upload-artifact@v3
+      with:
+        name: cloudgrep_darwin_arm64
+        path: ./bin/cloudgrep_darwin_arm64
+  
   release:
     name: Create release
+    # The step "Build Release Artifacts" should take longer than "build-macos-arm64"
+    # commented out to run in parallel to save time
+    # needs: [build-macos-arm64]
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.url }}
     steps:
 
-      - name: Checkout
-        uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
 
-      # Bump version on merging Pull Requests with specific labels.
-      # (bump:major,bump:minor,bump:patch)
-      - name: Bump version on merging PR
-        id: bumpr
-        if: "!startsWith(github.ref, 'refs/tags/')"
-        uses: haya14busa/action-bumpr@v1
-        
-      - name: Get tag name
-        if: "!steps.bumpr.outputs.skip"
-        id: tag
-        uses: haya14busa/action-cond@v1
-        with:
-          cond: "${{ startsWith(github.ref, 'refs/tags/') }}"
-          if_true: ${{ github.ref }}
-          if_false: ${{ steps.bumpr.outputs.next_version }}
-    
-      - name: Set up Go
-        if: "!steps.bumpr.outputs.skip"
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.18
+    # Bump version on merging Pull Requests with specific labels.
+    # (bump:major,bump:minor,bump:patch)
+    - name: Bump version on merging PR
+      id: bumpr
+      if: "!startsWith(github.ref, 'refs/tags/')"
+      uses: haya14busa/action-bumpr@v1
 
-      - name: Install GCC and SQLite for Arm64
-        uses: ryankurte/action-apt@v0.3.0
-        with:
-          arch: arm64
-          packages: "gcc-10-aarch64-linux-gnu gcc-aarch64-linux-gnu libsqlite3-dev:arm64"
+    - name: Get tag name
+      if: "!steps.bumpr.outputs.skip"
+      id: tag
+      uses: haya14busa/action-cond@v1
+      with:
+        cond: "${{ startsWith(github.ref, 'refs/tags/') }}"
+        if_true: ${{ github.ref }}
+        if_false: ${{ steps.bumpr.outputs.next_version }}
+  
+    - name: Set up Go
+      if: "!steps.bumpr.outputs.skip"
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.18
 
-      - name: Build Release Artifacts
-        if: "!steps.bumpr.outputs.skip"
-        id: build
-        run: |
-          make setup
-          VERSION=${{ steps.tag.outputs.value }} make release
+    - name: Install GCC and SQLite for Arm64
+      if: "!steps.bumpr.outputs.skip"
+      uses: ryankurte/action-apt@v0.3.0
+      with:
+        arch: arm64
+        packages: "gcc-10-aarch64-linux-gnu gcc-aarch64-linux-gnu libsqlite3-dev:arm64"
 
-      - name: Create Release
+    - name: Build Release Artifacts
+      if: "!steps.bumpr.outputs.skip"
+      id: build
+      run: |
+        make setup
+        VERSION=${{ steps.tag.outputs.value }} make release
+
+    # retrieve the darwin arm64 binary build in previous job
+    - uses: actions/download-artifact@v2
+      if: "!steps.bumpr.outputs.skip"
+      with:
+        name: cloudgrep_darwin_arm64
+    - run: |
         if: "!steps.bumpr.outputs.skip"
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.tag.outputs.value }}
-          generate_release_notes: true
-          files: |
-            ./bin/*.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        cp cloudgrep_darwin_arm64 ./bin/
+
+    - name: Create Release
+      if: "!steps.bumpr.outputs.skip"
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.tag.outputs.value }}
+        generate_release_notes: true
+        files: |
+          ./bin/*.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
