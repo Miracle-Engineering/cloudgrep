@@ -68,22 +68,23 @@ release: LDFLAGS += -X $(PKG)/pkg/api.GoVersion=$(GO_VERSION)
 release: LDFLAGS += -X $(PKG)/pkg/api.Version=$(VERSION)
 release:
 	@echo "Building binaries..."
-	@CGO_ENABLED=1 CC="/usr/bin/aarch64-linux-gnu-gcc" gox \
-		-osarch "$(TARGETS)" \
-		-ldflags "$(LDFLAGS)" \
-		-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
+	# @CGO_ENABLED=1 gox \
+	# 	-osarch "$(TARGETS)" \
+	# 	-ldflags "$(LDFLAGS)" \
+	# 	-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
 
-	@echo "Building Linux amd64 binaries..."
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 GOARM=5 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_amd64"
+	# @echo "Building Linux amd64 binaries..."
+	# CGO_ENABLED=1 GOOS=linux GOARCH=amd64 GOARM=5 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_amd64"
 
 	@echo "Building Linux ARM binaries..."
+	ls -lh /usr/bin/
 	CC="/usr/bin/aarch64-linux-gnu-gcc" CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=5 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm_v5"
 
-	@echo "Building Linux ARM64 binaries..."
-	CC="/usr/bin/aarch64-linux-gnu-gcc" CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm64_v7"
+	# @echo "Building Linux ARM64 binaries..."
+	# CC="/usr/bin/arm-linux-gnueabihf-gcc" CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm64_v7"
 
-	@echo "\nPackaging binaries...\n"
-	@./script/package.sh
+	# @echo "\nPackaging binaries...\n"
+	# @./script/package.sh
 
 
 release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GIT_COMMIT)
