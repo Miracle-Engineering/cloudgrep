@@ -22,7 +22,7 @@ jobs:
   build-macos-arm64:
     name: Build macOS ARM 64
     needs: [bumpr]
-    if: "!needs.bumpr.outputs.skip"
+    if: "needs.bumpr.outputs.skip"
     runs-on: macos-latest
     steps:
     - name: Checkout
