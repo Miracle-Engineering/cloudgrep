@@ -24,7 +24,7 @@ jobs:
       uses: haya14busa/action-bumpr@v1
 
   build-macos:
-    name: Build macOS Binaries
+    name: Build macOS
     needs: [bumpr]
     if: "!needs.bumpr.outputs.skip"
     runs-on: macos-latest
@@ -60,10 +60,10 @@ jobs:
         path: ./bin/*.zip
   
   build-linux-windows:
-    name: Build Linux and Windows Binaries
+    name: Build Linux and Windows
     needs: [bumpr]
     if: "!needs.bumpr.outputs.skip"
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -118,7 +118,7 @@ jobs:
         cond: "${{ startsWith(github.ref, 'refs/tags/') }}"
         if_true: ${{ github.ref }}
         if_false: ${{ needs.bumpr.outputs.next_version }}
-        
+
     # retrieve the darwin binaries built in the linux/windows job
     - uses: actions/download-artifact@v2
       with:

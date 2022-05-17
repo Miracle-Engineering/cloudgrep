@@ -57,7 +57,7 @@ jobs:
   build-linux-windows:
     name: Build Linux and Windows Binaries
     needs: [bumpr]
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
