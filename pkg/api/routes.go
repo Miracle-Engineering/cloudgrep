@@ -24,6 +24,7 @@ func SetupRoutes(router *gin.Engine, cfg config.Config, ds datastore.Datastore) 
 	api.GET("/info", Info)
 	api.GET("/resource", Resource)
 	api.GET("/resources", Resources)
+	api.GET("/tags", Tags)
 	api.GET("/stats", Stats)
 
 	// mock api serving static files (temporary)

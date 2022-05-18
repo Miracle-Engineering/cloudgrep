@@ -3,9 +3,9 @@ package model
 import "go.uber.org/zap/zapcore"
 
 type Property struct {
-	ResourceId string `json:"-" gorm:"primaryKey"`
-	Name       string `json:"name" gorm:"primaryKey"`
-	Value      string `json:"value"`
+	ResourceId ResourceId `json:"-" gorm:"primaryKey"`
+	Name       string     `json:"name" gorm:"primaryKey"`
+	Value      string     `json:"value"`
 }
 type Properties []Property
 

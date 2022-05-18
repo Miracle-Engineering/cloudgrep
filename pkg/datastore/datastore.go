@@ -11,8 +11,10 @@ import (
 
 //Datastore provides an interface to read/write/update to a store
 type Datastore interface {
-	GetResource(context.Context, string) (*model.Resource, error)
+	GetResource(context.Context, model.ResourceId) (*model.Resource, error)
+	//TODO we could probably simplify by not using point for slice elements
 	GetResources(context.Context, model.Filter) ([]*model.Resource, error)
+	GetTags(context.Context, model.Filter, int) ([]*model.TagInfo, error)
 	WriteResources(context.Context, []*model.Resource) error
 	Stats(context.Context) (model.Stats, error)
 }

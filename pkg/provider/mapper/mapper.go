@@ -192,7 +192,7 @@ func (m Mapper) ToResource(ctx context.Context, x any, region string) (model.Res
 	}
 
 	return model.Resource{
-		Id:         id,
+		Id:         model.ResourceId(id),
 		Region:     region,
 		Type:       mapping.ResourceType,
 		Properties: properties,

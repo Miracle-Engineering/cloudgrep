@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Init_Default(t *testing.T) {
+func TestInitDefault(t *testing.T) {
 	config, err := New(context.Background(), options.Options{})
 
 	assert.NoError(t, err)

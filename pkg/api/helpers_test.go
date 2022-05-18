@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_desanitize64(t *testing.T) {
+func TestDesanitize64(t *testing.T) {
 	examples := map[string]string{
 		"test":        "test",
 		"test+test+":  "test-test-",
@@ -23,7 +23,7 @@ func Test_desanitize64(t *testing.T) {
 	}
 }
 
-func Test_serveResult(t *testing.T) {
+func TestServeResult(t *testing.T) {
 	server := gin.Default()
 	server.GET("/good", func(c *gin.Context) {
 		serveResult(c, gin.H{"foo": "bar"}, nil)

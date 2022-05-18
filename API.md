@@ -13,7 +13,89 @@ The backend exposes an API at `http://localhost:8080/api`.
 | Parameters | Description |  Examples |
 | ------------- | ------------- | ------------- |
 | tags  | return resource(s) with the provided tag  | `tags[team]=infra` return resources with the tag `team=infra`, meaning "team" with value "infra" <br />`tags[team]=infra&tags[env]=prod` return resources with the tags `team=infra` **and** `env=dev` <br />`tags[env]=prod,dev` return resources with the tags `env=prod` **and** `env=dev` <br />`tags[team]=*` return all the resources with the tag `team` defined|
-| exclude-tags  | return resource(s) without the provided tag  | `exclude-tags=team` return resources without the tag `team`<br />`exclude-tags=team,env` return resources without the tag `team` **and** `env`
+| exclude-tags  | return resource(s) without the provided tag  | `exclude-tags=team` return resources without the tag `team`<br />`exclude-tags=team,env` return resources without the tag `team` **and** `env`|
+
+Example of response:
+```json
+[
+  {
+    "id":"arn:aws:elasticloadbalancing:us-east-1:1234567890:loadbalancer/net/staging-ingress/14522ba1bd959dd6",
+    "region":"us-east-1",
+    "type":"elb.LoadBalancer",
+    "tags":[
+      {
+        "key":"cluster",
+        "value":"staging"
+      },
+      {
+        "key":"service.k8s.aws/resource",
+        "value":"LoadBalancer"
+      },
+      {
+        "key":"service.k8s.aws/stack",
+        "value":"ingress-nginx/ingress-nginx-controller"
+      }
+    ],
+    "properties":[
+      {
+        "name":"CreatedTime",
+        "value":"2022-04-07 22:27:39.35 +0000 UTC"
+      },
+      {
+        "name":"DNSName",
+        "value":"staging-ingress-14522ba1bd959dd6.elb.us-east-1.amazonaws.com"
+      },
+      {
+        "name":"IpAddressType",
+        "value":"ipv4"
+      },
+      {
+        "name":"LoadBalancerArn",
+        "value":"arn:aws:elasticloadbalancing:us-east-1:1234567890:loadbalancer/net/staging-ingress/14522ba1bd959dd6"
+      },
+      {
+        "name":"LoadBalancerName",
+        "value":"staging-ingress"
+      }
+    ]
+  }
+]
+```
+
+## List tags
+
+| Route | Method |  Description |  Status |
+| ------------- | ------------- | ------------- | ------------- |
+| [/tags](http://localhost:8080/api/tags)  | GET  | Return list of tags |  :white_check_mark: |
+
+| Parameters | Description |  Examples |
+| ------------- | ------------- | ------------- |
+| tags  | return tags for the resources with the provided tag  | `tags[team]=infra` return the tags associated with the resources with the tag `team=infra`" <br />`tags[team]=infra&tags[env]=prod` return the tags associated with the resources with the tags `team=infra` **and** `env=dev` <br />`tags[env]=prod,dev` return the tags associated with the resources with the tags `env=prod` **and** `env=dev` <br />`tags[team]=*` return the tags associated with the resources with the tag `team` defined|
+| exclude-tags  | return the tags associated with the resources without the provided tag  | `exclude-tags=team` return resources without the tag `team`<br />`exclude-tags=team,env` return the tags associated with the resources without the tag `team` **and** `env`
+
+Example of response:
+```json
+[
+  {
+    "key":"cluster",
+    //the tag values found for this key
+    "values":[
+      "dev-cluster",
+      "prod-cluster",
+    ],
+    //there are 6 resource with this tag key
+    "count":6,
+    "ResourceIds":[
+      "i-024c4971f7f510c8f",
+      "i-046b8584f97edce25",
+      "i-0ce5fd258122ee34b",
+      "vol-06690829257c1451a",
+      "vol-0a6cf8e1480199cb3",
+      "vol-0effb20041bde4898"
+    ]
+  }
+]
+```
 
 ## Get a resource
 
@@ -24,6 +106,51 @@ The backend exposes an API at `http://localhost:8080/api`.
 | Parameters | Description |  Examples |
 | ------------- | ------------- | ------------- |
 | id  | the resource id  | `id=i-024c4971f7f510c8f` return resource with the id `i-024c4971f7f510c8f`
+
+Example of response:
+```json
+{
+  "id":"arn:aws:elasticloadbalancing:us-east-1:1234567890:loadbalancer/net/staging-ingress/14522ba1bd959dd6",
+  "region":"us-east-1",
+  "type":"elb.LoadBalancer",
+  "tags":[
+    {
+      "key":"cluster",
+      "value":"staging"
+    },
+    {
+      "key":"service.k8s.aws/resource",
+      "value":"LoadBalancer"
+    },
+    {
+      "key":"service.k8s.aws/stack",
+      "value":"ingress-nginx/ingress-nginx-controller"
+    }
+  ],
+  "properties":[
+    {
+      "name":"CreatedTime",
+      "value":"2022-04-07 22:27:39.35 +0000 UTC"
+    },
+    {
+      "name":"DNSName",
+      "value":"staging-ingress-14522ba1bd959dd6.elb.us-east-1.amazonaws.com"
+    },
+    {
+      "name":"IpAddressType",
+      "value":"ipv4"
+    },
+    {
+      "name":"LoadBalancerArn",
+      "value":"arn:aws:elasticloadbalancing:us-east-1:1234567890:loadbalancer/net/staging-ingress/14522ba1bd959dd6"
+    },
+    {
+      "name":"LoadBalancerName",
+      "value":"staging-ingress"
+    }
+  ]
+}
+```
 
 ## Mocked data
 

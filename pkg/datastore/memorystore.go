@@ -25,7 +25,7 @@ func NewMemoryStore(ctx context.Context, cfg config.Config) *MemoryStore {
 	return &datastore
 }
 
-func (m *MemoryStore) GetResource(ctx context.Context, id string) (*model.Resource, error) {
+func (m *MemoryStore) GetResource(ctx context.Context, id model.ResourceId) (*model.Resource, error) {
 	for _, r := range m.resources {
 		if r.Id == id {
 			return r, nil
@@ -57,4 +57,8 @@ func (m *MemoryStore) WriteResources(ctx context.Context, resources []*model.Res
 
 func (m *MemoryStore) Stats(context.Context) (model.Stats, error) {
 	return model.Stats{}, errors.New("not implemented")
+}
+
+func (m *MemoryStore) GetTags(context.Context, model.Filter, int) ([]*model.TagInfo, error) {
+	return nil, errors.New("not implemented")
 }

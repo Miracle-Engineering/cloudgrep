@@ -64,7 +64,7 @@ func Info(c *gin.Context) {
 // Resource retrieves a resource by its id
 func Resource(c *gin.Context) {
 	datastore := c.MustGet("datastore").(datastore.Datastore)
-	id := c.GetString("id")
+	id := model.ResourceId(c.GetString("id"))
 	if id == "" {
 		badRequest(c, fmt.Errorf("missing required parameter 'id'"))
 		return
@@ -104,4 +104,25 @@ func Stats(c *gin.Context) {
 		return
 	}
 	c.JSON(200, stats)
+}
+
+// Tags retrieves the tags for the current filter, sorted by count desc
+func Tags(c *gin.Context) {
+	datastore := c.MustGet("datastore").(datastore.Datastore)
+	filter := model.EmptyFilter()
+	if f, ok := c.Get("filter"); ok {
+		filter = f.(model.Filter)
+	}
+	limit := c.GetInt("limit")
+	if limit == 0 {
+		limit = 10
+	} else if limit > 100 {
+		limit = 100
+	}
+	tags, err := datastore.GetTags(c, filter, limit)
+	if err != nil {
+		badRequest(c, err)
+		return
+	}
+	c.JSON(200, tags)
 }

@@ -7,14 +7,25 @@ import (
 )
 
 type Tag struct {
-	ResourceId string `json:"-" gorm:"primaryKey"`
-	Key        string `json:"key" gorm:"primaryKey"`
-	Value      string `json:"value"`
+	ResourceId ResourceId `json:"-" gorm:"primaryKey"`
+	Key        string     `json:"key" gorm:"primaryKey"`
+	Value      string     `json:"value"`
 	//when used as a filter indicates to look for resources without this tag
-	Exclude bool `json:"-"`
+	Exclude bool `json:"-" gorm:"-"`
+}
+
+//TagInfo provide information about a searched tag, including count and values found
+type TagInfo struct {
+	Key    string   `json:"key"`
+	Values []string `json:"values"`
+	//number of resources found with this tag
+	Count int `json:"count"`
+	//list the resource with this tags
+	ResourceIds []ResourceId `json:"ResourceIds"`
 }
 
 type Tags []Tag
+type TagInfos []*TagInfo
 
 func (t Tag) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddString("key", t.Key)
@@ -31,14 +42,23 @@ func (t Tags) MarshalLogArray(enc zapcore.ArrayEncoder) error {
 	return nil
 }
 
-func newTags(m map[string]string) Tags {
-	var tags []Tag
+func newTags(m map[string]string, excludes []string) Tags {
+	var tags Tags
 	for k, str := range m {
 		//a filter on a tag can have multiple values
 		values := strings.Split(str, ",")
+		if len(k) == 0 {
+			continue
+		}
 		for _, v := range values {
 			tags = append(tags, Tag{Key: k, Value: v})
 		}
+	}
+	for _, tag := range excludes {
+		if len(tag) == 0 {
+			continue
+		}
+		tags = append(tags, Tag{Key: tag, Value: "*", Exclude: true})
 	}
 	return tags
 }
@@ -69,4 +89,14 @@ func (t Tags) Clean() Tags {
 
 func (t Tags) Empty() bool {
 	return len(t) == 0
+}
+
+//Find finds a TagInfo by Key, return nil if not found
+func (ts TagInfos) Find(key string) *TagInfo {
+	for _, t := range ts {
+		if t.Key == key {
+			return t
+		}
+	}
+	return nil
 }

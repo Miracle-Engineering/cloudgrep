@@ -69,7 +69,7 @@ func TestReadWrite(t *testing.T) {
 		})
 	}
 }
-func TestFiltering(t *testing.T) {
+func TestResourcesFiltering(t *testing.T) {
 	ctx := context.Background()
 	for _, datastore := range newDatastores(t, ctx) {
 		name := fmt.Sprintf("%T", datastore)
@@ -79,6 +79,7 @@ func TestFiltering(t *testing.T) {
 			resourceInst1 := all_resources[0]  //team:infra, release tag
 			resourceInst2 := all_resources[1]  //team:dev, no release tag
 			resourceBucket := all_resources[2] //s3 bucket without tags
+			resourceLB := all_resources[3]     //a load balancer
 
 			assert.NoError(t, datastore.WriteResources(ctx, all_resources))
 
@@ -152,10 +153,11 @@ func TestFiltering(t *testing.T) {
 			}
 			resourcesRead, err = datastore.GetResources(ctx, filter)
 			assert.NoError(t, err)
-			assert.Equal(t, 2, len(resourcesRead))
-			util.AssertEqualsResources(t, model.Resources{resourceInst2, resourceBucket}, resourcesRead)
+			assert.Equal(t, 3, len(resourcesRead))
+			util.AssertEqualsResources(t, model.Resources{resourceInst2, resourceBucket, resourceLB}, resourcesRead)
 
 			//test 2 exclusions - each instance resource has 1 tag but not both, kept them
+			// TODO we should probably revisit this behavior -> exclude tags should be an OR not AND
 			filter = model.Filter{
 				Tags: []model.Tag{
 					{Key: "release", Value: "*", Exclude: true},
@@ -198,7 +200,72 @@ func TestStats(t *testing.T) {
 			}
 			//check stats
 			assert.NoError(t, err)
-			assert.Equal(t, model.Stats{ResourcesCount: 3}, stats)
+			assert.Equal(t, model.Stats{ResourcesCount: 4}, stats)
+
+		})
+	}
+}
+
+func TestTagsFiltering(t *testing.T) {
+	ctx := context.Background()
+	for _, datastore := range newDatastores(t, ctx) {
+		name := fmt.Sprintf("%T", datastore)
+		t.Run(name, func(t *testing.T) {
+
+			all_resources := testdata.GetResources(t)
+			assert.NoError(t, datastore.WriteResources(ctx, all_resources))
+
+			var tags model.TagInfos
+
+			tags, err := datastore.GetTags(ctx, model.EmptyFilter(), 10)
+			//do not test result if not implemented
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+
+			assert.NoError(t, err)
+			//check all tags returned
+			assert.Equal(t, 10, len(tags))
+			//check a specific entry
+			clusterTag := model.TagInfo{
+				Key:         "cluster",
+				Values:      []string{"prod-cluster", "dev-cluster"},
+				ResourceIds: []model.ResourceId{"i-123", "i-124", "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6"},
+				Count:       3,
+			}
+			util.AssertEqualsTagIno(t, clusterTag, *tags.Find("cluster"))
+
+			//test limit - since it's sorted, the most frequent tag is always returned first
+			tags, err = datastore.GetTags(ctx, model.EmptyFilter(), 1)
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(tags))
+			util.AssertEqualsTagIno(t, clusterTag, *tags[0])
+
+			//test filter is applied
+			filter := model.Filter{
+				Tags: []model.Tag{{Key: "service.k8s.aws/resource", Value: "LoadBalancer"}},
+			}
+			tags, err = datastore.GetTags(ctx, filter, 10)
+			assert.NoError(t, err)
+			//only the lb should be scoped
+			//the lb has 3 tags
+			assert.Equal(t, 3, len(tags))
+			//only he values and resource related to the LB are present
+			clusterTag = model.TagInfo{
+				Key:         "cluster",
+				Values:      []string{"prod-cluster"},
+				ResourceIds: []model.ResourceId{"arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6"},
+				Count:       1,
+			}
+			util.AssertEqualsTagIno(t, clusterTag, *tags.Find("cluster"))
+
+			//test exclude filter - all resource have this tag, no result expected
+			filter = model.Filter{
+				Tags: []model.Tag{{Key: "cluster", Value: "*", Exclude: true}},
+			}
+			tags, err = datastore.GetTags(ctx, filter, 10)
+			assert.NoError(t, err)
+			assert.Equal(t, 0, len(tags))
 
 		})
 	}

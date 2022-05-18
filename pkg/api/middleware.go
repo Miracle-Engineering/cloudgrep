@@ -1,6 +1,8 @@
 package api
 
 import (
+	"strconv"
+	"strings"
 	"time"
 
 	ginzap "github.com/gin-contrib/zap"
@@ -44,16 +46,20 @@ func setDatastore(ds datastore.Datastore) gin.HandlerFunc {
 
 func setParams(cfg config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var filter model.Filter
 		tags := c.QueryMap("tags")
-		if len(tags) > 0 {
-			filter = model.NewFilter(tags)
-			c.Set("filter", filter)
-		}
+		excludeTags := strings.Split(c.Query("exclude-tags"), ",")
+		filter := model.NewFilter(tags, excludeTags)
+		c.Set("filter", filter)
+
 		id := c.Query("id")
 		c.Set("id", id)
+
+		limit, _ := strconv.Atoi(c.Query("limit"))
+		c.Set("limit", limit)
+
 		cfg.Logging.Logger.Sugar().Debugw("Request params:",
 			zap.Object("filter", filter),
+			zap.Int("limit", limit),
 			zap.String("id", id),
 		)
 	}

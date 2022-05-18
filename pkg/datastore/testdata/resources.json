@@ -27,6 +27,10 @@
             {
                 "key": "release",
                 "value": "v1"
+            },
+            {
+                "key": "cluster",
+                "value": "prod-cluster"
             }
         ],
         "properties": [
@@ -92,6 +96,10 @@
             {
                 "key": "debug:info",
                 "value": "breakpoint-123"
+            },
+            {
+                "key": "cluster",
+                "value": "dev-cluster"
             }
         ],
         "properties": [
@@ -138,6 +146,35 @@
             {
                 "name": "Name",
                 "value": "a-bucket-123"
+            }
+        ]
+    },
+    {
+        "id": "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6",
+        "region": "us-east-1",
+        "type": "elb.LoadBalancer",
+        "tags": [
+            {
+                "key": "cluster",
+                "value": "prod-cluster"
+            },
+            {
+                "key": "service.k8s.aws/resource",
+                "value": "LoadBalancer"
+            },
+            {
+                "key": "service.k8s.aws/stack",
+                "value": "ingress-nginx/ingress-nginx-controller"
+            }
+        ],
+        "properties": [
+            {
+                "name": "LoadBalancerArn",
+                "value": "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6"
+            },
+            {
+                "name": "LoadBalancerName",
+                "value": "opta-staging-ingress"
             }
         ]
     }

@@ -20,8 +20,6 @@ type SQLiteStore struct {
 	db     *gorm.DB
 }
 
-type resourceId string
-
 func NewSQLiteStore(ctx context.Context, cfg config.Config) (*SQLiteStore, error) {
 	s := SQLiteStore{}
 	logLevel := logger.Error
@@ -56,8 +54,8 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config) (*SQLiteStore, error
 	return &s, nil
 }
 
-func (s *SQLiteStore) getAllResourceIds(ctx context.Context) ([]resourceId, error) {
-	var resourceIds []resourceId
+func (s *SQLiteStore) getAllResourceIds(ctx context.Context) ([]model.ResourceId, error) {
+	var resourceIds []model.ResourceId
 	result := s.db.Model(&model.Resource{}).Select("id").Distinct().Find(&resourceIds)
 	if result.Error != nil {
 		return nil, result.Error
@@ -65,8 +63,8 @@ func (s *SQLiteStore) getAllResourceIds(ctx context.Context) ([]resourceId, erro
 	return resourceIds, nil
 }
 
-func (s *SQLiteStore) getResourceIdsByTag(ctx context.Context, tags model.Tags) ([]resourceId, error) {
-	var resourceIds []resourceId
+func (s *SQLiteStore) getResourceIdsByTag(ctx context.Context, tags model.Tags) ([]model.ResourceId, error) {
+	var resourceIds []model.ResourceId
 	db := s.db.Model(&model.Tag{}).Select("resource_id").Distinct()
 	if !tags.Empty() {
 		for _, tag := range tags {
@@ -107,18 +105,41 @@ func (s *SQLiteStore) getResourceIdsByTag(ctx context.Context, tags model.Tags) 
 	return resourceIds, nil
 }
 
-func (s *SQLiteStore) getResourcesById(ctx context.Context, idsInclude []resourceId, idsExclude []resourceId) ([]*model.Resource, error) {
+//getResourceIdsForFilter apply the resource filter and return the ids to include, ids to exclude and potential error
+func (s *SQLiteStore) getResourceIdsForFilter(ctx context.Context, filter model.Filter) ([]model.ResourceId, []model.ResourceId, error) {
+
+	//apply filter tags:include
+	includeTags := filter.TagsInclude()
+	var err error
+	var idsInclude []model.ResourceId
+	if includeTags.Empty() {
+		//no include filter set - include all
+		idsInclude, err = s.getAllResourceIds(ctx)
+	} else {
+		idsInclude, err = s.getResourceIdsByTag(ctx, includeTags)
+	}
+	if err != nil {
+		return nil, nil, fmt.Errorf("can't get resources from database: %w", err)
+	}
+
+	//apply filter tags:exclude
+	var idsExclude []model.ResourceId
+	if tagsExclude := filter.TagsExclude(); !tagsExclude.Empty() {
+		idsExclude, err = s.getResourceIdsByTag(ctx, filter.TagsExclude())
+		if err != nil {
+			return nil, nil, fmt.Errorf("can't get resources from database: %w", err)
+		}
+	}
+	return idsInclude, idsExclude, nil
+}
+
+func (s *SQLiteStore) getResourcesById(ctx context.Context, idsInclude []model.ResourceId, idsExclude []model.ResourceId) ([]*model.Resource, error) {
 	var resources []*model.Resource
 	if len(idsInclude) == 0 {
 		return resources, nil
 	}
-	db := s.db
-	if len(idsExclude) != 0 {
-		// exlucde these ids
-		db = db.Where("id not in ?", idsExclude)
-	}
-	db = db.
-		Preload("Tags").Preload("Properties").Find(&resources, idsInclude)
+	db := whereResourceIds(s.db, "id", idsInclude, idsExclude)
+	db = db.Preload("Tags").Preload("Properties").Find(&resources)
 
 	if db.Error != nil {
 		return nil, db.Error
@@ -126,8 +147,8 @@ func (s *SQLiteStore) getResourcesById(ctx context.Context, idsInclude []resourc
 	return resources, nil
 
 }
-func (s *SQLiteStore) GetResource(ctx context.Context, id string) (*model.Resource, error) {
-	resources, err := s.getResourcesById(ctx, []resourceId{resourceId(id)}, nil)
+func (s *SQLiteStore) GetResource(ctx context.Context, id model.ResourceId) (*model.Resource, error) {
+	resources, err := s.getResourcesById(ctx, []model.ResourceId{model.ResourceId(id)}, nil)
 	if err != nil {
 		return nil, fmt.Errorf("can't get resource from database: %w", err)
 	}
@@ -136,36 +157,18 @@ func (s *SQLiteStore) GetResource(ctx context.Context, id string) (*model.Resour
 		return nil, nil
 	}
 	s.logger.Sugar().Infow("Getting resource: ",
-		zap.String("id", id),
+		zap.String("id", string(id)),
 	)
 	return resources[0], nil
 }
 func (s *SQLiteStore) GetResources(ctx context.Context, filter model.Filter) ([]*model.Resource, error) {
-	var resources []*model.Resource
-
-	//apply filter tags:include
-	includeTags := filter.TagsInclude()
-	var err error
-	var idsInclude []resourceId
-	if includeTags.Empty() {
-		//no include filter set - include all
-		idsInclude, err = s.getAllResourceIds(ctx)
-	} else {
-		idsInclude, err = s.getResourceIdsByTag(ctx, includeTags)
-	}
+	//get resource ids for current filter
+	idsInclude, idsExclude, err := s.getResourceIdsForFilter(ctx, filter)
 	if err != nil {
-		return nil, fmt.Errorf("can't get resources from database: %w", err)
+		return nil, err
 	}
 
-	//apply filter tags:exclude
-	var idsExclude []resourceId
-	if tagsExclude := filter.TagsExclude(); !tagsExclude.Empty() {
-		idsExclude, err = s.getResourceIdsByTag(ctx, filter.TagsExclude())
-		if err != nil {
-			return nil, fmt.Errorf("can't get resources from database: %w", err)
-		}
-	}
-
+	var resources []*model.Resource
 	resources, err = s.getResourcesById(ctx, idsInclude, idsExclude)
 	if err != nil {
 		return nil, fmt.Errorf("can't get resources from database: %w", err)
@@ -195,4 +198,114 @@ func (s *SQLiteStore) Stats(context.Context) (model.Stats, error) {
 		return model.Stats{}, fmt.Errorf("can't read resources count from database: %w", result.Error)
 	}
 	return model.Stats{ResourcesCount: int(count)}, nil
+}
+
+//getTagValues return the tag values for a given key
+func (s *SQLiteStore) getTagValues(ctx context.Context, key string, resourceIdsInclude []model.ResourceId, resourceIdsExclude []model.ResourceId) ([]string, error) {
+	/*
+		select distinct(value) from tags
+		where tags.resource_id in (
+			resourceIdsInclude
+		)
+		and tags.resource_id not in (
+			resourceIdsExclude
+		)
+		and key='?'
+	*/
+	db := s.db.Model(&model.Tag{}).Select("value").Distinct().
+		Where("key=?", key)
+	db = whereResourceIds(db, "resource_id", resourceIdsInclude, resourceIdsExclude)
+
+	var values []string
+	db = db.Find(&values)
+	if db.Error != nil {
+		return nil, db.Error
+	}
+	return values, nil
+}
+
+//getTagValues return the tag resource ids for a given key
+func (s *SQLiteStore) getTagResourceIds(ctx context.Context, key string, resourceIdsInclude []model.ResourceId, resourceIdsExclude []model.ResourceId) ([]model.ResourceId, error) {
+	/*
+		select distinct(resource_id) from tags
+		where tags.resource_id in (
+			resourceIdsInclude
+		)
+		and tags.resource_id not in (
+			resourceIdsExclude
+		)
+		and key='?'
+	*/
+	db := s.db.Model(&model.Tag{}).Select("resource_id").Distinct().
+		Where("key=?", key)
+	db = whereResourceIds(db, "resource_id", resourceIdsInclude, resourceIdsExclude)
+
+	var resource_ids []model.ResourceId
+	if len(resourceIdsInclude) == 0 {
+		return resource_ids, nil
+	} else {
+		db = db.Where("resource_id in ?", resourceIdsInclude)
+	}
+	if len(resourceIdsExclude) != 0 {
+		// exlucde these ids
+		db = db.Where("resource_id not in ?", resourceIdsExclude)
+	}
+	db = db.Find(&resource_ids)
+	if db.Error != nil {
+		return nil, db.Error
+	}
+	return resource_ids, nil
+}
+
+func (s *SQLiteStore) GetTags(ctx context.Context, filter model.Filter, limit int) ([]*model.TagInfo, error) {
+	//get resource ids for current filter
+	resourceIdsInclude, resourceIdsExclude, err := s.getResourceIdsForFilter(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	if len(resourceIdsInclude) == 0 {
+		//current filter has no result
+		return nil, nil
+	}
+
+	db := s.db.Model(&model.Tag{}).Select("key", "count() as count")
+	db = whereResourceIds(db, "resource_id", resourceIdsInclude, resourceIdsExclude)
+
+	var tagInfos []*model.TagInfo
+	//get the tags with the highest count, apply the limit
+	db = db.
+		Group("key").
+		Order("count DESC").
+		Limit(limit).
+		Find(&tagInfos)
+
+	if db.Error != nil {
+		return nil, fmt.Errorf("can't read tags from database: %w", db.Error)
+	}
+
+	//get the values for each key
+	for _, tagInfo := range tagInfos {
+		values, err := s.getTagValues(ctx, tagInfo.Key, resourceIdsInclude, resourceIdsExclude)
+		if err != nil {
+			return nil, err
+		}
+		resourceIds, err := s.getTagResourceIds(ctx, tagInfo.Key, resourceIdsInclude, resourceIdsExclude)
+		if err != nil {
+			return nil, err
+		}
+		tagInfo.Values = values
+		tagInfo.ResourceIds = resourceIds
+	}
+
+	return tagInfos, nil
+}
+
+//whereIds add the where clause to select the provided resource ids
+func whereResourceIds(db *gorm.DB, idName string, idsInclude []model.ResourceId, idsExclude []model.ResourceId) *gorm.DB {
+	db = db.Where(idName+" in ?", idsInclude)
+	if len(idsExclude) != 0 {
+		// exlucde these ids
+		db = db.Where(idName+" not in ?", idsExclude)
+	}
+	return db
 }

@@ -20,8 +20,8 @@ func (f Filter) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	return enc.AddArray("tags", f.Tags)
 }
 
-func NewFilter(tags map[string]string) Filter {
-	return Filter{Tags: newTags(tags)}
+func NewFilter(tags map[string]string, excludeTags []string) Filter {
+	return Filter{Tags: newTags(tags, excludeTags)}
 }
 
 //TagIncludes returns the tags to include
