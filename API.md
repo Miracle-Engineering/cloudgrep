@@ -2,7 +2,7 @@
 
 # API
 
-The backend exposes an API at `http://localhost:8080/api`.
+The backend exposes an API at [http://localhost:8080/api](http://localhost:8080/api).
 
 ## List resources
 
@@ -14,8 +14,8 @@ List the resources for a given filter.
 
 | Parameters | Description |  Examples |
 | ------------- | ------------- | ------------- |
-| tags  | return resource(s) with the provided tag  | `tags[team]=infra` return resources with the tag `team=infra`, meaning "team" with value "infra" <br />`tags[team]=infra&tags[env]=prod` return resources with the tags `team=infra` **and** `env=dev` <br />`tags[env]=prod,dev` return resources with the tags `env=prod` **and** `env=dev` <br />`tags[team]=*` return all the resources with the tag `team` defined|
-| exclude-tags  | return resource(s) without the provided tag  | `exclude-tags=team` return resources without the tag `team`<br />`exclude-tags=team,env` return resources without the tag `team` **and** `env`|
+| tags  | return the resources **with** the provided tag(s)  | `tags[team]=infra` return resources with the tag `team=infra`, meaning "team" with value "infra" <br />`tags[team]=infra&tags[env]=prod` return resources with the tags `team=infra` **and** `env=dev` <br />`tags[env]=prod,dev` return resources with the tags `env=prod` **and** `env=dev` <br />`tags[team]=*` return all the resources with the tag `team` defined|
+| exclude-tags  | return the resources **without** the provided tag(s)  | `exclude-tags=team` return resources without the tag `team`<br />`exclude-tags=team,env` return resources without the tag `team` **and** `env`|
 
 Example of response:
 ```js
@@ -75,9 +75,9 @@ This list is sorted to return the most popular tags first (highest count).
 
 | Parameters | Description |  Examples |
 | ------------- | ------------- | ------------- |
-| tags  | return tags for the resources with the provided tag  | `tags[team]=infra` return the tags associated with the resources with the tag `team=infra`" <br />`tags[team]=infra&tags[env]=prod` return the tags associated with the resources with the tags `team=infra` **and** `env=dev` <br />`tags[env]=prod,dev` return the tags associated with the resources with the tags `env=prod` **and** `env=dev` <br />`tags[team]=*` return the tags associated with the resources with the tag `team` defined|
-| exclude-tags  | return the tags associated with the resources without the provided tag  | `exclude-tags=team` return resources without the tag `team`<br />`exclude-tags=team,env` return the tags associated with the resources without the tag `team` **and** `env`
-| limit  | the number of tags to return.<br />Default: 10, Maximum value: 100.
+| tags  | return the tags for the resources **with** the provided tag(s)  | `tags[team]=infra` return the tags associated with the resources with the tag `team=infra`" <br />`tags[team]=infra&tags[env]=prod` return the tags associated with the resources with the tags `team=infra` **and** `env=dev` <br />`tags[env]=prod,dev` return the tags associated with the resources with the tags `env=prod` **and** `env=dev` <br />`tags[team]=*` return the tags associated with the resources with the tag `team` defined|
+| exclude-tags  | return the tags associated with the resources **without** the provided tag(s)  | `exclude-tags=team` return resources without the tag `team`<br />`exclude-tags=team,env` return the tags associated with the resources without the tag `team` **and** `env`
+| limit  | the number of tags to return.<br />Default: 10, Maximum value: 100. | `limit=3` return the 3 most popular tags for the current filter
 
 Example of response:
 ```js
@@ -113,7 +113,7 @@ Return a resource by id.
 
 | Parameters | Description |  Examples |
 | ------------- | ------------- | ------------- |
-| id  | the resource id  | `id=i-024c4971f7f510c8f` return resource with the id `i-024c4971f7f510c8f`
+| id  | the resource id  | `id=i-024c4971f7f510c8f` return the resource with the id `i-024c4971f7f510c8f`
 
 Example of response:
 ```js
