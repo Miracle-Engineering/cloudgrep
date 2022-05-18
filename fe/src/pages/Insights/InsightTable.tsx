@@ -33,8 +33,11 @@ const InsightTable: FC = () => {
 				paddingLeft: '28px',
 				paddingRight: '44px',
 			}}>
-			<TableContainer component={Paper}>
-				<Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+			<TableContainer component={Paper} sx={{ height: '100%' }}>
+				<Table
+					sx={{ minWidth: 650, height: '100%', overflowY: 'scroll' }}
+					size="small"
+					aria-label="a dense table">
 					<TableHead>
 						<TableRow>
 							<TableCell sx={tableStyles.headerStyle}>{t('TYPE')} </TableCell>

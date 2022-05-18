@@ -11,7 +11,8 @@ import SearchInput from 'components/SearchInput/SearchInput';
 import { MockTag } from 'models/Tag';
 import React, { ChangeEvent, FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from 'store/hooks';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { getFilteredResources, getResources } from 'store/resources/thunks';
 
 import { accordionStyles, filterHeader, labelClasses, overrideSummaryClasses } from './style';
 
@@ -20,6 +21,7 @@ const InsightFilter: FC = () => {
 	const { t } = useTranslation();
 	const [searchTerm, setSearchTerm] = useState('');
 	const [searchTypeTerm, setSearchTypeTerm] = useState('');
+	const dispatch = useAppDispatch();
 
 	const regions = useMemo((): Set<string> => {
 		return new Set(tagResource?.Resources?.map(resource => resource.Region) || ['']);
@@ -41,12 +43,21 @@ const InsightFilter: FC = () => {
 		setSearchTypeTerm(e.target.value);
 	};
 
+	const handleChange = (event: React.ChangeEvent<HTMLInputElement>, tag: MockTag) => {
+		if (event.target.checked) {
+			dispatch(getFilteredResources(tag));
+		} else {
+			dispatch(getResources());
+		}
+	};
+
 	return (
 		<Box
 			sx={{
 				width: '15%',
 				height: '100%',
 				backgroundColor: '#F9F7F6',
+				overflowY: 'scroll',
 			}}>
 			<Accordion>
 				<AccordionSummary
@@ -145,7 +156,13 @@ const InsightFilter: FC = () => {
 									<FormControlLabel
 										classes={labelClasses}
 										key={tag.Value}
-										control={<Checkbox size={'small'} defaultChecked />}
+										control={
+											<Checkbox
+												size={'small'}
+												defaultChecked
+												onChange={e => handleChange(e, tag)}
+											/>
+										}
 										label={tag.Value}
 									/>
 								</FormGroup>

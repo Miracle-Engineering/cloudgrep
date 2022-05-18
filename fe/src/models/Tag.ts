@@ -9,3 +9,5 @@ export interface Tag {
 	key: string;
 	value: string;
 }
+
+export type TagType = { [key: string]: string };

@@ -45,7 +45,7 @@ const Insights: FC = () => {
 				p={2}>
 				<SearchInput width={'400px'} height={'32px'} onChange={handleChange} />
 			</Box>
-			<Box sx={{ display: 'flex', height: '100%' }}>
+			<Box sx={{ display: 'flex', height: 'calc(100% - 136px)' }}>
 				<InsightFilter />
 				<InsightTable />
 				{sideMenuVisible ? <SideMenu /> : <></>}
