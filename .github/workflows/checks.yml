@@ -23,6 +23,11 @@ jobs:
       - run: make test
         env:
           CGO_ENABLED: 1
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.out
+          token: ${{ secrets.CLOUDGREP_CODECOV_TOKEN }}
 
   fmt:
     name: fmt
