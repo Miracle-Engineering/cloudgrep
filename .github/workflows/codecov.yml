@@ -31,3 +31,4 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           files: ./coverage.out
+          token: ${{ secrets.CLOUDGREP_CODECOV_TOKEN }}
