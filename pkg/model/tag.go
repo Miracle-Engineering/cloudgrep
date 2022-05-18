@@ -21,7 +21,7 @@ type TagInfo struct {
 	//number of resources found with this tag
 	Count int `json:"count"`
 	//list the resource with this tags
-	ResourceIds []ResourceId `json:"ResourceIds"`
+	ResourceIds []ResourceId `json:"resourceIds"`
 }
 
 type Tags []Tag
