@@ -35,7 +35,7 @@ func TestAssertResource(t *testing.T) {
 	AssertEqualsResource(t, r1, r2)
 }
 
-func TestAssertTagIno(t *testing.T) {
+func TestAssertTagInfo(t *testing.T) {
 
 	t1 := model.TagInfo{
 		Key: "cluster", Values: []string{"prod", "dev"}, Count: 1, ResourceIds: []model.ResourceId{"i-1", "i-2"},
@@ -44,5 +44,5 @@ func TestAssertTagIno(t *testing.T) {
 		Key: "cluster", Values: []string{"dev", "prod"}, Count: 1, ResourceIds: []model.ResourceId{"i-2", "i-1"},
 	}
 	//t1 and t1 should be equals even though the order of their Values/ResourceIds are sorted differently
-	AssertEqualsTagIno(t, t1, t2)
+	AssertEqualsTagInfo(t, t1, t2)
 }

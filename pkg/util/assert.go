@@ -31,7 +31,7 @@ func AssertEqualsResource(t *testing.T, a, b model.Resource) {
 	assert.ElementsMatch(t, a.Tags.Clean(), b.Tags.Clean())
 }
 
-func AssertEqualsTagIno(t *testing.T, a, b model.TagInfo) {
+func AssertEqualsTagInfo(t *testing.T, a, b model.TagInfo) {
 	assert.Equal(t, a.Key, b.Key)
 	assert.Equal(t, a.Count, b.Count)
 	assert.ElementsMatch(t, a.ResourceIds, b.ResourceIds)

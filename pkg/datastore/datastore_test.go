@@ -233,13 +233,13 @@ func TestTagsFiltering(t *testing.T) {
 				ResourceIds: []model.ResourceId{"i-123", "i-124", "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6"},
 				Count:       3,
 			}
-			util.AssertEqualsTagIno(t, clusterTag, *tags.Find("cluster"))
+			util.AssertEqualsTagInfo(t, clusterTag, *tags.Find("cluster"))
 
 			//test limit - since it's sorted, the most frequent tag is always returned first
 			tags, err = datastore.GetTags(ctx, model.EmptyFilter(), 1)
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(tags))
-			util.AssertEqualsTagIno(t, clusterTag, *tags[0])
+			util.AssertEqualsTagInfo(t, clusterTag, *tags[0])
 
 			//test filter is applied
 			filter := model.Filter{
@@ -257,7 +257,7 @@ func TestTagsFiltering(t *testing.T) {
 				ResourceIds: []model.ResourceId{"arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6"},
 				Count:       1,
 			}
-			util.AssertEqualsTagIno(t, clusterTag, *tags.Find("cluster"))
+			util.AssertEqualsTagInfo(t, clusterTag, *tags.Find("cluster"))
 
 			//test exclude filter - all resource have this tag, no result expected
 			filter = model.Filter{
