@@ -160,6 +160,17 @@ Example of response:
 }
 ```
 
+## Stats
+
+Provide statistics about the fetched data.
+
+```js
+{
+  //number of resources stored
+  "resources_count":16
+}
+```
+
 ## Mocked data
 
 There is also a mocked API at `http://localhost:8080/mock/api`.  
