@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -66,5 +68,10 @@ func errorResponse(c *gin.Context, status int, err interface{}) {
 
 // Send a bad request (http 400) back to client
 func badRequest(c *gin.Context, err interface{}) {
-	errorResponse(c, 400, err)
+	errorResponse(c, http.StatusBadRequest, err)
+}
+
+// Send a not found (http 404) back to client
+func notFoundf(c *gin.Context, format string, a ...any) {
+	errorResponse(c, http.StatusNotFound, fmt.Errorf(format, a...))
 }

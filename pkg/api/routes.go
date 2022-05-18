@@ -21,8 +21,9 @@ func SetupRoutes(router *gin.Engine, cfg config.Config, ds datastore.Datastore) 
 	api := root.Group("/api")
 	setupMiddlewares(api, cfg, ds)
 
-	api.GET("/info", GetInfo)
-	api.GET("/resources", GetResources)
+	api.GET("/info", Info)
+	api.GET("/resource", Resource)
+	api.GET("/resources", Resources)
 	api.GET("/stats", Stats)
 
 	// mock api serving static files (temporary)

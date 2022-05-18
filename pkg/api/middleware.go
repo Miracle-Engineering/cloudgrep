@@ -16,7 +16,7 @@ func setupMiddlewares(group *gin.RouterGroup, cfg config.Config, ds datastore.Da
 		group.Use(logAllQueryParams(cfg), logAllRequests(cfg))
 	}
 	group.Use(setDatastore(ds))
-	group.Use(setFilter(cfg))
+	group.Use(setParams(cfg))
 }
 
 // Middleware to print out request parameters and body for debugging
@@ -42,13 +42,19 @@ func setDatastore(ds datastore.Datastore) gin.HandlerFunc {
 	}
 }
 
-func setFilter(cfg config.Config) gin.HandlerFunc {
+func setParams(cfg config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var filter model.Filter
 		tags := c.QueryMap("tags")
 		if len(tags) > 0 {
-			filter := model.NewFilter(tags)
-			cfg.Logging.Logger.Sugar().Debugw("Request filter:", zap.Object("filter", filter))
+			filter = model.NewFilter(tags)
 			c.Set("filter", filter)
 		}
+		id := c.Query("id")
+		c.Set("id", id)
+		cfg.Logging.Logger.Sugar().Debugw("Request params:",
+			zap.Object("filter", filter),
+			zap.String("id", id),
+		)
 	}
 }

@@ -126,7 +126,20 @@ func (s *SQLiteStore) getResourcesById(ctx context.Context, idsInclude []resourc
 	return resources, nil
 
 }
-
+func (s *SQLiteStore) GetResource(ctx context.Context, id string) (*model.Resource, error) {
+	resources, err := s.getResourcesById(ctx, []resourceId{resourceId(id)}, nil)
+	if err != nil {
+		return nil, fmt.Errorf("can't get resource from database: %w", err)
+	}
+	if len(resources) == 0 {
+		//not found
+		return nil, nil
+	}
+	s.logger.Sugar().Infow("Getting resource: ",
+		zap.String("id", id),
+	)
+	return resources[0], nil
+}
 func (s *SQLiteStore) GetResources(ctx context.Context, filter model.Filter) ([]*model.Resource, error) {
 	var resources []*model.Resource
 
