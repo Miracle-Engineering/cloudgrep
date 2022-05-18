@@ -35,7 +35,7 @@ const InsightTable: FC = () => {
 			}}>
 			<TableContainer component={Paper} sx={{ height: '100%' }}>
 				<Table
-					sx={{ minWidth: 650, height: '100%', overflowY: 'scroll' }}
+					sx={{ minWidth: 650, maxHeight: '100%', overflowY: 'scroll' }}
 					size="small"
 					aria-label="a dense table">
 					<TableHead>
