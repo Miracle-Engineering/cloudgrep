@@ -32,6 +32,7 @@ jobs:
         with:
           files: ./coverage.out
           token: ${{ secrets.CLOUDGREP_CODECOV_TOKEN }}
+          fail_ci_if_error: true
 
   fmt:
     name: fmt
