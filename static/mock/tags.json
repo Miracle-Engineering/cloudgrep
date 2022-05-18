@@ -1,40 +1,26 @@
-{
-  "Tags": [
-    {
-      "Key": "eks:cluster-name",
-      "Value": "opta-staging",
-      "Count": 2,
-      "ResourceIds": [
-        "i-024c4971f7f510c8f",
-        "i-046b8584f97edce25"
-      ]
-    },
-    {
-      "Key": "VpcId",
-      "Value": "vpc-0c0919dddbbd3bede",
-      "Count": 3,
-      "ResourceIds": [
-        "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6",
-        "i-024c4971f7f510c8f",
-        "i-046b8584f97edce25"
-      ]
-    }
-  ],
-  "Resources": [
-    {
-      "Type": "elasticLoadBalancingV2.LoadBalancer",
-      "Id": "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6",
-      "Region": "us-east-1"
-    },
-    {
-      "Type": "ec2.Instance",
-      "Id": "i-024c4971f7f510c8f",
-      "Region": "us-east-1"
-    },
-    {
-      "Type": "ec2.Instance",
-      "Id": "i-046b8584f97edce25",
-      "Region": "us-east-1"
-    }
-  ]
-}
+[
+  {
+    "key": "eks:cluster-name",
+    "values": [
+      "opta-staging",
+      "opta-dev"
+    ],
+    "count": 2,
+    "resourceIds": [
+      "i-024c4971f7f510c8f",
+      "i-046b8584f97edce25"
+    ]
+  },
+  {
+    "key": "VpcId",
+    "values": [
+      "vpc-0c0919dddbbd3bede"
+    ],
+    "count": 3,
+    "resourceIds": [
+      "arn:aws:elasticloadbalancing:us-east-1:248233625043:loadbalancer/net/opta-staging-ingress/14522ba1bd959dd6",
+      "i-024c4971f7f510c8f",
+      "i-046b8584f97edce25"
+    ]
+  }
+]
