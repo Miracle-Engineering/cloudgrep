@@ -16,15 +16,15 @@ if (process.env.REACT_APP_ENABLE_GA === 'true' && process.env.NODE_ENV !== 'deve
 	const gtagScript = document.createElement('script'); // Make a script DOM node
 
 	// Google Analytics (ga) script is added to public folder
-	gtagScript.src = `${process.env.PUBLIC_URL?.toString() || ''}/static/js/ga.js`; // Set it's src to the provided URL
+	gtagScript.src = `${process.env.PUBLIC_URL?.toString() || ''}${process.env.REACT_APP_PATH_PREFIX}/ga.js`; // Set script source path
 
 	const gaScript = document.createElement('script');
 	gaScript.async = true;
-	gaScript.src = 'https://www.google-analytics.com/analytics.js';
+	gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-J94VVQXGPT';
 
 	if (document.head) {
-		document.head.appendChild(gtagScript);
 		document.head.appendChild(gaScript);
+		document.head.appendChild(gtagScript);
 	}
 }
 
