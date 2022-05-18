@@ -1,8 +1,12 @@
 name: checks
 
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - [main]
+  pull_request:
+    branches:
+      - [main]
 
 env:
   GO_VERSION: 1.18
