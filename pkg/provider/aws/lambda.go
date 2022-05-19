@@ -8,7 +8,7 @@ import (
 	"github.com/run-x/cloudgrep/pkg/model"
 )
 
-func (awsPrv *AWSProvider) FetchLambdas(ctx context.Context) ([]types.FunctionConfiguration, error) {
+func (awsPrv *AWSProvider) FetchFunctions(ctx context.Context) ([]types.FunctionConfiguration, error) {
 	input := &lambda.ListFunctionsInput{}
 	var functions []types.FunctionConfiguration
 	paginator := lambda.NewListFunctionsPaginator(awsPrv.lambdaClient, input)

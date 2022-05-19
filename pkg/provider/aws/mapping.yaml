@@ -31,5 +31,5 @@ mappings:
   - type: "github.com/aws/aws-sdk-go-v2/service/lambda/types.FunctionConfiguration"
     resourceType: "lambda.Function"
     idField: FunctionArn
-    impl: FetchLambdas
+    impl: FetchFunctions
     tagImpl: FetchFunctionTag
