@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"go.uber.org/zap"
@@ -24,6 +25,7 @@ type AWSProvider struct {
 	elbClient *elbv2.Client
 	s3Client  *s3.Client
 	mapper    mapper.Mapper
+	lambdaClient *lambda.Client
 }
 
 //go:embed mapping.yaml

@@ -28,3 +28,8 @@ mappings:
     resourceType: "ec2.Volume"
     idField: VolumeId
     impl: FetchEBSVolumes
+  - type: "github.com/aws/aws-sdk-go-v2/service/lambda/types.FunctionConfiguration"
+    resourceType: "lambda.Function"
+    idField: FunctionArn
+    impl: FetchLambdas
+    tagImpl: FetchFunctionTag
