@@ -3,3 +3,6 @@
 run:
   go: '1.17'
   timeout: 5m
+
+  # Timeout for analysis, Default: 1m
+  timeout: 5m
