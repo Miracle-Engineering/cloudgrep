@@ -46,6 +46,7 @@ func NewAWSProvider(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) (
 	provider.ec2Client = ec2.NewFromConfig(provider.config)
 	provider.elbClient = elbv2.NewFromConfig(provider.config)
 	provider.s3Client = s3.NewFromConfig(provider.config)
+	provider.lambdaClient = lambda.NewFromConfig(provider.config)
 
 	//create the mapper for this provider
 	provider.mapper, err = mapper.New(embedConfig, *logger, reflect.ValueOf(&provider))

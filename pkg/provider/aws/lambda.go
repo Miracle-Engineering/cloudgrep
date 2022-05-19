@@ -20,7 +20,7 @@ func (awsPrv *AWSProvider) FetchLambdas(ctx context.Context) ([]types.FunctionCo
 
 		functions = append(functions, result.Functions...)
 		input.Marker = result.NextMarker
-		continuePagination = input.Marker == nil
+		continuePagination = input.Marker != nil
 	}
 	return functions, nil
 }
