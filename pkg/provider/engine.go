@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -31,22 +32,22 @@ func NewEngine(ctx context.Context, cfg config.Config, datastore datastore.Datas
 
 //Run the providers: fetches data about cloud resources and save them to store
 func (e *Engine) Run(ctx context.Context) error {
-
+	var errors error
 	//TODO use go routine to start the provider, review error handling to continue on error
 	for _, provider := range e.Providers {
 		// fetch the resources
 		resources, err := fetchResources(ctx, provider)
 		if err != nil {
-			return err
+			errors = multierror.Append(errors, err)
 		}
 		// save to store
 		err = e.Datastore.WriteResources(ctx, resources)
 		if err != nil {
-			return err
+			errors = multierror.Append(errors, err)
 		}
 	}
 
-	return nil
+	return errors
 }
 
 func fetchResources(ctx context.Context, provider Provider) ([]*model.Resource, error) {

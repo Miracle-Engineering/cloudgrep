@@ -178,6 +178,10 @@ func (s *SQLiteStore) GetResources(ctx context.Context, filter model.Filter) ([]
 }
 
 func (s *SQLiteStore) WriteResources(ctx context.Context, resources []*model.Resource) error {
+	if len(resources) == 0 {
+		//nothing to write
+		return nil
+	}
 	result := s.db.Create(resources)
 	s.logger.Sugar().Infow("Writting resources: ",
 		zap.Int("count", int(result.RowsAffected)),

@@ -51,6 +51,10 @@ func TestReadWrite(t *testing.T) {
 			resources := testdata.GetResources(t)
 			assert.NotZero(t, len(resources))
 
+			//test write empty slice
+			assert.NoError(t, datastore.WriteResources(ctx, []*model.Resource{}))
+
+			//write the resources
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
 			var resourcesRead []*model.Resource

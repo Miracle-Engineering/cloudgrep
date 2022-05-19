@@ -50,11 +50,12 @@ func Run() error {
 	}
 	if err = engine.Run(ctx); err != nil {
 		stats, _ := datastore.Stats(ctx)
-		if stats.ResourcesCount >= 0 {
+		if stats.ResourcesCount > 0 {
 			//log the error but the api can still server with the datastore
-			cfg.Logging.Logger.Sugar().Errorw("can't run engine", "error", err)
+			cfg.Logging.Logger.Sugar().Errorw("some error(s) when running the provider engine", "error", err)
 		} else {
-			return err
+			// nothing to view - exit
+			return fmt.Errorf("can't run the provider engine: %w", err)
 		}
 	}
 
