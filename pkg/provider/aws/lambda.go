@@ -11,16 +11,13 @@ import (
 func (awsPrv *AWSProvider) FetchLambdas(ctx context.Context) ([]types.FunctionConfiguration, error) {
 	input := &lambda.ListFunctionsInput{}
 	var functions []types.FunctionConfiguration
-	continuePagination := true
-	for continuePagination {
-		result, err := awsPrv.lambdaClient.ListFunctions(ctx, input)
+	paginator := lambda.NewListFunctionsPaginator(awsPrv.lambdaClient, input)
+	for paginator.HasMorePages() {
+		result, err := paginator.NextPage(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("failed to fetch Lambda Functions: %w", err)
 		}
-
 		functions = append(functions, result.Functions...)
-		input.Marker = result.NextMarker
-		continuePagination = input.Marker != nil
 	}
 	return functions, nil
 }
