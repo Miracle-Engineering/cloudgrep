@@ -21,6 +21,7 @@ __debug_bin
 
 # visual studio
 .vscode
+.idea
 
 # local databases
 *.db
