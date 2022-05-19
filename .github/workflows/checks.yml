@@ -1,8 +1,12 @@
 name: checks
 
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 env:
   GO_VERSION: 1.18
@@ -23,6 +27,13 @@ jobs:
       - run: make test
         env:
           CGO_ENABLED: 1
+          TEST: 1
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.out
+          token: ${{ secrets.CLOUDGREP_CODECOV_TOKEN }}
+          fail_ci_if_error: true
 
   fmt:
     name: fmt
