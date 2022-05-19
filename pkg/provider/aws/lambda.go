@@ -36,5 +36,3 @@ func (p *AWSProvider) FetchFunctionTag(ctx context.Context, fn types.FunctionCon
 	}
 	return tags, nil
 }
-
-
