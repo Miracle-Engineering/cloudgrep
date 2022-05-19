@@ -2,3 +2,4 @@
 # follow https://github.com/golangci/golangci-lint/issues/2649
 run:
   go: '1.17'
+  timeout: 5m
