@@ -38,10 +38,8 @@ const InsightFilter: FC = () => {
 
 	useEffect(() => {
 		if (filterTags?.length) {
-			console.log(filterTags);
 			dispatch(getFilteredResources(filterTags));
 		} else {
-			console.log(filterTags);
 			dispatch(getResources());
 		}
 	}, [filterTags]);
@@ -163,7 +161,9 @@ const InsightFilter: FC = () => {
 						</AccordionSummary>
 						<AccordionDetails>
 							<SearchInput onChange={handleSearchTags} />
-							<Typography mt={1}>
+							<Typography
+								mt={1}
+								sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 								<FormGroup>
 									<FormControlLabel
 										classes={labelClasses}
@@ -172,6 +172,7 @@ const InsightFilter: FC = () => {
 										label={tag.Value}
 									/>
 								</FormGroup>
+								<Typography sx={{ fontSize: '13px', fontWeight: 600 }}>{tag.Count}</Typography>
 							</Typography>
 						</AccordionDetails>
 					</Accordion>
