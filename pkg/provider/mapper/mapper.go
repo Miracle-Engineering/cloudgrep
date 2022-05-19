@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/util"
 	"go.uber.org/zap"
@@ -201,16 +202,25 @@ func (m Mapper) ToResource(ctx context.Context, x any, region string) (model.Res
 }
 
 //FetchResources calls the implementation method on each Mapping and returns the resources
+//this method can return both resources and error - if it has partially worked
 func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Resource, error) {
 	var resources []*model.Resource
+	var errors error
 	for _, mapping := range m.Mappings {
 		new_resources, err := m.fetchResources(ctx, mapping, region)
 		if err != nil {
-			return nil, err
+			errors = multierror.Append(errors, err)
 		}
 		resources = append(resources, new_resources...)
 	}
-	return resources, nil
+	//if we have no resource and some errors, only return the first error
+	//most likely a global issue such as auth or connectivity and would be too verbose
+	if len(resources) == 0 && errors != nil {
+		if merr, ok := errors.(*multierror.Error); ok {
+			errors = merr.Errors[0]
+		}
+	}
+	return resources, errors
 }
 
 func (m Mapper) fetchResources(ctx context.Context, mapping Mapping, region string) ([]*model.Resource, error) {
