@@ -7,7 +7,7 @@ class ResourceService {
 		return ApiClient.get<string | undefined, Resource[]>(getResourcesPath());
 	}
 
-	static async getFilteredResources(data: MockTag): Promise<Response<Resource[]>> {
+	static async getFilteredResources(data: MockTag[]): Promise<Response<Resource[]>> {
 		const path = getFilteredResourcesPath(data);
 		return ApiClient.get<string | undefined, Resource[]>(path);
 	}

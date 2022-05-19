@@ -9,7 +9,7 @@ import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
 import SearchInput from 'components/SearchInput/SearchInput';
 import { MockTag } from 'models/Tag';
-import React, { ChangeEvent, FC, useMemo, useState } from 'react';
+import React, { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getFilteredResources, getResources } from 'store/resources/thunks';
@@ -21,6 +21,7 @@ const InsightFilter: FC = () => {
 	const { t } = useTranslation();
 	const [searchTerm, setSearchTerm] = useState('');
 	const [searchTypeTerm, setSearchTypeTerm] = useState('');
+	const [filterTags, setFilterTags] = useState<MockTag[]>(tags);
 	const dispatch = useAppDispatch();
 
 	const regions = useMemo((): Set<string> => {
@@ -35,6 +36,16 @@ const InsightFilter: FC = () => {
 		);
 	}, [tagResource.Resources?.length, searchTypeTerm]);
 
+	useEffect(() => {
+		if (filterTags?.length) {
+			console.log(filterTags);
+			dispatch(getFilteredResources(filterTags));
+		} else {
+			console.log(filterTags);
+			dispatch(getResources());
+		}
+	}, [filterTags]);
+
 	const handleSearchTags = (e: ChangeEvent<HTMLInputElement>): void => {
 		setSearchTerm(e.target.value);
 	};
@@ -44,10 +55,11 @@ const InsightFilter: FC = () => {
 	};
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>, tag: MockTag) => {
-		if (event.target.checked) {
-			dispatch(getFilteredResources(tag));
-		} else {
-			dispatch(getResources());
+		const existingTag = filterTags?.some(item => item.Key === tag.Key && item.Value === tag.Value);
+		if (event.target.checked && !existingTag) {
+			setFilterTags([...filterTags, tag]);
+		} else if (!event.target.checked && existingTag) {
+			setFilterTags(filterTags.filter(item => item.Key !== tag.Key && item.Value !== tag.Value));
 		}
 	};
 
@@ -156,13 +168,7 @@ const InsightFilter: FC = () => {
 									<FormControlLabel
 										classes={labelClasses}
 										key={tag.Value}
-										control={
-											<Checkbox
-												size={'small'}
-												defaultChecked
-												onChange={e => handleChange(e, tag)}
-											/>
-										}
+										control={<Checkbox size={'small'} onChange={e => handleChange(e, tag)} />}
 										label={tag.Value}
 									/>
 								</FormGroup>

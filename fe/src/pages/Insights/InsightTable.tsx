@@ -50,7 +50,7 @@ const InsightTable: FC = () => {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{resources.map((row: Resource, index: number) => (
+						{resources?.map((row: Resource, index: number) => (
 							<TableRow
 								onClick={() => handleClick(row)}
 								key={row.id + row.type + index}

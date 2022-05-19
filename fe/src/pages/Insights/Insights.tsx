@@ -21,13 +21,13 @@ const Insights: FC = () => {
 		if (!tags?.length) {
 			dispatch(getTags());
 		}
-	}, [tags?.length]);
+	}, []);
 
 	useEffect(() => {
 		if (!resources?.length) {
 			dispatch(getResources());
 		}
-	}, [resources?.length]);
+	}, []);
 
 	const handleChange = () => {
 		// TODO

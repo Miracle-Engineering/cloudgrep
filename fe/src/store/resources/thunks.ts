@@ -14,7 +14,7 @@ const getResources = createAsyncThunk('resources/getResources', async (_, thunkA
 	}
 });
 
-const getFilteredResources = createAsyncThunk('resources/getFilteredResources', async (data: MockTag, thunkAPI) => {
+const getFilteredResources = createAsyncThunk('resources/getFilteredResources', async (data: MockTag[], thunkAPI) => {
 	try {
 		const response = await ResourceService.getFilteredResources(data);
 		thunkAPI.dispatch(setResources(response.data));
