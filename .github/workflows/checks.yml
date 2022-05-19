@@ -27,6 +27,7 @@ jobs:
       - run: make test
         env:
           CGO_ENABLED: 1
+          TEST: 1
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
