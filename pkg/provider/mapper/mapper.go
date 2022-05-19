@@ -223,12 +223,15 @@ func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Res
 	return resources, errors
 }
 
+//fetchResources fetches the resources for a mapping and a region
+//note this method can return some resources and an error, if it has partially worked
 func (m Mapper) fetchResources(ctx context.Context, mapping Mapping, region string) ([]*model.Resource, error) {
 	m.logger.Sugar().Infow("Fetching resources",
 		zap.String("ResourceType", mapping.ResourceType),
 		zap.String("Region", region),
 	)
 	var resources []*model.Resource
+	var errors error
 	// call the method to fetch the resources
 	result := mapping.Method.Call([]reflect.Value{reflect.ValueOf(ctx)})
 	//generate a error message to avoid duplication in code below
@@ -240,12 +243,17 @@ func (m Mapper) fetchResources(ctx context.Context, mapping Mapping, region stri
 				any := v.Index(i).Interface()
 				resource, err := m.ToResource(ctx, any, region)
 				if err != nil {
-					return nil, fmt.Errorf("error converting %v result slice to resource: %w", mapping.Impl, err)
+					//store error and keep processing other resources
+					errors = multierror.Append(errors,
+						fmt.Errorf(
+							"error converting %v result slice to resource: %w", mapping.Impl, err),
+					)
+					continue
 				}
 				resources = append(resources, &resource)
 			}
 		case reflect.Interface:
-			// an error was returned
+			// an error was returned by the fetch method
 			err, ok := v.Interface().(error)
 			if ok {
 				return nil, err
@@ -260,7 +268,7 @@ func (m Mapper) fetchResources(ctx context.Context, mapping Mapping, region stri
 		zap.String("Region", region),
 		zap.Int("Count", len(resources)),
 	)
-	return resources, nil
+	return resources, errors
 }
 
 func getProperties(name string, v reflect.Value, ignoredFields []string, maxRecursion int) []model.Property {
