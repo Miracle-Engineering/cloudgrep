@@ -1,0 +1,9 @@
+types:
+  - name: Instance
+    description: EC2 Instances
+    listApi:
+      call: DescribeInstances
+      pagination: true
+      outputKey: [Reservations, Instances]
+      id: InstanceId
+      tags: Tags

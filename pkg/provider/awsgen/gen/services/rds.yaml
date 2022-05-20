@@ -1,0 +1,17 @@
+types:
+  - name: DBInstance
+    description: RDS DB Instances
+    listApi:
+      call: DescribeDBInstances
+      pagination: true
+      outputKey: [DBInstances]
+      id: DBInstanceIdentifier
+      tags: TagList
+  - name: DBCluster
+    description: RDS Auora DB Clusters
+    listApi:
+      call: DescribeDBClusters
+      pagination: true
+      outputKey: [DBClusters]
+      id: DBClusterIdentifier
+      tags: TagList

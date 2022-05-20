@@ -1,0 +1,12 @@
+types:
+  - name: Function
+    description: Lambda Functions
+    listApi:
+      call: ListFunctions
+      pagination: true
+      outputKey: [Functions]
+      id: FunctionArn
+    getTagsApi:
+      call: GetFunction
+      inputIDField: FunctionName
+      outputKey: [Tags]

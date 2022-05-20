@@ -1,0 +1,27 @@
+{{- define "output" }}
+{{- if .IsLast }}
+resources = append(resources, {{ .IterVar }}.{{ .Current }}...)
+{{- else }}
+for _, {{ .NextIterVar }} := range {{ .IterVar }}.{{ .Current }} {
+	{{- tabindent 1 (include "output" .Next) }}
+}
+{{- end }}
+{{- end }}
+
+func (p *AWSProvider) {{.Name}}(ctx context.Context) ([]types.{{.Type}}, error) {
+	input := &{{.Service}}.{{.Action}}Input{}
+	paginator := {{.Service}}.New{{.Action}}Paginator(p.{{.Client}}, input)
+
+	var resources []types.{{.Type}}
+
+	for paginator.HasMorePages() {
+		output, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch {{.Description}}: %w", err)
+		}
+
+		{{ include "output" (.OutputKey.WithRoot "output") | tabindent 2 }}
+	}
+
+	return resources, nil
+}

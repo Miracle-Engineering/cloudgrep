@@ -1,0 +1,18 @@
+func (p *AWSProvider) {{.Name}}(ctx context.Context, resource types.{{ .Type }}) (model.Tags, error) {
+	input := &{{ .Service }}.{{ .Action }}Input{}
+	input.{{ .InputIDField }} = resource.{{ .IDField }}
+
+	output, err := {{.Service}}.{{.Action}}(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch {{.Description}} tags: %w", err)
+	}
+
+	var tags model.Tags
+
+	var tags model.Tags
+	for key, value := range tagsResponse.Tags {
+		tags = append(tags, model.Tag{Key: key, Value: value})
+	}
+
+	return resources, nil
+}

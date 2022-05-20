@@ -1,0 +1,24 @@
+{{- define "output" }}
+{{- if .IsLast }}
+resources = append(resources, {{ .IterVar }}.{{ .Current }}...)
+{{- else }}
+for _, {{ .NextIterVar }} := range {{ .IterVar }}.{{ .Current }} {
+	{{- tabindent 1 (include "output" .Next) }}
+}
+{{- end }}
+{{- end }}
+
+func (p *AWSProvider) {{.Name}}(ctx context.Context) ([]types.{{.Type}}, error) {
+	input := &{{.Service}}.{{.Action}}Input{}
+
+	output, err := {{.Service}}.{{.Action}}(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch {{.Description}}: %w", err)
+	}
+
+	var resources []types.{{.Type}}
+
+	{{- include "output" (.OutputKey.WithRoot "output") | tabindent 1 }}
+
+	return resources, nil
+}

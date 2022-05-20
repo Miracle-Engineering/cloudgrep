@@ -1,0 +1,22 @@
+package {{ .Package }}
+
+import (
+    "reflect"
+
+    "github.com/run-x/cloudgrep/pkg/provider/awsgen/registry"
+)
+
+func RegisterAll(r registry.Registry) {
+    {{- range .Services }}
+    register_{{ . }}(r)
+    {{- end }}
+}
+
+func mustFieldByName(t reflect.Type, name string) reflect.StructField {
+    f, ok := t.FieldByName(name)
+    if !ok {
+        panic("field " + name + " not found")
+    }
+
+    return f
+}
