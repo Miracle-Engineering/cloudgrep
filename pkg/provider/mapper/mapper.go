@@ -221,7 +221,7 @@ func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Res
 	go func() {
 		var masterError error
 		for _ = range m.Mappings {
-			err := <- errorsChan
+			err := <-errorsChan
 			masterError = multierror.Append(masterError, err)
 		}
 		errorChan <- masterError
@@ -231,14 +231,14 @@ func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Res
 	go func() {
 		var masterResourceList []*model.Resource
 		for _ = range m.Mappings {
-			new_resources := <- resourceListChan
+			new_resources := <-resourceListChan
 			masterResourceList = append(masterResourceList, new_resources...)
 		}
 		resourcesChan <- masterResourceList
 	}()
 
-	errors = <- errorChan
-	resources = <- resourcesChan
+	errors = <-errorChan
+	resources = <-resourcesChan
 	//if we have no resource and some errors, only return the first error
 	//most likely a global issue such as auth or connectivity and would be too verbose
 	if len(resources) == 0 && errors != nil {
