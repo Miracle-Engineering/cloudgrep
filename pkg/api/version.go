@@ -13,3 +13,7 @@ var (
 	// GoVersion contains the build time Go version
 	GoVersion string
 )
+
+func IsDev() bool {
+	return Version == "dev"
+}
