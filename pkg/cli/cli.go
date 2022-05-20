@@ -61,7 +61,7 @@ func Run() error {
 
 	api.StartWebServer(ctx, cfg, datastore)
 
-	url := fmt.Sprintf("http://%v:%v/%v%v", cfg.Web.Host, cfg.Web.Port, cfg.Web.Prefix, "api/fields")
+	url := fmt.Sprintf("http://%v:%v/%v", cfg.Web.Host, cfg.Web.Port, cfg.Web.Prefix)
 	fmt.Println("To view Cloudgrep UI, open ", url, "in browser")
 
 	if !opts.SkipOpen {
