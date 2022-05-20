@@ -1,31 +1,29 @@
-package util
+package model
 
 import (
 	"testing"
-
-	"github.com/run-x/cloudgrep/pkg/model"
 )
 
 func TestAssertResource(t *testing.T) {
-	r1 := model.Resource{
+	r1 := Resource{
 		Id: "i-123", Region: "us-east-1", Type: "test.Instance",
-		Tags: []model.Tag{
+		Tags: []Tag{
 			{Key: "enabled", Value: "true"},
 			{Key: "eks:nodegroup", Value: "staging-default"},
 		},
-		Properties: []model.Property{
+		Properties: []Property{
 			{Name: "InstanceId", Value: "i-123"},
 			{Name: "Architecture", Value: "x86_64"},
 			{Name: "SecurityGroups[0]", Value: "sg-1"},
 		},
 	}
-	r2 := model.Resource{
+	r2 := Resource{
 		Id: "i-123", Region: "us-east-1", Type: "test.Instance",
-		Tags: []model.Tag{
+		Tags: []Tag{
 			{Key: "eks:nodegroup", Value: "staging-default"},
 			{Key: "enabled", Value: "true"},
 		},
-		Properties: []model.Property{
+		Properties: []Property{
 			{Name: "SecurityGroups[0]", Value: "sg-1"},
 			{Name: "Architecture", Value: "x86_64"},
 			{Name: "InstanceId", Value: "i-123"},

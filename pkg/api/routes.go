@@ -25,6 +25,7 @@ func SetupRoutes(router *gin.Engine, cfg config.Config, ds datastore.Datastore) 
 	api.GET("/resource", Resource)
 	api.GET("/resources", Resources)
 	api.GET("/stats", Stats)
+	api.GET("/fields", Fields)
 
 	// mock api serving static files (temporary)
 	mock_files, err := ioutil.ReadDir("./static/mock")
