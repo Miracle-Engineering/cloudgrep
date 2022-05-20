@@ -4,16 +4,20 @@
     min-height: 15px;
     margin: 0px 0px !important;
     padding: 4px 4px;
-    font-size: 11px;
+    font-size: 11px !important;
     font-weight: 400;
+    font-family: "Montserrat" !important;
+    align-items: center;
 }
 
 .summary_root {
     margin-top: 4px !important;
+    border-radius: 0px 4px 0px 0px !important;
 }
 
 .label_label {
     font-weight: 400;
     font-size: 13px !important;
     color: rgba(28, 43, 52, 0.98);
+    font-family: "Montserrat" !important;
 }

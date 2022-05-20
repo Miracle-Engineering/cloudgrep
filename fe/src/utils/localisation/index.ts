@@ -22,16 +22,26 @@ i18n.use(initReactI18next).init({
 				REGISTER: 'Register',
 				EXISTING_ACCOUNT: 'Already have an account?',
 				NOT_FOUND: 'Not Found',
+				SEARCH: 'Search',
+				SEARCH_TERM: 'Search term',
+				REFRESH: 'Refresh',
+
+				// HEADER:
+				HOME: 'Home',
+				SLACK: 'Slack',
+				GITHUB: 'Github',
+				CONTACT: 'Contact',
 
 				// Application specific
 				TAGS: 'Tags',
+				PROPERTIES: 'Properties',
 
 				// Resources
 				TYPE: 'Type',
 				ID: 'Id',
 				REGION: 'Region',
-				REGIONS: 'REGIONS',
-				TYPES: 'TYPES',
+				REGIONS: 'Regions',
+				TYPES: 'Types',
 			},
 		},
 	},

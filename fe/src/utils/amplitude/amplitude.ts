@@ -1,7 +1,7 @@
 import amplitude from 'amplitude-js';
 
 export const initAmplitude = () => {
-	amplitude.getInstance().init(process.env.REACT_APP_AMPLITUDE_API_KEY || '');
+	amplitude.getInstance().init('2b0167b9ea1dacf8f0dae96326abd879');
 	amplitude.getInstance().logEvent('PAGE LOAD');
 };
 

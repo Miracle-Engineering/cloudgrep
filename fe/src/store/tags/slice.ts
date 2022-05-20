@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Tag } from 'models/Tag';
+import { MockTag } from 'models/Tag';
 import { TagResource } from 'models/TagResource';
 
 import { TagState } from './types';
@@ -13,7 +13,7 @@ const tagsSlice = createSlice({
 	name: 'tags',
 	initialState,
 	reducers: {
-		setTags: (state, action: PayloadAction<Tag[]>) => {
+		setTags: (state, action: PayloadAction<MockTag[]>) => {
 			state.tags = action.payload;
 		},
 		setTagResource: (state, action: PayloadAction<TagResource>) => {
