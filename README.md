@@ -1,3 +1,5 @@
+# cloudgrep
+
 <p align="center">
     <a href="https://github.com/run-x/cloudgrep/actions/workflows/checks.yml">
         <img src="https://github.com/run-x/cloudgrep/actions/workflows/checks.yml/badge.svg"/>
@@ -6,7 +8,6 @@
         <img src="https://codecov.io/gh/run-x/cloudgrep/branch/main/graph/badge.svg?token=IW4MK6TRP8"/>
     </a>
 </p>
-# cloudgrep
 
 Web-based Cloud grep utlity written in Go.
 
