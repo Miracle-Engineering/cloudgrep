@@ -222,7 +222,9 @@ func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Res
 		var masterError error
 		for range m.Mappings {
 			err := <-errorsChan
-			masterError = multierror.Append(masterError, err)
+			if err != nil {
+				masterError = multierror.Append(masterError, err)
+			}
 		}
 		errorChan <- masterError
 	}()
