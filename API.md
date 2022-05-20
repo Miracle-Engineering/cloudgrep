@@ -27,12 +27,18 @@ The backend exposes an API at `http://localhost:8080/api`.
 
 ## List fields
 
-Return the list of fileds available for filtering the resources.
-The fields can be used when querying the resources. (details TBD)
+Return the list of fields available for filtering the resources.
+
+The fields can be presented to the user to enable the user to build a search query using these field.
+
+A field can be:
+- a resource type
+- a region
+- a tag key
 
 | Route | Method |  Description |  Status |
 | ------------- | ------------- | ------------- | ------------- |
-| [/fields](http://localhost:8080/api/fields)  | GET  |  |  :white_check_mark: |
+| [/fields](http://localhost:8080/api/fields)  | GET  | Return the fields available for the stored resources |  :white_check_mark: |
 
 Example of response:
 ```js
