@@ -1,10 +1,10 @@
 package util
 
 import (
+	"github.com/run-x/cloudgrep/pkg/version"
 	"testing"
 
 	"github.com/matishsiao/goInfo"
-	"github.com/run-x/cloudgrep/pkg/app"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,7 +33,7 @@ func TestGenerateAmplitudeEvent(t *testing.T) {
 				"device_id":        systemInfo.Hostname,
 				"event_type":       BaseEvent,
 				"event_properties": map[string]interface{}{"application": application},
-				"app_version":      app.Version,
+				"app_version":      version.Version,
 				"platform":         systemInfo.Platform,
 				"insert_id":        "test",
 				"session_id":       sessionId,
@@ -46,7 +46,7 @@ func TestGenerateAmplitudeEvent(t *testing.T) {
 			assert.Equal(t, got["user_id"], userId)
 			assert.Equal(t, got["device_id"], systemInfo.Hostname)
 			assert.Equal(t, got["event_type"], tt.args.eventType)
-			assert.Equal(t, got["app_version"], app.Version)
+			assert.Equal(t, got["app_version"], version.Version)
 			assert.Equal(t, got["platform"], systemInfo.Platform)
 			gotEventProperties := got["event_properties"].(map[string]interface{})
 			assert.Equal(t, gotEventProperties["application"], application)
