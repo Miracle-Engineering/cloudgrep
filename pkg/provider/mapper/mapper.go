@@ -219,24 +219,24 @@ func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Res
 
 	errorChan := make(chan error)
 	go func() {
-		var masterError error
+		var mainError error
 		for range m.Mappings {
 			err := <-errorsChan
 			if err != nil {
-				masterError = multierror.Append(masterError, err)
+				mainError = multierror.Append(mainError, err)
 			}
 		}
-		errorChan <- masterError
+		errorChan <- mainError
 	}()
 
 	resourcesChan := make(chan []*model.Resource)
 	go func() {
-		var masterResourceList []*model.Resource
+		var mainResourceList []*model.Resource
 		for range m.Mappings {
 			new_resources := <-resourceListChan
-			masterResourceList = append(masterResourceList, new_resources...)
+			mainResourceList = append(mainResourceList, new_resources...)
 		}
-		resourcesChan <- masterResourceList
+		resourcesChan <- mainResourceList
 	}()
 
 	errors = <-errorChan
