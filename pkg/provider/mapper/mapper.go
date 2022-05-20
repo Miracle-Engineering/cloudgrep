@@ -220,7 +220,7 @@ func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Res
 	errorChan := make(chan error)
 	go func() {
 		var masterError error
-		for _ = range m.Mappings {
+		for range m.Mappings {
 			err := <-errorsChan
 			masterError = multierror.Append(masterError, err)
 		}
@@ -230,7 +230,7 @@ func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Res
 	resourcesChan := make(chan []*model.Resource)
 	go func() {
 		var masterResourceList []*model.Resource
-		for _ = range m.Mappings {
+		for range m.Mappings {
 			new_resources := <-resourceListChan
 			masterResourceList = append(masterResourceList, new_resources...)
 		}
