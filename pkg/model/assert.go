@@ -1,13 +1,12 @@
-package util
+package model
 
 import (
 	"testing"
 
-	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
-func AssertEqualsResources(t *testing.T, a, b model.Resources) {
+func AssertEqualsResources(t *testing.T, a, b Resources) {
 	assert.Equal(t, len(a), len(b))
 	for _, resourceA := range a {
 		resourceB := b.FindById(resourceA.Id)
@@ -19,14 +18,20 @@ func AssertEqualsResources(t *testing.T, a, b model.Resources) {
 	}
 }
 
-func AssertEqualsResourcePter(t *testing.T, a, b *model.Resource) {
+func AssertEqualsResourcePter(t *testing.T, a, b *Resource) {
 	AssertEqualsResource(t, *a, *b)
 }
 
-func AssertEqualsResource(t *testing.T, a, b model.Resource) {
+func AssertEqualsResource(t *testing.T, a, b Resource) {
 	assert.Equal(t, a.Id, b.Id)
 	assert.Equal(t, a.Region, b.Region)
 	assert.Equal(t, a.Type, b.Type)
 	assert.ElementsMatch(t, a.Properties.Clean(), b.Properties.Clean())
 	assert.ElementsMatch(t, a.Tags.Clean(), b.Tags.Clean())
+}
+
+func AssertEqualsField(t *testing.T, a, b Field) {
+	assert.Equal(t, a.Name, b.Name)
+	assert.Equal(t, a.Count, b.Count)
+	assert.ElementsMatch(t, a.Values, b.Values)
 }

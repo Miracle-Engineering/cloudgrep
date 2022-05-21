@@ -25,6 +25,82 @@ The backend exposes an API at `http://localhost:8080/api`.
 | ------------- | ------------- | ------------- |
 | id  | the resource id  | `id=i-024c4971f7f510c8f` return resource with the id `i-024c4971f7f510c8f`
 
+## List fields
+
+Return the list of fields available for filtering the resources.
+
+The fields can be presented to the user to enable the user to build a search query using these field.
+
+A field can be:
+- a resource type
+- a region
+- a tag key
+
+| Route | Method |  Description |  Status |
+| ------------- | ------------- | ------------- | ------------- |
+| [/fields](http://localhost:8080/api/fields)  | GET  | Return the fields available for the stored resources |  :white_check_mark: |
+
+Example of response:
+```js
+[
+  {
+    "name":"region",
+    "count":16,
+    "values":[
+      {
+        "value":"us-east-1",
+        "count":8
+      },
+      {
+        "value":"us-west-2",
+        "count":8
+      }
+    ]
+  },
+  {
+    "name":"type",
+    "count":16,
+    "values":[
+      {
+        "value":"ec2.Instance",
+        "count":3
+      },
+      {
+        "value":"ec2.Volume",
+        "count":6
+      },
+      {
+        "value":"elb.LoadBalancer",
+        "count":1
+      },
+      {
+        "value":"s3.Bucket",
+        "count":6
+      }
+    ]
+  },
+  {
+    "name":"cluster",
+    "count":6,
+    "values":[
+      {
+        "value":"prod",
+        "count":2
+      },
+      {
+        "value":"dev",
+        "count":2
+      },
+      {
+        "value":"stage",
+        "count":2
+      }
+    ]
+  }
+]
+```
+
+
 ## Mocked data
 
 There is also a mocked API at `http://localhost:8080/mock/api`.  

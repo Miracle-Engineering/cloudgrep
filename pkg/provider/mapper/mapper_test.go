@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/util"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest"
 )
@@ -59,7 +58,7 @@ func TestNewMapperOk(t *testing.T) {
 	}
 	instance, err := mapper.ToResource(ctx, instances[0], "us-west-2")
 	assert.NoError(t, err)
-	util.AssertEqualsResource(t, expectedInstance, instance)
+	model.AssertEqualsResource(t, expectedInstance, instance)
 
 	expectedLB := model.Resource{
 		Id:     "arn:aws:elasticloadbalancing:us-east-1:0123456789:loadbalancer/net/my-load-balancer/14522ba1bd959dd6",
@@ -78,7 +77,7 @@ func TestNewMapperOk(t *testing.T) {
 	assert.NoError(t, err)
 	resourceLB, err := mapper.ToResource(ctx, loadBalancers[0], "us-west-2")
 	assert.NoError(t, err)
-	util.AssertEqualsResource(t, expectedLB, resourceLB)
+	model.AssertEqualsResource(t, expectedLB, resourceLB)
 }
 
 func TestNewMapperError(t *testing.T) {
