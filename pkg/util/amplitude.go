@@ -5,12 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/run-x/cloudgrep/pkg/version"
 	"io/ioutil"
 	"net/http"
 	"time"
 
 	"github.com/run-x/cloudgrep/pkg/config"
+	"github.com/run-x/cloudgrep/pkg/version"
 
 	"github.com/google/uuid"
 	"github.com/matishsiao/goInfo"
