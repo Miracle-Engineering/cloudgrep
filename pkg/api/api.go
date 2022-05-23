@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/run-x/cloudgrep/pkg/app"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -54,10 +55,10 @@ func GetAssets(prefix string) http.Handler {
 // Info renders the system information
 func Info(c *gin.Context) {
 	successResponse(c, gin.H{
-		"version":    Version,
-		"go_version": GoVersion,
-		"git_sha":    GitCommit,
-		"build_time": BuildTime,
+		"version":    app.Version,
+		"go_version": app.GoVersion,
+		"git_sha":    app.GitCommit,
+		"build_time": app.BuildTime,
 	})
 }
 

@@ -10,7 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/matishsiao/goInfo"
-	"github.com/run-x/cloudgrep/pkg/api"
+	"github.com/run-x/cloudgrep/pkg/app"
 	"github.com/tcnksm/go-gitconfig"
 )
 
@@ -45,13 +45,13 @@ func isValidEvent(eventType string) bool {
 	return false
 }
 
-func sendAmplitudeEvent(eventType string, eventProperties map[string]interface{}, userProperties map[string]interface{}) (int, error) {
-	if api.IsDev() {
-		return 0, nil
+func sendAmplitudeEvent(eventType string, eventProperties map[string]interface{}, userProperties map[string]interface{}) {
+	if app.IsDev() {
+		fmt.Println("dev application, not sending events to amplitude")
 	}
 
 	if !isValidEvent(eventType) {
-		return 0, fmt.Errorf("Invalid Event Type: %s", eventType)
+		fmt.Printf("invalid event type: %s, not sending events to amplitude\n", eventType)
 	}
 
 	if eventProperties == nil {
@@ -71,7 +71,7 @@ func sendAmplitudeEvent(eventType string, eventProperties map[string]interface{}
 		"event_type":       eventType,
 		"event_properties": eventProperties,
 		"user_properties":  userProperties,
-		"app_version":      api.Version,
+		"app_version":      app.Version,
 		"platform":         systemInfo.Platform,
 		"insert_id":        id,
 		"session_id":       SESSION_ID,
@@ -87,15 +87,12 @@ func sendAmplitudeEvent(eventType string, eventProperties map[string]interface{}
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		defer response.Body.Close()
-		body, _ := ioutil.ReadAll(response.Body)
-		fmt.Println(response.Status)
-		fmt.Println(body)
-		fmt.Print("lalala")
-		fmt.Println(string(body))
+		if response.StatusCode != 200 {
+			fmt.Printf("amplitude response: %s\n", response.Status)
+			responseBody, _ := ioutil.ReadAll(response.Body)
+			fmt.Printf("amplitude response: %s\n", responseBody)
+		}
 	}
-
-	return 0, nil
 }
 
 func SendEvent(eventType string, eventProperties map[string]interface{}, userProperties map[string]interface{}) {

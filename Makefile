@@ -56,18 +56,18 @@ frontend-deploy:
 	cp ./fe/build/*.json ./static
 	cp ./fe/build/*.png ./static
 
-build: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GITHUB_SHA)
-build: LDFLAGS += -X $(PKG)/pkg/api.BuildTime=$(BUILD_TIME)
-build: LDFLAGS += -X $(PKG)/pkg/api.GoVersion=$(GO_VERSION)
-build: LDFLAGS += -X $(PKG)/pkg/api.Version=$(VERSION)
+build: LDFLAGS += -X $(PKG)/pkg/app.GitCommit=$(GITHUB_SHA)
+build: LDFLAGS += -X $(PKG)/pkg/app.BuildTime=$(BUILD_TIME)
+build: LDFLAGS += -X $(PKG)/pkg/app.GoVersion=$(GO_VERSION)
+build: LDFLAGS += -X $(PKG)/pkg/app.Version=$(VERSION)
 build:
 	go build -ldflags "$(LDFLAGS)"
 	@echo "You can now execute ./cloudgrep"
 
-release: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GITHUB_SHA)
-release: LDFLAGS += -X $(PKG)/pkg/api.BuildTime=$(BUILD_TIME)
-release: LDFLAGS += -X $(PKG)/pkg/api.GoVersion=$(GO_VERSION)
-release: LDFLAGS += -X $(PKG)/pkg/api.Version=$(VERSION)
+release: LDFLAGS += -X $(PKG)/pkg/app.GitCommit=$(GITHUB_SHA)
+release: LDFLAGS += -X $(PKG)/pkg/app.BuildTime=$(BUILD_TIME)
+release: LDFLAGS += -X $(PKG)/pkg/app.GoVersion=$(GO_VERSION)
+release: LDFLAGS += -X $(PKG)/pkg/app.Version=$(VERSION)
 release:
 	@echo "Building binaries..."
 	@CGO_ENABLED=1 gox \
