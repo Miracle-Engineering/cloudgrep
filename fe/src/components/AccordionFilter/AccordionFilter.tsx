@@ -9,22 +9,47 @@ import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
 import SearchInput from 'components/SearchInput/SearchInput';
 import { ValueType } from 'models/Field';
-import React, { ChangeEvent, FC, useState } from 'react';
+import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
+import useHover from 'utils/hooks/useHover';
 
 import { accordionStyles, filterStyles, labelClasses, overrideSummaryClasses } from './style';
 import { AccordionFilterProps } from './types';
 
+const SEARCH_ELEMENTS_NUMBER = 7;
+
 const AccordionFilter: FC<AccordionFilterProps> = props => {
 	const { label, hasSearch, id, field, handleChange } = props;
-	const [_, setSearchTerm] = useState('');
+	const [, setSearchTerm] = useState('');
+	const [applyHover, setApplyHover] = useState(false);
+	const [boxHeight, setBoxHeight] = useState('unset');
+	const [containerRef, isHovered] = useHover<HTMLDivElement>();
+	const accordionRef = useRef<HTMLElement>();
+	const [expanded, setExpanded] = useState(false);
+
+	const handleExpand = () => {
+		setExpanded(!expanded);
+	};
 
 	const handleSearchTerm = (e: ChangeEvent<HTMLInputElement>): void => {
 		setSearchTerm(e.target.value);
 	};
 
+	useEffect(() => {
+		if (expanded && isHovered && accordionRef?.current?.clientHeight) {
+			setBoxHeight(`${accordionRef?.current.clientHeight + 4}px`);
+			setApplyHover(true);
+		} else {
+			setBoxHeight('unset');
+			setApplyHover(false);
+		}
+	}, [isHovered, accordionRef?.current?.clientHeight, expanded, accordionRef]);
+
 	return (
-		<Box>
-			<Accordion sx={{ '&:hover': filterStyles.filterHover }}>
+		<Box ref={accordionRef} key={id} sx={{ height: boxHeight }}>
+			<Accordion
+				expanded={expanded}
+				onChange={handleExpand}
+				sx={{ '&:hover': applyHover ? filterStyles.filterHover : '' }}>
 				<AccordionSummary
 					sx={filterStyles.filterHeader}
 					expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
@@ -33,8 +58,10 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 					classes={overrideSummaryClasses}>
 					<Typography sx={accordionStyles.accordionHeader}>{label}</Typography>
 				</AccordionSummary>
-				<AccordionDetails>
-					{hasSearch && <SearchInput onChange={handleSearchTerm} />}
+				<AccordionDetails ref={containerRef}>
+					{hasSearch && field?.values?.length > SEARCH_ELEMENTS_NUMBER && (
+						<SearchInput onChange={handleSearchTerm} />
+					)}
 					<Typography>
 						<FormGroup>
 							{field?.values &&

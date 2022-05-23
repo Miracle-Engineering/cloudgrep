@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { MockTag, TagType } from 'models/Tag';
+import { Tag, TagType } from 'models/Tag';
 import ResourceService from 'services/ResourceService';
 
 import { setResources } from './slice';
@@ -14,7 +14,7 @@ const getResources = createAsyncThunk('resources/getResources', async (_, thunkA
 	}
 });
 
-const getFilteredResources = createAsyncThunk('resources/getFilteredResources', async (data: MockTag[], thunkAPI) => {
+const getFilteredResources = createAsyncThunk('resources/getFilteredResources', async (data: Tag[], thunkAPI) => {
 	try {
 		const response = await ResourceService.getFilteredResources(data);
 		thunkAPI.dispatch(setResources(response.data));

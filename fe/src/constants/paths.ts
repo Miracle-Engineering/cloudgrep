@@ -1,15 +1,15 @@
-import { MockTag } from 'models/Tag';
+import { Tag } from 'models/Tag';
 
-export const GET_TAGS_PATH = 'tags';
+export const GET_FIELDS_PATH = 'fields';
 export const GET_RESOURCES_PATH = 'resources';
 
-export const getTagsPath = (): string => `${process.env.REACT_APP_MOCK_API_URL}${GET_TAGS_PATH}`;
+export const getFieldsPath = (): string => `${process.env.REACT_APP_MOCK_API_URL}${GET_FIELDS_PATH}`;
 export const getResourcesPath = (): string => `${process.env.REACT_APP_API_URL}${GET_RESOURCES_PATH}`;
-export const getFilteredResourcesPath = (data: MockTag[]): string => {
+export const getFilteredResourcesPath = (data: Tag[]): string => {
 	let tagsPath = '';
 
-	data.forEach((tag: MockTag, index: number) => {
-		tagsPath += `${index === 0 ? '?' : '&'}tags[${tag.Key}]=${tag.Value}`;
+	data.forEach((tag: Tag, index: number) => {
+		tagsPath += `${index === 0 ? '?' : '&'}tags[${tag.key}]=${tag.value}`;
 	});
 
 	return `${process.env.REACT_APP_API_URL}${GET_RESOURCES_PATH}${tagsPath}`;

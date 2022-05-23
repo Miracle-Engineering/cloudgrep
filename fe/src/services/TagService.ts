@@ -1,11 +1,11 @@
-import { getTagsPath } from 'constants/paths';
+import { getFieldsPath } from 'constants/paths';
 import ApiClient, { Response } from 'utils/apiClient/ApiClient';
 
-import { TagResource } from '../models/TagResource';
+import { Field } from '../models/Field';
 
 class TagService {
-	static async getTags(): Promise<Response<TagResource>> {
-		return ApiClient.get<string | undefined, TagResource>(getTagsPath());
+	static async getFields(): Promise<Response<Field[]>> {
+		return ApiClient.get<string | undefined, Field[]>(getFieldsPath());
 	}
 }
 

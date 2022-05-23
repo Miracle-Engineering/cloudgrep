@@ -1,16 +1,16 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import TagService from 'services/TagService';
 
-import { setTagResource } from './slice';
+import { setFields } from './slice';
 
-const getTags = createAsyncThunk('tags/getTags', async (_, thunkAPI) => {
+const getFields = createAsyncThunk('tags/getFields', async (_, thunkAPI) => {
 	try {
-		const response = await TagService.getTags();
-		thunkAPI.dispatch(setTagResource(response.data));
+		const response = await TagService.getFields();
+		thunkAPI.dispatch(setFields(response.data));
 		return response.data;
 	} catch (error: any) {
 		return thunkAPI.rejectWithValue({ status: error.response?.status, error: error.message });
 	}
 });
 
-export { getTags };
+export { getFields };
