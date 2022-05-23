@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/run-x/cloudgrep/pkg/api"
+	"github.com/run-x/cloudgrep/pkg/app"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/options"
@@ -17,6 +18,12 @@ import (
 )
 
 func Run() error {
+	eventProperties := map[string]interface{}{
+		"app": "cloudgrep",
+	}
+
+	util.SendEvent(util.BASE_EVENT, eventProperties, nil)
+
 	ctx := context.Background()
 
 	opts, err := options.ParseOptions(os.Args)
@@ -24,7 +31,7 @@ func Run() error {
 		return fmt.Errorf("failed to parse cli options: %w", err)
 	}
 	if opts.Version {
-		fmt.Println(api.Version)
+		fmt.Println(app.Version)
 		os.Exit(0)
 	}
 
