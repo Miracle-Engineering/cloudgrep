@@ -3,8 +3,8 @@
 web:
   host: localhost
   port: 8080
-  # Add a url prefix
-  # prefix: 
+  prefix: "/"
+  skipOpen: false
 
 datastore:
   type: sqlite
@@ -13,8 +13,3 @@ datastore:
 
 providers:
   - cloud: aws
-
-logging:
-  # prod: https://pkg.go.dev/go.uber.org/zap#NewProduction
-  # dev: https://pkg.go.dev/go.uber.org/zap#NewDevelopment
-  mode: dev

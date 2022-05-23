@@ -18,13 +18,13 @@ type Datastore interface {
 	GetFields(context.Context) (model.Fields, error)
 }
 
-func NewDatastore(ctx context.Context, cfg config.Config) (Datastore, error) {
-	cfg.Logging.Logger.Sugar().Infow("Creating a datastore", zap.String("type", cfg.Datastore.Type))
+func NewDatastore(ctx context.Context, cfg config.Config, logger *zap.Logger) (Datastore, error) {
+	logger.Sugar().Infow("Creating a datastore", zap.String("type", cfg.Datastore.Type))
 	switch cfg.Datastore.Type {
 	case "memory":
-		return NewMemoryStore(ctx, cfg), nil
+		return NewMemoryStore(ctx, cfg, logger), nil
 	case "sqlite":
-		return NewSQLiteStore(ctx, cfg)
+		return NewSQLiteStore(ctx, cfg, logger)
 	}
 	return nil, fmt.Errorf("unknown datastore type '%v'", cfg.Datastore.Type)
 }

@@ -56,18 +56,18 @@ frontend-deploy:
 	cp ./fe/build/*.json ./static
 	cp ./fe/build/*.png ./static
 
-build: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GITHUB_SHA)
-build: LDFLAGS += -X $(PKG)/pkg/api.BuildTime=$(BUILD_TIME)
-build: LDFLAGS += -X $(PKG)/pkg/api.GoVersion=$(GO_VERSION)
-build: LDFLAGS += -X $(PKG)/pkg/api.Version=$(VERSION)
+build: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GITHUB_SHA)
+build: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
+build: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
+build: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
 build:
 	go build -ldflags "$(LDFLAGS)"
 	@echo "You can now execute ./cloudgrep"
 
-release: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GITHUB_SHA)
-release: LDFLAGS += -X $(PKG)/pkg/api.BuildTime=$(BUILD_TIME)
-release: LDFLAGS += -X $(PKG)/pkg/api.GoVersion=$(GO_VERSION)
-release: LDFLAGS += -X $(PKG)/pkg/api.Version=$(VERSION)
+release: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GITHUB_SHA)
+release: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
+release: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
+release: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
 release:
 	@echo "Building binaries..."
 	@CGO_ENABLED=1 gox \
@@ -93,10 +93,10 @@ release-darwin:
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh
 
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.GitCommit=$(GIT_COMMIT)
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.BuildTime=$(BUILD_TIME)
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.GoVersion=$(GO_VERSION)
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/api.Version=$(VERSION)
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GIT_COMMIT)
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
+release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
 release-linux-amd64:
 	@echo "Building Linux binaries..."
 	GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_amd64"

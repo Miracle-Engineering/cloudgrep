@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
 	"net/http"
 	"os"
 
@@ -10,19 +11,20 @@ import (
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/version"
 	"github.com/run-x/cloudgrep/static"
 )
 
-func StartWebServer(ctx context.Context, cfg config.Config, ds datastore.Datastore) {
+func StartWebServer(ctx context.Context, cfg config.Config, logger *zap.Logger, ds datastore.Datastore) {
 	router := gin.Default()
 
-	if cfg.Logging.IsDev() {
+	if logger.Core().Enabled(zap.DebugLevel) {
 		gin.SetMode("debug")
 	} else {
 		gin.SetMode("release")
 	}
 
-	SetupRoutes(router, cfg, ds)
+	SetupRoutes(router, cfg, logger, ds)
 
 	fmt.Println("Starting server...")
 	go func() {
@@ -36,14 +38,14 @@ func StartWebServer(ctx context.Context, cfg config.Config, ds datastore.Datasto
 
 // GetHome renderes the home page
 func GetHome(prefix string) http.Handler {
-	if prefix != "" {
+	if prefix != "" && prefix != "/" {
 		prefix = "/" + prefix
 	}
 	return http.StripPrefix(prefix, http.FileServer(http.FS(static.Static)))
 }
 
 func GetAssets(prefix string) http.Handler {
-	if prefix != "" {
+	if prefix != "" && prefix != "/" {
 		prefix = "/" + prefix + "static/"
 	} else {
 		prefix = "/static/"
@@ -54,10 +56,10 @@ func GetAssets(prefix string) http.Handler {
 // Info renders the system information
 func Info(c *gin.Context) {
 	successResponse(c, gin.H{
-		"version":    Version,
-		"go_version": GoVersion,
-		"git_sha":    GitCommit,
-		"build_time": BuildTime,
+		"version":    version.Version,
+		"go_version": version.GoVersion,
+		"git_sha":    version.GitCommit,
+		"build_time": version.BuildTime,
 	})
 }
 
