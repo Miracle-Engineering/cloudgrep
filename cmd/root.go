@@ -71,14 +71,9 @@ func initConfig() {
 	}
 	var err error
 	if verbose {
-		fmt.Println("hi1")
 		logger, err = zap.NewDevelopment()
 	} else {
-		fmt.Println("hi2")
 		logger, err = zap.NewProduction()
-		if logger.Core().Enabled(zap.DebugLevel) {
-			fmt.Println("hi3")
-		}
 	}
 	if err != nil {
 		panic(err)
