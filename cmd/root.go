@@ -31,6 +31,7 @@ import (
 var cfgFile string
 var verbose bool
 var logger *zap.Logger
+var runCmd = cli.Run
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -45,7 +46,7 @@ their cloud accounts.`,
 			panic(err)
 		}
 		logger.Sugar().Debugf("Using the following config %+v", cfg)
-		err = cli.Run(cmd.Context(), cfg, logger)
+		err = runCmd(cmd.Context(), cfg, logger)
 		if err != nil {
 			panic(err)
 		}
