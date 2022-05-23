@@ -105,3 +105,14 @@ func Stats(c *gin.Context) {
 	}
 	c.JSON(200, stats)
 }
+
+// Fields Return the list of fields available for filtering the resources
+func Fields(c *gin.Context) {
+	datastore := c.MustGet("datastore").(datastore.Datastore)
+	fields, err := datastore.GetFields(c)
+	if err != nil {
+		badRequest(c, err)
+		return
+	}
+	c.JSON(200, fields)
+}

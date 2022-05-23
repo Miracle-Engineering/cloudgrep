@@ -200,3 +200,129 @@ func (s *SQLiteStore) Stats(context.Context) (model.Stats, error) {
 	}
 	return model.Stats{ResourcesCount: int(count)}, nil
 }
+
+func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
+	/*
+		SELECT DISTINCT `type` , count(*)
+		FROM `resources`
+		group by  `type`
+		order by `type`
+	*/
+	rows, err := s.db.Model(&model.Resource{}).Select(name, "count() as count").
+		Distinct().
+		Group(name).
+		Order(name).
+		Rows()
+	if err != nil {
+		return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
+	}
+	defer rows.Close()
+	field := model.Field{Name: name}
+	var totalCount int
+	for rows.Next() {
+		var value string
+		var count int
+		err = rows.Scan(&value, &count)
+		if err != nil {
+			return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
+		}
+		field.Values = append(field.Values, model.FieldValue{Value: value, Count: count})
+		totalCount = totalCount + count
+	}
+	field.Count = totalCount
+	return field, nil
+}
+
+func (s *SQLiteStore) getTagFields() (model.Fields, error) {
+	fields, err := s.getTagKeys()
+	if err != nil {
+		return model.Fields{}, fmt.Errorf("can't get tag keys from database: %w", err)
+	}
+	var result model.Fields
+	for _, f := range fields {
+		values, err := s.getTagValues(f.Name)
+		if err != nil {
+			return nil, err
+		}
+		f.Values = values
+		result = append(result, f)
+	}
+	return result, nil
+}
+
+func (s *SQLiteStore) getTagKeys() (model.Fields, error) {
+	/*
+		SELECT distinct(`key`), count() as count
+		FROM `tags`
+		group by key
+		order by count desc
+	*/
+	rows, err := s.db.Model(&model.Tag{}).Select("key", "count() as count").
+		Distinct().
+		Group("key").
+		Order("count desc").
+		Rows()
+	if err != nil {
+		return model.Fields{}, fmt.Errorf("can't get tag keys from database: %w", err)
+	}
+	var fields model.Fields
+	defer rows.Close()
+	for rows.Next() {
+		var key string
+		var count int
+		err = rows.Scan(&key, &count)
+		if err != nil {
+			return nil, err
+		}
+		field := model.Field{
+			Name:  key,
+			Count: count,
+		}
+		fields = append(fields, field)
+	}
+	return fields, nil
+}
+
+func (s *SQLiteStore) getTagValues(key string) (model.FieldValues, error) {
+	/*
+		SELECT distinct(`value`), count() as count
+		FROM `tags`
+		where key=?
+		group by value
+		order by count desc
+	*/
+	var values model.FieldValues
+	db := s.db.Model(&model.Tag{}).Select("value", "count() as count").
+		Distinct().
+		Where("key=?", key).
+		Group("value").
+		Order("count desc").
+		Find(&values)
+
+	if db.Error != nil {
+		return nil, fmt.Errorf("can't get tag value for key '%v' : %w", key, db.Error)
+	}
+	return values, nil
+}
+
+func (s *SQLiteStore) GetFields(context.Context) (model.Fields, error) {
+	var fields model.Fields
+
+	//get fields on resources
+	for _, name := range []string{"region", "type"} {
+		field, err := s.getResourceField(name)
+		if err != nil {
+			return nil, err
+		}
+		fields = append(fields, field)
+	}
+
+	//get fields on tags
+	tagFields, err := s.getTagFields()
+	if err != nil {
+		return nil, err
+	}
+	fields = append(fields, tagFields...)
+
+	return fields, nil
+}

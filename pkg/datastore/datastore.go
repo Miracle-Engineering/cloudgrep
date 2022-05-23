@@ -15,6 +15,7 @@ type Datastore interface {
 	GetResources(context.Context, model.Filter) ([]*model.Resource, error)
 	WriteResources(context.Context, []*model.Resource) error
 	Stats(context.Context) (model.Stats, error)
+	GetFields(context.Context) (model.Fields, error)
 }
 
 func NewDatastore(ctx context.Context, cfg config.Config) (Datastore, error) {

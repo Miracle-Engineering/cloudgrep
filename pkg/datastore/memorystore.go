@@ -58,3 +58,7 @@ func (m *MemoryStore) WriteResources(ctx context.Context, resources []*model.Res
 func (m *MemoryStore) Stats(context.Context) (model.Stats, error) {
 	return model.Stats{}, errors.New("not implemented")
 }
+
+func (m *MemoryStore) GetFields(context.Context) (model.Fields, error) {
+	return nil, errors.New("not implemented")
+}
