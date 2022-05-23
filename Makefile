@@ -33,7 +33,7 @@ lint:
 	golangci-lint run ./...
 
 test:
-	go test -race ./pkg/... -coverprofile=coverage.out -covermode=atomic
+	go test -race ./pkg/... ./cmd/... -coverprofile=coverage.out -covermode=atomic
 
 run:
 	go run main.go
