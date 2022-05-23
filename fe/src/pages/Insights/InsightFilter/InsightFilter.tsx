@@ -8,13 +8,14 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
 import SearchInput from 'components/SearchInput/SearchInput';
+import { Field, ValueType } from 'models/Field';
 import { MockTag } from 'models/Tag';
 import React, { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getFilteredResources, getResources } from 'store/resources/thunks';
 
-import { accordionStyles, filterHeader, labelClasses, overrideSummaryClasses } from './style';
+import { accordionStyles, filterStyles, labelClasses, overrideSummaryClasses } from '../style';
 
 const InsightFilter: FC = () => {
 	const { tags, tagResource } = useAppSelector(state => state.tags);
@@ -52,7 +53,8 @@ const InsightFilter: FC = () => {
 		setSearchTypeTerm(e.target.value);
 	};
 
-	const handleChange = (event: React.ChangeEvent<HTMLInputElement>, tag: MockTag) => {
+	const handleChange = (event: React.ChangeEvent<HTMLInputElement>, field: Field, item: ValueType) => {
+		const tag: MockTag = { Key: field.name, Value: item.value };
 		const existingTag = filterTags?.some(item => item.Key === tag.Key && item.Value === tag.Value);
 		if (event.target.checked && !existingTag) {
 			setFilterTags([...filterTags, tag]);
@@ -69,61 +71,36 @@ const InsightFilter: FC = () => {
 				backgroundColor: '#F9F7F6',
 				overflowY: 'scroll',
 			}}>
-			<Accordion>
+			<Box>
+				<Accordion sx={{ '&:hover': filterStyles.filterHover }}>
+					<AccordionSummary
+						sx={filterStyles.filterHeader}
+						expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+						aria-controls="panel2a-content"
+						id="panel2a-header"
+						classes={overrideSummaryClasses}>
+						<Typography sx={accordionStyles.accordionHeader}>{t('REGIONS')}</Typography>
+					</AccordionSummary>
+					<AccordionDetails>
+						<Typography>
+							<FormGroup>
+								{regions &&
+									Array.from(regions).map((region: string) => (
+										<FormControlLabel
+											classes={labelClasses}
+											key={region}
+											control={<Checkbox size={'small'} defaultChecked />}
+											label={region}
+										/>
+									))}
+							</FormGroup>
+						</Typography>
+					</AccordionDetails>
+				</Accordion>
+			</Box>
+			<Accordion sx={{ '&:hover': filterStyles.filterHover }}>
 				<AccordionSummary
-					sx={filterHeader}
-					expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-					aria-controls="panel1a-content"
-					id="panel1a-header"
-					classes={overrideSummaryClasses}>
-					<Typography sx={accordionStyles.accordionHeader}>{t('TAGS')}</Typography>
-				</AccordionSummary>
-				<AccordionDetails>
-					<SearchInput onChange={handleSearchTags} />
-					<Typography mt={1}>
-						<FormGroup>
-							{tags
-								.filter(tag => tag.Key.toUpperCase().includes(searchTerm.toUpperCase()))
-								.map((tag: MockTag) => (
-									<FormControlLabel
-										classes={labelClasses}
-										key={tag.Key}
-										control={<Checkbox size={'small'} defaultChecked />}
-										label={tag.Key}
-									/>
-								))}
-						</FormGroup>
-					</Typography>
-				</AccordionDetails>
-			</Accordion>
-			<Accordion>
-				<AccordionSummary
-					sx={filterHeader}
-					expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-					aria-controls="panel2a-content"
-					id="panel2a-header"
-					classes={overrideSummaryClasses}>
-					<Typography sx={accordionStyles.accordionHeader}>{t('REGIONS')}</Typography>
-				</AccordionSummary>
-				<AccordionDetails>
-					<Typography>
-						<FormGroup>
-							{regions &&
-								Array.from(regions).map((region: string) => (
-									<FormControlLabel
-										classes={labelClasses}
-										key={region}
-										control={<Checkbox size={'small'} defaultChecked />}
-										label={region}
-									/>
-								))}
-						</FormGroup>
-					</Typography>
-				</AccordionDetails>
-			</Accordion>
-			<Accordion>
-				<AccordionSummary
-					sx={filterHeader}
+					sx={filterStyles.filterHeader}
 					expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
 					aria-controls="panel2a-content"
 					id="panel2a-header"
@@ -150,9 +127,9 @@ const InsightFilter: FC = () => {
 			{tags
 				.filter(tag => tag.Key.toUpperCase().includes(searchTerm.toUpperCase()))
 				.map((tag: MockTag, index: number) => (
-					<Accordion key={`${tag.Key}${index}`}>
+					<Accordion sx={{ '&:hover': filterStyles.filterHover }} key={`${tag.Key}${index}`}>
 						<AccordionSummary
-							sx={filterHeader}
+							sx={filterStyles.filterHeader}
 							expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
 							aria-controls={`accordion${tag.Key}${index}`}
 							id={`accordion${tag.Key}${index}`}
@@ -168,9 +145,10 @@ const InsightFilter: FC = () => {
 									<FormControlLabel
 										classes={labelClasses}
 										key={tag.Value}
-										control={<Checkbox size={'small'} onChange={e => handleChange(e, tag)} />}
+										control={<Checkbox size={'small'} />}
 										label={tag.Value}
 									/>
+									{/* onChange={e => handleChange(e, tag)} */}
 								</FormGroup>
 								<Typography sx={{ fontSize: '13px', fontWeight: 600 }}>{tag.Count}</Typography>
 							</Typography>

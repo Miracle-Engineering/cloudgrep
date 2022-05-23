@@ -1,21 +1,6 @@
 import { DARK_BLUE } from 'constants/colors';
 import { CSSProperties } from 'react';
 
-const headerStyle: CSSProperties = {
-	backgroundColor: DARK_BLUE,
-	color: 'white',
-	height: 56,
-	fontFamily: 'Montserrat',
-	fontSize: 32,
-};
-
-const hoverStyle: CSSProperties = {
-	cursor: 'pointer',
-	backgroundColor: '#8FCAF9',
-};
-
-export const tableStyles = { hoverStyle, headerStyle };
-
 export const overrideSummaryClasses = {
 	content: 'summary_content',
 	root: 'summary_root',
