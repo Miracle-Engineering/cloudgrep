@@ -19,6 +19,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"github.com/run-x/cloudgrep/pkg/cli"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"go.uber.org/zap"
 	"os"
@@ -37,6 +38,18 @@ var rootCmd = &cobra.Command{
 	Short: "A web-based utility to query and manage cloud resources",
 	Long: `Cloudgrep is an app built by RunX to help devops manage the multitude of resources in
 their cloud accounts.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		var cfg config.Config
+		err := viper.Unmarshal(&cfg)
+		if err != nil {
+			panic(err)
+		}
+		logger.Sugar().Debugf("Using the following config %+v", cfg)
+		err = cli.Run(cmd.Context(), cfg, logger)
+		if err != nil {
+			panic(err)
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -53,6 +66,20 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.cloudgrep.yaml)")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "log verbosity")
+
+	defaultConfig, _ := config.GetDefault()
+
+	rootCmd.Flags().String("bind", defaultConfig.Web.Host, "Host to bind on")
+	_ = viper.BindPFlag("web.host", rootCmd.Flags().Lookup("bind"))
+
+	rootCmd.Flags().IntP("port", "p", defaultConfig.Web.Port, "Port to use")
+	_ = viper.BindPFlag("web.port", rootCmd.Flags().Lookup("port"))
+
+	rootCmd.Flags().String("prefix", defaultConfig.Web.Prefix, "URL prefix to use")
+	_ = viper.BindPFlag("web.prefix", rootCmd.Flags().Lookup("prefix"))
+
+	rootCmd.Flags().Bool("skip-open", false, "Skip running the open command to open default browser")
+	_ = viper.BindPFlag("web.skipOpen", rootCmd.Flags().Lookup("skip-open"))
 }
 
 // initConfig reads in config file and ENV variables if set.
