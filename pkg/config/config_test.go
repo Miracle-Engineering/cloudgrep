@@ -19,7 +19,4 @@ func Test_Init_Default(t *testing.T) {
 	assert.Equal(t, "localhost", config.Web.Host)
 	assert.Equal(t, 8080, config.Web.Port)
 	assert.Equal(t, "/", config.Web.Prefix)
-
-	//assert.Equal(t, "dev", config.Logging.Mode)
-	//assert.Equal(t, true, config.Logging.IsDev())
 }
