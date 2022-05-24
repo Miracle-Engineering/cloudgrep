@@ -25,6 +25,8 @@ func TestRootCommand(t *testing.T) {
 	defaultConfig, _ := config.GetDefault()
 	newPortConfig, _ := config.GetDefault()
 	newPortConfig.Web.Port = 8081
+	userConfig, _ := config.GetDefault()
+	userConfig.Web.Host = "helloworld"
 
 	testCases := []struct {
 		name    string
@@ -37,6 +39,7 @@ func TestRootCommand(t *testing.T) {
 		{"NewPort", newPortConfig, false, []string{"--port", "8081"}},
 		{"NewPortShortHand", newPortConfig, false, []string{"-p", "8081"}},
 		{"NewPortVerbose", newPortConfig, true, []string{"-v", "-p", "8081"}},
+		{"UserConfig", userConfig, false, []string{"-c", "./test_config.yaml"}},
 	}
 
 	defer func() {

@@ -1,0 +1,15 @@
+# this is the default configuration
+
+web:
+  host: helloworld
+  port: 8080
+  prefix: "/"
+  skipOpen: false
+
+datastore:
+  type: sqlite
+  # TODO once we support updating existing resources switch to disk
+  dataSourceName: file::memory:?cache=shared
+
+providers:
+  - cloud: aws
