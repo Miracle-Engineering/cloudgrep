@@ -1,4 +1,3 @@
-// Package cmd
 /*
 Copyright © 2022 RunX
 
