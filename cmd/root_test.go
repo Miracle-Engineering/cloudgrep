@@ -31,7 +31,7 @@ func TestRootCommand(t *testing.T) {
 	newPortConfig, _ := config.GetDefault()
 	newPortConfig.Web.Port = 8081
 	var userConfig config.Config
-	yaml.Unmarshal(EmbedConfig, &userConfig)
+	assert.NoError(t, yaml.Unmarshal(EmbedConfig, &userConfig))
 
 	testCases := []struct {
 		name    string
