@@ -78,7 +78,7 @@ func init() {
 	rootCmd.Flags().String("prefix", defaultConfig.Web.Prefix, "URL prefix to use")
 	_ = viper.BindPFlag("web.prefix", rootCmd.Flags().Lookup("prefix"))
 
-	rootCmd.Flags().Bool("skip-open", false, "Skip running the open command to open default browser")
+	rootCmd.Flags().Bool("skip-open", defaultConfig.Web.SkipOpen, "Skip running the open command to open default browser")
 	_ = viper.BindPFlag("web.skipOpen", rootCmd.Flags().Lookup("skip-open"))
 }
 
