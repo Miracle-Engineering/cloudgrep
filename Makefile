@@ -89,7 +89,7 @@ release-darwin:
 	@echo "Building Darwin AMD64 binaries (require Mac OS)..."
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin \
 		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_amd64"
-		
+
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh
 
@@ -118,3 +118,7 @@ setup:
 clean:
 	@rm -f ./cloudgrep
 	@rm -rf ./bin/*
+
+gen-mock:
+	@rm -rf ./mocks/
+	go run github.com/vektra/mockery/v2 --all --recursive --inpackage

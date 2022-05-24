@@ -22,7 +22,7 @@ import (
 type AWSProvider struct {
 	logger       *zap.Logger
 	config       aws.Config
-	ec2Client    *ec2.Client
+	ec2Client    EC2Client
 	elbClient    *elbv2.Client
 	s3Client     *s3.Client
 	rdsClient    *rds.Client

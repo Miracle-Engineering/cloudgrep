@@ -1,0 +1,6 @@
+all: true
+case: snake
+inpackage: true
+keeptree: true
+recursive: true
+with-expecter: true

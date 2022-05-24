@@ -8,6 +8,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 )
 
+type EC2Client interface {
+	ec2.DescribeInstancesAPIClient
+	ec2.DescribeVolumesAPIClient
+}
+
 func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context) ([]types.Instance, error) {
 	input := &ec2.DescribeInstancesInput{}
 	var instances []types.Instance
