@@ -1,4 +1,4 @@
-# this is the default configuration
+# configuration used in TestRootCommand
 
 web:
   host: helloworld
