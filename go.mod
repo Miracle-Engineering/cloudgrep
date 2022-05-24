@@ -10,7 +10,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/rds v1.21.2
 	github.com/gin-contrib/zap v0.0.2
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/jessevdk/go-flags v1.5.0
+	github.com/spf13/cobra v1.4.0
+	github.com/spf13/viper v1.11.0
 	go.uber.org/zap v1.21.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/gorm v1.23.5
@@ -55,14 +56,11 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.0-beta.8 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
-	github.com/spf13/cobra v1.4.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spf13/viper v1.11.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
