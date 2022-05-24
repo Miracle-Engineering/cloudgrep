@@ -1,8 +1,8 @@
 # cloudgrep
 
 <p align="center">
-    <a href="https://run-x/cloudgrep/actions/workflows/checks.yml">
-        <img src="https://run-x/cloudgrep/actions/workflows/checks.yml/badge.svg"/>
+    <a href="https://github.com/run-x/cloudgrep/actions/workflows/checks.yml">
+        <img src="https://github.com/run-x/cloudgrep/actions/workflows/checks.yml/badge.svg"/>
     </a>
     <a href="https://codecov.io/gh/run-x/cloudgrep">
         <img src="https://codecov.io/gh/run-x/cloudgrep/branch/main/graph/badge.svg?token=IW4MK6TRP8"/>
