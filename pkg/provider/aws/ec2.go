@@ -8,19 +8,27 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 )
 
-func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context) ([]types.Instance, error) {
+func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context, output chan<- types.Instance) error {
 	input := &ec2.DescribeInstancesInput{}
-	var instances []types.Instance
-	//TODO use pagination (consider returning a channel?)
-	result, err := awsPrv.ec2Client.DescribeInstances(ctx, input)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch EC2 Instances: %w", err)
+	p := ec2.NewDescribeInstancesPaginator(awsPrv.ec2Client, input)
+	for p.HasMorePages() {
+		page, err := p.NextPage(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to fetch EC2 Instances: %w", err)
+		}
+
+		for _, r := range page.Reservations {
+			for _, i := range r.Instances {
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case output <- i:
+				}
+			}
+		}
 	}
 
-	for _, r := range result.Reservations {
-		instances = append(instances, r.Instances...)
-	}
-	return instances, nil
+	return nil
 }
 
 func (p *AWSProvider) FetchEBSVolumes(ctx context.Context) ([]types.Volume, error) {
