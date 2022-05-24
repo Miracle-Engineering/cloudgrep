@@ -3,11 +3,16 @@ package cmd
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
+	"gopkg.in/yaml.v2"
 	"testing"
 )
+
+//go:embed test_config.yaml
+var EmbedConfig []byte
 
 func TestRootCommand(t *testing.T) {
 	var actualConfig config.Config
@@ -25,8 +30,8 @@ func TestRootCommand(t *testing.T) {
 	defaultConfig, _ := config.GetDefault()
 	newPortConfig, _ := config.GetDefault()
 	newPortConfig.Web.Port = 8081
-	userConfig, _ := config.GetDefault()
-	userConfig.Web.Host = "helloworld"
+	var userConfig config.Config
+	yaml.Unmarshal(EmbedConfig, &userConfig)
 
 	testCases := []struct {
 		name    string
