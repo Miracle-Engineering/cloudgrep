@@ -459,19 +459,6 @@ func typeStr(v any) string {
 	return fmt.Sprintf("%v/%v", path.Dir(t.PkgPath()), t.String())
 }
 
-func mustMethodByName(t *testing.T, v reflect.Value, name string) reflect.Type {
-	t.Helper()
-
-	typ := v.Type()
-
-	method := v.MethodByName(name)
-	if method.IsZero() {
-		t.Fatalf("type %s does not have method %s", typ.PkgPath(), name)
-	}
-
-	return method.Type()
-}
-
 func funcSignature(t reflect.Type) string {
 	// Source: https://stackoverflow.com/a/54129236
 	if t.Kind() != reflect.Func {
