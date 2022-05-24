@@ -16,8 +16,8 @@ permissions:
   contents: read
 
 jobs:
-  tests:
-    name: tests
+  go-test:
+    name: go test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -37,7 +37,7 @@ jobs:
           token: ${{ secrets.CLOUDGREP_CODECOV_TOKEN }}
           fail_ci_if_error: true
 
-  fmt:
+  go-fmt:
     name: go fmt
     runs-on: ubuntu-latest
     steps:
@@ -50,7 +50,7 @@ jobs:
       - run: go mod download
       - run: script/check_formatting.sh
 
-  mod_tidy_check:
+  go-mod-tidy:
     name: go mod tidy
     runs-on: ubuntu-latest
     steps:
@@ -70,7 +70,7 @@ jobs:
           go_sum_changed=$?
           if [[ $go_mod_changed -gt 0 || $go_sum_changed -gt 0 ]]; then exit 1; fi
 
-  golangci:
+  golangci-lint:
     name: golangci-lint
     runs-on: ubuntu-latest
     steps:
