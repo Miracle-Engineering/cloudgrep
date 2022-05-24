@@ -66,18 +66,22 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 						<FormGroup>
 							{field?.values &&
 								field?.values.map((item: ValueType) => (
-									<FormControlLabel
-										classes={labelClasses}
+									<Box
 										key={item.value}
-										control={
-											<Checkbox
-												size={'small'}
-												defaultChecked
-												onChange={e => handleChange(e, field, item)}
-											/>
-										}
-										label={item.value}
-									/>
+										sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+										<FormControlLabel
+											classes={labelClasses}
+											control={
+												<Checkbox
+													size={'small'}
+													defaultChecked
+													onChange={e => handleChange(e, field, item)}
+												/>
+											}
+											label={item.value}
+										/>
+										<Typography sx={{ fontSize: '13px', fontWeight: 600 }}>{item.count}</Typography>
+									</Box>
 								))}
 						</FormGroup>
 					</Typography>
