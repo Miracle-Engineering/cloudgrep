@@ -8,10 +8,13 @@ export const overrideSummaryClasses = {
 
 const accordionHeader: CSSProperties = {
 	fontWeight: '400',
-	fontSize: '26px',
-	lineHeight: '26px',
+	fontSize: '18px',
+	lineHeight: '18px',
 	marginBottom: '4px',
 	fontFamily: 'Montserrat',
+	overflow: 'hidden',
+	whiteSpace: 'nowrap',
+	textOverflow: 'ellipsis',
 };
 
 const accordionDetails: CSSProperties = {
@@ -38,6 +41,7 @@ export const filterHover = {
 	zIndex: '10',
 	backgroundColor: 'white',
 	overflow: 'visible',
+	top: '4px',
 };
 
 export const filterStyles = { filterHeader, filterHover };

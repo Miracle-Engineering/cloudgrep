@@ -1,22 +1,11 @@
-// import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-// import Accordion from '@mui/material/Accordion';
-// import AccordionDetails from '@mui/material/AccordionDetails';
-// import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
-// import Checkbox from '@mui/material/Checkbox';
-// import FormControlLabel from '@mui/material/FormControlLabel';
-// import FormGroup from '@mui/material/FormGroup';
-// import Typography from '@mui/material/Typography';
 import AccordionFilter from 'components/AccordionFilter';
-// import SearchInput from 'components/SearchInput';
 import { Field, ValueType } from 'models/Field';
 import { Tag } from 'models/Tag';
 import React, { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getFilteredResources, getResources } from 'store/resources/thunks';
-
-// import { accordionStyles, filterStyles, labelClasses, overrideSummaryClasses } from '../style';
 
 const InsightFilter: FC = () => {
 	const { fields, tagResource } = useAppSelector(state => state.tags);

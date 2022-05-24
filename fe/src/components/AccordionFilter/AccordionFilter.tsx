@@ -36,7 +36,7 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 
 	useEffect(() => {
 		if (expanded && isHovered && accordionRef?.current?.clientHeight) {
-			setBoxHeight(`${accordionRef?.current.clientHeight + 4}px`);
+			setBoxHeight(`${accordionRef?.current.clientHeight}px`);
 			setApplyHover(true);
 		} else {
 			setBoxHeight('unset');
