@@ -15,6 +15,9 @@ import (
 
 var datastoreConfigs []config.Datastore
 
+const tagMaxKey = "service.k8s.aws/stack-XVlBzgbaiCMRAjWwhTHctcuAxhxKQFDaFpLSjFbcXoEFfRsWxPLDnJObCsNVlgTeMaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBEmfdzdcEkXBAkjQZLCtTMtTCoaNatyyiNKAReKJyiXJrscctNswYNsGRussVmaozFZBsbOJiFQGZsnwTKSmVoiGLOpbUOpEdKupdOMeRVjaRzL-----END"
+const tagMaxValue = "ingress-nginx/ingress-nginx-controllerLDnJObCsNVlgTeMaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBEEdKupdOMeRVjaRzL-----END"
+
 func newDatastores(t *testing.T, ctx context.Context) []Datastore {
 	datastoreConfigs = []config.Datastore{
 		{
@@ -181,6 +184,17 @@ func TestFiltering(t *testing.T) {
 			assert.Equal(t, 1, len(resourcesRead))
 			model.AssertEqualsResourcePter(t, resourceInst2, resourcesRead[0])
 
+			//test on max value
+			filter = model.Filter{
+				Tags: []model.Tag{
+					{Key: tagMaxKey, Value: tagMaxValue},
+				},
+			}
+			resourcesRead, err = datastore.GetResources(ctx, filter)
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(resourcesRead))
+			model.AssertEqualsResourcePter(t, resourceInst2, resourcesRead[0])
+
 		})
 	}
 }
@@ -223,11 +237,12 @@ func TestFields(t *testing.T) {
 			}
 			//check fields
 			assert.NoError(t, err)
-			assert.Equal(t, 9, len(fields))
+			assert.Equal(t, 10, len(fields))
 
 			//test a few fields
 			fmt.Printf("--> %#v\n", fields.Find("tags"))
 			model.AssertEqualsField(t, model.Field{
+				Group: "info",
 				Name:  "type",
 				Count: 3,
 				Values: model.FieldValues{
@@ -236,12 +251,21 @@ func TestFields(t *testing.T) {
 				},
 			}, *fields.Find("type"))
 			model.AssertEqualsField(t, model.Field{
+				Group: "tags",
 				Name:  "team",
 				Count: 2,
 				Values: model.FieldValues{
 					model.FieldValue{Value: "infra", Count: 1},
 					model.FieldValue{Value: "dev", Count: 1},
 				}}, *fields.Find("team"))
+			//test long field
+			model.AssertEqualsField(t, model.Field{
+				Group: "tags",
+				Name:  tagMaxKey,
+				Count: 1,
+				Values: model.FieldValues{
+					model.FieldValue{Value: tagMaxValue, Count: 1},
+				}}, *fields.Find(tagMaxKey))
 
 		})
 	}

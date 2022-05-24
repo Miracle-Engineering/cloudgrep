@@ -1,6 +1,7 @@
 [
   {
     "name": "region",
+    "group": "info",
     "count": 16,
     "values": [
       {
@@ -11,6 +12,7 @@
   },
   {
     "name": "type",
+    "group": "info",
     "count": 16,
     "values": [
       {
@@ -33,6 +35,7 @@
   },
   {
     "name": "kubernetes.io/cluster/opta-staging",
+    "group": "tags",
     "count": 6,
     "values": [
       {
@@ -43,6 +46,7 @@
   },
   {
     "name": "tf_address",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -53,6 +57,7 @@
   },
   {
     "name": "opta",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -63,6 +68,7 @@
   },
   {
     "name": "layer",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -73,6 +79,7 @@
   },
   {
     "name": "kubernetes.io/created-for/pvc/namespace",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -83,6 +90,7 @@
   },
   {
     "name": "kubernetes.io/created-for/pvc/name",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -93,6 +101,7 @@
   },
   {
     "name": "kubernetes.io/created-for/pv/name",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -111,6 +120,7 @@
   },
   {
     "name": "k8s.io/cluster-autoscaler/opta-staging",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -121,6 +131,7 @@
   },
   {
     "name": "k8s.io/cluster-autoscaler/enabled",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -131,6 +142,7 @@
   },
   {
     "name": "eks:nodegroup-name",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -141,6 +153,7 @@
   },
   {
     "name": "eks:cluster-name",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -151,6 +164,7 @@
   },
   {
     "name": "aws:ec2launchtemplate:version",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -161,6 +175,7 @@
   },
   {
     "name": "aws:ec2launchtemplate:id",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -171,6 +186,7 @@
   },
   {
     "name": "aws:ec2:fleet-id",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -189,6 +205,7 @@
   },
   {
     "name": "aws:autoscaling:groupName",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -199,6 +216,7 @@
   },
   {
     "name": "Name",
+    "group": "tags",
     "count": 3,
     "values": [
       {
@@ -216,17 +234,19 @@
     ]
   },
   {
-    "name": "service.k8s.aws/stack",
+    "name": "service.k8s.aws/stack-XVlBzgbaiCMRAjWwhTHctcuAxhxKQFDaFpLSjFbcXoEFfRsWxPLDnJObCsNVlgTeMaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBEmfdzdcEkXBAkjQZLCtTMtTCoaNatyyiNKAReKJyiXJrscctNswYNsGRussVmaozFZBsbOJiFQGZsnwTKSmVoiGLOpbUOpEdKupdOMeRVjaRzL-----END",
+    "group": "tags",
     "count": 1,
     "values": [
       {
-        "value": "ingress-nginx/ingress-nginx-controller",
+        "value": "ingress-nginx/ingress-nginx-controllerLDnJObCsNVlgTeMaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBEEdKupdOMeRVjaRzL-----END",
         "count": 1
       }
     ]
   },
   {
     "name": "service.k8s.aws/resource",
+    "group": "tags",
     "count": 1,
     "values": [
       {
@@ -237,6 +257,7 @@
   },
   {
     "name": "elbv2.k8s.aws/cluster",
+    "group": "tags",
     "count": 1,
     "values": [
       {
