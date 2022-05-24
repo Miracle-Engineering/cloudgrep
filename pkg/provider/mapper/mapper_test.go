@@ -123,7 +123,7 @@ func TestNewMapperError(t *testing.T) {
 		},
 	}
 	assert.PanicsWithError(t,
-		"method WrongReturnType has invalid return type, expecting ([]any, error)",
+		"method WrongReturnType has invalid signature; expecting one of [func(context.Context) ([]T, error), func(context.Context, chan<- T) error]",
 		func() {
 			new(cfg, *logger, reflect.ValueOf(TestProvider{})) //nolint
 		},
