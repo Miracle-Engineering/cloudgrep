@@ -59,9 +59,9 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
       - run: go mod download
       - run: go mod tidy -go=${{ env.GO_VERSION }}
-      - run: |
+      - name: "Check go.mod and go.sum changed"
+        run: |
           export go_mod_changed=$(git status | grep go.mod | wc -l | tr -d ' ')
           if [[ $go_mod_changed -gt 0 ]]; then exit 1; fi
           export go_sum_changed=$(git status | grep go.sum | wc -l | tr -d ' ')
           if [[ $go_sum_changed -gt 0 ]]; then exit 1; fi
-          exit 1
