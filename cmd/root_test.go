@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/stretchr/testify/assert"
@@ -22,8 +23,8 @@ func TestRootCommand(t *testing.T) {
 
 	runCmd = dummyRunCmd
 	defaultConfig, _ := config.GetDefault()
-	//newPortConfig, _ := config.GetDefault()
-	//newPortConfig.Web.Port = 8081
+	newPortConfig, _ := config.GetDefault()
+	newPortConfig.Web.Port = 8081
 
 	testCases := []struct {
 		name    string
@@ -33,9 +34,9 @@ func TestRootCommand(t *testing.T) {
 	}{
 		{"AllGood", defaultConfig, false, []string{}},
 		{"AllGoodVerbose", defaultConfig, true, []string{"-v"}},
-		//{"NewPort", newPortConfig, false, []string{"--port", "8081"}},
-		//{"NewPortShortHand", newPortConfig, false, []string{"-p", "8081"}},
-		//{"NewPortVerbose", newPortConfig, true, []string{"-v"}},
+		{"NewPort", newPortConfig, false, []string{"--port", "8081"}},
+		{"NewPortShortHand", newPortConfig, false, []string{"-p", "8081"}},
+		{"NewPortVerbose", newPortConfig, true, []string{"-v", "-p", "8081"}},
 	}
 
 	defer func() {
@@ -44,11 +45,14 @@ func TestRootCommand(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			rootCmd := NewRootCmd(buf)
 			rootCmd.SetArgs(tc.args)
 			err := rootCmd.Execute()
 			assert.NoError(t, err)
 			assert.Equal(t, tc.cfg, actualConfig)
 			assert.True(t, tc.verbose == actualLogger.Core().Enabled(zap.DebugLevel))
+			assert.Equal(t, 0, buf.Len())
 		})
 	}
 

@@ -21,6 +21,7 @@ import (
 	"github.com/run-x/cloudgrep/pkg/cli"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"go.uber.org/zap"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -32,36 +33,27 @@ var verbose bool
 var logger *zap.Logger
 var runCmd = cli.Run
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "cloudgrep",
-	Short: "A web-based utility to query and manage cloud resources",
-	Long: `Cloudgrep is an app built by RunX to help devops manage the multitude of resources in
+// NewRootCmd returns the base command when called without any subcommands
+func NewRootCmd(out io.Writer) *cobra.Command {
+	var rootCmd = &cobra.Command{
+		Use:   "cloudgrep",
+		Short: "A web-based utility to query and manage cloud resources",
+		Long: `Cloudgrep is an app built by RunX to help devops manage the multitude of resources in
 their cloud accounts.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		var cfg config.Config
-		err := viper.Unmarshal(&cfg)
-		if err != nil {
-			panic(err)
-		}
-		logger.Sugar().Debugf("Using the following config %+v", cfg)
-		err = runCmd(cmd.Context(), cfg, logger)
-		if err != nil {
-			panic(err)
-		}
-	},
-}
-
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		os.Exit(1)
+		Run: func(cmd *cobra.Command, args []string) {
+			var cfg config.Config
+			err := viper.Unmarshal(&cfg)
+			if err != nil {
+				panic(err)
+			}
+			logger.Sugar().Debugf("Using the following config %+v", cfg)
+			err = runCmd(cmd.Context(), cfg, logger)
+			if err != nil {
+				panic(err)
+			}
+		},
 	}
-}
 
-func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.cloudgrep.yaml)")
@@ -80,6 +72,19 @@ func init() {
 
 	rootCmd.Flags().Bool("skip-open", defaultConfig.Web.SkipOpen, "Skip running the open command to open default browser")
 	_ = viper.BindPFlag("web.skipOpen", rootCmd.Flags().Lookup("skip-open"))
+
+	rootCmd.AddCommand(NewVersionCommand(out))
+
+	return rootCmd
+}
+
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+	err := NewRootCmd(os.Stdout).Execute()
+	if err != nil {
+		os.Exit(1)
+	}
 }
 
 // initConfig reads in config file and ENV variables if set.
