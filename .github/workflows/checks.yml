@@ -38,7 +38,7 @@ jobs:
           fail_ci_if_error: true
 
   fmt:
-    name: fmt
+    name: go fmt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -51,7 +51,7 @@ jobs:
       - run: script/check_formatting.sh
 
   mod_tidy_check:
-    name: mod_tidy_check
+    name: go mod tidy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -71,7 +71,7 @@ jobs:
           if [[ $go_mod_changed -gt 0 || $go_sum_changed -gt 0 ]]; then exit 1; fi
 
   golangci:
-    name: lint
+    name: golangci-lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v3
