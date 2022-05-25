@@ -45,11 +45,8 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 	}, [isHovered, accordionRef?.current?.clientHeight, expanded, accordionRef]);
 
 	return (
-		<Box ref={accordionRef} key={id} sx={{ height: boxHeight }}>
-			<Accordion
-				expanded={expanded}
-				onChange={handleExpand}
-				sx={{ '&:hover': applyHover ? filterStyles.filterHover : '' }}>
+		<Box ref={accordionRef} key={id} sx={{ height: boxHeight, position: 'relative' }}>
+			<Accordion expanded={expanded} onChange={handleExpand}>
 				<AccordionSummary
 					sx={filterStyles.filterHeader}
 					expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}

@@ -56,7 +56,7 @@ const InsightFilter: FC = () => {
 	return (
 		<Box
 			sx={{
-				width: '15%',
+				width: '20%',
 				height: '100%',
 				backgroundColor: '#F9F7F6',
 				overflowY: 'scroll',

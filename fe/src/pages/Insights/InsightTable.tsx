@@ -27,7 +27,7 @@ const InsightTable: FC = () => {
 	return (
 		<Box
 			sx={{
-				width: '85%',
+				width: '80%',
 				height: '100%',
 				backgroundColor: '#F9F7F6',
 				paddingLeft: '28px',
