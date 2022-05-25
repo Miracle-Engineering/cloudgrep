@@ -68,18 +68,28 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
 1. Implement the method define in the mapping
     ```go
     // this method is named after the mapping.impl value and return a slice of the mapping.type value
-    func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context) ([]types.Instance, error) {
+    // It must not write to the chan<- passed to the method after returning
+    func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context, output chan<- types.Instance) error {
         input := &ec2.DescribeInstancesInput{}
-        var instances []types.Instance
-        result, err := awsPrv.ec2Client.DescribeInstances(ctx, input)
-        if err != nil {
-		    return nil, fmt.Errorf("failed to fetch EC2 Instances: %w", err)
+        p := ec2.NewDescribeInstancesPaginator(awsPrv.ec2Client, input)
+        for p.HasMorePages() {
+            page, err := p.NextPage(ctx)
+            if err != nil {
+                return fmt.Errorf("failed to fetch EC2 Instances: %w", err)
+            }
+
+            for _, r := range page.Reservations {
+                for _, i := range r.Instances {
+                    select {
+                    case <-ctx.Done():
+                        return ctx.Err()
+                    case output <- i:
+                    }
+                }
+            }
         }
 
-        for _, r := range result.Reservations {
-            instances = append(instances, r.Instances...)
-        }
-        return instances, nil
+        return nil
     }
     ```
 1. [Optional] Implement the method to return the tags. Unless there is already a `Tags` field, this method would need to be implemented. Here is an example for Load Balancer.
@@ -105,5 +115,5 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
     ```
 
 
-This method will be automatically called at startup.  
+This method will be automatically called at startup.
 The mapping definition will be used to convert the returned type to some `model.Resource` objects.

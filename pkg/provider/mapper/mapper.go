@@ -9,7 +9,6 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/util"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -99,7 +98,7 @@ func new(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 		mapping.Method = findImplMethod(providerValue, mapping.Impl)
 		//find the implementation method for tags
 		if mapping.TagImpl != "" {
-			mapping.TagMethod = findImplMethod(providerValue, mapping.TagImpl)
+			mapping.TagMethod = findTagMethod(providerValue, mapping.TagImpl)
 		}
 		mapper.Mappings[mapping.Type] = mapping
 
@@ -108,19 +107,6 @@ func new(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 		return Mapper{}, fmt.Errorf("no mapping loaded for '%T'", providerValue.Interface())
 	}
 	return mapper, nil
-}
-
-func findImplMethod(v reflect.Value, impl string) *reflect.Value {
-	//find the implementation method
-	method := v.MethodByName(impl)
-	if reflect.ValueOf(method).IsZero() {
-		panic(fmt.Errorf("could not find a method called '%v' on '%T'", impl, v.Interface()))
-	}
-	//check return type is (slice, error)
-	if t := method.Type(); t.NumOut() != 2 || t.Out(0).Kind().String() != "slice" || t.Out(1).Name() != "error" {
-		panic(fmt.Errorf("method %v has invalid return type, expecting ([]any, error)", impl))
-	}
-	return &method
 }
 
 //ToResource generate a Resource by using reflection
@@ -254,6 +240,20 @@ func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Res
 //fetchResources fetches the resources for a mapping and a region
 //note this method can return some resources and an error, if it has partially worked
 func (m Mapper) fetchResources(ctx context.Context, mapping Mapping, region string) ([]*model.Resource, error) {
+	t := mapping.Method.Type()
+
+	if isFetchMethodSync(t) {
+		return m.fetchResourcesSync(ctx, mapping, region)
+	}
+
+	if isFetchMethodAsync(t) {
+		return m.fetchResourcesAsync(ctx, mapping, region)
+	}
+
+	panic("unexpected invalid fetch method signature")
+}
+
+func (m Mapper) fetchResourcesSync(ctx context.Context, mapping Mapping, region string) ([]*model.Resource, error) {
 	m.logger.Sugar().Infow("Fetching resources",
 		zap.String("ResourceType", mapping.ResourceType),
 		zap.String("Region", region),
@@ -299,104 +299,82 @@ func (m Mapper) fetchResources(ctx context.Context, mapping Mapping, region stri
 	return resources, errors
 }
 
-func getProperties(name string, v reflect.Value, ignoredFields []string, maxRecursion int) []model.Property {
+func (m Mapper) fetchResourcesAsync(ctx context.Context, mapping Mapping, region string) ([]*model.Resource, error) {
+	m.logger.Sugar().Infow("Fetching resources async",
+		zap.String("ResourceType", mapping.ResourceType),
+		zap.String("Region", region),
+	)
 
-	if util.Contains(ignoredFields, name) || maxRecursion <= 0 {
-		//ignore this field
-		return nil
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	fetchFuncType := mapping.Method.Type()
+	outChanType := fetchFuncType.In(1)
+	bothOutChanType := reflect.ChanOf(reflect.BothDir, outChanType.Elem())
+	bothOutChan := reflect.MakeChan(bothOutChanType, 0)
+	outChan := bothOutChan.Convert(outChanType)
+
+	var resources []*model.Resource
+	doneCh := make(chan struct{})
+	var recvErr error
+
+	go func() {
+		defer close(doneCh)
+
+		cases := []reflect.SelectCase{
+			{
+				Dir:  reflect.SelectRecv,
+				Chan: reflect.ValueOf(ctx.Done()),
+			},
+			{
+				Dir:  reflect.SelectRecv,
+				Chan: bothOutChan,
+			},
+		}
+
+		for {
+			chosen, recv, ok := reflect.Select(cases)
+			if chosen == 0 {
+				recvErr = ctx.Err()
+				return
+			}
+
+			// chosen == 1
+			if !ok {
+				// Channel closed, so we are done
+				return
+			}
+
+			val := recv.Interface()
+			resource, err := m.ToResource(ctx, val, region)
+			if err != nil {
+				//store error and keep processing other resources
+				recvErr = multierror.Append(recvErr,
+					fmt.Errorf(
+						"error converting %v result slice to resource: %w", mapping.Impl, err),
+				)
+				continue
+			}
+			resources = append(resources, &resource)
+		}
+	}()
+
+	args := []reflect.Value{reflect.ValueOf(ctx), outChan}
+
+	results := mapping.Method.Call(args)
+	err := results[0].Interface()
+	if err != nil {
+		return nil, err.(error)
 	}
 
-	emptyProp := []model.Property{{Name: name, Value: ""}}
+	bothOutChan.Close()
 
-	switch v.Kind() {
-	case reflect.Invalid:
-		//ignore this field
-		return nil
-	case reflect.Interface, reflect.Ptr:
-		if v.IsZero() {
-			//empty pointer
-			return emptyProp
-		}
-		//display pointer value
-		return getProperties(name, v.Elem(), ignoredFields, maxRecursion)
-	case reflect.Slice:
-		if v.IsZero() {
-			//empty slice
-			return emptyProp
-		}
-		//return a distinct property for each slice element
-		//ex: Subnets=[a,b] -> Subnets[0]=a Subnets[1]=b
-		var props []model.Property
-		for i := 0; i < v.Len(); i++ {
-			props = append(props,
-				getProperties(
-					fmt.Sprintf("%v[%d]", name, i), v.Index(i), ignoredFields, maxRecursion-1)...)
-		}
-		return props
-	case reflect.Struct:
-		defaultFormatVal := fmt.Sprintf("%v", v)
-		if !strings.Contains(defaultFormatVal, "{") {
-			// this looks like a custom format, use it
-			// ex: a datetime might have a nice formatting already implemented
-			return []model.Property{{Name: name, Value: defaultFormatVal}}
-		}
-		//return a distinct property for each struct element
-		//ex: IamInstanceProfile{Arn:, Id:} -> IamInstanceProfile["Arn"]=... IamInstanceProfile["Id"]=...
-		t := v.Type()
-		var props []model.Property
-		for i := 0; i < v.NumField(); i++ {
-			field := t.Field(i)
-			props = append(props,
-				getProperties(
-					fmt.Sprintf("%v[%v]", name, field.Name), v.Field(i), ignoredFields, maxRecursion-1)...)
-		}
-		return props
-	default:
-		return []model.Property{{Name: name, Value: fmt.Sprintf("%v", v)}}
-	}
-}
+	// Wait for all resources to be read
+	<-doneCh
 
-func getTags(v reflect.Value, tagField TagField) []model.Tag {
-	switch v.Kind() {
-	case reflect.Invalid:
-		return nil
-	case reflect.Interface, reflect.Ptr:
-		if v.IsZero() {
-			//empty pointer
-			return nil
-		}
-		//display pointer value
-		return getTags(v.Elem(), tagField)
-	case reflect.Slice:
-		if v.IsZero() {
-			//empty slice
-			return nil
-		}
-		//return a distinct Tag for each slice element
-		//ex: Tags=[a,b] -> Tag=a Tag=b
-		var tags []model.Tag
-		for i := 0; i < v.Len(); i++ {
-			tags = append(tags,
-				getTags(v.Index(i), tagField)...)
-		}
-		return tags
-	case reflect.Struct:
-		//expects a Key and Value
-		key := getPtrVal(v.FieldByName(tagField.Key))
-		value := getPtrVal(v.FieldByName(tagField.Value))
-		keyStr := fmt.Sprintf("%v", key)
-		valStr := fmt.Sprintf("%v", value)
-		// we have a tag
-		return []model.Tag{{Key: keyStr, Value: valStr}}
-	default:
-		return nil
+	if recvErr != nil {
+		return resources, recvErr
 	}
 
-}
-
-func getPtrVal(v reflect.Value) reflect.Value {
-	if v.IsValid() && !v.IsZero() && v.Kind() == reflect.Ptr {
-		return v.Elem()
-	}
-	return v
+	return resources, nil
 }
