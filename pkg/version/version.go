@@ -46,3 +46,7 @@ func Get() BuildInfo {
 	}
 	return v
 }
+
+func IsDev() bool {
+	return Version == "dev"
+}
