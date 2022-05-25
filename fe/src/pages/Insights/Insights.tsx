@@ -43,7 +43,12 @@ const Insights: FC = () => {
 					paddingRight: '44px',
 				}}
 				p={2}>
-				<SearchInput width={'400px'} height={'32px'} onChange={handleChange} />
+				<SearchInput
+					width={'400px'}
+					height={'32px'}
+					onChange={handleChange}
+					rest={{ flexDirection: 'row-reverse' }}
+				/>
 			</Box>
 			<Box sx={{ display: 'flex', height: 'calc(100% - 136px)' }}>
 				<InsightFilter />
