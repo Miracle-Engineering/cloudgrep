@@ -24,7 +24,9 @@ func NewDatastore(ctx context.Context, cfg config.Config, logger *zap.Logger) (D
 	case "memory":
 		return NewMemoryStore(ctx, cfg, logger), nil
 	case "sqlite":
-		return NewSQLiteStore(ctx, cfg, logger)
+		return NewSQLStore(ctx, cfg, logger)
+	case "postgres":
+		return NewPostgresStore(ctx, cfg, logger)
 	}
 	return nil, fmt.Errorf("unknown datastore type '%v'", cfg.Datastore.Type)
 }

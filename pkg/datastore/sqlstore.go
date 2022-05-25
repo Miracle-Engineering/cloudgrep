@@ -3,6 +3,7 @@ package datastore
 import (
 	"context"
 	"fmt"
+	"gorm.io/driver/postgres"
 	"log"
 	"os"
 	"time"
@@ -15,15 +16,15 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type SQLiteStore struct {
+type SQLStore struct {
 	logger *zap.Logger
 	db     *gorm.DB
 }
 
 type resourceId string
 
-func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLiteStore, error) {
-	s := SQLiteStore{}
+func NewSQLStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLStore, error) {
+	s := SQLStore{}
 	logLevel := logger.Error
 	if zapLogger.Core().Enabled(zap.DebugLevel) {
 		//log all SQL queries
@@ -56,7 +57,41 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	return &s, nil
 }
 
-func (s *SQLiteStore) getAllResourceIds(ctx context.Context) ([]resourceId, error) {
+func NewPostgresStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLStore, error) {
+	s := SQLStore{}
+	logLevel := logger.Error
+	if zapLogger.Core().Enabled(zap.DebugLevel) {
+		//log all SQL queries
+		logLevel = logger.Info
+	}
+	//gormLogger has it's own logger for SQL queries - better than zaplog for that purpose
+	gormLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold:             time.Second,
+			LogLevel:                  logLevel,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
+		},
+	)
+	s.logger = zapLogger
+	//create the DB client
+	var err error
+	s.db, err = gorm.Open(postgres.Open(cfg.Datastore.DataSourceName),
+		&gorm.Config{Logger: gormLogger})
+	if err != nil {
+		return nil, fmt.Errorf("can't create the SQLite database: %w", err)
+	}
+
+	// Migrate the schema
+	if err = s.db.AutoMigrate(&model.Resource{}, &model.Property{}, &model.Tag{}); err != nil {
+		return nil, fmt.Errorf("can't create the SQLite data model: %w", err)
+	}
+
+	return &s, nil
+}
+
+func (s *SQLStore) getAllResourceIds(ctx context.Context) ([]resourceId, error) {
 	var resourceIds []resourceId
 	result := s.db.Model(&model.Resource{}).Select("id").Distinct().Find(&resourceIds)
 	if result.Error != nil {
@@ -65,7 +100,7 @@ func (s *SQLiteStore) getAllResourceIds(ctx context.Context) ([]resourceId, erro
 	return resourceIds, nil
 }
 
-func (s *SQLiteStore) getResourceIdsByTag(ctx context.Context, tags model.Tags) ([]resourceId, error) {
+func (s *SQLStore) getResourceIdsByTag(ctx context.Context, tags model.Tags) ([]resourceId, error) {
 	var resourceIds []resourceId
 	db := s.db.Model(&model.Tag{}).Select("resource_id").Distinct()
 	if !tags.Empty() {
@@ -107,7 +142,7 @@ func (s *SQLiteStore) getResourceIdsByTag(ctx context.Context, tags model.Tags) 
 	return resourceIds, nil
 }
 
-func (s *SQLiteStore) getResourcesById(ctx context.Context, idsInclude []resourceId, idsExclude []resourceId) ([]*model.Resource, error) {
+func (s *SQLStore) getResourcesById(ctx context.Context, idsInclude []resourceId, idsExclude []resourceId) ([]*model.Resource, error) {
 	var resources []*model.Resource
 	if len(idsInclude) == 0 {
 		return resources, nil
@@ -126,7 +161,7 @@ func (s *SQLiteStore) getResourcesById(ctx context.Context, idsInclude []resourc
 	return resources, nil
 
 }
-func (s *SQLiteStore) GetResource(ctx context.Context, id string) (*model.Resource, error) {
+func (s *SQLStore) GetResource(ctx context.Context, id string) (*model.Resource, error) {
 	resources, err := s.getResourcesById(ctx, []resourceId{resourceId(id)}, nil)
 	if err != nil {
 		return nil, fmt.Errorf("can't get resource from database: %w", err)
@@ -140,7 +175,7 @@ func (s *SQLiteStore) GetResource(ctx context.Context, id string) (*model.Resour
 	)
 	return resources[0], nil
 }
-func (s *SQLiteStore) GetResources(ctx context.Context, filter model.Filter) ([]*model.Resource, error) {
+func (s *SQLStore) GetResources(ctx context.Context, filter model.Filter) ([]*model.Resource, error) {
 	var resources []*model.Resource
 
 	//apply filter tags:include
@@ -177,7 +212,7 @@ func (s *SQLiteStore) GetResources(ctx context.Context, filter model.Filter) ([]
 	return resources, nil
 }
 
-func (s *SQLiteStore) WriteResources(ctx context.Context, resources []*model.Resource) error {
+func (s *SQLStore) WriteResources(ctx context.Context, resources []*model.Resource) error {
 	if len(resources) == 0 {
 		//nothing to write
 		return nil
@@ -192,7 +227,7 @@ func (s *SQLiteStore) WriteResources(ctx context.Context, resources []*model.Res
 	return nil
 }
 
-func (s *SQLiteStore) Stats(context.Context) (model.Stats, error) {
+func (s *SQLStore) Stats(context.Context) (model.Stats, error) {
 	var count int64
 	result := s.db.Table("resources").Count(&count)
 	if result.Error != nil {
@@ -201,7 +236,7 @@ func (s *SQLiteStore) Stats(context.Context) (model.Stats, error) {
 	return model.Stats{ResourcesCount: int(count)}, nil
 }
 
-func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
+func (s *SQLStore) getResourceField(name string) (model.Field, error) {
 	/*
 		SELECT DISTINCT `type` , count(*)
 		FROM `resources`
@@ -239,7 +274,7 @@ func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 	return field, nil
 }
 
-func (s *SQLiteStore) getTagFields() (model.Fields, error) {
+func (s *SQLStore) getTagFields() (model.Fields, error) {
 	fields, err := s.getTagKeys()
 	if err != nil {
 		return model.Fields{}, fmt.Errorf("can't get tag keys from database: %w", err)
@@ -256,7 +291,7 @@ func (s *SQLiteStore) getTagFields() (model.Fields, error) {
 	return result, nil
 }
 
-func (s *SQLiteStore) getTagKeys() (model.Fields, error) {
+func (s *SQLStore) getTagKeys() (model.Fields, error) {
 	/*
 		SELECT distinct(`key`), count() as count
 		FROM `tags`
@@ -290,7 +325,7 @@ func (s *SQLiteStore) getTagKeys() (model.Fields, error) {
 	return fields, nil
 }
 
-func (s *SQLiteStore) getTagValues(key string) (model.FieldValues, error) {
+func (s *SQLStore) getTagValues(key string) (model.FieldValues, error) {
 	/*
 		SELECT distinct(`value`), count() as count
 		FROM `tags`
@@ -312,7 +347,7 @@ func (s *SQLiteStore) getTagValues(key string) (model.FieldValues, error) {
 	return values, nil
 }
 
-func (s *SQLiteStore) GetFields(context.Context) (model.Fields, error) {
+func (s *SQLStore) GetFields(context.Context) (model.Fields, error) {
 	var fields model.Fields
 
 	//get fields on resources
