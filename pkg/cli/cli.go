@@ -22,7 +22,7 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 	}
 
 	//send amplitude event
-	util.SendEvent(ctx, cfg, util.BaseEvent, nil)
+	util.SendEvent(ctx, logger, util.BaseEvent, nil)
 
 	//init the storage to contain cloud data
 	datastore, err := datastore.NewDatastore(ctx, cfg, logger)

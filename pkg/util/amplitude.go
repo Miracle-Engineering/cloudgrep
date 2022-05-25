@@ -5,11 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
 	"time"
 
-	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/version"
 
 	"github.com/google/uuid"
@@ -79,7 +79,7 @@ func GenerateAmplitudeEvent(eventType string, eventProperties map[string]interfa
 	return event, nil
 }
 
-func SendAmplitudeEvent(ctx context.Context, cfg config.Config, eventType string, eventProperties map[string]interface{}) (int, error) {
+func SendAmplitudeEvent(ctx context.Context, logger *zap.Logger, eventType string, eventProperties map[string]interface{}) (int, error) {
 	if version.IsDev() {
 		return 1, fmt.Errorf("dev application, not sending events to amplitude") //dev application, not sending events to amplitude
 	}
@@ -115,17 +115,17 @@ func SendAmplitudeEvent(ctx context.Context, cfg config.Config, eventType string
 		if err != nil {
 			return 1, fmt.Errorf("failed to read amplitude response body: %w", err)
 		}
-		cfg.Logging.Logger.Sugar().Debug("amplitude response status code: %d", response.StatusCode)
-		cfg.Logging.Logger.Sugar().Debug("amplitude response body: %s", string(responseBody))
+		logger.Sugar().Debug("amplitude response status code: %d", response.StatusCode)
+		logger.Sugar().Debug("amplitude response body: %s", string(responseBody))
 	}
 	return 0, nil
 }
 
-func SendEvent(ctx context.Context, cfg config.Config, eventType string, eventProperties map[string]interface{}) {
+func SendEvent(ctx context.Context, logger *zap.Logger, eventType string, eventProperties map[string]interface{}) {
 	go func() {
-		_, err := SendAmplitudeEvent(ctx, cfg, eventType, eventProperties)
+		_, err := SendAmplitudeEvent(ctx, logger, eventType, eventProperties)
 		if err != nil {
-			cfg.Logging.Logger.Sugar().Debug(err)
+			logger.Sugar().Debug(err)
 		}
 	}()
 }
