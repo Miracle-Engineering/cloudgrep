@@ -62,16 +62,22 @@ func TestSendAmplitudeEvent(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("TestSendAmplitudeEventDevVersion", func(t *testing.T) {
-		returnValue, err := sendAmplitudeEvent(ctx, logger, BaseEvent, nil)
+		returnValue, err := sendAmplitudeEvent(ctx, logger, amplitudeUrl, BaseEvent, nil)
 		assert.Equal(t, returnValue, 1)
 		assert.ErrorContains(t, err, "dev application, not sending events to amplitude")
 	})
 
 	version.Version = "test"
 	t.Run("TestSendAmplitudeEventInvalidEvent", func(t *testing.T) {
-		returnValue, err := sendAmplitudeEvent(ctx, logger, "INVALID_EVENT", nil)
+		returnValue, err := sendAmplitudeEvent(ctx, logger, amplitudeUrl, "INVALID_EVENT", nil)
 		assert.Equal(t, returnValue, 1)
 		assert.ErrorContains(t, err, "invalid event type: INVALID_EVENT, not sending events to amplitude\n")
+	})
+
+	t.Run("TestSendAmplitudeEventInvalidUri", func(t *testing.T) {
+		returnValue, err := sendAmplitudeEvent(ctx, logger, "localhost:8080/", BaseEvent, nil)
+		assert.Equal(t, returnValue, 1)
+		assert.ErrorContains(t, err, "failed amplitude response: Post \"localhost:8080/\": unsupported protocol scheme \"localhost\"")
 	})
 
 }

@@ -79,7 +79,7 @@ func generateAmplitudeEvent(eventType string, eventProperties map[string]interfa
 	return event, nil
 }
 
-func sendAmplitudeEvent(ctx context.Context, logger *zap.Logger, eventType string, eventProperties map[string]interface{}) (int, error) {
+func sendAmplitudeEvent(ctx context.Context, logger *zap.Logger, amplitudeUri string, eventType string, eventProperties map[string]interface{}) (int, error) {
 	if version.IsDev() {
 		return 1, fmt.Errorf("dev application, not sending events to amplitude") //dev application, not sending events to amplitude
 	}
@@ -99,7 +99,7 @@ func sendAmplitudeEvent(ctx context.Context, logger *zap.Logger, eventType strin
 	}
 
 	client := &http.Client{Timeout: time.Second * 10}
-	req, err := http.NewRequest("POST", amplitudeUrl, bytes.NewBuffer(amplitudeBody))
+	req, err := http.NewRequest("POST", amplitudeUri, bytes.NewBuffer(amplitudeBody))
 	if err != nil {
 		return 1, fmt.Errorf("failed to create amplitude request: %w", err) // don't send event to amplitude
 	}
@@ -123,7 +123,7 @@ func sendAmplitudeEvent(ctx context.Context, logger *zap.Logger, eventType strin
 
 func SendEvent(ctx context.Context, logger *zap.Logger, eventType string, eventProperties map[string]interface{}) {
 	go func() {
-		_, err := sendAmplitudeEvent(ctx, logger, eventType, eventProperties)
+		_, err := sendAmplitudeEvent(ctx, logger, amplitudeUrl, eventType, eventProperties)
 		if err != nil {
 			logger.Sugar().Debug(err)
 		}
