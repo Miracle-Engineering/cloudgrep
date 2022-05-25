@@ -45,18 +45,19 @@ their cloud accounts.`,
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Log verbosity")
 
 	defaultConfig, _ := config.GetDefault()
+	flags := rootCmd.Flags()
 
-	rootCmd.Flags().String("bind", defaultConfig.Web.Host, "Host to bind on")
-	_ = viper.BindPFlag("web.host", rootCmd.Flags().Lookup("bind"))
+	flags.String("bind", defaultConfig.Web.Host, "Host to bind on")
+	_ = viper.BindPFlag("web.host", flags.Lookup("bind"))
 
-	rootCmd.Flags().IntP("port", "p", defaultConfig.Web.Port, "Port to use")
-	_ = viper.BindPFlag("web.port", rootCmd.Flags().Lookup("port"))
+	flags.IntP("port", "p", defaultConfig.Web.Port, "Port to use")
+	_ = viper.BindPFlag("web.port", flags.Lookup("port"))
 
-	rootCmd.Flags().String("prefix", defaultConfig.Web.Prefix, "URL prefix to use")
-	_ = viper.BindPFlag("web.prefix", rootCmd.Flags().Lookup("prefix"))
+	flags.String("prefix", defaultConfig.Web.Prefix, "URL prefix to use")
+	_ = viper.BindPFlag("web.prefix", flags.Lookup("prefix"))
 
-	rootCmd.Flags().Bool("skip-open", defaultConfig.Web.SkipOpen, "Skip running the open command to open default browser")
-	_ = viper.BindPFlag("web.skipOpen", rootCmd.Flags().Lookup("skip-open"))
+	flags.Bool("skip-open", defaultConfig.Web.SkipOpen, "Skip running the open command to open default browser")
+	_ = viper.BindPFlag("web.skipOpen", flags.Lookup("skip-open"))
 
 	rootCmd.AddCommand(NewVersionCommand(out))
 
