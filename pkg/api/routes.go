@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -12,14 +13,14 @@ import (
 	"github.com/run-x/cloudgrep/pkg/datastore"
 )
 
-func SetupRoutes(router *gin.Engine, cfg config.Config, ds datastore.Datastore) {
+func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds datastore.Datastore) {
 	root := router.Group(cfg.Web.Prefix)
 
 	root.GET("/", gin.WrapH(GetHome(cfg.Web.Prefix)))
 	root.GET("/static/*path", gin.WrapH(GetAssets(cfg.Web.Prefix)))
 
 	api := root.Group("/api")
-	setupMiddlewares(api, cfg, ds)
+	setupMiddlewares(api, cfg, logger, ds)
 
 	api.GET("/info", Info)
 	api.GET("/resource", Resource)

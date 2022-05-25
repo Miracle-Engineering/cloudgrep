@@ -16,14 +16,10 @@ func NewTestEngine(t *testing.T) Engine {
 	logger := zaptest.NewLogger(t)
 	cfg := config.Config{
 		// Datastore: datastoreConfig,
-		Logging: config.Logging{
-			Logger: logger,
-			Mode:   "dev",
-		},
 	}
-	datastore := datastore.NewMemoryStore(ctx, cfg)
+	datastore := datastore.NewMemoryStore(ctx, cfg, logger)
 
-	engine, err := NewEngine(ctx, cfg, datastore)
+	engine, err := NewEngine(ctx, cfg, logger, datastore)
 	assert.NoError(t, err)
 	testProvider, err := NewTestProvider(ctx, config.Provider{}, logger)
 	assert.NoError(t, err)

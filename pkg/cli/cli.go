@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -11,40 +12,23 @@ import (
 	"github.com/run-x/cloudgrep/pkg/api"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/options"
 	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/run-x/cloudgrep/pkg/util"
 )
 
-func Run() error {
-	ctx := context.Background()
-
-	opts, err := options.ParseOptions(os.Args)
-	if err != nil {
-		return fmt.Errorf("failed to parse cli options: %w", err)
-	}
-	if opts.Version {
-		fmt.Println(api.Version)
-		os.Exit(0)
-	}
-
-	cfg, err := config.New(ctx, opts)
-	if err != nil {
-		return fmt.Errorf("failed to load config: %w", err)
-	}
-
-	if cfg.Logging.IsDev() {
+func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
+	if logger.Core().Enabled(zap.DebugLevel) {
 		util.StartProfiler()
 	}
 
 	//init the storage to contain cloud data
-	datastore, err := datastore.NewDatastore(ctx, cfg)
+	datastore, err := datastore.NewDatastore(ctx, cfg, logger)
 	if err != nil {
 		return fmt.Errorf("failed to setup datastore: %w", err)
 	}
 
 	//start the providers to collect cloud data
-	engine, err := provider.NewEngine(ctx, cfg, datastore)
+	engine, err := provider.NewEngine(ctx, cfg, logger, datastore)
 	if err != nil {
 		return fmt.Errorf("failed to start engine: %w", err)
 	}
@@ -52,19 +36,19 @@ func Run() error {
 		stats, _ := datastore.Stats(ctx)
 		if stats.ResourcesCount > 0 {
 			//log the error but the api can still server with the datastore
-			cfg.Logging.Logger.Sugar().Errorw("some error(s) when running the provider engine", "error", err)
+			logger.Sugar().Errorw("some error(s) when running the provider engine", "error", err)
 		} else {
 			// nothing to view - exit
 			return fmt.Errorf("can't run the provider engine: %w", err)
 		}
 	}
 
-	api.StartWebServer(ctx, cfg, datastore)
+	api.StartWebServer(ctx, cfg, logger, datastore)
 
 	url := fmt.Sprintf("http://%v:%v/%v", cfg.Web.Host, cfg.Web.Port, cfg.Web.Prefix)
 	fmt.Println("To view Cloudgrep UI, open ", url, "in browser")
 
-	if !opts.SkipOpen {
+	if !cfg.Web.SkipOpen {
 		openPage(url)
 	}
 	handleSignals()

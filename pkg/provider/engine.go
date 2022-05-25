@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"go.uber.org/zap"
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/run-x/cloudgrep/pkg/config"
@@ -16,12 +17,12 @@ type Engine struct {
 }
 
 //Setup the providers, make sure configuration is valid
-func NewEngine(ctx context.Context, cfg config.Config, datastore datastore.Datastore) (Engine, error) {
+func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datastore datastore.Datastore) (Engine, error) {
 	e := Engine{}
 	e.Datastore = datastore
 	for _, config := range cfg.Providers {
 		// create a provider
-		provider, err := NewProvider(ctx, config, cfg.Logging.Logger)
+		provider, err := NewProvider(ctx, config, logger)
 		if err != nil {
 			return Engine{}, err
 		}

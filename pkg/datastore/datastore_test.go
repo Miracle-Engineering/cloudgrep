@@ -32,12 +32,8 @@ func newDatastores(t *testing.T, ctx context.Context) []Datastore {
 	for _, datastoreConfig := range datastoreConfigs {
 		cfg := config.Config{
 			Datastore: datastoreConfig,
-			Logging: config.Logging{
-				Logger: zaptest.NewLogger(t),
-				Mode:   "dev",
-			},
 		}
-		dataStore, err := NewDatastore(ctx, cfg)
+		dataStore, err := NewDatastore(ctx, cfg, zaptest.NewLogger(t))
 		assert.NoError(t, err)
 		datastores = append(datastores, dataStore)
 	}

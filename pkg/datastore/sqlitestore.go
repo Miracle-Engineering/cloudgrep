@@ -22,10 +22,10 @@ type SQLiteStore struct {
 
 type resourceId string
 
-func NewSQLiteStore(ctx context.Context, cfg config.Config) (*SQLiteStore, error) {
+func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLiteStore, error) {
 	s := SQLiteStore{}
 	logLevel := logger.Error
-	if cfg.Logging.IsDev() {
+	if zapLogger.Core().Enabled(zap.DebugLevel) {
 		//log all SQL queries
 		logLevel = logger.Info
 	}
@@ -39,7 +39,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config) (*SQLiteStore, error
 			Colorful:                  true,
 		},
 	)
-	s.logger = cfg.Logging.Logger
+	s.logger = zapLogger
 	//create the DB client
 	var err error
 	s.db, err = gorm.Open(sqlite.Open(cfg.Datastore.DataSourceName),
