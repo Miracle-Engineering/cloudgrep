@@ -28,7 +28,7 @@ Visit TBD to see cloudgrep in action.
 
 ## Installation
 
-- [Precompiled binaries](https://run-x/cloudgrep/releases) for supported 
+- [Precompiled binaries](https://github.com/run-x/cloudgrep/releases) for supported 
 operating systems are available.
 
 ## Usage
