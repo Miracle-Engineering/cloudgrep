@@ -217,7 +217,10 @@ func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 		return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
 	}
 	defer rows.Close()
-	field := model.Field{Name: name}
+	field := model.Field{
+		Name:  name,
+		Group: "core",
+	}
 	var totalCount int
 	for rows.Next() {
 		var value string
@@ -226,7 +229,10 @@ func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 		if err != nil {
 			return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
 		}
-		field.Values = append(field.Values, model.FieldValue{Value: value, Count: count})
+		field.Values = append(field.Values, model.FieldValue{
+			Value: value,
+			Count: count,
+		})
 		totalCount = totalCount + count
 	}
 	field.Count = totalCount
@@ -275,6 +281,7 @@ func (s *SQLiteStore) getTagKeys() (model.Fields, error) {
 			return nil, err
 		}
 		field := model.Field{
+			Group: "tags",
 			Name:  key,
 			Count: count,
 		}

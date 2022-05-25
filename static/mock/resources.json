@@ -161,6 +161,10 @@
       {
         "key": "eks:nodegroup-name",
         "value": "opta-staging-default-0f40b67a876a6e47"
+      },
+      {
+        "key": "service.k8s.aws/stack-XVlBzgbaiCMRAjWwhTHctcuAxhxKQFDaFpLSjFbcXoEFfRsWxPLDnJObCsNVlgTeMaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBEmfdzdcEkXBAkjQZLCtTMtTCoaNatyyiNKAReKJyiXJrscctNswYNsGRussVmaozFZBsbOJiFQGZsnwTKSmVoiGLOpbUOpEdKupdOMeRVjaRzL-----END",
+        "value": "ingress-nginx/ingress-nginx-controller"
       }
     ],
     "properties_json": {

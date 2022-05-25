@@ -2,6 +2,7 @@ package model
 
 type Field struct {
 	Name   string      `json:"name"`
+	Group  string      `json:"group"`
 	Count  int         `json:"count"`
 	Values FieldValues `json:"values"`
 }
