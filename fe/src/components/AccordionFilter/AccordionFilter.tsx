@@ -65,8 +65,14 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 								field?.values.map((item: ValueType) => (
 									<Box
 										key={item.value}
-										sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+										sx={{
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'space-between',
+											maxWidth: '100%',
+										}}>
 										<FormControlLabel
+											sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
 											classes={labelClasses}
 											control={
 												<Checkbox
