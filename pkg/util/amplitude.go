@@ -52,7 +52,7 @@ func isValidEvent(eventType string) bool {
 	return false
 }
 
-func GenerateAmplitudeEvent(eventType string, eventProperties map[string]interface{}) (map[string]interface{}, error) {
+func generateAmplitudeEvent(eventType string, eventProperties map[string]interface{}) (map[string]interface{}, error) {
 	if eventProperties == nil {
 		eventProperties = make(map[string]interface{})
 	}
@@ -79,7 +79,7 @@ func GenerateAmplitudeEvent(eventType string, eventProperties map[string]interfa
 	return event, nil
 }
 
-func SendAmplitudeEvent(ctx context.Context, logger *zap.Logger, eventType string, eventProperties map[string]interface{}) (int, error) {
+func sendAmplitudeEvent(ctx context.Context, logger *zap.Logger, eventType string, eventProperties map[string]interface{}) (int, error) {
 	if version.IsDev() {
 		return 1, fmt.Errorf("dev application, not sending events to amplitude") //dev application, not sending events to amplitude
 	}
@@ -88,7 +88,7 @@ func SendAmplitudeEvent(ctx context.Context, logger *zap.Logger, eventType strin
 		return 1, fmt.Errorf("invalid event type: %s, not sending events to amplitude\n", eventType) // not sending invalid events
 	}
 
-	amplitudeEvent, err := GenerateAmplitudeEvent(eventType, eventProperties)
+	amplitudeEvent, err := generateAmplitudeEvent(eventType, eventProperties)
 	if err != nil {
 		return 1, fmt.Errorf("failed to generate amplitude event: %w", err) // don't send event to amplitude
 	}
@@ -123,7 +123,7 @@ func SendAmplitudeEvent(ctx context.Context, logger *zap.Logger, eventType strin
 
 func SendEvent(ctx context.Context, logger *zap.Logger, eventType string, eventProperties map[string]interface{}) {
 	go func() {
-		_, err := SendAmplitudeEvent(ctx, logger, eventType, eventProperties)
+		_, err := sendAmplitudeEvent(ctx, logger, eventType, eventProperties)
 		if err != nil {
 			logger.Sugar().Debug(err)
 		}

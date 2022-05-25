@@ -45,7 +45,7 @@ func TestGenerateAmplitudeEvent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := GenerateAmplitudeEvent(tt.args.eventType, tt.args.eventProperties)
+			got, _ := generateAmplitudeEvent(tt.args.eventType, tt.args.eventProperties)
 			assert.Equal(t, got["user_id"], userId)
 			assert.Equal(t, got["device_id"], systemInfo.Hostname)
 			assert.Equal(t, got["event_type"], tt.args.eventType)
@@ -62,14 +62,14 @@ func TestSendAmplitudeEvent(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("TestSendAmplitudeEventDevVersion", func(t *testing.T) {
-		returnValue, err := SendAmplitudeEvent(ctx, logger, BaseEvent, nil)
+		returnValue, err := sendAmplitudeEvent(ctx, logger, BaseEvent, nil)
 		assert.Equal(t, returnValue, 1)
 		assert.ErrorContains(t, err, "dev application, not sending events to amplitude")
 	})
 
 	version.Version = "test"
 	t.Run("TestSendAmplitudeEventInvalidEvent", func(t *testing.T) {
-		returnValue, err := SendAmplitudeEvent(ctx, logger, "INVALID_EVENT", nil)
+		returnValue, err := sendAmplitudeEvent(ctx, logger, "INVALID_EVENT", nil)
 		assert.Equal(t, returnValue, 1)
 		assert.ErrorContains(t, err, "invalid event type: INVALID_EVENT, not sending events to amplitude\n")
 	})
