@@ -19,7 +19,7 @@ const SEARCH_ELEMENTS_NUMBER = 3;
 
 const AccordionFilter: FC<AccordionFilterProps> = props => {
 	const { label, hasSearch, id, field, handleChange } = props;
-	const [, setSearchTerm] = useState('');
+	const [searchTerm, setSearchTerm] = useState('');
 	const [applyHover, setApplyHover] = useState(false);
 	const [boxHeight, setBoxHeight] = useState('unset');
 	const [containerRef, isHovered] = useHover<HTMLDivElement>();
@@ -62,30 +62,38 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 					<Typography>
 						<FormGroup>
 							{field?.values &&
-								field?.values.map((item: ValueType) => (
-									<Box
-										key={item.value}
-										sx={{
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'space-between',
-											maxWidth: '100%',
-										}}>
-										<FormControlLabel
-											sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-											classes={labelClasses}
-											control={
-												<Checkbox
-													size={'small'}
-													defaultChecked
-													onChange={e => handleChange(e, field, item)}
-												/>
-											}
-											label={item.value}
-										/>
-										<Typography sx={{ fontSize: '13px', fontWeight: 600 }}>{item.count}</Typography>
-									</Box>
-								))}
+								field?.values
+									.filter(item => item.value?.toLowerCase()?.includes(searchTerm?.toLowerCase()))
+									.map((item: ValueType) => (
+										<Box
+											key={item.value}
+											sx={{
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'space-between',
+												maxWidth: '100%',
+											}}>
+											<FormControlLabel
+												sx={{
+													overflow: 'hidden',
+													textOverflow: 'ellipsis',
+													whiteSpace: 'nowrap',
+												}}
+												classes={labelClasses}
+												control={
+													<Checkbox
+														size={'small'}
+														defaultChecked
+														onChange={e => handleChange(e, field, item)}
+													/>
+												}
+												label={item.value}
+											/>
+											<Typography sx={{ fontSize: '13px', fontWeight: 600 }}>
+												{item.count}
+											</Typography>
+										</Box>
+									))}
 						</FormGroup>
 					</Typography>
 				</AccordionDetails>
