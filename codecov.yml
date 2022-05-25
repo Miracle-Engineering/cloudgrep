@@ -1,3 +1,5 @@
+# TODO: Change the Coverage Target in future.
+
 coverage:
   status:
     patch: off

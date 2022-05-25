@@ -33,3 +33,19 @@ mappings:
     idField: FunctionArn
     impl: FetchFunctions
     tagImpl: FetchFunctionTag
+  - type: "github.com/aws/aws-sdk-go-v2/service/rds/types.DBInstance"
+    resourceType: rds.DBInstance
+    idField: DBInstanceIdentifier
+    impl: FetchRDSInstances
+    tagField:
+      name: TagList
+      key: Key
+      value: Value
+  - type: "github.com/aws/aws-sdk-go-v2/service/rds/types.DBCluster"
+    resourceType: rds.DBCluster
+    idField: DBClusterIdentifier
+    impl: FetchRDSClusters
+    tagField:
+      name: TagList
+      key: Key
+      value: Value

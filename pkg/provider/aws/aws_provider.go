@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
+	"github.com/aws/aws-sdk-go-v2/service/rds"
 	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"go.uber.org/zap"
 
@@ -24,6 +25,7 @@ type AWSProvider struct {
 	ec2Client    *ec2.Client
 	elbClient    *elbv2.Client
 	s3Client     *s3.Client
+	rdsClient    *rds.Client
 	mapper       mapper.Mapper
 	lambdaClient *lambda.Client
 }
@@ -47,6 +49,7 @@ func NewAWSProvider(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) (
 	provider.elbClient = elbv2.NewFromConfig(provider.config)
 	provider.s3Client = s3.NewFromConfig(provider.config)
 	provider.lambdaClient = lambda.NewFromConfig(provider.config)
+	provider.rdsClient = rds.NewFromConfig(provider.config)
 
 	//create the mapper for this provider
 	provider.mapper, err = mapper.New(embedConfig, *logger, reflect.ValueOf(&provider))
