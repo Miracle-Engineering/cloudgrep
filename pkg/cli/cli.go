@@ -18,12 +18,6 @@ import (
 )
 
 func Run() error {
-	eventProperties := map[string]interface{}{
-		"app": "cloudgrep",
-	}
-
-	util.SendEvent(util.BASE_EVENT, eventProperties, nil)
-
 	ctx := context.Background()
 
 	opts, err := options.ParseOptions(os.Args)
@@ -43,6 +37,9 @@ func Run() error {
 	if cfg.Logging.IsDev() {
 		util.StartProfiler()
 	}
+
+	//send amplitude event
+	util.SendEvent(ctx, cfg, util.BaseEvent, nil)
 
 	//init the storage to contain cloud data
 	datastore, err := datastore.NewDatastore(ctx, cfg)
