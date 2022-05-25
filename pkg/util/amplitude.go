@@ -14,6 +14,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/matishsiao/goInfo"
+	"github.com/tcnksm/go-gitconfig"
 )
 
 func GetConfigEmail() string {
