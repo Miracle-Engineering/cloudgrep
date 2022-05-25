@@ -15,7 +15,7 @@ import useHover from 'utils/hooks/useHover';
 import { accordionStyles, filterStyles, labelClasses, overrideSummaryClasses } from './style';
 import { AccordionFilterProps } from './types';
 
-const SEARCH_ELEMENTS_NUMBER = 7;
+const SEARCH_ELEMENTS_NUMBER = 3;
 
 const AccordionFilter: FC<AccordionFilterProps> = props => {
 	const { label, hasSearch, id, field, handleChange } = props;
