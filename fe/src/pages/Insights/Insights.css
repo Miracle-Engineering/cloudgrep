@@ -8,6 +8,7 @@
     font-weight: 400;
     font-family: "Montserrat" !important;
     align-items: center;
+    overflow: hidden;
 }
 
 .summary_root {

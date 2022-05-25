@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Field } from 'models/Field';
 import { MockTag } from 'models/Tag';
 import { TagResource } from 'models/TagResource';
 
@@ -7,6 +8,7 @@ import { TagState } from './types';
 const initialState: TagState = {
 	tagResource: { Tags: [], Resources: [] },
 	tags: [],
+	fields: [],
 };
 
 const tagsSlice = createSlice({
@@ -20,9 +22,12 @@ const tagsSlice = createSlice({
 			state.tagResource = action.payload;
 			state.tags = action.payload.Tags;
 		},
+		setFields: (state, action: PayloadAction<Field[]>) => {
+			state.fields = action.payload;
+		},
 	},
 });
 
-export const { setTags, setTagResource } = tagsSlice.actions;
+export const { setFields, setTags, setTagResource } = tagsSlice.actions;
 
 export default tagsSlice;

@@ -1,21 +1,6 @@
 import { DARK_BLUE } from 'constants/colors';
 import { CSSProperties } from 'react';
 
-const headerStyle: CSSProperties = {
-	backgroundColor: DARK_BLUE,
-	color: 'white',
-	height: 56,
-	fontFamily: 'Montserrat',
-	fontSize: 32,
-};
-
-const hoverStyle: CSSProperties = {
-	cursor: 'pointer',
-	backgroundColor: '#8FCAF9',
-};
-
-export const tableStyles = { hoverStyle, headerStyle };
-
 export const overrideSummaryClasses = {
 	content: 'summary_content',
 	root: 'summary_root',
@@ -23,10 +8,13 @@ export const overrideSummaryClasses = {
 
 const accordionHeader: CSSProperties = {
 	fontWeight: '400',
-	fontSize: '26px',
-	lineHeight: '26px',
+	fontSize: '18px',
+	lineHeight: '18px',
 	marginBottom: '4px',
 	fontFamily: 'Montserrat',
+	overflow: 'hidden',
+	whiteSpace: 'nowrap',
+	textOverflow: 'ellipsis',
 };
 
 const accordionDetails: CSSProperties = {
@@ -53,6 +41,7 @@ export const filterHover = {
 	zIndex: '10',
 	backgroundColor: 'white',
 	overflow: 'visible',
+	top: '4px',
 };
 
 export const filterStyles = { filterHeader, filterHover };
