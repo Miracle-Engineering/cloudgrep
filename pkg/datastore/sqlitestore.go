@@ -49,7 +49,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	}
 
 	// Migrate the schema
-	if err = s.db.AutoMigrate(&model.Resource{}, &model.Property{}, &model.Tag{}); err != nil {
+	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}); err != nil {
 		return nil, fmt.Errorf("can't create the SQLite data model: %w", err)
 	}
 
@@ -118,7 +118,7 @@ func (s *SQLiteStore) getResourcesById(ctx context.Context, idsInclude []resourc
 		db = db.Where("id not in ?", idsExclude)
 	}
 	db = db.
-		Preload("Tags").Preload("Properties").Find(&resources, idsInclude)
+		Preload("Tags").Find(&resources, idsInclude)
 
 	if db.Error != nil {
 		return nil, db.Error
