@@ -1,7 +1,7 @@
 [
   {
     "name": "region",
-    "group": "info",
+    "group": "core",
     "count": 16,
     "values": [
       {
@@ -12,7 +12,7 @@
   },
   {
     "name": "type",
-    "group": "info",
+    "group": "core",
     "count": 16,
     "values": [
       {

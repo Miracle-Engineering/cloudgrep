@@ -45,7 +45,7 @@ Example of response:
 [
   {
     "name":"region",
-    "group": "info",
+    "group": "core",
     "count":16,
     "values":[
       {
@@ -60,7 +60,7 @@ Example of response:
   },
   {
     "name":"type",
-    "group": "info",
+    "group": "core",
     "count":16,
     "values":[
       {

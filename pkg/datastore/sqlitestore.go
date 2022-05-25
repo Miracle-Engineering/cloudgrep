@@ -219,7 +219,7 @@ func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 	defer rows.Close()
 	field := model.Field{
 		Name:  name,
-		Group: "info",
+		Group: "core",
 	}
 	var totalCount int
 	for rows.Next() {

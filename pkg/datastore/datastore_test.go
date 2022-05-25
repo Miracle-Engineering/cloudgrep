@@ -242,7 +242,7 @@ func TestFields(t *testing.T) {
 			//test a few fields
 			fmt.Printf("--> %#v\n", fields.Find("tags"))
 			model.AssertEqualsField(t, model.Field{
-				Group: "info",
+				Group: "core",
 				Name:  "type",
 				Count: 3,
 				Values: model.FieldValues{
