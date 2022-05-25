@@ -6,6 +6,7 @@ import (
 	"github.com/run-x/cloudgrep/pkg/cli"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"go.uber.org/zap"
+	"gopkg.in/yaml.v2"
 	"io"
 	"os"
 
@@ -31,7 +32,6 @@ their cloud accounts.`,
 			if err != nil {
 				panic(err)
 			}
-			logger.Sugar().Debugf("Using the following config %+v", cfg)
 			err = runCmd(cmd.Context(), cfg, logger)
 			if err != nil {
 				panic(err)
@@ -107,4 +107,14 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
+	var cfg config.Config
+	err = viper.Unmarshal(&cfg)
+	if err != nil {
+		panic(err)
+	}
+	yamlData, err := yaml.Marshal(&cfg)
+	if err != nil {
+		fmt.Printf("Error while Marshaling. %v", err)
+	}
+	logger.Sugar().Debugf("Using the following config \n%+v", string(yamlData))
 }
