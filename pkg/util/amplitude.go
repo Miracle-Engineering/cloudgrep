@@ -79,54 +79,53 @@ func GenerateAmplitudeEvent(eventType string, eventProperties map[string]interfa
 	return event, nil
 }
 
-func sendAmplitudeEvent(ctx context.Context, cfg config.Config, eventType string, eventProperties map[string]interface{}) {
+func SendAmplitudeEvent(ctx context.Context, cfg config.Config, eventType string, eventProperties map[string]interface{}) (int, error) {
 	if app.IsDev() {
-		cfg.Logging.Logger.Sugar().Debug("dev application, not sending events to amplitude")
-		return //dev application, not sending events to amplitude
+		return 1, fmt.Errorf("dev application, not sending events to amplitude") //dev application, not sending events to amplitude
 	}
 
 	if !isValidEvent(eventType) {
-		cfg.Logging.Logger.Sugar().Debug("invalid event type: %s, not sending events to amplitude\n", eventType)
-		return // not sending invalid events
+		return 1, fmt.Errorf("invalid event type: %s, not sending events to amplitude\n", eventType) // not sending invalid events
 	}
 
 	amplitudeEvent, err := GenerateAmplitudeEvent(eventType, eventProperties)
 	if err != nil {
-		cfg.Logging.Logger.Sugar().Debug("failed to generate amplitude event: %w", err)
-		return // don't send event to amplitude
+		return 1, fmt.Errorf("failed to generate amplitude event: %w", err) // don't send event to amplitude
 	}
 
 	amplitudeBody, err := json.Marshal(map[string]interface{}{"api_key": amplitudeToken, "events": []interface{}{amplitudeEvent}})
 	if err != nil {
-		cfg.Logging.Logger.Sugar().Debug("failed to marshal amplitude event: %w", err)
-		return // don't send event to amplitude
+		return 1, fmt.Errorf("failed to marshal amplitude event: %w", err) // don't send event to amplitude
 	}
 
 	client := &http.Client{Timeout: time.Second * 10}
 	req, err := http.NewRequest("POST", amplitudeUrl, bytes.NewBuffer(amplitudeBody))
 	if err != nil {
-		cfg.Logging.Logger.Sugar().Debug("failed to create amplitude request: %w", err)
-		return // don't send event to amplitude
+		return 1, fmt.Errorf("failed to create amplitude request: %w", err) // don't send event to amplitude
 	}
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "*/*")
 	response, err := client.Do(req)
 	if err != nil {
-		cfg.Logging.Logger.Sugar().Debug("failed amplitude response: %w", err)
-		return //failed to get amplitude response
+		return 1, fmt.Errorf("failed amplitude response: %w", err) //failed to get amplitude response
 	}
 
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		responseBody, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			cfg.Logging.Logger.Sugar().Debug("failed to read amplitude response body: %w", err)
-			return
+			return 1, fmt.Errorf("failed to read amplitude response body: %w", err)
 		}
 		cfg.Logging.Logger.Sugar().Debug("amplitude response status code: %d", response.StatusCode)
 		cfg.Logging.Logger.Sugar().Debug("amplitude response body: %s", string(responseBody))
 	}
+	return 0, nil
 }
 
 func SendEvent(ctx context.Context, cfg config.Config, eventType string, eventProperties map[string]interface{}) {
-	go sendAmplitudeEvent(ctx, cfg, eventType, eventProperties)
+	go func() {
+		_, err := SendAmplitudeEvent(ctx, cfg, eventType, eventProperties)
+		if err != nil {
+			cfg.Logging.Logger.Sugar().Debug(err)
+		}
+	}()
 }

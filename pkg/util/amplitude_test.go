@@ -1,10 +1,14 @@
 package util
 
 import (
+	"context"
 	"testing"
+
+	"go.uber.org/zap"
 
 	"github.com/matishsiao/goInfo"
 	"github.com/run-x/cloudgrep/pkg/app"
+	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -52,4 +56,25 @@ func TestGenerateAmplitudeEvent(t *testing.T) {
 			assert.Equal(t, gotEventProperties["application"], application)
 		})
 	}
+}
+
+func TestSendAmplitudeEvent(t *testing.T) {
+	cfg := config.Config{}
+	cfg.Logging.Logger, _ = zap.NewDevelopment()
+	cfg.Logging.Mode = "test"
+	ctx := context.Background()
+
+	t.Run("TestSendAmplitudeEventDevVersion", func(t *testing.T) {
+		returnValue, err := SendAmplitudeEvent(ctx, cfg, BaseEvent, nil)
+		assert.Equal(t, returnValue, 1)
+		assert.ErrorContains(t, err, "dev application, not sending events to amplitude")
+	})
+
+	app.Version = "test"
+	t.Run("TestSendAmplitudeEventInvalidEvent", func(t *testing.T) {
+		returnValue, err := SendAmplitudeEvent(ctx, cfg, "INVALID_EVENT", nil)
+		assert.Equal(t, returnValue, 1)
+		assert.ErrorContains(t, err, "invalid event type: INVALID_EVENT, not sending events to amplitude\n")
+	})
+
 }
