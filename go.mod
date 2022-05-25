@@ -17,6 +17,7 @@ require (
 	github.com/tcnksm/go-gitconfig v0.1.2
 	go.uber.org/zap v1.21.0
 	gopkg.in/yaml.v2 v2.4.0
+	gorm.io/datatypes v1.0.6
 	gorm.io/gorm v1.23.5
 )
 
@@ -75,7 +76,6 @@ require (
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
-	gorm.io/datatypes v1.0.6 // indirect
 	gorm.io/driver/mysql v1.3.2 // indirect
 )
 
