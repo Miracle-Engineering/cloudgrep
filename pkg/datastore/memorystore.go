@@ -16,12 +16,12 @@ type MemoryStore struct {
 	resources []*model.Resource
 }
 
-func NewMemoryStore(ctx context.Context, cfg config.Config) *MemoryStore {
-	if !cfg.Logging.IsDev() {
-		cfg.Logging.Logger.Warn("MemoryStore should not be used for production")
+func NewMemoryStore(ctx context.Context, cfg config.Config, logger *zap.Logger) *MemoryStore {
+	if !logger.Core().Enabled(zap.DebugLevel) {
+		logger.Warn("MemoryStore should not be used for production")
 	}
 	datastore := MemoryStore{}
-	datastore.logger = cfg.Logging.Logger
+	datastore.logger = logger
 	return &datastore
 }
 

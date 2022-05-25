@@ -32,6 +32,7 @@ func AssertEqualsResource(t *testing.T, a, b Resource) {
 
 func AssertEqualsField(t *testing.T, a, b Field) {
 	assert.Equal(t, a.Name, b.Name)
+	assert.Equal(t, a.Group, b.Group)
 	assert.Equal(t, a.Count, b.Count)
 	assert.ElementsMatch(t, a.Values, b.Values)
 }

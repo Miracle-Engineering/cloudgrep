@@ -22,10 +22,10 @@ type SQLiteStore struct {
 
 type resourceId string
 
-func NewSQLiteStore(ctx context.Context, cfg config.Config) (*SQLiteStore, error) {
+func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLiteStore, error) {
 	s := SQLiteStore{}
 	logLevel := logger.Error
-	if cfg.Logging.IsDev() {
+	if zapLogger.Core().Enabled(zap.DebugLevel) {
 		//log all SQL queries
 		logLevel = logger.Info
 	}
@@ -39,7 +39,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config) (*SQLiteStore, error
 			Colorful:                  true,
 		},
 	)
-	s.logger = cfg.Logging.Logger
+	s.logger = zapLogger
 	//create the DB client
 	var err error
 	s.db, err = gorm.Open(sqlite.Open(cfg.Datastore.DataSourceName),
@@ -217,7 +217,10 @@ func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 		return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
 	}
 	defer rows.Close()
-	field := model.Field{Name: name}
+	field := model.Field{
+		Name:  name,
+		Group: "core",
+	}
 	var totalCount int
 	for rows.Next() {
 		var value string
@@ -226,7 +229,10 @@ func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 		if err != nil {
 			return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
 		}
-		field.Values = append(field.Values, model.FieldValue{Value: value, Count: count})
+		field.Values = append(field.Values, model.FieldValue{
+			Value: value,
+			Count: count,
+		})
 		totalCount = totalCount + count
 	}
 	field.Count = totalCount
@@ -275,6 +281,7 @@ func (s *SQLiteStore) getTagKeys() (model.Fields, error) {
 			return nil, err
 		}
 		field := model.Field{
+			Group: "tags",
 			Name:  key,
 			Count: count,
 		}
