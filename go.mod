@@ -10,7 +10,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/rds v1.21.2
 	github.com/gin-contrib/zap v0.0.2
 	github.com/google/uuid v1.3.0
-	github.com/google/uuid v1.1.2
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/matishsiao/goInfo v0.0.0-20210923090445-da2e3fa8d45f
 	github.com/spf13/cobra v1.4.0
