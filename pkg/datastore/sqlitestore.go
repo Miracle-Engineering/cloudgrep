@@ -16,8 +16,9 @@ import (
 )
 
 type SQLiteStore struct {
-	logger *zap.Logger
-	db     *gorm.DB
+	logger  *zap.Logger
+	db      *gorm.DB
+	indexer resourceIndexer
 }
 
 type resourceId string
@@ -53,6 +54,12 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 		return nil, fmt.Errorf("can't create the SQLite data model: %w", err)
 	}
 
+	//create the indexer
+	s.indexer, err = newResourceIndexer(ctx, s.logger, s.db)
+	if err != nil {
+		return nil, fmt.Errorf("can't create the query builder: %w", err)
+	}
+
 	return &s, nil
 }
 
@@ -73,60 +80,12 @@ func (s *SQLiteStore) getAllResourceIds(ctx context.Context) ([]resourceId, erro
 	return resourceIds, nil
 }
 
-func (s *SQLiteStore) getResourceIdsByTag(ctx context.Context, tags model.Tags) ([]resourceId, error) {
-	var resourceIds []resourceId
-	db := s.db.Model(&model.Tag{}).Select("resource_id").Distinct()
-	if !tags.Empty() {
-		for _, tag := range tags {
-			if tag.Value == "*" {
-				//wild card - check for any value
-				db = db.Or("key=? and value like ?", tag.Key, "%")
-			} else {
-				//exact value
-				db = db.Or("key=? and value=?", tag.Key, tag.Value)
-			}
-		}
-
-		// our data model has one row per tag, we need a group by to only keep the results matching all tags
-		/* table tags
-		//original data, tag filter = team=infra and cluster=staging
-		1. i-123	cluster		staging
-		2. i-123	team		infra
-		3. i-124	cluster		staging
-		4. i-124	team		dev
-
-		//where team=infra OR cluster=staging
-		1. i-123	cluster		staging
-		2. i-123	team		infra
-		3. i-124	cluster		staging
-
-		// group by + count on id
-		1. i-123	2 <- we only want to keep this row
-		2. i-124	1
-		*/
-		db = db.Group("resource_id").
-			Having("count(resource_id)=?", tags.DistinctKeys())
-	}
-	result := db.Find(&resourceIds)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	return resourceIds, nil
-}
-
-func (s *SQLiteStore) getResourcesById(ctx context.Context, idsInclude []resourceId, idsExclude []resourceId) ([]*model.Resource, error) {
+func (s *SQLiteStore) getResourcesById(ctx context.Context, ids []resourceId) ([]*model.Resource, error) {
 	var resources []*model.Resource
-	if len(idsInclude) == 0 {
+	if len(ids) == 0 {
 		return resources, nil
 	}
-	db := s.db
-	if len(idsExclude) != 0 {
-		// exlucde these ids
-		db = db.Where("id not in ?", idsExclude)
-	}
-	db = db.
-		Preload("Tags").Find(&resources, idsInclude)
+	db := s.db.Preload("Tags").Preload("Properties").Find(&resources, ids)
 
 	if db.Error != nil {
 		return nil, db.Error
@@ -135,7 +94,7 @@ func (s *SQLiteStore) getResourcesById(ctx context.Context, idsInclude []resourc
 
 }
 func (s *SQLiteStore) GetResource(ctx context.Context, id string) (*model.Resource, error) {
-	resources, err := s.getResourcesById(ctx, []resourceId{resourceId(id)}, nil)
+	resources, err := s.getResourcesById(ctx, []resourceId{resourceId(id)})
 	if err != nil {
 		return nil, fmt.Errorf("can't get resource from database: %w", err)
 	}
@@ -148,42 +107,6 @@ func (s *SQLiteStore) GetResource(ctx context.Context, id string) (*model.Resour
 	)
 	return resources[0], nil
 }
-func (s *SQLiteStore) GetResources(ctx context.Context, filter model.Filter) ([]*model.Resource, error) {
-	var resources []*model.Resource
-
-	//apply filter tags:include
-	includeTags := filter.TagsInclude()
-	var err error
-	var idsInclude []resourceId
-	if includeTags.Empty() {
-		//no include filter set - include all
-		idsInclude, err = s.getAllResourceIds(ctx)
-	} else {
-		idsInclude, err = s.getResourceIdsByTag(ctx, includeTags)
-	}
-	if err != nil {
-		return nil, fmt.Errorf("can't get resources from database: %w", err)
-	}
-
-	//apply filter tags:exclude
-	var idsExclude []resourceId
-	if tagsExclude := filter.TagsExclude(); !tagsExclude.Empty() {
-		idsExclude, err = s.getResourceIdsByTag(ctx, filter.TagsExclude())
-		if err != nil {
-			return nil, fmt.Errorf("can't get resources from database: %w", err)
-		}
-	}
-
-	resources, err = s.getResourcesById(ctx, idsInclude, idsExclude)
-	if err != nil {
-		return nil, fmt.Errorf("can't get resources from database: %w", err)
-	}
-	s.logger.Sugar().Infow("Getting resources: ",
-		zap.Object("filter", filter),
-		zap.Int("count", len(resources)),
-	)
-	return resources, nil
-}
 
 func (s *SQLiteStore) WriteResources(ctx context.Context, resources []*model.Resource) error {
 	if len(resources) == 0 {
@@ -194,8 +117,12 @@ func (s *SQLiteStore) WriteResources(ctx context.Context, resources []*model.Res
 	s.logger.Sugar().Infow("Writting resources: ",
 		zap.Int("count", int(result.RowsAffected)),
 	)
+
 	if result.Error != nil {
 		return fmt.Errorf("can't write resources to database: %w", result.Error)
+	}
+	if err := s.indexer.writeResourceIndexes(ctx, s.db, resources); err != nil {
+		return err
 	}
 	return nil
 }
@@ -340,4 +267,18 @@ func (s *SQLiteStore) GetFields(context.Context) (model.Fields, error) {
 	fields = append(fields, tagFields...)
 
 	return fields, nil
+}
+
+func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) ([]*model.Resource, error) {
+	var ids []resourceId
+	var err error
+	if len(jsonQuery) == 0 {
+		ids, err = s.getAllResourceIds(ctx)
+	} else {
+		ids, err = s.indexer.findResourceIds(*s.db, s.logger, jsonQuery)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return s.getResourcesById(ctx, ids)
 }

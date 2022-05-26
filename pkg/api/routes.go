@@ -2,10 +2,11 @@ package api
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"log"
 	"path/filepath"
 	"strings"
+
+	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
 	"github.com/run-x/cloudgrep/pkg/config"
@@ -29,6 +30,7 @@ func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds d
 	api.GET("/info", Info)
 	api.GET("/resource", Resource)
 	api.GET("/resources", Resources)
+	api.POST("/resources", Resources)
 	api.GET("/stats", Stats)
 	api.GET("/fields", Fields)
 
