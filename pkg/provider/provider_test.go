@@ -9,6 +9,7 @@ import (
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/provider/mapper"
+	"github.com/run-x/cloudgrep/pkg/util"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
@@ -136,6 +137,6 @@ func (p TestProvider) Region() string {
 
 type Return string
 
-func (TestProvider) FetchTestResources(ctx context.Context) ([]TestResource, error) {
-	return ctx.Value(Return("FetchTestResources")).([]TestResource), nil
+func (TestProvider) FetchTestResources(ctx context.Context, output chan<- TestResource) error {
+	return util.SendAllFromSlice(ctx, output, ctx.Value(Return("FetchTestResources")).([]TestResource))
 }
