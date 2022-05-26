@@ -56,6 +56,14 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	return &s, nil
 }
 
+func (s *SQLiteStore) Ping() error {
+	db, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+	return db.Ping()
+}
+
 func (s *SQLiteStore) getAllResourceIds(ctx context.Context) ([]resourceId, error) {
 	var resourceIds []resourceId
 	result := s.db.Model(&model.Resource{}).Select("id").Distinct().Find(&resourceIds)

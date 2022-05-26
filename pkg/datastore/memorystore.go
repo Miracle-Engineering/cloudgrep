@@ -25,6 +25,10 @@ func NewMemoryStore(ctx context.Context, cfg config.Config, logger *zap.Logger) 
 	return &datastore
 }
 
+func (m *MemoryStore) Ping() error {
+	return nil
+}
+
 func (m *MemoryStore) GetResource(ctx context.Context, id string) (*model.Resource, error) {
 	for _, r := range m.resources {
 		if r.Id == id {

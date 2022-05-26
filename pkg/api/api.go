@@ -53,6 +53,16 @@ func GetAssets(prefix string) http.Handler {
 	return http.StripPrefix(prefix, http.FileServer(http.FS(static.Static)))
 }
 
+func HealthCheck(c *gin.Context) {
+	datastore := c.MustGet("datastore").(datastore.Datastore)
+	err := datastore.Ping()
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "Internal")
+		return
+	}
+	successResponse(c, gin.H{"status": "All good!"})
+}
+
 // Info renders the system information
 func Info(c *gin.Context) {
 	successResponse(c, gin.H{
