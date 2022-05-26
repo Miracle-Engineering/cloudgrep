@@ -85,7 +85,7 @@ func (s *SQLiteStore) getResourcesById(ctx context.Context, ids []resourceId) ([
 	if len(ids) == 0 {
 		return resources, nil
 	}
-	db := s.db.Preload("Tags").Preload("Properties").Find(&resources, ids)
+	db := s.db.Preload("Tags").Find(&resources, ids)
 
 	if db.Error != nil {
 		return nil, db.Error
