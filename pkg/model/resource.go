@@ -9,7 +9,7 @@ type Resource struct {
 	Region  string         `json:"region"`
 	Type    string         `json:"type"`
 	Tags    Tags           `json:"tags"`
-	RawData datatypes.JSON `json:"raw_data"`
+	RawData datatypes.JSON `json:"rawData"`
 }
 
 type Resources []*Resource
