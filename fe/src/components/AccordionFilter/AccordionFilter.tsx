@@ -49,7 +49,7 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 			<Accordion expanded={expanded} onChange={handleExpand}>
 				<AccordionSummary
 					sx={filterStyles.filterHeader}
-					expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+					expandIcon={<ExpandMoreIcon />}
 					aria-controls={`${id}-content`}
 					id={`${id}-header`}
 					classes={overrideSummaryClasses}>

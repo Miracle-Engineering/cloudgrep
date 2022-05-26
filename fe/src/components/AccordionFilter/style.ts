@@ -1,4 +1,4 @@
-import { DARK_BLUE } from 'constants/colors';
+import { BLACK, WHITE } from 'constants/colors';
 import { CSSProperties } from 'react';
 
 export const overrideSummaryClasses = {
@@ -28,8 +28,9 @@ export const labelClasses = {
 };
 
 export const filterHeader = {
-	backgroundColor: `${DARK_BLUE}`,
-	color: '#FFFFFF',
+	backgroundColor: `${WHITE}`,
+	color: `${BLACK}`,
+	opacity: '0.8',
 	borderRadius: '4px',
 	minHeight: '42px !important',
 };

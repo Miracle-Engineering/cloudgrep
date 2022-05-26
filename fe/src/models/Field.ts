@@ -5,6 +5,7 @@ export interface ValueType {
 
 export interface Field {
 	name: string;
+	group: string;
 	count: number;
 	values: ValueType[];
 }
