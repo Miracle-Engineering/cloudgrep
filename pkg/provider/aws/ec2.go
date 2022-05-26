@@ -6,6 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
+
+	"github.com/run-x/cloudgrep/pkg/util"
 )
 
 func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context, output chan<- types.Instance) error {
@@ -18,12 +20,8 @@ func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context, output chan<- 
 		}
 
 		for _, r := range page.Reservations {
-			for _, i := range r.Instances {
-				select {
-				case <-ctx.Done():
-					return ctx.Err()
-				case output <- i:
-				}
+			if err := util.SendAllFromSlice(ctx, output, r.Instances); err != nil {
+				return err
 			}
 		}
 	}
@@ -31,12 +29,20 @@ func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context, output chan<- 
 	return nil
 }
 
-func (p *AWSProvider) FetchEBSVolumes(ctx context.Context) ([]types.Volume, error) {
+func (p *AWSProvider) FetchEBSVolumes(ctx context.Context, output chan<- types.Volume) error {
 	input := &ec2.DescribeVolumesInput{}
+	paginator := ec2.NewDescribeVolumesPaginator(p.ec2Client, input)
 
-	result, err := p.ec2Client.DescribeVolumes(ctx, input)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch EC2 EBS Volumes: %w", err)
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to fetch EC2 EBS Volumes: %w", err)
+		}
+
+		if err := util.SendAllFromSlice(ctx, output, page.Volumes); err != nil {
+			return err
+		}
 	}
-	return result.Volumes, nil
+
+	return nil
 }

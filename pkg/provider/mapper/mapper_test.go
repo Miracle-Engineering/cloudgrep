@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/util"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest"
 )
@@ -44,7 +45,7 @@ func TestNewMapperOk(t *testing.T) {
 	mapper, err := new(cfg, *logger, reflect.ValueOf(provider))
 	assert.NoError(t, err)
 
-	instances, err := provider.FetchTestInstances(ctx)
+	instances, err := fetchAll(ctx, provider.FetchTestInstances)
 	assert.NoError(t, err)
 
 	//test expected resource
@@ -76,7 +77,7 @@ func TestNewMapperOk(t *testing.T) {
 			{Name: "DNSName", Value: "my-load-balancer-14522ba1bd959dd6.elb.us-east-1.amazonaws.com"},
 		},
 	}
-	loadBalancers, err := provider.FetchTestLoadBalancers(ctx)
+	loadBalancers, err := fetchAll(ctx, provider.FetchTestLoadBalancers)
 	assert.NoError(t, err)
 	resourceLB, err := mapper.ToResource(ctx, loadBalancers[0], "us-west-2")
 	assert.NoError(t, err)
@@ -126,7 +127,7 @@ func TestNewMapperError(t *testing.T) {
 		},
 	}
 	assert.PanicsWithError(t,
-		"method WrongReturnType has invalid signature; expecting one of [func(context.Context) ([]T, error), func(context.Context, chan<- T) error]",
+		"method WrongReturnType has invalid signature; expecting func(context.Context, chan<- T) error",
 		func() {
 			new(cfg, *logger, reflect.ValueOf(TestProvider{})) //nolint
 		},
@@ -166,7 +167,7 @@ func TestFetchResourcesAsync(t *testing.T) {
 		t.Fatalf("method %s for type %s not async", mapper.Mappings[typeID].Method, typeID)
 	}
 
-	resources, err := mapper.fetchResourcesAsync(context.Background(), mapper.Mappings[typeID], "foo")
+	resources, err := mapper.fetchResources(context.Background(), mapper.Mappings[typeID], "foo")
 	if err != nil {
 		t.Fatalf("error calling fetchResourcesAsync: %v", err)
 	}
@@ -193,7 +194,7 @@ func TestFetchResourcesAsyncCanceled(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	cancel()
-	resources, err := mapper.fetchResourcesAsync(ctx, mapper.Mappings[typeID], "foo")
+	resources, err := mapper.fetchResources(ctx, mapper.Mappings[typeID], "foo")
 	if assert.Error(t, err) {
 		assert.Equal(t, context.Canceled, err)
 	}
@@ -268,9 +269,9 @@ func TestFindTagMethod(t *testing.T) {
 
 	assert.PanicsWithError(
 		t,
-		"method FetchTestInstancesAsync has invalid signature; expecting func(context.Context, T) (model.Tags, error)",
+		"method FetchTestInstances has invalid signature; expecting func(context.Context, T) (model.Tags, error)",
 		func() {
-			findTagMethod(provider, "FetchTestInstancesAsync")
+			findTagMethod(provider, "FetchTestInstances")
 		},
 	)
 
@@ -361,23 +362,7 @@ type TestLoadBalancer struct {
 
 type Return string
 
-func (TestProvider) FetchTestInstances(ctx context.Context) ([]TestInstance, error) {
-	return []TestInstance{
-		{
-			Id:    "i-1",
-			Value: "abc",
-			SomeTags: []TestTag{
-				{Name: "tag1", Val: "val1"},
-				{Name: "tag2", Val: "val2"},
-			},
-		}, {
-			Id:    "i-2",
-			Value: "edf",
-		},
-	}, nil
-}
-
-func (TestProvider) FetchTestInstancesAsync(ctx context.Context, output chan<- TestInstance) error {
+func (TestProvider) FetchTestInstances(ctx context.Context, output chan<- TestInstance) error {
 	resources := []TestInstance{
 		{
 			Id:    "i-1",
@@ -392,24 +377,18 @@ func (TestProvider) FetchTestInstancesAsync(ctx context.Context, output chan<- T
 		},
 	}
 
-	for _, resource := range resources {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case output <- resource:
-		}
-	}
-
-	return nil
+	return util.SendAllFromSlice(ctx, output, resources)
 }
 
-func (TestProvider) FetchTestLoadBalancers(ctx context.Context) ([]TestLoadBalancer, error) {
-	return []TestLoadBalancer{
+func (TestProvider) FetchTestLoadBalancers(ctx context.Context, output chan<- TestLoadBalancer) error {
+	resources := []TestLoadBalancer{
 		{
 			Arn:     "arn:aws:elasticloadbalancing:us-east-1:0123456789:loadbalancer/net/my-load-balancer/14522ba1bd959dd6",
 			DNSName: "my-load-balancer-14522ba1bd959dd6.elb.us-east-1.amazonaws.com",
 		},
-	}, nil
+	}
+
+	return util.SendAllFromSlice(ctx, output, resources)
 }
 
 func (TestProvider) FetchTestLoadBalancerTags(ctx context.Context, lb TestLoadBalancer) (model.Tags, error) {
@@ -433,9 +412,9 @@ func buildMapperConfig() Config {
 		Mappings: []Mapping{
 			{
 				Type:         typeStr(TestInstance{}),
-				ResourceType: "test.InstanceAsync",
+				ResourceType: "test.Instance",
 				IdField:      "Id",
-				Impl:         "FetchTestInstancesAsync",
+				Impl:         "FetchTestInstances",
 			},
 			{
 				Type:         typeStr(TestLoadBalancer{}),
@@ -492,4 +471,24 @@ func funcSignature(t reflect.Type) string {
 	}
 
 	return buf.String()
+}
+
+type fetchFunc[T any] func(context.Context, chan<- T) error
+
+func fetchAll[T any](ctx context.Context, f fetchFunc[T]) ([]T, error) {
+	var resources []T
+	resourceChan := make(chan T)
+	doneCh := make(chan struct{})
+	go func() {
+		defer close(doneCh)
+		for r := range resourceChan {
+			resources = append(resources, r)
+		}
+	}()
+
+	err := f(ctx, resourceChan)
+	close(resourceChan)
+	<-doneCh
+
+	return resources, err
 }
