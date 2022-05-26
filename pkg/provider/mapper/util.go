@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"strings"
 
 	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/util"
 )
 
 func findImplMethod(v reflect.Value, impl string) *reflect.Value {
@@ -103,62 +101,6 @@ func isFetchTagSync(t reflect.Type) bool {
 	}
 
 	return true
-}
-
-func getProperties(name string, v reflect.Value, ignoredFields []string, maxRecursion int) []model.Property {
-	if util.Contains(ignoredFields, name) || maxRecursion <= 0 {
-		//ignore this field
-		return nil
-	}
-
-	emptyProp := []model.Property{{Name: name, Value: ""}}
-
-	switch v.Kind() {
-	case reflect.Invalid:
-		//ignore this field
-		return nil
-	case reflect.Interface, reflect.Ptr:
-		if v.IsZero() {
-			//empty pointer
-			return emptyProp
-		}
-		//display pointer value
-		return getProperties(name, v.Elem(), ignoredFields, maxRecursion)
-	case reflect.Slice:
-		if v.IsZero() {
-			//empty slice
-			return emptyProp
-		}
-		//return a distinct property for each slice element
-		//ex: Subnets=[a,b] -> Subnets[0]=a Subnets[1]=b
-		var props []model.Property
-		for i := 0; i < v.Len(); i++ {
-			props = append(props,
-				getProperties(
-					fmt.Sprintf("%v[%d]", name, i), v.Index(i), ignoredFields, maxRecursion-1)...)
-		}
-		return props
-	case reflect.Struct:
-		defaultFormatVal := fmt.Sprintf("%v", v)
-		if !strings.Contains(defaultFormatVal, "{") {
-			// this looks like a custom format, use it
-			// ex: a datetime might have a nice formatting already implemented
-			return []model.Property{{Name: name, Value: defaultFormatVal}}
-		}
-		//return a distinct property for each struct element
-		//ex: IamInstanceProfile{Arn:, Id:} -> IamInstanceProfile["Arn"]=... IamInstanceProfile["Id"]=...
-		t := v.Type()
-		var props []model.Property
-		for i := 0; i < v.NumField(); i++ {
-			field := t.Field(i)
-			props = append(props,
-				getProperties(
-					fmt.Sprintf("%v[%v]", name, field.Name), v.Field(i), ignoredFields, maxRecursion-1)...)
-		}
-		return props
-	default:
-		return []model.Property{{Name: name, Value: fmt.Sprintf("%v", v)}}
-	}
 }
 
 func getTags(v reflect.Value, tagField TagField) []model.Tag {

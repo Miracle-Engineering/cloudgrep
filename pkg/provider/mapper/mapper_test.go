@@ -3,6 +3,7 @@ package mapper
 import (
 	"context"
 	"fmt"
+	"gorm.io/datatypes"
 	"path"
 	"reflect"
 	"strings"
@@ -19,7 +20,7 @@ func TestNewMapperOk(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	cfg := Config{
 		Mappings: []Mapping{
-			//most common case - use fields for id, properties, tags
+			//most common case - use fields for id, raw data, tags
 			{
 				Type:         "github.com/run-x/cloudgrep/pkg/provider/mapper.TestInstance",
 				ResourceType: "mapper.Instance",
@@ -55,10 +56,7 @@ func TestNewMapperOk(t *testing.T) {
 			{Key: "tag1", Value: "val1"},
 			{Key: "tag2", Value: "val2"},
 		},
-		Properties: []model.Property{
-			{Name: "Id", Value: "i-1"},
-			{Name: "Value", Value: "abc"},
-		},
+		RawData: datatypes.JSON([]byte(`{"Id":"i-1","Value":"abc","SomeTags":[{"Name":"tag1","Val":"val1"},{"Name":"tag2","Val":"val2"}]}`)),
 	}
 	instance, err := mapper.ToResource(ctx, instances[0], "us-west-2")
 	assert.NoError(t, err)
@@ -72,10 +70,7 @@ func TestNewMapperOk(t *testing.T) {
 			{Key: "tag1", Value: "val1"},
 			{Key: "tag2", Value: "val2"},
 		},
-		Properties: []model.Property{
-			{Name: "Arn", Value: "arn:aws:elasticloadbalancing:us-east-1:0123456789:loadbalancer/net/my-load-balancer/14522ba1bd959dd6"},
-			{Name: "DNSName", Value: "my-load-balancer-14522ba1bd959dd6.elb.us-east-1.amazonaws.com"},
-		},
+		RawData: datatypes.JSON([]byte(`{"Arn":"arn:aws:elasticloadbalancing:us-east-1:0123456789:loadbalancer/net/my-load-balancer/14522ba1bd959dd6","DNSName":"my-load-balancer-14522ba1bd959dd6.elb.us-east-1.amazonaws.com"}`)),
 	}
 	loadBalancers, err := fetchAll(ctx, provider.FetchTestLoadBalancers)
 	assert.NoError(t, err)

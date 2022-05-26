@@ -2,6 +2,7 @@ package mapper
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"path"
 	"reflect"
@@ -12,9 +13,6 @@ import (
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
-
-// limit the depth when using reflection to generate the property list
-const maxRecursion = 5
 
 //Mapper defines rules on how to map a Go Type to a model.Resource
 type Mapper struct {
@@ -110,7 +108,7 @@ func new(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 }
 
 //ToResource generate a Resource by using reflection
-// all fields will become properties
+// all fields will be added to raw data
 // if there is a Tags field, this will become Tags
 func (m Mapper) ToResource(ctx context.Context, x any, region string) (model.Resource, error) {
 
@@ -122,25 +120,21 @@ func (m Mapper) ToResource(ctx context.Context, x any, region string) (model.Res
 		return model.Resource{}, fmt.Errorf("could not find a mapping definition for type '%v'", key)
 	}
 
-	//generate properties
-	var properties []model.Property
+	// get the id field
+	var id string
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		name := field.Name
-		value := reflect.ValueOf(x).FieldByName(name)
-		if field.IsExported() {
-			properties = append(properties, getProperties(name, value, mapping.IgnoredFields, maxRecursion)...)
-		}
-	}
-
-	// generate id field
-	var id string
-	for _, p := range properties {
-		if p.Name == mapping.IdField {
-			id = p.Value
+		if name == mapping.IdField {
+			fieldPtrRef := reflect.ValueOf(x).FieldByName(name)
+			fieldRef := reflect.Indirect(fieldPtrRef)
+			if !fieldRef.IsZero() {
+				id = fmt.Sprintf("%v", fieldRef.Interface())
+			}
 			break
 		}
 	}
+
 	if id == "" {
 		return model.Resource{}, fmt.Errorf("could not find id field '%v' for type '%v", mapping.IdField, key)
 	}
@@ -177,13 +171,16 @@ func (m Mapper) ToResource(ctx context.Context, x any, region string) (model.Res
 			}
 		}
 	}
-
+	marshaledStruct, err := json.Marshal(x)
+	if err != nil {
+		return model.Resource{}, err
+	}
 	return model.Resource{
-		Id:         id,
-		Region:     region,
-		Type:       mapping.ResourceType,
-		Properties: properties,
-		Tags:       tags,
+		Id:      id,
+		Region:  region,
+		Type:    mapping.ResourceType,
+		RawData: marshaledStruct,
+		Tags:    tags,
 	}, nil
 }
 

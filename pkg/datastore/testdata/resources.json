@@ -29,40 +29,44 @@
                 "value": "v1"
             }
         ],
-        "properties": [
-            {
-                "name": "InstanceId",
-                "value": "i-123"
-            },
-            {
-                "name": "Architecture",
-                "value": "x86_64"
-            },
-            {
-                "name": "SecurityGroups[0]",
-                "value": "sg-1"
-            },
-            {
-                "name": "SecurityGroups[1]",
-                "value": "sg-2"
-            },
-            {
-                "name": "Limit[CPU][Min]",
-                "value": "1"
-            },
-            {
-                "name": "Limit[CPU][Max]",
-                "value": "3"
-            },
-            {
-                "name": "Limit[Memory][Min]",
-                "value": "256"
-            },
-            {
-                "name": "Limit[Memory][Max]",
-                "value": "512"
-            }
-        ]
+        "rawData": {
+            "AmiLaunchIndex": 0,
+            "Architecture": "x86_64",
+            "Hypervisor": "xen",
+            "IamInstanceProfile": null,
+            "ImageId": "ami-0e472ba40eb589f49",
+            "InstanceId": "i-123",
+            "InstanceLifecycle": "",
+            "InstanceType": "t3.small",
+            "Ipv6Address": null,
+            "KernelId": null,
+            "Tags": [
+                {
+                    "key": "enabled",
+                    "value": "true"
+                },
+                {
+                    "key": "eks:nodegroup",
+                    "value": "staging-default"
+                },
+                {
+                    "key": "team",
+                    "value": "infra"
+                },
+                {
+                    "key": "env",
+                    "value": "prod"
+                },
+                {
+                    "key": "vpc",
+                    "value": "vpc-123"
+                },
+                {
+                    "key": "release",
+                    "value": "v1"
+                }
+            ]
+        }
     },
     {
         "id": "i-124",
@@ -98,51 +102,57 @@
                 "value": "ingress-nginx/ingress-nginx-controllerLDnJObCsNVlgTeMaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBEEdKupdOMeRVjaRzL-----END"
             }
         ],
-        "properties": [
-            {
-                "name": "InstanceId",
-                "value": "i-124"
-            },
-            {
-                "name": "Architecture",
-                "value": ""
-            },
-            {
-                "name": "SecurityGroups",
-                "value": ""
-            },
-            {
-                "name": "Limit[CPU][Min]",
-                "value": "0"
-            },
-            {
-                "name": "Limit[CPU][Max]",
-                "value": "0"
-            },
-            {
-                "name": "Limit[Memory][Min]",
-                "value": "0"
-            },
-            {
-                "name": "Limit[Memory][Max]",
-                "value": "0"
-            }
-        ]
+        "rawData": {
+            "AmiLaunchIndex": 0,
+            "Architecture": "x86_64",
+            "Hypervisor": "xen",
+            "IamInstanceProfile": null,
+            "ImageId": "ami-0e472ba40eb589f49",
+            "InstanceId": "i-124",
+            "InstanceLifecycle": "",
+            "InstanceType": "t3.small",
+            "Ipv6Address": null,
+            "KernelId": null,
+            "Tags": [
+                {
+                    "key": "enabled",
+                    "value": "false"
+                },
+                {
+                    "key": "eks:nodegroup",
+                    "value": "staging-default"
+                },
+                {
+                    "key": "team",
+                    "value": "dev"
+                },
+                {
+                    "key": "env",
+                    "value": "dev"
+                },
+                {
+                    "key": "vpc",
+                    "value": "vpc-123"
+                },
+                {
+                    "key": "debug:info",
+                    "value": "breakpoint-123"
+                },
+                {
+                    "key": "service.k8s.aws/stack-XVlBzgbaiCMRAjWwhTHctcuAxhxKQFDaFpLSjFbcXoEFfRsWxPLDnJObCsNVlgTeMaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBEmfdzdcEkXBAkjQZLCtTMtTCoaNatyyiNKAReKJyiXJrscctNswYNsGRussVmaozFZBsbOJiFQGZsnwTKSmVoiGLOpbUOpEdKupdOMeRVjaRzL-----END",
+                    "value": "ingress-nginx/ingress-nginx-controllerLDnJObCsNVlgTeMaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBEEdKupdOMeRVjaRzL-----END"
+                }
+            ]
+        }
     },
     {
         "id": "a-bucket-123",
         "region": "us-east-1",
         "type": "s3.Bucket",
         "tags": [],
-        "properties": [
-            {
-                "name": "CreationDate",
-                "value": "2022-02-04 22:26:51 +0000 UTC"
-            },
-            {
-                "name": "Name",
-                "value": "a-bucket-123"
-            }
-        ]
+        "rawData": {
+            "CreationDate": "2021-08-02T19:43:48Z",
+            "Name": "a-bucket-123"
+        }
     }
 ]
