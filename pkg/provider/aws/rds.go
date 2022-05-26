@@ -6,40 +6,42 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
+
+	"github.com/run-x/cloudgrep/pkg/util"
 )
 
-func (p *AWSProvider) FetchRDSInstances(ctx context.Context) ([]types.DBInstance, error) {
+func (p *AWSProvider) FetchRDSInstances(ctx context.Context, output chan<- types.DBInstance) error {
 	input := &rds.DescribeDBInstancesInput{}
 	paginator := rds.NewDescribeDBInstancesPaginator(p.rdsClient, input)
 
-	var resources []types.DBInstance
-
 	for paginator.HasMorePages() {
-		output, err := paginator.NextPage(ctx)
+		page, err := paginator.NextPage(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("failed to fetch RDS DB Instances: %w", err)
+			return fmt.Errorf("failed to fetch RDS DB Instances: %w", err)
 		}
 
-		resources = append(resources, output.DBInstances...)
+		if err := util.SendAllFromSlice(ctx, output, page.DBInstances); err != nil {
+			return err
+		}
 	}
 
-	return resources, nil
+	return nil
 }
 
-func (p *AWSProvider) FetchRDSClusters(ctx context.Context) ([]types.DBCluster, error) {
+func (p *AWSProvider) FetchRDSClusters(ctx context.Context, output chan<- types.DBCluster) error {
 	input := &rds.DescribeDBClustersInput{}
 	paginator := rds.NewDescribeDBClustersPaginator(p.rdsClient, input)
 
-	var resources []types.DBCluster
-
 	for paginator.HasMorePages() {
-		output, err := paginator.NextPage(ctx)
+		page, err := paginator.NextPage(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("failed to fetch RDS DB Clusters: %w", err)
+			return fmt.Errorf("failed to fetch RDS DB Clusters: %w", err)
 		}
 
-		resources = append(resources, output.DBClusters...)
+		if err := util.SendAllFromSlice(ctx, output, page.DBClusters); err != nil {
+			return err
+		}
 	}
 
-	return resources, nil
+	return nil
 }

@@ -6,16 +6,23 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/util"
 )
 
-func (p *AWSProvider) FetchS3Buckets(ctx context.Context) ([]types.Bucket, error) {
+func (p *AWSProvider) FetchS3Buckets(ctx context.Context, output chan<- types.Bucket) error {
 	input := &s3.ListBucketsInput{}
 	result, err := p.s3Client.ListBuckets(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch S3 buckets: %w", err)
+		return fmt.Errorf("failed to fetch S3 buckets: %w", err)
 	}
-	return result.Buckets, nil
+
+	if err := util.SendAllFromSlice(ctx, output, result.Buckets); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *AWSProvider) FetchS3BucketsTag(ctx context.Context, bucket types.Bucket) (model.Tags, error) {

@@ -18,11 +18,11 @@ func findImplMethod(v reflect.Value, impl string) *reflect.Value {
 
 	t := method.Type()
 
-	if isFetchMethodSync(t) || isFetchMethodAsync(t) {
+	if isFetchMethodAsync(t) {
 		return &method
 	}
 
-	panic(fmt.Errorf("method %v has invalid signature; expecting one of [func(context.Context) ([]T, error), func(context.Context, chan<- T) error]", impl))
+	panic(fmt.Errorf("method %v has invalid signature; expecting func(context.Context, chan<- T) error", impl))
 }
 
 func findTagMethod(v reflect.Value, impl string) *reflect.Value {
@@ -68,37 +68,6 @@ func isFetchMethodAsync(t reflect.Type) bool {
 	}
 	// TODO: Make sure this is the builtin error type
 	if t.Out(0).Name() != "error" {
-		return false
-	}
-
-	return true
-}
-
-func isFetchMethodSync(t reflect.Type) bool {
-	if t.Kind() != reflect.Func {
-		return false
-	}
-
-	if t.NumIn() != 1 {
-		return false
-	}
-
-	var ctx context.Context
-	ctxType := reflect.TypeOf(&ctx).Elem()
-	if !ctxType.AssignableTo(t.In(0)) {
-		return false
-	}
-
-	if t.NumOut() != 2 {
-		return false
-	}
-
-	if t.Out(0).Kind() != reflect.Slice {
-		return false
-	}
-
-	// TODO: Make sure this is the builtin error type
-	if t.Out(1).Name() != "error" {
 		return false
 	}
 
