@@ -126,7 +126,11 @@ func (m Mapper) ToResource(ctx context.Context, x any, region string) (model.Res
 		field := t.Field(i)
 		name := field.Name
 		if name == mapping.IdField {
-			id = fmt.Sprintf("%v", reflect.ValueOf(x).FieldByName(name))
+			fieldPtrRef := reflect.ValueOf(x).FieldByName(name)
+			fieldRef := reflect.Indirect(fieldPtrRef)
+			if !fieldRef.IsZero() {
+				id = fmt.Sprintf("%v", fieldRef.Interface())
+			}
 			break
 		}
 	}
