@@ -102,7 +102,6 @@ func TestUpdateQueryFields(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		// actual, err := updateQueryFields([]byte(tc.input.(string)))
 		actual, err := ri.updateQueryFields([]byte(tc.input.(string)))
 		assert.NoError(t, err)
 		assert.JSONEq(t, tc.output.(string), string(actual))

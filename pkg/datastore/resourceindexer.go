@@ -182,7 +182,7 @@ func (qb *resourceIndexer) rebuildDataModel(ctx context.Context, db *gorm.DB) er
 
 func (qb *resourceIndexer) updateQueryFields(jsonQuery []byte) ([]byte, error) {
 	var query map[string]interface{}
-	err := json.Unmarshal([]byte(jsonQuery), &query)
+	err := json.Unmarshal(jsonQuery, &query)
 	if err != nil {
 		return nil, err
 	}
