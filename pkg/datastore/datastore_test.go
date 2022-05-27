@@ -84,7 +84,7 @@ func TestSearchByQuery(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 
 			all_resources := testdata.GetResources(t)
-			resourceInst1 := all_resources[0]  //i-123 team:infra, release tag
+			resourceInst1 := all_resources[0]  //i-123 team:infra, release tag, tag region:us-west-2
 			resourceInst2 := all_resources[1]  //i-124 team:dev, no release tag
 			resourceBucket := all_resources[2] //s3 bucket without tags
 
@@ -202,6 +202,19 @@ func TestSearchByQuery(t *testing.T) {
 			assert.Equal(t, 1, len(resourcesRead))
 			model.AssertEqualsResourcePter(t, resourceInst2, resourcesRead[0])
 
+			//test on a tag called region - find the tag (ignore the core field)
+			// we can probably revisit this in the future and include the group in the query field
+			//ex: support "tags.region":"us-west-2" and "core.region":"us-west-2"
+			query = `{
+  "filter":{
+    "region":"us-west-2"
+  }
+}`
+			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(resourcesRead))
+			model.AssertEqualsResourcePter(t, resourceInst1, resourcesRead[0])
+
 		})
 	}
 }
@@ -243,10 +256,16 @@ func TestFields(t *testing.T) {
 			}
 			//check fields
 			assert.NoError(t, err)
-			assert.Equal(t, 10, len(fields))
+			assert.Equal(t, 11, len(fields))
 
 			//test a few fields
-			fmt.Printf("--> %#v\n", fields.Find("tags"))
+			model.AssertEqualsField(t, model.Field{
+				Group: "core",
+				Name:  "region",
+				Count: 3,
+				Values: model.FieldValues{
+					model.FieldValue{Value: "us-east-1", Count: 3},
+				}}, *fields.Find("core", "region"))
 			model.AssertEqualsField(t, model.Field{
 				Group: "core",
 				Name:  "type",
@@ -255,7 +274,7 @@ func TestFields(t *testing.T) {
 					model.FieldValue{Value: "s3.Bucket", Count: 1},
 					model.FieldValue{Value: "test.Instance", Count: 2},
 				},
-			}, *fields.Find("type"))
+			}, *fields.Find("core", "type"))
 			model.AssertEqualsField(t, model.Field{
 				Group: "tags",
 				Name:  "team",
@@ -263,7 +282,7 @@ func TestFields(t *testing.T) {
 				Values: model.FieldValues{
 					model.FieldValue{Value: "infra", Count: 1},
 					model.FieldValue{Value: "dev", Count: 1},
-				}}, *fields.Find("team"))
+				}}, *fields.Find("tags", "team"))
 			//test long field
 			model.AssertEqualsField(t, model.Field{
 				Group: "tags",
@@ -271,7 +290,16 @@ func TestFields(t *testing.T) {
 				Count: 1,
 				Values: model.FieldValues{
 					model.FieldValue{Value: tagMaxValue, Count: 1},
-				}}, *fields.Find(tagMaxKey))
+				}}, *fields.Find("tags", tagMaxKey))
+
+			//test the tag field called "region"
+			model.AssertEqualsField(t, model.Field{
+				Group: "tags",
+				Name:  "region",
+				Count: 1,
+				Values: model.FieldValues{
+					model.FieldValue{Value: "us-west-2", Count: 1},
+				}}, *fields.Find("tags", "region"))
 
 		})
 	}

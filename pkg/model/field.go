@@ -15,9 +15,9 @@ type FieldValue struct {
 type Fields []Field
 type FieldValues []FieldValue
 
-func (fields Fields) Find(name string) *Field {
+func (fields Fields) Find(group string, name string) *Field {
 	for _, f := range fields {
-		if f.Name == name {
+		if f.Group == group && f.Name == name {
 			return &f
 		}
 	}
