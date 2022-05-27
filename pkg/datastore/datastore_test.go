@@ -384,10 +384,19 @@ func TestLoad(t *testing.T) {
 					assert.NoError(t, datastore.WriteResources(ctx, newResources))
 
 				}
+				if tc.Resources > defaultLimit {
+					//test limit is returned by default
+					limitedResources, err := datastore.GetResources(ctx, nil)
+					assert.NoError(t, err)
+					assert.Equal(t, defaultLimit, len(limitedResources))
+				}
+
 				//test all resources added
-				allResources, err := datastore.GetResources(ctx, nil)
+				allResources, err := datastore.GetResources(ctx, []byte(fmt.Sprintf(`{"limit":%d}`, limitMaxValue)))
 				assert.NoError(t, err)
-				assert.Equal(t, tc.Resources, len(allResources))
+				if tc.Resources <= limitMaxValue {
+					assert.Equal(t, tc.Resources, len(allResources))
+				}
 				//check the tags have been set
 				assert.Equal(t, tc.TagsPerBatch, len(allResources[0].Tags))
 

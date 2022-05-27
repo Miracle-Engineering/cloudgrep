@@ -16,14 +16,17 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-const resourceIndexTable = "resource_index"
-
-//the name the dynamic columns
-const columnDynamicName = "col_%d"
-
-//the maximum number of columns allowed
-//this is a limitation for sqlite https://www.sqlite.org/limits.html
-const maxColumns = 2000
+const (
+	//limit number of resource returned
+	defaultLimit       = 25
+	limitMaxValue      = 2000
+	resourceIndexTable = "resource_index"
+	//the name the dynamic columns
+	columnDynamicName = "col_%d"
+	//the maximum number of columns allowed
+	//this is a limitation for sqlite https://www.sqlite.org/limits.html
+	maxColumns = 2000
+)
 
 //resourceIndexer is responsible to index the resources in the DB and provides dynamic querying capabilities
 type resourceIndexer struct {
@@ -156,8 +159,8 @@ func (qb *resourceIndexer) rebuildDataModel(ctx context.Context, db *gorm.DB) er
 	qb.parser = rql.MustNewParser(rql.Config{
 		Model:         resourceIndex,
 		FieldSep:      ".",
-		DefaultLimit:  25,
-		LimitMaxValue: 100,
+		DefaultLimit:  defaultLimit,
+		LimitMaxValue: limitMaxValue,
 	})
 
 	//migrate the data to have new columns
@@ -341,6 +344,10 @@ func replaceWith(s string, old string, new string, sep string, i int) string {
 //findResourceIds finds resources using a RQL query
 //see https://github.com/a8m/rql#getting-started for the syntax
 func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQuery []byte) ([]resourceId, error) {
+	if len(jsonQuery) == 0 {
+		//use en empty json if nothing is set - this will use the default limit
+		jsonQuery = []byte(`{}`)
+	}
 	p, err := ri.parse(jsonQuery)
 	if err != nil {
 		return nil, err

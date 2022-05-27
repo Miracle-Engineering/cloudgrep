@@ -71,15 +71,6 @@ func (s *SQLiteStore) Ping() error {
 	return db.Ping()
 }
 
-func (s *SQLiteStore) getAllResourceIds(ctx context.Context) ([]resourceId, error) {
-	var resourceIds []resourceId
-	result := s.db.Model(&model.Resource{}).Select("id").Distinct().Find(&resourceIds)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return resourceIds, nil
-}
-
 func (s *SQLiteStore) getResourcesById(ctx context.Context, ids []resourceId) ([]*model.Resource, error) {
 	var resources []*model.Resource
 	if len(ids) == 0 {
@@ -270,13 +261,7 @@ func (s *SQLiteStore) GetFields(context.Context) (model.Fields, error) {
 }
 
 func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) ([]*model.Resource, error) {
-	var ids []resourceId
-	var err error
-	if len(jsonQuery) == 0 {
-		ids, err = s.getAllResourceIds(ctx)
-	} else {
-		ids, err = s.indexer.findResourceIds(*s.db, s.logger, jsonQuery)
-	}
+	ids, err := s.indexer.findResourceIds(*s.db, s.logger, jsonQuery)
 	if err != nil {
 		return nil, err
 	}
