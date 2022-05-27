@@ -129,15 +129,16 @@ func (s *SQLiteStore) Stats(context.Context) (model.Stats, error) {
 
 func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 	/*
-		SELECT DISTINCT `type` , count(*)
+		SELECT DISTINCT `type` , count(*) as count
 		FROM `resources`
 		group by  `type`
 		order by `type`
+		sort by `count` desc
 	*/
 	rows, err := s.db.Model(&model.Resource{}).Select(name, "count() as count").
 		Distinct().
 		Group(name).
-		Order(name).
+		Order("count desc").
 		Rows()
 	if err != nil {
 		return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)

@@ -266,6 +266,8 @@ func TestFields(t *testing.T) {
 				Values: model.FieldValues{
 					model.FieldValue{Value: "us-east-1", Count: 3},
 				}}, *fields.Find("core", "region"))
+
+			typeField := *fields.Find("core", "type")
 			model.AssertEqualsField(t, model.Field{
 				Group: "core",
 				Name:  "type",
@@ -274,7 +276,12 @@ func TestFields(t *testing.T) {
 					model.FieldValue{Value: "s3.Bucket", Count: 1},
 					model.FieldValue{Value: "test.Instance", Count: 2},
 				},
-			}, *fields.Find("core", "type"))
+			}, typeField)
+
+			//check that values are sorted by count desc
+			assert.Equal(t, typeField.Values[0].Count, 2)
+			assert.Equal(t, typeField.Values[1].Count, 1)
+
 			model.AssertEqualsField(t, model.Field{
 				Group: "tags",
 				Name:  "team",
@@ -283,6 +290,7 @@ func TestFields(t *testing.T) {
 					model.FieldValue{Value: "infra", Count: 1},
 					model.FieldValue{Value: "dev", Count: 1},
 				}}, *fields.Find("tags", "team"))
+
 			//test long field
 			model.AssertEqualsField(t, model.Field{
 				Group: "tags",
