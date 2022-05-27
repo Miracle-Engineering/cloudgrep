@@ -12,5 +12,5 @@ test('renders cloud grep react link', () => {
 		</Provider>
 	);
 
-	expect(getByText(/CloudGrep/i)).toBeInTheDocument();
+	expect(getByText(/Contact/i)).toBeInTheDocument();
 });
