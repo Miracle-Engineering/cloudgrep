@@ -19,7 +19,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func PrepareApiUnitTest(t *testing.T) (*zap.Logger, datastore.Datastore, *gin.Engine) {
+func prepareApiUnitTest(t *testing.T) (*zap.Logger, datastore.Datastore, *gin.Engine) {
 	ctx := context.Background()
 	logger := zaptest.NewLogger(t)
 
@@ -40,7 +40,7 @@ func PrepareApiUnitTest(t *testing.T) (*zap.Logger, datastore.Datastore, *gin.En
 }
 
 func TestHealthRoute(t *testing.T) {
-	_, _, router := PrepareApiUnitTest(t)
+	_, _, router := prepareApiUnitTest(t)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/healthz", nil)
@@ -51,7 +51,7 @@ func TestHealthRoute(t *testing.T) {
 }
 
 func TestHomeRoute(t *testing.T) {
-	_, _, router := PrepareApiUnitTest(t)
+	_, _, router := prepareApiUnitTest(t)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/", nil)
@@ -63,7 +63,7 @@ func TestHomeRoute(t *testing.T) {
 }
 
 func TestInfoRoute(t *testing.T) {
-	_, _, router := PrepareApiUnitTest(t)
+	_, _, router := prepareApiUnitTest(t)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/info", nil)
@@ -80,115 +80,143 @@ func TestInfoRoute(t *testing.T) {
 }
 
 func TestStatsRoute(t *testing.T) {
-	_, _, router := PrepareApiUnitTest(t)
+	ctx := context.Background()
+	_, ds, router := prepareApiUnitTest(t)
+	t.Run("NoResources", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/api/stats", nil)
+		router.ServeHTTP(w, req)
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		var body *model.Stats
+		err := json.Unmarshal(w.Body.Bytes(), &body)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, body.ResourcesCount, 0)
+	})
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/api/stats", nil)
-	router.ServeHTTP(w, req)
-	assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-	var body map[string]interface{}
-	err := json.Unmarshal(w.Body.Bytes(), &body)
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, w.Code)
+	t.Run("SomeResources", func(t *testing.T) {
+		//write the resources
+		resources := testdata.GetResources(t)
+		assert.NotZero(t, len(resources))
+		sort.Sort(model.ResourcesById(resources))
+		assert.NoError(t, ds.WriteResources(ctx, resources))
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/api/stats", nil)
+		router.ServeHTTP(w, req)
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		var body *model.Stats
+		err := json.Unmarshal(w.Body.Bytes(), &body)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, body.ResourcesCount, 3)
+	})
 }
 
 func TestResourcesRoute(t *testing.T) {
 	ctx := context.Background()
-	_, ds, router := PrepareApiUnitTest(t)
+	_, ds, router := prepareApiUnitTest(t)
 
-	w := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/api/resources", nil)
-	assert.NoError(t, err)
-	router.ServeHTTP(w, req)
-	assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-	var body model.Resources
-	err = json.Unmarshal(w.Body.Bytes(), &body)
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, len(body), 0)
+	t.Run("NoResources", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/api/resources", nil)
+		assert.NoError(t, err)
+		router.ServeHTTP(w, req)
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		var body model.Resources
+		err = json.Unmarshal(w.Body.Bytes(), &body)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, len(body), 0)
+	})
 
-	resources := testdata.GetResources(t)
-	assert.NotZero(t, len(resources))
-	sort.Sort(model.ResourcesById(resources))
+	t.Run("SomeResources", func(t *testing.T) {
+		//write the resources
+		resources := testdata.GetResources(t)
+		assert.NotZero(t, len(resources))
+		sort.Sort(model.ResourcesById(resources))
+		assert.NoError(t, ds.WriteResources(ctx, resources))
 
-	//write the resources
-	assert.NoError(t, ds.WriteResources(ctx, resources))
-	w = httptest.NewRecorder()
-	req, err = http.NewRequest("GET", "/api/resources", nil)
-	assert.NoError(t, err)
-	router.ServeHTTP(w, req)
-	assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-	body = nil
-	err = json.Unmarshal(w.Body.Bytes(), &body)
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, len(body), 3)
-	sort.Sort(model.ResourcesById(body))
-	model.AssertEqualsResources(t, body, resources)
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/api/resources", nil)
+		assert.NoError(t, err)
+		router.ServeHTTP(w, req)
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		var body model.Resources
+		err = json.Unmarshal(w.Body.Bytes(), &body)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, len(body), 3)
+		sort.Sort(model.ResourcesById(body))
+		model.AssertEqualsResources(t, body, resources)
+	})
 }
 
 func TestResourceRoute(t *testing.T) {
 	ctx := context.Background()
-	_, ds, router := PrepareApiUnitTest(t)
-	var body map[string]interface{}
-
-	// Test w/o "" parameter
-	w := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/api/resource", nil)
-	assert.NoError(t, err)
-	router.ServeHTTP(w, req)
-	assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
-	assert.Equal(t, body["status"], float64(http.StatusBadRequest))
-	assert.Equal(t, body["error"], "missing required parameter 'id'")
+	_, ds, router := prepareApiUnitTest(t)
 
 	//write the resources
 	resources := testdata.GetResources(t)
 	assert.NotZero(t, len(resources))
 	assert.NoError(t, ds.WriteResources(ctx, resources))
 
-	// Test w/ "" parameter
-	body = nil
-	w = httptest.NewRecorder()
-	req, err = http.NewRequest("GET", "/api/resource", nil)
-	assert.NoError(t, err)
-	q := req.URL.Query()
-	q.Add("id", "")
-	req.URL.RawQuery = q.Encode()
-	router.ServeHTTP(w, req)
-	assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
-	assert.Equal(t, body["status"], float64(http.StatusBadRequest))
-	assert.Equal(t, body["error"], "missing required parameter 'id'")
+	t.Run("MissingParam", func(t *testing.T) {
+		var body map[string]interface{}
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/api/resource", nil)
+		assert.NoError(t, err)
+		router.ServeHTTP(w, req)
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+		assert.Equal(t, body["status"], float64(http.StatusBadRequest))
+		assert.Equal(t, body["error"], "missing required parameter 'id'")
+	})
 
-	// Test w/ missing parameter
-	body = nil
-	w = httptest.NewRecorder()
-	req, err = http.NewRequest("GET", "/api/resource", nil)
-	assert.NoError(t, err)
-	q = req.URL.Query()
-	q.Add("id", "blah")
-	req.URL.RawQuery = q.Encode()
-	router.ServeHTTP(w, req)
-	assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-	assert.Equal(t, http.StatusNotFound, w.Code)
-	assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
-	assert.Equal(t, body["status"], float64(http.StatusNotFound))
-	assert.Equal(t, body["error"], "can't find resource with id 'blah'")
+	t.Run("EmptyParam", func(t *testing.T) {
+		var body map[string]interface{}
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/api/resource", nil)
+		assert.NoError(t, err)
+		q := req.URL.Query()
+		q.Add("id", "")
+		req.URL.RawQuery = q.Encode()
+		router.ServeHTTP(w, req)
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+		assert.Equal(t, body["status"], float64(http.StatusBadRequest))
+		assert.Equal(t, body["error"], "missing required parameter 'id'")
+	})
 
-	// Test w/ valid parameter
-	var actualResource model.Resource
-	w = httptest.NewRecorder()
-	req, err = http.NewRequest("GET", "/api/resource", nil)
-	assert.NoError(t, err)
-	q = req.URL.Query()
-	q.Add("id", resources[0].Id)
-	req.URL.RawQuery = q.Encode()
-	router.ServeHTTP(w, req)
-	assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &actualResource))
-	model.AssertEqualsResource(t, actualResource, *resources[0])
+	t.Run("UnknownParam", func(t *testing.T) {
+		var body map[string]interface{}
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/api/resource", nil)
+		assert.NoError(t, err)
+		q := req.URL.Query()
+		q.Add("id", "blah")
+		req.URL.RawQuery = q.Encode()
+		router.ServeHTTP(w, req)
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		assert.Equal(t, http.StatusNotFound, w.Code)
+		assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+		assert.Equal(t, body["status"], float64(http.StatusNotFound))
+		assert.Equal(t, body["error"], "can't find resource with id 'blah'")
+	})
+
+	t.Run("ValidParam", func(t *testing.T) {
+		var actualResource model.Resource
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/api/resource", nil)
+		assert.NoError(t, err)
+		q := req.URL.Query()
+		q.Add("id", resources[0].Id)
+		req.URL.RawQuery = q.Encode()
+		router.ServeHTTP(w, req)
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.NoError(t, json.Unmarshal(w.Body.Bytes(), &actualResource))
+		model.AssertEqualsResource(t, actualResource, *resources[0])
+	})
 }

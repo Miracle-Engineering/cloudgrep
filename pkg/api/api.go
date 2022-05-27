@@ -57,7 +57,7 @@ func HealthCheck(c *gin.Context) {
 	ds := c.MustGet("datastore").(datastore.Datastore)
 	err := ds.Ping()
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "Internal")
+		badRequest(c, "Internal")
 		return
 	}
 	successResponse(c, gin.H{"status": "All good!"})
