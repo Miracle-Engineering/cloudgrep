@@ -1,6 +1,8 @@
 package model
 
 import (
+	"encoding/json"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,6 +20,18 @@ func AssertEqualsResources(t *testing.T, a, b Resources) {
 	}
 }
 
+// JSONBytesEqual compares the JSON in two byte slices.
+func JSONBytesEqual(a, b []byte) (bool, error) {
+	var j, j2 interface{}
+	if err := json.Unmarshal(a, &j); err != nil {
+		return false, err
+	}
+	if err := json.Unmarshal(b, &j2); err != nil {
+		return false, err
+	}
+	return reflect.DeepEqual(j2, j), nil
+}
+
 func AssertEqualsResourcePter(t *testing.T, a, b *Resource) {
 	AssertEqualsResource(t, *a, *b)
 }
@@ -26,7 +40,9 @@ func AssertEqualsResource(t *testing.T, a, b Resource) {
 	assert.Equal(t, a.Id, b.Id)
 	assert.Equal(t, a.Region, b.Region)
 	assert.Equal(t, a.Type, b.Type)
-	assert.Equal(t, string(a.RawData), string(b.RawData))
+	jsonsEqual, err := JSONBytesEqual(a.RawData, b.RawData)
+	assert.NoError(t, err)
+	assert.True(t, jsonsEqual)
 	assert.ElementsMatch(t, a.Tags.Clean(), b.Tags.Clean())
 }
 

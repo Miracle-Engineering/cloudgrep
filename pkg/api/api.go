@@ -54,8 +54,8 @@ func GetAssets(prefix string) http.Handler {
 }
 
 func HealthCheck(c *gin.Context) {
-	datastore := c.MustGet("datastore").(datastore.Datastore)
-	err := datastore.Ping()
+	ds := c.MustGet("datastore").(datastore.Datastore)
+	err := ds.Ping()
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "Internal")
 		return
@@ -75,13 +75,13 @@ func Info(c *gin.Context) {
 
 // Resource retrieves a resource by its id
 func Resource(c *gin.Context) {
-	datastore := c.MustGet("datastore").(datastore.Datastore)
+	ds := c.MustGet("datastore").(datastore.Datastore)
 	id := c.GetString("id")
 	if id == "" {
 		badRequest(c, fmt.Errorf("missing required parameter 'id'"))
 		return
 	}
-	resource, err := datastore.GetResource(c, id)
+	resource, err := ds.GetResource(c, id)
 	if err != nil {
 		badRequest(c, err)
 	}
@@ -94,7 +94,7 @@ func Resource(c *gin.Context) {
 
 // Resources retrieves the cloud resources matching the query parameters
 func Resources(c *gin.Context) {
-	datastore := c.MustGet("datastore").(datastore.Datastore)
+	ds := c.MustGet("datastore").(datastore.Datastore)
 
 	//the body contains the query
 	body, err := c.GetRawData()
@@ -102,7 +102,7 @@ func Resources(c *gin.Context) {
 		badRequest(c, err)
 		return
 	}
-	resources, err := datastore.GetResources(c, body)
+	resources, err := ds.GetResources(c, body)
 	if err != nil {
 		badRequest(c, err)
 		return
@@ -112,8 +112,8 @@ func Resources(c *gin.Context) {
 
 // Stats provides stats about stored data
 func Stats(c *gin.Context) {
-	datastore := c.MustGet("datastore").(datastore.Datastore)
-	stats, err := datastore.Stats(c)
+	ds := c.MustGet("datastore").(datastore.Datastore)
+	stats, err := ds.Stats(c)
 	if err != nil {
 		badRequest(c, err)
 		return
@@ -123,8 +123,8 @@ func Stats(c *gin.Context) {
 
 // Fields Return the list of fields available for filtering the resources
 func Fields(c *gin.Context) {
-	datastore := c.MustGet("datastore").(datastore.Datastore)
-	fields, err := datastore.GetFields(c)
+	ds := c.MustGet("datastore").(datastore.Datastore)
+	fields, err := ds.GetFields(c)
 	if err != nil {
 		badRequest(c, err)
 		return

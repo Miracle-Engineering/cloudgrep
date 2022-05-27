@@ -14,6 +14,12 @@ type Resource struct {
 
 type Resources []*Resource
 
+type ResourcesById []*Resource
+
+func (a ResourcesById) Len() int           { return len(a) }
+func (a ResourcesById) Less(i, j int) bool { return a[i].Id < a[j].Id }
+func (a ResourcesById) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
 func (r Resource) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddString("id", r.Id)
 	enc.AddString("region", r.Region)
