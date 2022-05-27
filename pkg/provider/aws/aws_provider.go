@@ -44,15 +44,10 @@ func NewAWSProvider(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) (
 	}
 	logger.Sugar().Infow("AWS", "region", provider.Region())
 
-	//create the clients
-	provider.ec2Client = ec2.NewFromConfig(provider.config)
-	provider.elbClient = elbv2.NewFromConfig(provider.config)
-	provider.s3Client = s3.NewFromConfig(provider.config)
-	provider.lambdaClient = lambda.NewFromConfig(provider.config)
-	provider.rdsClient = rds.NewFromConfig(provider.config)
+	provider.initClients()
 
 	//create the mapper for this provider
-	provider.mapper, err = mapper.New(embedConfig, *logger, reflect.ValueOf(&provider))
+	provider.mapper, err = mapper.New(embedConfig, logger, reflect.ValueOf(&provider))
 	if err != nil {
 		return nil, err
 	}
@@ -65,4 +60,14 @@ func (p AWSProvider) Region() string {
 
 func (p AWSProvider) GetMapper() mapper.Mapper {
 	return p.mapper
+}
+
+func (p *AWSProvider) initClients() {
+	cfg := p.config
+
+	p.ec2Client = ec2.NewFromConfig(cfg)
+	p.elbClient = elbv2.NewFromConfig(cfg)
+	p.s3Client = s3.NewFromConfig(cfg)
+	p.lambdaClient = lambda.NewFromConfig(cfg)
+	p.rdsClient = rds.NewFromConfig(cfg)
 }

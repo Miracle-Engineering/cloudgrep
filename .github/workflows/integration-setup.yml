@@ -1,0 +1,91 @@
+name: Integration Test Setup
+
+env:
+  AWS_REGION: us-east-1
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to run terraform in"
+        type: choice
+        options:
+          - dev
+          - prod
+
+  push:
+    branches:
+      - main
+    paths:
+      - "integration/aws/terraform/**"
+
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
+    paths:
+      - "integration/aws/terraform/**"
+
+concurrency: terraform-integration
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  terraform-apply:
+    name: terraform apply
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.1.7
+
+      - name: Select AWS account
+        uses: actions/github-script@v6
+        with:
+          script: |
+            var env
+            if (context.eventName == "workflow_dispatch") {
+              env = context.payload.inputs.environment
+            } else if (context.eventName == "push") {
+              env = "prod"
+            } else if (context.eventName == "pull_request") {
+              env = "dev"
+            } else {
+              throw "Unknown env for push event " + context.eventName
+            }
+
+            accounts = {
+              "dev": "316817240772",
+            }
+
+            if (!accounts.hasOwnProperty(env)) {
+              throw "Unknown account for env " + process.env.ENV
+            }
+
+            core.exportVariable('ENV', env);
+            core.exportVariable('AWS_ACCOUNT_ID', accounts[process.env.ENV]);
+            core.exportVariable('TF_DIR', 'integration/aws/terraform/' + env + '-environment')
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: "${{ env.AWS_REGION }}"
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-actions-terraform
+
+      - run: terraform init -no-color
+        working-directory: ${{ env.TF_DIR }}
+
+      - run: terraform validate -no-color
+        working-directory: ${{ env.TF_DIR }}
+
+      - run: terraform plan -no-color -out "${{ runner.temp }}/tfplan"
+        working-directory: ${{ env.TF_DIR }}
+
+      - run: terraform apply -no-color "${{ runner.temp }}/tfplan"
+        working-directory: ${{ env.TF_DIR }}

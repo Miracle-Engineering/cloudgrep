@@ -57,7 +57,7 @@ type TagField struct {
 	Value string `yaml:"value"`
 }
 
-func New(config []byte, logger zap.Logger, providerValue reflect.Value) (Mapper, error) {
+func New(config []byte, logger *zap.Logger, providerValue reflect.Value) (Mapper, error) {
 	var configStruct Config
 	err := yaml.Unmarshal(config, &configStruct)
 	if err != nil {
@@ -66,11 +66,11 @@ func New(config []byte, logger zap.Logger, providerValue reflect.Value) (Mapper,
 	return new(configStruct, logger, providerValue)
 }
 
-func new(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper, error) {
+func new(config Config, logger *zap.Logger, providerValue reflect.Value) (Mapper, error) {
 	logger.Sugar().Infow("Loading Mappings", zap.String("provider", fmt.Sprintf("%T", providerValue.Interface())))
 	tagField := config.TagField
 	ignoredFields := config.IgnoredFields
-	mapper := Mapper{logger: &logger}
+	mapper := Mapper{logger: logger}
 	mapper.Mappings = make(map[string]Mapping)
 	for _, mapping := range config.Mappings {
 		if mapping.Type == "" {

@@ -3,11 +3,12 @@ package mapper
 import (
 	"context"
 	"fmt"
-	"gorm.io/datatypes"
 	"path"
 	"reflect"
 	"strings"
 	"testing"
+
+	"gorm.io/datatypes"
 
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/util"
@@ -43,7 +44,7 @@ func TestNewMapperOk(t *testing.T) {
 		},
 	}
 	provider := TestProvider{}
-	mapper, err := new(cfg, *logger, reflect.ValueOf(provider))
+	mapper, err := new(cfg, logger, reflect.ValueOf(provider))
 	assert.NoError(t, err)
 
 	instances, err := fetchAll(ctx, provider.FetchTestInstances)
@@ -101,7 +102,7 @@ func TestNewMapperError(t *testing.T) {
 	assert.PanicsWithError(t,
 		"could not find a method called 'Unknown' on 'mapper.TestProvider'",
 		func() {
-			new(cfg, *logger, reflect.ValueOf(TestProvider{})) //nolint
+			new(cfg, logger, reflect.ValueOf(TestProvider{})) //nolint
 		},
 	)
 
@@ -124,7 +125,7 @@ func TestNewMapperError(t *testing.T) {
 	assert.PanicsWithError(t,
 		"method WrongReturnType has invalid signature; expecting func(context.Context, chan<- T) error",
 		func() {
-			new(cfg, *logger, reflect.ValueOf(TestProvider{})) //nolint
+			new(cfg, logger, reflect.ValueOf(TestProvider{})) //nolint
 		},
 	)
 
@@ -143,7 +144,7 @@ func TestNewMapperError(t *testing.T) {
 	assert.PanicsWithError(t,
 		"could not find a method called 'Unknown' on 'mapper.TestProvider'",
 		func() {
-			new(cfg, *logger, reflect.ValueOf(TestProvider{})) //nolint
+			new(cfg, logger, reflect.ValueOf(TestProvider{})) //nolint
 		},
 	)
 }
@@ -153,7 +154,7 @@ func TestFetchResourcesAsync(t *testing.T) {
 
 	config := buildMapperConfig()
 	provider := TestProvider{}
-	mapper, err := new(config, *zaptest.NewLogger(t), reflect.ValueOf(provider))
+	mapper, err := new(config, zaptest.NewLogger(t), reflect.ValueOf(provider))
 	if err != nil {
 		t.Fatalf("cannot create mapper: %v", err)
 	}
@@ -177,7 +178,7 @@ func TestFetchResourcesAsyncCanceled(t *testing.T) {
 
 	config := buildMapperConfig()
 	provider := TestProvider{}
-	mapper, err := new(config, *zaptest.NewLogger(t), reflect.ValueOf(provider))
+	mapper, err := new(config, zaptest.NewLogger(t), reflect.ValueOf(provider))
 	if err != nil {
 		t.Fatalf("cannot create mapper: %v", err)
 	}

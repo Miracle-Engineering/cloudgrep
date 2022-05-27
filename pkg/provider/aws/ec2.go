@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
@@ -11,7 +12,21 @@ import (
 )
 
 func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context, output chan<- types.Instance) error {
-	input := &ec2.DescribeInstancesInput{}
+	input := &ec2.DescribeInstancesInput{
+		// Ignore terminated (and other) instances
+		Filters: []types.Filter{
+			{
+				Name: aws.String("instance-state-name"),
+				Values: []string{
+					"pending",
+					"running",
+					"shutting-down",
+					"stopped",
+					"stopping",
+				},
+			},
+		},
+	}
 	p := ec2.NewDescribeInstancesPaginator(awsPrv.ec2Client, input)
 	for p.HasMorePages() {
 		page, err := p.NextPage(ctx)

@@ -1,0 +1,140 @@
+package aws
+
+import (
+	"bytes"
+	"context"
+	"errors"
+	"os"
+	"reflect"
+	"sync"
+	"testing"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/run-x/cloudgrep/pkg/provider/mapper"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+)
+
+const testEnvVar = "CLOUD_INTEGRATION_TESTS"
+
+var integrationAwsAccounts = []string{"316817240772"}
+
+var onceTestCreds sync.Once
+var hasCreds *bool
+
+type integrationTestContext struct {
+	p         *AWSProvider
+	log       *zap.Logger
+	logBuffer *bytes.Buffer
+	ctx       context.Context
+}
+
+func setupIntegrationTest(t testing.TB) *integrationTestContext {
+	t.Helper()
+
+	ctx := &integrationTestContext{}
+	ctx.ctx = context.Background()
+	setupIntegrationLogs(t, ctx)
+	setupIntegrationProvider(t, ctx)
+
+	checkShouldRunIntegrationTests(t, ctx)
+
+	return ctx
+}
+
+func checkShouldRunIntegrationTests(t testing.TB, ctx *integrationTestContext) {
+	t.Helper()
+
+	creds := hasAwsCreds(t, ctx.p.config)
+	_, hasEnvVar := os.LookupEnv(testEnvVar)
+
+	if hasEnvVar && !creds {
+		t.Fatalf("cannot run integration tests without creds")
+	}
+
+	if !creds {
+		t.Skip("no active creds for the integration testing account")
+	}
+}
+
+func setupIntegrationProvider(t testing.TB, ctx *integrationTestContext) {
+	t.Helper()
+
+	var err error
+	provider := &AWSProvider{}
+	provider.logger = ctx.log
+	provider.config, err = config.LoadDefaultConfig(ctx.ctx)
+	if err != nil {
+		t.Fatalf("cannot load config: %v", err)
+	}
+
+	provider.initClients()
+	provider.mapper, err = mapper.New(embedConfig, ctx.log, reflect.ValueOf(provider))
+	if err != nil {
+		t.Fatalf("cannot instantiate mapper: %v", err)
+	}
+
+	ctx.p = provider
+}
+
+func setupIntegrationLogs(t testing.TB, ctx *integrationTestContext) {
+	t.Helper()
+	buf, ws := logBuffer()
+	ctx.logBuffer = buf
+
+	log, err := zap.NewDevelopment(zap.ErrorOutput(ws))
+	if err != nil {
+		t.Fatalf("cannot create zap logger: %v", err)
+	}
+	ctx.log = log
+}
+
+func logBuffer() (*bytes.Buffer, zapcore.WriteSyncer) {
+	buf := &bytes.Buffer{}
+	return buf, zapcore.Lock(zapcore.AddSync(buf))
+}
+
+func hasAwsCreds(t testing.TB, cfg aws.Config) bool {
+	t.Helper()
+
+	if hasCreds != nil {
+		return *hasCreds
+	}
+
+	onceTestCreds.Do(func() {
+		client := sts.NewFromConfig(cfg)
+
+		output, err := client.GetCallerIdentity(context.TODO(), &sts.GetCallerIdentityInput{})
+		if err != nil {
+			var re *awshttp.ResponseError
+			if !errors.As(err, &re) {
+				t.Fatalf("unknown error calling sts:GetCallerIdentity: %v", err)
+			}
+			if re.HTTPStatusCode() == 403 {
+				// No creds
+				hasCreds = aws.Bool(false)
+				return
+			}
+
+			if re.HTTPStatusCode() == 400 {
+				// Bad creds
+				hasCreds = aws.Bool(false)
+				return
+			}
+		}
+
+		for _, id := range integrationAwsAccounts {
+			if *output.Account == id {
+				hasCreds = aws.Bool(true)
+				return
+			}
+		}
+
+		hasCreds = aws.Bool(false)
+	})
+
+	return *hasCreds
+}

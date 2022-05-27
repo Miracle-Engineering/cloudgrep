@@ -3,9 +3,10 @@ package provider
 import (
 	"context"
 	_ "embed"
-	"gorm.io/datatypes"
 	"reflect"
 	"testing"
+
+	"gorm.io/datatypes"
 
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -105,7 +106,7 @@ func NewTestProvider(ctx context.Context, cfg config.Provider, logger *zap.Logge
 	p := TestProvider{}
 	p.Logger = logger
 	var err error
-	p.Mapper, err = mapper.New(embedConfig, *logger, reflect.ValueOf(p))
+	p.Mapper, err = mapper.New(embedConfig, logger, reflect.ValueOf(p))
 	if err != nil {
 		return nil, err
 	}
