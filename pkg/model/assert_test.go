@@ -1,6 +1,7 @@
 package model
 
 import (
+	"gorm.io/datatypes"
 	"testing"
 )
 
@@ -11,11 +12,7 @@ func TestAssertResource(t *testing.T) {
 			{Key: "enabled", Value: "true"},
 			{Key: "eks:nodegroup", Value: "staging-default"},
 		},
-		Properties: []Property{
-			{Name: "InstanceId", Value: "i-123"},
-			{Name: "Architecture", Value: "x86_64"},
-			{Name: "SecurityGroups[0]", Value: "sg-1"},
-		},
+		RawData: datatypes.JSON([]byte(`{"name": "jinzhu", "age": 18, "tags": ["tag1", "tag2"], "orgs": {"orga": "orga"}}`)),
 	}
 	r2 := Resource{
 		Id: "i-123", Region: "us-east-1", Type: "test.Instance",
@@ -23,12 +20,8 @@ func TestAssertResource(t *testing.T) {
 			{Key: "eks:nodegroup", Value: "staging-default"},
 			{Key: "enabled", Value: "true"},
 		},
-		Properties: []Property{
-			{Name: "SecurityGroups[0]", Value: "sg-1"},
-			{Name: "Architecture", Value: "x86_64"},
-			{Name: "InstanceId", Value: "i-123"},
-		},
+		RawData: datatypes.JSON([]byte(`{"name": "jinzhu", "age": 18, "tags": ["tag1", "tag2"], "orgs": {"orga": "orga"}}`)),
 	}
-	//r1 and r2 should be equals even though the order of their tags/properties are different
+	//r1 and r2 should be equals even though the order of their tags/raw data are different
 	AssertEqualsResource(t, r1, r2)
 }

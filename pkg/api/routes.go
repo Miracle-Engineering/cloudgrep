@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"go.uber.org/zap"
-	"io/ioutil"
 	"log"
 	"path/filepath"
 	"strings"
@@ -11,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
+	"github.com/run-x/cloudgrep/static"
 )
 
 func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds datastore.Datastore) {
@@ -22,14 +22,17 @@ func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds d
 	api := root.Group("/api")
 	setupMiddlewares(api, cfg, logger, ds)
 
+	healthCheck := root.Group("/healthz")
+	setupMiddlewares(healthCheck, cfg, logger, ds)
+	healthCheck.GET("", HealthCheck)
+
 	api.GET("/info", Info)
 	api.GET("/resource", Resource)
 	api.GET("/resources", Resources)
 	api.GET("/stats", Stats)
 	api.GET("/fields", Fields)
 
-	// mock api serving static files (temporary)
-	mock_files, err := ioutil.ReadDir("./static/mock")
+	mock_files, err := static.Static.ReadDir("mock")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -6,15 +6,26 @@ import (
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/util"
 )
 
-func (p *AWSProvider) FetchLoadBalancers(ctx context.Context) ([]types.LoadBalancer, error) {
-	lbOutput, err := p.elbClient.DescribeLoadBalancers(ctx, &elbv2.DescribeLoadBalancersInput{})
-	if err != nil {
-		return nil, err
+func (p *AWSProvider) FetchLoadBalancers(ctx context.Context, output chan<- types.LoadBalancer) error {
+	// lbOutput, err := p.elbClient.DescribeLoadBalancers(ctx, &elbv2.DescribeLoadBalancersInput{})
+	pages := elbv2.NewDescribeLoadBalancersPaginator(p.elbClient, &elbv2.DescribeLoadBalancersInput{})
+	for pages.HasMorePages() {
+		page, err := pages.NextPage(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to fetch Load Balancers: %w", err)
+		}
+
+		if err := util.SendAllFromSlice(ctx, output, page.LoadBalancers); err != nil {
+			return err
+		}
 	}
-	return lbOutput.LoadBalancers, nil
+
+	return nil
 }
 
 func (p *AWSProvider) FetchLoadBalancerTag(ctx context.Context, lb types.LoadBalancer) (model.Tags, error) {

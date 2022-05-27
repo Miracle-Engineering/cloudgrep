@@ -16,6 +16,7 @@ type Datastore interface {
 	WriteResources(context.Context, []*model.Resource) error
 	Stats(context.Context) (model.Stats, error)
 	GetFields(context.Context) (model.Fields, error)
+	Ping() error
 }
 
 func NewDatastore(ctx context.Context, cfg config.Config, logger *zap.Logger) (Datastore, error) {

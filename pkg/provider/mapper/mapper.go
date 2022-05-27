@@ -2,6 +2,7 @@ package mapper
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"path"
 	"reflect"
@@ -12,9 +13,6 @@ import (
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
-
-// limit the depth when using reflection to generate the property list
-const maxRecursion = 5
 
 //Mapper defines rules on how to map a Go Type to a model.Resource
 type Mapper struct {
@@ -110,7 +108,7 @@ func new(config Config, logger zap.Logger, providerValue reflect.Value) (Mapper,
 }
 
 //ToResource generate a Resource by using reflection
-// all fields will become properties
+// all fields will be added to raw data
 // if there is a Tags field, this will become Tags
 func (m Mapper) ToResource(ctx context.Context, x any, region string) (model.Resource, error) {
 
@@ -122,25 +120,21 @@ func (m Mapper) ToResource(ctx context.Context, x any, region string) (model.Res
 		return model.Resource{}, fmt.Errorf("could not find a mapping definition for type '%v'", key)
 	}
 
-	//generate properties
-	var properties []model.Property
+	// get the id field
+	var id string
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		name := field.Name
-		value := reflect.ValueOf(x).FieldByName(name)
-		if field.IsExported() {
-			properties = append(properties, getProperties(name, value, mapping.IgnoredFields, maxRecursion)...)
-		}
-	}
-
-	// generate id field
-	var id string
-	for _, p := range properties {
-		if p.Name == mapping.IdField {
-			id = p.Value
+		if name == mapping.IdField {
+			fieldPtrRef := reflect.ValueOf(x).FieldByName(name)
+			fieldRef := reflect.Indirect(fieldPtrRef)
+			if !fieldRef.IsZero() {
+				id = fmt.Sprintf("%v", fieldRef.Interface())
+			}
 			break
 		}
 	}
+
 	if id == "" {
 		return model.Resource{}, fmt.Errorf("could not find id field '%v' for type '%v", mapping.IdField, key)
 	}
@@ -177,13 +171,16 @@ func (m Mapper) ToResource(ctx context.Context, x any, region string) (model.Res
 			}
 		}
 	}
-
+	marshaledStruct, err := json.Marshal(x)
+	if err != nil {
+		return model.Resource{}, err
+	}
 	return model.Resource{
-		Id:         id,
-		Region:     region,
-		Type:       mapping.ResourceType,
-		Properties: properties,
-		Tags:       tags,
+		Id:      id,
+		Region:  region,
+		Type:    mapping.ResourceType,
+		RawData: marshaledStruct,
+		Tags:    tags,
 	}, nil
 }
 
@@ -240,66 +237,6 @@ func (m Mapper) FetchResources(ctx context.Context, region string) ([]*model.Res
 //fetchResources fetches the resources for a mapping and a region
 //note this method can return some resources and an error, if it has partially worked
 func (m Mapper) fetchResources(ctx context.Context, mapping Mapping, region string) ([]*model.Resource, error) {
-	t := mapping.Method.Type()
-
-	if isFetchMethodSync(t) {
-		return m.fetchResourcesSync(ctx, mapping, region)
-	}
-
-	if isFetchMethodAsync(t) {
-		return m.fetchResourcesAsync(ctx, mapping, region)
-	}
-
-	panic("unexpected invalid fetch method signature")
-}
-
-func (m Mapper) fetchResourcesSync(ctx context.Context, mapping Mapping, region string) ([]*model.Resource, error) {
-	m.logger.Sugar().Infow("Fetching resources",
-		zap.String("ResourceType", mapping.ResourceType),
-		zap.String("Region", region),
-	)
-	var resources []*model.Resource
-	var errors error
-	// call the method to fetch the resources
-	result := mapping.Method.Call([]reflect.Value{reflect.ValueOf(ctx)})
-	//generate a error message to avoid duplication in code below
-	for _, v := range result {
-		switch v.Kind() {
-		case reflect.Slice:
-			//convert all slice elements to resources
-			for i := 0; i < v.Len(); i++ {
-				any := v.Index(i).Interface()
-				resource, err := m.ToResource(ctx, any, region)
-				if err != nil {
-					//store error and keep processing other resources
-					errors = multierror.Append(errors,
-						fmt.Errorf(
-							"error converting %v result slice to resource: %w", mapping.Impl, err),
-					)
-					continue
-				}
-				resources = append(resources, &resource)
-			}
-		case reflect.Interface:
-			// an error was returned by the fetch method
-			err, ok := v.Interface().(error)
-			if ok {
-				return nil, err
-			}
-		default:
-			return nil, fmt.Errorf("method '%v' has the wrong return type", mapping.Impl)
-		}
-	}
-
-	m.logger.Sugar().Infow("Fetched resources",
-		zap.String("ResourceType", mapping.ResourceType),
-		zap.String("Region", region),
-		zap.Int("Count", len(resources)),
-	)
-	return resources, errors
-}
-
-func (m Mapper) fetchResourcesAsync(ctx context.Context, mapping Mapping, region string) ([]*model.Resource, error) {
 	m.logger.Sugar().Infow("Fetching resources async",
 		zap.String("ResourceType", mapping.ResourceType),
 		zap.String("Region", region),

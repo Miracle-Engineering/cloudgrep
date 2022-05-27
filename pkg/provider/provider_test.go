@@ -3,12 +3,14 @@ package provider
 import (
 	"context"
 	_ "embed"
+	"gorm.io/datatypes"
 	"reflect"
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/provider/mapper"
+	"github.com/run-x/cloudgrep/pkg/util"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
@@ -44,29 +46,12 @@ func TestMapper(t *testing.T) {
 		Tags: []model.Tag{
 			{Key: "enabled", Value: "true"},
 			{Key: "eks:nodegroup", Value: "staging-default"}},
-		Properties: []model.Property{
-			{Name: "InstanceId", Value: "i-123"},
-			{Name: "Architecture", Value: "x86_64"},
-			{Name: "SecurityGroups[0]", Value: "sg-1"},
-			{Name: "SecurityGroups[1]", Value: "sg-2"},
-			{Name: "Limit[CPU][Min]", Value: "1"},
-			{Name: "Limit[CPU][Max]", Value: "3"},
-			{Name: "Limit[Memory][Min]", Value: "256"},
-			{Name: "Limit[Memory][Max]", Value: "512"},
-		},
+		RawData: datatypes.JSON([]byte(`{"InstanceId":"i-123","Architecture":"x86_64","SomeTags":[{"Name":"enabled","Val":"true"},{"Name":"eks:nodegroup","Val":"staging-default"}],"NeverReturned":"should not see this","SecurityGroups":["sg-1","sg-2"],"Limit":{"CPU":{"Min":1,"Max":3},"Memory":{"Min":256,"Max":512}}}`)),
 	}
 	r2 := model.Resource{
 		Id: "i-124", Region: "us-east-1", Type: "test.Instance",
-		Tags: []model.Tag(nil),
-		Properties: []model.Property{
-			{Name: "InstanceId", Value: "i-124"},
-			{Name: "Architecture", Value: ""},
-			{Name: "SecurityGroups", Value: ""},
-			{Name: "Limit[CPU][Min]", Value: "0"},
-			{Name: "Limit[CPU][Max]", Value: "0"},
-			{Name: "Limit[Memory][Min]", Value: "0"},
-			{Name: "Limit[Memory][Max]", Value: "0"},
-		},
+		Tags:    []model.Tag(nil),
+		RawData: datatypes.JSON([]byte(`{"InstanceId":"i-124","Architecture":null,"SomeTags":[],"NeverReturned":"","SecurityGroups":null,"Limit":{"CPU":{"Min":0,"Max":0},"Memory":{"Min":0,"Max":0}}}`)),
 	}
 
 	// test conversion
@@ -136,6 +121,6 @@ func (p TestProvider) Region() string {
 
 type Return string
 
-func (TestProvider) FetchTestResources(ctx context.Context) ([]TestResource, error) {
-	return ctx.Value(Return("FetchTestResources")).([]TestResource), nil
+func (TestProvider) FetchTestResources(ctx context.Context, output chan<- TestResource) error {
+	return util.SendAllFromSlice(ctx, output, ctx.Value(Return("FetchTestResources")).([]TestResource))
 }

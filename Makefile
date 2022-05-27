@@ -113,7 +113,7 @@ docker-push:
 
 setup:
 	go install github.com/mitchellh/gox@v1.0.1
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.2
 
 clean:
 	@rm -f ./cloudgrep
