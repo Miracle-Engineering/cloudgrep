@@ -6,7 +6,6 @@ import (
 
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest"
 )
@@ -53,7 +52,7 @@ func TestEngineRun(t *testing.T) {
 	)
 	assert.NoError(t, err)
 	//check that the resources were stored
-	resources, err := engine.GetResources(ctx, model.EmptyFilter())
+	resources, err := engine.GetResources(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(resources))
 
@@ -63,7 +62,7 @@ func TestEngineRun(t *testing.T) {
 	err = engine.Run(ctx)
 	assert.ErrorContains(t, err, "could not find id field")
 	//check that 1 resource was stored
-	resources, err = engine.GetResources(ctx, model.EmptyFilter())
+	resources, err = engine.GetResources(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(resources))
 }

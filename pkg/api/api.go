@@ -3,14 +3,14 @@ package api
 import (
 	"context"
 	"fmt"
-	"go.uber.org/zap"
 	"net/http"
 	"os"
+
+	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/version"
 	"github.com/run-x/cloudgrep/static"
 )
@@ -95,11 +95,14 @@ func Resource(c *gin.Context) {
 // Resources retrieves the cloud resources matching the query parameters
 func Resources(c *gin.Context) {
 	datastore := c.MustGet("datastore").(datastore.Datastore)
-	filter := model.EmptyFilter()
-	if f, ok := c.Get("filter"); ok {
-		filter = f.(model.Filter)
+
+	//the body contains the query
+	body, err := c.GetRawData()
+	if err != nil {
+		badRequest(c, err)
+		return
 	}
-	resources, err := datastore.GetResources(c, filter)
+	resources, err := datastore.GetResources(c, body)
 	if err != nil {
 		badRequest(c, err)
 		return

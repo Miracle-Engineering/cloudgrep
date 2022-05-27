@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+
 	"go.uber.org/zap"
 
 	"github.com/hashicorp/go-multierror"
@@ -34,7 +35,6 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 //Run the providers: fetches data about cloud resources and save them to store
 func (e *Engine) Run(ctx context.Context) error {
 	var errors error
-	//TODO use go routine to start the provider, review error handling to continue on error
 	for _, provider := range e.Providers {
 		// fetch the resources
 		resources, err := fetchResources(ctx, provider)

@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/model"
 	"go.uber.org/zap"
 )
 
@@ -44,16 +43,9 @@ func setDatastore(ds datastore.Datastore) gin.HandlerFunc {
 
 func setParams(cfg config.Config, logger *zap.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var filter model.Filter
-		tags := c.QueryMap("tags")
-		if len(tags) > 0 {
-			filter = model.NewFilter(tags)
-			c.Set("filter", filter)
-		}
 		id := c.Query("id")
 		c.Set("id", id)
 		logger.Sugar().Debugw("Request params:",
-			zap.Object("filter", filter),
 			zap.String("id", id),
 		)
 	}

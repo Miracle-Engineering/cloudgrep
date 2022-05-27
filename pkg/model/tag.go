@@ -10,8 +10,6 @@ type Tag struct {
 	ResourceId string `json:"-" gorm:"primaryKey"`
 	Key        string `json:"key" gorm:"primaryKey"`
 	Value      string `json:"value"`
-	//when used as a filter indicates to look for resources without this tag
-	Exclude bool `json:"-"`
 }
 
 type Tags []Tag
