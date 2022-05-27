@@ -38,9 +38,10 @@ const Insights: FC = () => {
 			<Box
 				sx={{
 					backgroundColor: BACKGROUND_COLOR,
-					display: 'flex',
+					display: 'none', // todo replace with flex
 					justifyContent: 'end',
 					paddingRight: '44px',
+					flexDirection: 'row-reverse',
 				}}
 				p={2}>
 				<SearchInput
