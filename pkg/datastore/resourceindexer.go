@@ -18,8 +18,8 @@ import (
 
 const (
 	//limit number of resource returned
-	defaultLimit       = 25
-	limitMaxValue      = 2000
+	DefaultLimit       = 25
+	LimitMaxValue      = 2000
 	resourceIndexTable = "resource_index"
 	//the name the dynamic columns
 	columnDynamicName = "col_%d"
@@ -159,8 +159,8 @@ func (qb *resourceIndexer) rebuildDataModel(ctx context.Context, db *gorm.DB) er
 	qb.parser = rql.MustNewParser(rql.Config{
 		Model:         resourceIndex,
 		FieldSep:      ".",
-		DefaultLimit:  defaultLimit,
-		LimitMaxValue: limitMaxValue,
+		DefaultLimit:  DefaultLimit,
+		LimitMaxValue: LimitMaxValue,
 	})
 
 	//migrate the data to have new columns
