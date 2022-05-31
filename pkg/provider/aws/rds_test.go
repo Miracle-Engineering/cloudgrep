@@ -6,7 +6,7 @@ import (
 	"github.com/run-x/cloudgrep/pkg/testingutil"
 )
 
-func TestRdsFetchInstances(t *testing.T) {
+func TestFetchRDSInstances(t *testing.T) {
 	t.Parallel()
 
 	ctx := setupIntegrationTest(t)

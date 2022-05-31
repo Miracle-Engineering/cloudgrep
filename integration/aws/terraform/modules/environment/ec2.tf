@@ -13,7 +13,18 @@ resource "aws_launch_template" "amz_arm" {
     resource_type = "instance"
 
     tags = {
+      // provider default_tags doesn't support aws_autoscaling_group
+      IntegrationTest = "true"
       test = "ec2-instance-${count.index}"
+    }
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+
+    tags = {
+      IntegrationTest = "true"
+      test = "ec2-volume-${count.index}"
     }
   }
 }
@@ -30,19 +41,13 @@ resource "aws_autoscaling_group" "test" {
 
   launch_template {
     id      = aws_launch_template.amz_arm[count.index].id
-    version = "$Latest"
-  }
-
-  tag {
-    // provider default_tags doesn't support aws_autoscaling_group
-    key                 = "IntegrationTest"
-    value               = "true"
-    propagate_at_launch = true
+    version = aws_launch_template.amz_arm[count.index].latest_version
   }
 
   instance_refresh {
     strategy = "Rolling"
     preferences {
+      instance_warmup = 1
       min_healthy_percentage = 0
     }
     triggers = ["tag"]

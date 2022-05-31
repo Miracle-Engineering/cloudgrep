@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"reflect"
+	"strings"
 	"sync"
 	"testing"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/run-x/cloudgrep/pkg/provider/mapper"
+	"github.com/run-x/cloudgrep/pkg/testingutil"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -33,6 +35,10 @@ type integrationTestContext struct {
 
 func setupIntegrationTest(t testing.TB) *integrationTestContext {
 	t.Helper()
+
+	if testing.Short() {
+		t.Skip("integration tests run long")
+	}
 
 	ctx := &integrationTestContext{}
 	ctx.ctx = context.Background()
@@ -65,7 +71,10 @@ func setupIntegrationProvider(t testing.TB, ctx *integrationTestContext) {
 	var err error
 	provider := &AWSProvider{}
 	provider.logger = ctx.log
-	provider.config, err = config.LoadDefaultConfig(ctx.ctx)
+	provider.config, err = config.LoadDefaultConfig(ctx.ctx, func(lo *config.LoadOptions) error {
+		lo.Region = testingutil.TestRegion
+		return nil
+	})
 	if err != nil {
 		t.Fatalf("cannot load config: %v", err)
 	}
@@ -117,6 +126,10 @@ func (c *credChecker) HasAWSCreds(t testing.TB, cfg aws.Config) bool {
 	if err != nil {
 		var re *awshttp.ResponseError
 		if !errors.As(err, &re) {
+			if strings.Contains(err.Error(), "failed to retrieve credentials") {
+				return false
+			}
+
 			t.Fatalf("unknown error calling sts:GetCallerIdentity: %v", err)
 		}
 		if re.HTTPStatusCode() == 403 {
