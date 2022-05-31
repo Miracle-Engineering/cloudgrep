@@ -2,4 +2,6 @@ package cli
 
 import "testing"
 
-func TestNothing(t *testing.T) {}
+func TestNothing(t *testing.T) {
+	// This test exists so Codecov counts this package for coverage metrics
+}
