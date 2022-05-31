@@ -52,7 +52,7 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 							</Box>
 						</>
 					) : (
-						<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex' }}>
+						<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex', lineHeight: '1' }}>
 							{` { ... } `}
 						</Typography>
 					)}
