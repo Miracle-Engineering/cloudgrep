@@ -22,7 +22,8 @@ import (
 
 const testEnvVar = "CLOUD_INTEGRATION_TESTS"
 
-var integrationAwsAccounts = []string{"316817240772"}
+// Only run the integration tests on these specially preparred accounts
+var integrationAwsAccounts = []string{"316817240772", "438881294876"}
 
 var credCheck credChecker
 

@@ -62,6 +62,7 @@ jobs:
 
             accounts = {
               "dev": "316817240772",
+              "prod": "438881294876",
             }
 
             if (!accounts.hasOwnProperty(env)) {
