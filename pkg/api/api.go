@@ -66,12 +66,15 @@ func Resource(c *gin.Context) {
 // Resources retrieves the cloud resources matching the query parameters
 func Resources(c *gin.Context) {
 	ds := c.MustGet("datastore").(datastore.Datastore)
-
+	var body []byte
 	//the body contains the query
-	body, err := c.GetRawData()
-	if err != nil {
-		badRequest(c, err)
-		return
+	if c.Request.Body != nil {
+		var err error
+		body, err = c.GetRawData()
+		if err != nil {
+			badRequest(c, err)
+			return
+		}
 	}
 	resources, err := ds.GetResources(c, body)
 	if err != nil {
