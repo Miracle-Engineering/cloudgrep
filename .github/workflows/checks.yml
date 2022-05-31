@@ -13,7 +13,7 @@ env:
   CGO_ENABLED: 0
 
   AWS_REGION: us-east-1
-  AWS_ACCOUNT_ID: "316817240772" # TODO: Make this the prod account
+  AWS_ACCOUNT_ID: "438881294876" # cloudgrep-integration-prod
 
 permissions:
   contents: read
