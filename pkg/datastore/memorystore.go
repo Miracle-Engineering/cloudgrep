@@ -39,13 +39,12 @@ func (m *MemoryStore) GetResource(ctx context.Context, id string) (*model.Resour
 	return nil, nil
 }
 
-func (m *MemoryStore) GetResources(ctx context.Context, filter model.Filter) ([]*model.Resource, error) {
+func (m *MemoryStore) GetResources(ctx context.Context, query []byte) ([]*model.Resource, error) {
 	result := m.resources
-	if !filter.IsEmpty() {
+	if query != nil {
 		return nil, errors.New("not implemented")
 	}
 	m.logger.Sugar().Infow("Getting resources: ",
-		zap.Object("filter", filter),
 		zap.Int("count", len(result)),
 	)
 	return result, nil
@@ -63,6 +62,6 @@ func (m *MemoryStore) Stats(context.Context) (model.Stats, error) {
 	return model.Stats{}, errors.New("not implemented")
 }
 
-func (m *MemoryStore) GetFields(context.Context) (model.Fields, error) {
+func (m *MemoryStore) GetFields(context.Context) (model.FieldGroups, error) {
 	return nil, errors.New("not implemented")
 }

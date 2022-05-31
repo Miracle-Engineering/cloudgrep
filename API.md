@@ -8,14 +8,37 @@ The backend exposes an API at `http://localhost:8080/api`.
 
 | Route | Method |  Description |  Status |
 | ------------- | ------------- | ------------- | ------------- |
-| [/resources](http://localhost:8080/api/resources)  | GET  | Return list of cloud resources |  :white_check_mark: |
+| [/resources](http://localhost:8080/api/resources)  | POST  | Return list of cloud resources |  :white_check_mark: |
 
-| Parameters | Description |  Examples |
-| ------------- | ------------- | ------------- |
-| tags  | return resource(s) with the provided tag  | `tags[team]=infra` return resources with the tag `team=infra`, meaning "team" with value "infra" <br />`tags[team]=infra&tags[env]=prod` return resources with the tags `team=infra` **and** `env=dev` <br />`tags[env]=prod,dev` return resources with the tags `env=prod` **and** `env=dev` <br />`tags[team]=*` return all the resources with the tag `team` defined|
-| exclude-tags  | return resource(s) without the provided tag  | `exclude-tags=team` return resources without the tag `team`<br />`exclude-tags=team,env` return resources without the tag `team` **and** `env`
+To filter the resources, send a body containing a query.
+The name of the fields used in `filter` and `sort` is the `field.name` returned in the `/fields/` API.
 
-Example of queries: (not yet supported)
+```js
+{
+  // set a limit, default is 25, max is 100 
+  "limit": 25,
+  //specifies the number of rows to skip before any rows are retrieved
+  "offset": 0,
+  //filter the resources
+  "filter": {
+    "type": "ec2.Instance"
+  }
+  //optional sort
+  "sort": ["type"]
+}
+```
+
+```shell
+curl --location --request POST 'http://localhost:8080/api/resources' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "filter": {
+        "kubernetes.io/created-for/pv/name": "opta-persistent-0-hellopv-hellopv-k8s-service-0"
+    }
+}'
+```
+
+Example of queries:
 ```js
 
 //default return all the resources (no payload)
@@ -29,17 +52,17 @@ Example of queries: (not yet supported)
   }
 }
 
-//return resources with the tag "team"
+//return resources with the tag "team" defined
 {
   "filter":{
-	  "team": { "$neq": "" }
+	  "team": "[not null]"
   }
 }
 
 //return resources missing the tag "team"
 {
   "filter":{
-	  "team": { "$eq": "" }
+	  "team": "[null]"
   }
 }
 

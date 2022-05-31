@@ -27,6 +27,10 @@
             {
                 "key": "release",
                 "value": "v1"
+            },
+            {
+                "key": "region",
+                "value": "us-west-2"
             }
         ],
         "rawData": {

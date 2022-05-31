@@ -2,6 +2,8 @@ package model
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFieldFind(t *testing.T) {
@@ -13,6 +15,12 @@ func TestFieldFind(t *testing.T) {
 		Name:   "type",
 		Values: nil,
 	}
-	fields := Fields{f1, f2}
-	AssertEqualsField(t, f2, *fields.Find("type"))
+	groups := FieldGroups{
+		{
+			Name:   "core",
+			Fields: []Field{f1, f2},
+		},
+	}
+	assert.Equal(t, "core", groups.FindGroup("core").Name)
+	AssertEqualsField(t, f2, *groups.FindField("core", "type"))
 }
