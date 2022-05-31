@@ -251,20 +251,22 @@ func TestFields(t *testing.T) {
 			}
 			//check fields
 			assert.NoError(t, err)
-			assert.Equal(t, 11, len(fields))
+			//check number of groups
+			assert.Equal(t, 2, len(fields))
+			//check fields by group
+			assert.Equal(t, 2, len(fields.FindGroup("core").Fields))
+			assert.Equal(t, 9, len(fields.FindGroup("tags").Fields))
 
 			//test a few fields
 			model.AssertEqualsField(t, model.Field{
-				Group: "core",
 				Name:  "region",
 				Count: 3,
 				Values: model.FieldValues{
 					model.FieldValue{Value: "us-east-1", Count: 3},
-				}}, *fields.Find("core", "region"))
+				}}, *fields.FindField("core", "region"))
 
-			typeField := *fields.Find("core", "type")
+			typeField := *fields.FindField("core", "type")
 			model.AssertEqualsField(t, model.Field{
-				Group: "core",
 				Name:  "type",
 				Count: 3,
 				Values: model.FieldValues{
@@ -278,31 +280,28 @@ func TestFields(t *testing.T) {
 			assert.Equal(t, typeField.Values[1].Count, 1)
 
 			model.AssertEqualsField(t, model.Field{
-				Group: "tags",
 				Name:  "team",
 				Count: 2,
 				Values: model.FieldValues{
 					model.FieldValue{Value: "infra", Count: 1},
 					model.FieldValue{Value: "dev", Count: 1},
-				}}, *fields.Find("tags", "team"))
+				}}, *fields.FindField("tags", "team"))
 
 			//test long field
 			model.AssertEqualsField(t, model.Field{
-				Group: "tags",
 				Name:  tagMaxKey,
 				Count: 1,
 				Values: model.FieldValues{
 					model.FieldValue{Value: tagMaxValue, Count: 1},
-				}}, *fields.Find("tags", tagMaxKey))
+				}}, *fields.FindField("tags", tagMaxKey))
 
 			//test the tag field called "region"
 			model.AssertEqualsField(t, model.Field{
-				Group: "tags",
 				Name:  "region",
 				Count: 1,
 				Values: model.FieldValues{
 					model.FieldValue{Value: "us-west-2", Count: 1},
-				}}, *fields.Find("tags", "region"))
+				}}, *fields.FindField("tags", "region"))
 
 		})
 	}
