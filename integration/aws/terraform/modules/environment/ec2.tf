@@ -15,7 +15,7 @@ resource "aws_launch_template" "amz_arm" {
     tags = {
       // provider default_tags doesn't support aws_autoscaling_group
       IntegrationTest = "true"
-      test = "ec2-instance-${count.index}"
+      test            = "ec2-instance-${count.index}"
     }
   }
 
@@ -24,7 +24,7 @@ resource "aws_launch_template" "amz_arm" {
 
     tags = {
       IntegrationTest = "true"
-      test = "ec2-volume-${count.index}"
+      test            = "ec2-volume-${count.index}"
     }
   }
 }
@@ -47,7 +47,7 @@ resource "aws_autoscaling_group" "test" {
   instance_refresh {
     strategy = "Rolling"
     preferences {
-      instance_warmup = 1
+      instance_warmup        = 1
       min_healthy_percentage = 0
     }
     triggers = ["tag"]
