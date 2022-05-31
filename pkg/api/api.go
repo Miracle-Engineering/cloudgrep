@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 
 	"go.uber.org/zap"
@@ -12,7 +11,6 @@ import (
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/version"
-	"github.com/run-x/cloudgrep/static"
 )
 
 func StartWebServer(ctx context.Context, cfg config.Config, logger *zap.Logger, ds datastore.Datastore) {
@@ -36,33 +34,6 @@ func StartWebServer(ctx context.Context, cfg config.Config, logger *zap.Logger, 
 	}()
 }
 
-// GetHome renderes the home page
-func GetHome(prefix string) http.Handler {
-	if prefix != "" && prefix != "/" {
-		prefix = "/" + prefix
-	}
-	return http.StripPrefix(prefix, http.FileServer(http.FS(static.Static)))
-}
-
-func GetAssets(prefix string) http.Handler {
-	if prefix != "" && prefix != "/" {
-		prefix = "/" + prefix + "static/"
-	} else {
-		prefix = "/static/"
-	}
-	return http.StripPrefix(prefix, http.FileServer(http.FS(static.Static)))
-}
-
-func HealthCheck(c *gin.Context) {
-	datastore := c.MustGet("datastore").(datastore.Datastore)
-	err := datastore.Ping()
-	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "Internal")
-		return
-	}
-	successResponse(c, gin.H{"status": "All good!"})
-}
-
 // Info renders the system information
 func Info(c *gin.Context) {
 	successResponse(c, gin.H{
@@ -75,13 +46,13 @@ func Info(c *gin.Context) {
 
 // Resource retrieves a resource by its id
 func Resource(c *gin.Context) {
-	datastore := c.MustGet("datastore").(datastore.Datastore)
+	ds := c.MustGet("datastore").(datastore.Datastore)
 	id := c.GetString("id")
 	if id == "" {
 		badRequest(c, fmt.Errorf("missing required parameter 'id'"))
 		return
 	}
-	resource, err := datastore.GetResource(c, id)
+	resource, err := ds.GetResource(c, id)
 	if err != nil {
 		badRequest(c, err)
 	}
@@ -94,15 +65,18 @@ func Resource(c *gin.Context) {
 
 // Resources retrieves the cloud resources matching the query parameters
 func Resources(c *gin.Context) {
-	datastore := c.MustGet("datastore").(datastore.Datastore)
-
+	ds := c.MustGet("datastore").(datastore.Datastore)
+	var body []byte
 	//the body contains the query
-	body, err := c.GetRawData()
-	if err != nil {
-		badRequest(c, err)
-		return
+	if c.Request.Body != nil {
+		var err error
+		body, err = c.GetRawData()
+		if err != nil {
+			badRequest(c, err)
+			return
+		}
 	}
-	resources, err := datastore.GetResources(c, body)
+	resources, err := ds.GetResources(c, body)
 	if err != nil {
 		badRequest(c, err)
 		return
@@ -112,8 +86,8 @@ func Resources(c *gin.Context) {
 
 // Stats provides stats about stored data
 func Stats(c *gin.Context) {
-	datastore := c.MustGet("datastore").(datastore.Datastore)
-	stats, err := datastore.Stats(c)
+	ds := c.MustGet("datastore").(datastore.Datastore)
+	stats, err := ds.Stats(c)
 	if err != nil {
 		badRequest(c, err)
 		return
@@ -123,8 +97,8 @@ func Stats(c *gin.Context) {
 
 // Fields Return the list of fields available for filtering the resources
 func Fields(c *gin.Context) {
-	datastore := c.MustGet("datastore").(datastore.Datastore)
-	fields, err := datastore.GetFields(c)
+	ds := c.MustGet("datastore").(datastore.Datastore)
+	fields, err := ds.GetFields(c)
 	if err != nil {
 		badRequest(c, err)
 		return
