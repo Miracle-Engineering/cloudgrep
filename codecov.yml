@@ -8,3 +8,6 @@ coverage:
         # basic settings
         target: 69
         threshold: 2% # Raise exception if it drops lower by 2% (e.g. 94% coverage to 92%)
+
+ignore:
+  - pkg/testingutil
