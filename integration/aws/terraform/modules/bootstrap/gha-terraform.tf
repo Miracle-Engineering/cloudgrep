@@ -91,13 +91,13 @@ data "aws_iam_policy_document" "gha_terraform" {
 
 data "aws_iam_policy_document" "gha_terraform_resources" {
   statement {
-    effect = "Deny"
+    effect    = "Deny"
     resources = ["*"]
     actions = [
       "ec2:*CapacityReservation", // Block access to the reservation APIs
       "ec2:Purchase*",
       "rds:Purchase*",
-      "cloudtrail:*", // Prevent turning of any cloudtrail logs
+      "cloudtrail:*",       // Prevent turning of any cloudtrail logs
       "cloudwatch:*Alarm*", // Protect any billing alarms
     ]
   }

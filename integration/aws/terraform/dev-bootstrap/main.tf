@@ -21,5 +21,5 @@ module "bootstrap" {
 }
 
 output "github_actions_iam_role" {
-    value = module.bootstrap.github_actions_iam_role
+  value = module.bootstrap.github_actions_iam_role
 }

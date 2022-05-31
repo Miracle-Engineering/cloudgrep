@@ -1,9 +1,9 @@
 locals {
-  ec2_instance_groups = 2
+  ec2_instance_count = 2
 }
 
 resource "aws_launch_template" "amz_arm" {
-  count = local.ec2_instance_groups
+  count = local.ec2_instance_count
 
   name_prefix   = "testing-"
   image_id      = "ami-0e449176cecc3e577"
@@ -20,7 +20,7 @@ resource "aws_launch_template" "amz_arm" {
 
 
 resource "aws_autoscaling_group" "test" {
-  count = local.ec2_instance_groups
+  count = local.ec2_instance_count
 
   name_prefix        = "testing-${count.index}-"
   availability_zones = ["us-east-1a"]
