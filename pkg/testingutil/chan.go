@@ -7,6 +7,7 @@ import (
 
 type FetchAllFunc[T any] func(context.Context, chan<- T) error
 
+// FetchAll pulls all resources from `f` over the passed channel, returning the resources as a slice
 func FetchAll[T any](ctx context.Context, t testing.TB, f FetchAllFunc[T]) ([]T, error) {
 	t.Helper()
 
@@ -27,6 +28,7 @@ func FetchAll[T any](ctx context.Context, t testing.TB, f FetchAllFunc[T]) ([]T,
 	return resources, err
 }
 
+// MustFetchAll is like FetchAll, but fatals the running test if there is an error during fetching
 func MustFetchAll[T any](ctx context.Context, t testing.TB, f FetchAllFunc[T]) []T {
 	t.Helper()
 

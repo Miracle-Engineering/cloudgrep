@@ -7,11 +7,12 @@ import (
 	"github.com/run-x/cloudgrep/pkg/model"
 )
 
-// Redefine for the single method to avoid import cycles
+// Mapper is a redefinition for the single method that we need to avoid import cycles
 type Mapper interface {
 	ToResource(context.Context, any, string) (model.Resource, error)
 }
 
+// ConvertToResources converts all the raw cloud SDK resources to `model.Resource`s using the given mapper.
 func ConvertToResources[T any](t testing.TB, ctx context.Context, mapper Mapper, raw []T) []model.Resource {
 	t.Helper()
 	output := make([]model.Resource, 0, len(raw))

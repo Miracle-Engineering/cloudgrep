@@ -12,7 +12,6 @@ import (
 )
 
 func (p *AWSProvider) FetchLoadBalancers(ctx context.Context, output chan<- types.LoadBalancer) error {
-	// lbOutput, err := p.elbClient.DescribeLoadBalancers(ctx, &elbv2.DescribeLoadBalancersInput{})
 	pages := elbv2.NewDescribeLoadBalancersPaginator(p.elbClient, &elbv2.DescribeLoadBalancersInput{})
 	for pages.HasMorePages() {
 		page, err := pages.NextPage(ctx)

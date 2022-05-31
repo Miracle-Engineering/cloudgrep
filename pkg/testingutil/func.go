@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// FuncSignature returns the signature of a function as a string, useful for error messages.
 func FuncSignature(value any) string {
 	var t reflect.Type
 	t, ok := value.(reflect.Type)

@@ -92,3 +92,13 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.46.2
+
+  terraform-fmt:
+    name: terraform fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.1.7
+      - run: terraform fmt -diff -check -recursive integration/aws/terraform

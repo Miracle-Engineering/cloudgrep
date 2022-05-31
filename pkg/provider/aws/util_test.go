@@ -20,11 +20,13 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// Set this env var to force enable the integration tests (will fail tests if creds aren't available)
 const testEnvVar = "CLOUD_INTEGRATION_TESTS"
 
 // Only run the integration tests on these specially preparred accounts
 var integrationAwsAccounts = []string{"316817240772", "438881294876"}
 
+// Cache the checks for credentials so it doesn't run for every test
 var credCheck credChecker
 
 type integrationTestContext struct {
