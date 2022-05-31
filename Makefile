@@ -23,6 +23,7 @@ usage:
 	@echo "make run           	: Run using local code"
 	@echo "make setup           : Install all necessary dependencies"
 	@echo "make test            : Execute test suite"
+	@echo "make load-test       : Execute load test suite"
 	@echo "make version         : Show version"
 	@echo ""
 
@@ -34,6 +35,10 @@ lint:
 
 test:
 	go test -race ./pkg/... ./cmd/... -coverprofile=coverage.out -covermode=atomic
+
+load-test:
+	go test ./loadtest/...
+
 
 run:
 	go run main.go
