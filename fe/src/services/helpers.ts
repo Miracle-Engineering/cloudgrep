@@ -1,23 +1,23 @@
 import { Tag } from 'models/Tag';
 
 export const getArrayOfObjects = (data: Tag[]) => {
-    return data.map((tag: Tag) => {
-        return {
-            [tag.key]: tag.value,
-        };
-    });
+	return data.map((tag: Tag) => {
+		return {
+			[tag.key]: tag.value,
+		};
+	});
 };
 
 export const getResourcesRequestData = (data: Tag[]) => {
-    const tags: {
-        [key: string]: string;
-    } = {};
+	const tags: {
+		[key: string]: string;
+	} = {};
 
-    data.forEach((tag: Tag) => {
-        tags[tag.key] = tag.value;
-    });
+	data.forEach((tag: Tag) => {
+		tags[tag.key] = tag.value;
+	});
 
-    const filter = tags;
+	const filter = tags;
 
-    return { filter };
+	return { filter };
 };
