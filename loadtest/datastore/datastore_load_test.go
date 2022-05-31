@@ -135,8 +135,7 @@ func TestLoad(t *testing.T) {
 				//test all fields
 				fields, err := ds.GetFields(ctx)
 				assert.NoError(t, err)
-				//the +2 is for region, type
-				assert.Equal(t, tc.Tags+2, len(fields))
+				assert.Equal(t, tc.Tags, len(fields.FindGroup("tags").Fields))
 
 				//test some queries
 				for i := 0; i < tc.Queries; i = i + 1 {

@@ -1,268 +1,257 @@
 [
   {
-    "name": "region",
-    "group": "core",
-    "count": 16,
-    "values": [
+    "name": "core",
+    "fields": [
       {
-        "value": "us-east-1",
-        "count": 16
-      }
-    ]
-  },
-  {
-    "name": "type",
-    "group": "core",
-    "count": 16,
-    "values": [
-      {
-        "value": "ec2.Instance",
-        "count": 3
+        "name": "region",
+        "count": 16,
+        "values": [
+          {
+            "value": "us-east-1",
+            "count": 16
+          }
+        ]
       },
       {
-        "value": "ec2.Volume",
-        "count": 6
+        "name": "type",
+        "count": 16,
+        "values": [
+          {
+            "value": "s3.Bucket",
+            "count": 6
+          },
+          {
+            "value": "ec2.Volume",
+            "count": 6
+          },
+          {
+            "value": "ec2.Instance",
+            "count": 3
+          },
+          {
+            "value": "elb.LoadBalancer",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "tags",
+    "fields": [
+      {
+        "name": "kubernetes.io/cluster/opta-staging",
+        "count": 6,
+        "values": [
+          {
+            "value": "owned",
+            "count": 6
+          }
+        ]
       },
       {
-        "value": "elb.LoadBalancer",
-        "count": 1
+        "name": "tf_address",
+        "count": 3,
+        "values": [
+          {
+            "value": "module.base.aws_s3_bucket.log_bucket",
+            "count": 3
+          }
+        ]
       },
       {
-        "value": "s3.Bucket",
-        "count": 6
-      }
-    ]
-  },
-  {
-    "name": "kubernetes.io/cluster/opta-staging",
-    "group": "tags",
-    "count": 6,
-    "values": [
-      {
-        "value": "owned",
-        "count": 6
-      }
-    ]
-  },
-  {
-    "name": "tf_address",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "module.base.aws_s3_bucket.log_bucket",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "opta",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "true",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "layer",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "staging",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "kubernetes.io/created-for/pvc/namespace",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "hellopv",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "kubernetes.io/created-for/pvc/name",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "opta-persistent-0-hellopv-hellopv-k8s-service-0",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "kubernetes.io/created-for/pv/name",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "pvc-af8faba9-f1e6-451a-b2d0-b0eaa9d521f7",
-        "count": 1
+        "name": "opta",
+        "count": 3,
+        "values": [
+          {
+            "value": "true",
+            "count": 3
+          }
+        ]
       },
       {
-        "value": "pvc-959a2ed4-d255-4155-afc8-c4033a1973c9",
-        "count": 1
+        "name": "layer",
+        "count": 3,
+        "values": [
+          {
+            "value": "staging",
+            "count": 3
+          }
+        ]
       },
       {
-        "value": "pvc-79f713ed-906b-4e53-bbe1-8ef2aa78ff56",
-        "count": 1
-      }
-    ]
-  },
-  {
-    "name": "k8s.io/cluster-autoscaler/opta-staging",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "owned",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "k8s.io/cluster-autoscaler/enabled",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "true",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "eks:nodegroup-name",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "opta-staging-default-0f40b67a876a6e47",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "eks:cluster-name",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "opta-staging",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "aws:ec2launchtemplate:version",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "1",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "aws:ec2launchtemplate:id",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "lt-0330c4c2536531e3b",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "aws:ec2:fleet-id",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "fleet-bafee5d7-215d-addb-2632-290ab09da4e7",
-        "count": 1
+        "name": "kubernetes.io/created-for/pvc/namespace",
+        "count": 3,
+        "values": [
+          {
+            "value": "hellopv",
+            "count": 3
+          }
+        ]
       },
       {
-        "value": "fleet-38dc45d7-2b57-ad53-26b0-a120b80d203a",
-        "count": 1
+        "name": "kubernetes.io/created-for/pvc/name",
+        "count": 3,
+        "values": [
+          {
+            "value": "opta-persistent-0-hellopv-hellopv-k8s-service-0",
+            "count": 3
+          }
+        ]
       },
       {
-        "value": "fleet-10d6ef75-0bd7-857b-84b2-ab82fad1d8b8",
-        "count": 1
-      }
-    ]
-  },
-  {
-    "name": "aws:autoscaling:groupName",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148",
-        "count": 3
-      }
-    ]
-  },
-  {
-    "name": "Name",
-    "group": "tags",
-    "count": 3,
-    "values": [
-      {
-        "value": "kubernetes-dynamic-pvc-af8faba9-f1e6-451a-b2d0-b0eaa9d521f7",
-        "count": 1
+        "name": "kubernetes.io/created-for/pv/name",
+        "count": 3,
+        "values": [
+          {
+            "value": "pvc-af8faba9-f1e6-451a-b2d0-b0eaa9d521f7",
+            "count": 1
+          },
+          {
+            "value": "pvc-959a2ed4-d255-4155-afc8-c4033a1973c9",
+            "count": 1
+          },
+          {
+            "value": "pvc-79f713ed-906b-4e53-bbe1-8ef2aa78ff56",
+            "count": 1
+          }
+        ]
       },
       {
-        "value": "kubernetes-dynamic-pvc-959a2ed4-d255-4155-afc8-c4033a1973c9",
-        "count": 1
+        "name": "k8s.io/cluster-autoscaler/opta-staging",
+        "count": 3,
+        "values": [
+          {
+            "value": "owned",
+            "count": 3
+          }
+        ]
       },
       {
-        "value": "kubernetes-dynamic-pvc-79f713ed-906b-4e53-bbe1-8ef2aa78ff56",
-        "count": 1
-      }
-    ]
-  },
-  {
-    "name": "service.k8s.aws/stack-XVlBzgbaiCMRAjWwhTHctcuAxhxKQFDaFpLSjFbcXoEFfRsWxPLDnJObCsNVlgTeMaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBEmfdzdcEkXBAkjQZLCtTMtTCoaNatyyiNKAReKJyiXJrscctNswYNsGRussVmaozFZBsbOJiFQGZsnwTKSmVoiGLOpbUOpEdKupdOMeRVjaRzL-----END",
-    "group": "tags",
-    "count": 1,
-    "values": [
+        "name": "k8s.io/cluster-autoscaler/enabled",
+        "count": 3,
+        "values": [
+          {
+            "value": "true",
+            "count": 3
+          }
+        ]
+      },
       {
-        "value": "ingress-nginx/ingress-nginx-controllerLDnJObCsNVlgTeMaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBEEdKupdOMeRVjaRzL-----END",
-        "count": 1
-      }
-    ]
-  },
-  {
-    "name": "service.k8s.aws/resource",
-    "group": "tags",
-    "count": 1,
-    "values": [
+        "name": "eks:nodegroup-name",
+        "count": 3,
+        "values": [
+          {
+            "value": "opta-staging-default-0f40b67a876a6e47",
+            "count": 3
+          }
+        ]
+      },
       {
-        "value": "LoadBalancer",
-        "count": 1
-      }
-    ]
-  },
-  {
-    "name": "elbv2.k8s.aws/cluster",
-    "group": "tags",
-    "count": 1,
-    "values": [
+        "name": "eks:cluster-name",
+        "count": 3,
+        "values": [
+          {
+            "value": "opta-staging",
+            "count": 3
+          }
+        ]
+      },
       {
-        "value": "opta-staging",
-        "count": 1
+        "name": "aws:ec2launchtemplate:version",
+        "count": 3,
+        "values": [
+          {
+            "value": "1",
+            "count": 3
+          }
+        ]
+      },
+      {
+        "name": "aws:ec2launchtemplate:id",
+        "count": 3,
+        "values": [
+          {
+            "value": "lt-0330c4c2536531e3b",
+            "count": 3
+          }
+        ]
+      },
+      {
+        "name": "aws:ec2:fleet-id",
+        "count": 3,
+        "values": [
+          {
+            "value": "fleet-bafee5d7-215d-addb-2632-290ab09da4e7",
+            "count": 1
+          },
+          {
+            "value": "fleet-38dc45d7-2b57-ad53-26b0-a120b80d203a",
+            "count": 1
+          },
+          {
+            "value": "fleet-10d6ef75-0bd7-857b-84b2-ab82fad1d8b8",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "name": "aws:autoscaling:groupName",
+        "count": 3,
+        "values": [
+          {
+            "value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148",
+            "count": 3
+          }
+        ]
+      },
+      {
+        "name": "Name",
+        "count": 3,
+        "values": [
+          {
+            "value": "kubernetes-dynamic-pvc-af8faba9-f1e6-451a-b2d0-b0eaa9d521f7",
+            "count": 1
+          },
+          {
+            "value": "kubernetes-dynamic-pvc-959a2ed4-d255-4155-afc8-c4033a1973c9",
+            "count": 1
+          },
+          {
+            "value": "kubernetes-dynamic-pvc-79f713ed-906b-4e53-bbe1-8ef2aa78ff56",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "name": "service.k8s.aws/stack",
+        "count": 1,
+        "values": [
+          {
+            "value": "ingress-nginx/ingress-nginx-controller",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "name": "service.k8s.aws/resource",
+        "count": 1,
+        "values": [
+          {
+            "value": "LoadBalancer",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "name": "elbv2.k8s.aws/cluster",
+        "count": 1,
+        "values": [
+          {
+            "value": "opta-staging",
+            "count": 1
+          }
+        ]
       }
     ]
   }

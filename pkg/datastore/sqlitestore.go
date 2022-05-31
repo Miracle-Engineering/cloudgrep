@@ -145,8 +145,7 @@ func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 	}
 	defer rows.Close()
 	field := model.Field{
-		Name:  name,
-		Group: "core",
+		Name: name,
 	}
 	var totalCount int
 	for rows.Next() {
@@ -208,7 +207,6 @@ func (s *SQLiteStore) getTagKeys() (model.Fields, error) {
 			return nil, err
 		}
 		field := model.Field{
-			Group: "tags",
 			Name:  key,
 			Count: count,
 		}
@@ -239,26 +237,34 @@ func (s *SQLiteStore) getTagValues(key string) (model.FieldValues, error) {
 	return values, nil
 }
 
-func (s *SQLiteStore) GetFields(context.Context) (model.Fields, error) {
-	var fields model.Fields
+func (s *SQLiteStore) GetFields(context.Context) (model.FieldGroups, error) {
+	var fieldGroups model.FieldGroups
 
-	//get fields on resources
+	//get core fields
+	coreGroup := model.FieldGroup{
+		Name: "core",
+	}
 	for _, name := range []string{"region", "type"} {
 		field, err := s.getResourceField(name)
 		if err != nil {
 			return nil, err
 		}
-		fields = append(fields, field)
+		coreGroup.Fields = append(coreGroup.Fields, field)
 	}
+	fieldGroups = append(fieldGroups, coreGroup)
 
-	//get fields on tags
+	//get tag fields
 	tagFields, err := s.getTagFields()
 	if err != nil {
 		return nil, err
 	}
-	fields = append(fields, tagFields...)
+	tagsGroup := model.FieldGroup{
+		Name:   "tags",
+		Fields: tagFields,
+	}
+	fieldGroups = append(fieldGroups, tagsGroup)
 
-	return fields, nil
+	return fieldGroups, nil
 }
 
 func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) ([]*model.Resource, error) {
