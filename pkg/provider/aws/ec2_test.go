@@ -11,8 +11,8 @@ func TestFetchEC2Instances(t *testing.T) {
 
 	ctx := setupIntegrationTest(t)
 
-	instances := testingutil.MustFetchAll(ctx.ctx, t, ctx.p.FetchEC2Instances)
-	resources := testingutil.ConvertToResources(t, ctx.ctx, ctx.p.mapper, instances)
+	raw := testingutil.MustFetchAll(ctx.ctx, t, ctx.p.FetchEC2Instances)
+	resources := testingutil.ConvertToResources(t, ctx.ctx, ctx.p.mapper, raw)
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
 	testingutil.AssertResourceCount(t, resources, "ec2-instance-0", 1)
