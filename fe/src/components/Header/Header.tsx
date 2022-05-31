@@ -17,7 +17,7 @@ function Header() {
 			<Box>
 				<img
 					style={{ marginLeft: '24px', width: '160px', height: '40px', cursor: 'pointer' }}
-					src="./logo.png"
+					src={`${process.env.REACT_APP_PATH_PREFIX}/logo.png`}
 				/>
 			</Box>
 			<Box sx={{ display: 'flex' }}>

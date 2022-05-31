@@ -17,11 +17,7 @@ const accordionHeader: CSSProperties = {
 	textOverflow: 'ellipsis',
 };
 
-const accordionDetails: CSSProperties = {
-	overflow: 'hidden',
-};
-
-export const accordionStyles = { accordionHeader, accordionDetails };
+export const accordionStyles = { accordionHeader };
 
 export const labelClasses = {
 	label: 'label_label',
