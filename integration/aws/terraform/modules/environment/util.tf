@@ -14,8 +14,8 @@ data "aws_subnets" "default" {
 
 locals {
   vpc_azs = [
-      "${data.aws_region.current.name}a",
-      "${data.aws_region.current.name}b",
-      "${data.aws_region.current.name}c",
+    "${data.aws_region.current.name}a",
+    "${data.aws_region.current.name}b",
+    "${data.aws_region.current.name}c",
   ]
 }

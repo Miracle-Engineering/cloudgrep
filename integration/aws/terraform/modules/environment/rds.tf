@@ -1,12 +1,12 @@
 locals {
   rds_instance_count = 1
-  rds_cluster_count = 1
+  rds_cluster_count  = 1
 }
 
 resource "aws_db_instance" "test" {
   count = local.rds_instance_count
 
-  identifier_prefix = "testing-${count.index}-"
+  identifier_prefix    = "testing-${count.index}-"
   allocated_storage    = 10
   engine               = "postgres"
   engine_version       = "13.4"
@@ -22,13 +22,13 @@ resource "aws_db_instance" "test" {
 }
 
 resource "aws_rds_cluster" "postgresql" {
-  count  = local.rds_cluster_count
+  count = local.rds_cluster_count
 
   cluster_identifier_prefix = "testing-${count.index}-"
-  engine = "aurora-postgresql"
-  availability_zones = local.vpc_azs
-  master_username = "postgres"
-  master_password = "password"
+  engine                    = "aurora-postgresql"
+  availability_zones        = local.vpc_azs
+  master_username           = "postgres"
+  master_password           = "password"
 
   tags = {
     test = "rds-cluster-${count.index}"
