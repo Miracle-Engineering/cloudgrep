@@ -1,6 +1,11 @@
-name: load-test
+name: Load Test
 
 on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "loadtest/**"
+      - "pkg/datastore/**"
   push:
     branches:
       - main
