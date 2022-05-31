@@ -22,8 +22,7 @@ const testEnvVar = "CLOUD_INTEGRATION_TESTS"
 
 var integrationAwsAccounts = []string{"316817240772"}
 
-var onceTestCreds sync.Once
-var hasCreds *bool
+var credCheck credChecker
 
 type integrationTestContext struct {
 	p         *AWSProvider
@@ -48,7 +47,7 @@ func setupIntegrationTest(t testing.TB) *integrationTestContext {
 func checkShouldRunIntegrationTests(t testing.TB, ctx *integrationTestContext) {
 	t.Helper()
 
-	creds := hasAwsCreds(t, ctx.p.config)
+	creds := credCheck.HasAWSCreds(t, ctx.p.config)
 	_, hasEnvVar := os.LookupEnv(testEnvVar)
 
 	if hasEnvVar && !creds {
@@ -97,44 +96,46 @@ func logBuffer() (*bytes.Buffer, zapcore.WriteSyncer) {
 	return buf, zapcore.Lock(zapcore.AddSync(buf))
 }
 
-func hasAwsCreds(t testing.TB, cfg aws.Config) bool {
-	t.Helper()
+type credChecker struct {
+	l        sync.Mutex
+	hasCreds bool
+	done     bool
+}
 
-	if hasCreds != nil {
-		return *hasCreds
+func (c *credChecker) HasAWSCreds(t testing.TB, cfg aws.Config) bool {
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	if c.done {
+		return c.hasCreds
 	}
 
-	onceTestCreds.Do(func() {
-		client := sts.NewFromConfig(cfg)
+	c.done = true
 
-		output, err := client.GetCallerIdentity(context.TODO(), &sts.GetCallerIdentityInput{})
-		if err != nil {
-			var re *awshttp.ResponseError
-			if !errors.As(err, &re) {
-				t.Fatalf("unknown error calling sts:GetCallerIdentity: %v", err)
-			}
-			if re.HTTPStatusCode() == 403 {
-				// No creds
-				hasCreds = aws.Bool(false)
-				return
-			}
-
-			if re.HTTPStatusCode() == 400 {
-				// Bad creds
-				hasCreds = aws.Bool(false)
-				return
-			}
+	client := sts.NewFromConfig(cfg)
+	output, err := client.GetCallerIdentity(context.TODO(), &sts.GetCallerIdentityInput{})
+	if err != nil {
+		var re *awshttp.ResponseError
+		if !errors.As(err, &re) {
+			t.Fatalf("unknown error calling sts:GetCallerIdentity: %v", err)
+		}
+		if re.HTTPStatusCode() == 403 {
+			// No creds
+			return false
 		}
 
-		for _, id := range integrationAwsAccounts {
-			if *output.Account == id {
-				hasCreds = aws.Bool(true)
-				return
-			}
+		if re.HTTPStatusCode() == 400 {
+			// Bad creds
+			return false
 		}
+	}
 
-		hasCreds = aws.Bool(false)
-	})
+	for _, id := range integrationAwsAccounts {
+		if *output.Account == id {
+			c.hasCreds = true
+			return true
+		}
+	}
 
-	return *hasCreds
+	return false
 }
