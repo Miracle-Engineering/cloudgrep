@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 
 	"go.uber.org/zap"
@@ -12,7 +11,6 @@ import (
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/version"
-	"github.com/run-x/cloudgrep/static"
 )
 
 func StartWebServer(ctx context.Context, cfg config.Config, logger *zap.Logger, ds datastore.Datastore) {
@@ -34,33 +32,6 @@ func StartWebServer(ctx context.Context, cfg config.Config, logger *zap.Logger, 
 			os.Exit(1)
 		}
 	}()
-}
-
-// GetHome renderes the home page
-func GetHome(prefix string) http.Handler {
-	if prefix != "" && prefix != "/" {
-		prefix = "/" + prefix
-	}
-	return http.StripPrefix(prefix, http.FileServer(http.FS(static.Static)))
-}
-
-func GetAssets(prefix string) http.Handler {
-	if prefix != "" && prefix != "/" {
-		prefix = "/" + prefix + "static/"
-	} else {
-		prefix = "/static/"
-	}
-	return http.StripPrefix(prefix, http.FileServer(http.FS(static.Static)))
-}
-
-func HealthCheck(c *gin.Context) {
-	ds := c.MustGet("datastore").(datastore.Datastore)
-	err := ds.Ping()
-	if err != nil {
-		badRequest(c, "Internal")
-		return
-	}
-	successResponse(c, gin.H{"status": "All good!"})
 }
 
 // Info renders the system information

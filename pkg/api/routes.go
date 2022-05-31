@@ -23,9 +23,9 @@ func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds d
 	api := root.Group("/api")
 	setupMiddlewares(api, cfg, logger, ds)
 
-	healthCheck := root.Group("/healthz")
-	setupMiddlewares(healthCheck, cfg, logger, ds)
-	healthCheck.GET("", HealthCheck)
+	healthz := root.Group("/healthz")
+	setupMiddlewares(healthz, cfg, logger, ds)
+	healthz.GET("", Healthz)
 
 	api.GET("/info", Info)
 	api.GET("/resource", Resource)
