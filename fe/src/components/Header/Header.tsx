@@ -15,9 +15,10 @@ function Header() {
 	return (
 		<Box sx={headerStyle}>
 			<Box>
-				<Typography ml={3} sx={{ color: '#2B3A67', textTransform: 'uppercase', cursor: 'pointer' }}>
-					{t('APP_HEADER')}
-				</Typography>
+				<img
+					style={{ marginLeft: '24px', width: '160px', height: '40px', cursor: 'pointer' }}
+					src={`${process.env.REACT_APP_PATH_PREFIX}/logo.png`}
+				/>
 			</Box>
 			<Box sx={{ display: 'flex' }}>
 				<Typography sx={{ ...menuItems, color: DARK_BLUE }}>{t('HOME')}</Typography>

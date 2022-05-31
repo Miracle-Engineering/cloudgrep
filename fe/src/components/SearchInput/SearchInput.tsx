@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { SearchProps } from './types';
 
 const SearchInput: FC<SearchProps> = props => {
-	const { onChange, width, height } = props;
+	const { onChange, width, height, rest } = props;
 	const { t } = useTranslation();
 
 	return (
@@ -26,6 +26,7 @@ const SearchInput: FC<SearchProps> = props => {
 				borderRadius: '0px',
 				boxShadow: 'none',
 				backgroundColor: BACKGROUND_COLOR,
+				...rest,
 			}}>
 			<InputBase
 				sx={{

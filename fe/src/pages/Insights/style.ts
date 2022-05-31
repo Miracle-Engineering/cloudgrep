@@ -23,10 +23,13 @@ export const overrideSummaryClasses = {
 
 const accordionHeader: CSSProperties = {
 	fontWeight: '400',
-	fontSize: '26px',
-	lineHeight: '26px',
+	fontSize: '18px',
+	lineHeight: '18px',
 	marginBottom: '4px',
 	fontFamily: 'Montserrat',
+	overflow: 'hidden',
+	whiteSpace: 'nowrap',
+	textOverflow: 'ellipsis',
 };
 
 const accordionDetails: CSSProperties = {
