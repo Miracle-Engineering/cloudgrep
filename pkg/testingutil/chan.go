@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-type FetchFunc[T any] func(context.Context, chan<- T) error
+type FetchAllFunc[T any] func(context.Context, chan<- T) error
 
-func FetchAll[T any](ctx context.Context, t testing.TB, f FetchFunc[T]) ([]T, error) {
+func FetchAll[T any](ctx context.Context, t testing.TB, f FetchAllFunc[T]) ([]T, error) {
 	t.Helper()
 
 	var resources []T
@@ -27,7 +27,7 @@ func FetchAll[T any](ctx context.Context, t testing.TB, f FetchFunc[T]) ([]T, er
 	return resources, err
 }
 
-func MustFetchAll[T any](ctx context.Context, t testing.TB, f FetchFunc[T]) []T {
+func MustFetchAll[T any](ctx context.Context, t testing.TB, f FetchAllFunc[T]) []T {
 	t.Helper()
 
 	resources, err := FetchAll(ctx, t, f)

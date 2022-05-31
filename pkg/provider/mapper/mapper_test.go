@@ -2,15 +2,13 @@ package mapper
 
 import (
 	"context"
-	"fmt"
-	"path"
 	"reflect"
-	"strings"
 	"testing"
 
 	"gorm.io/datatypes"
 
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/testingutil"
 	"github.com/run-x/cloudgrep/pkg/util"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest"
@@ -47,7 +45,7 @@ func TestNewMapperOk(t *testing.T) {
 	mapper, err := new(cfg, logger, reflect.ValueOf(provider))
 	assert.NoError(t, err)
 
-	instances, err := fetchAll(ctx, provider.FetchTestInstances)
+	instances, err := testingutil.FetchAll(ctx, t, provider.FetchTestInstances)
 	assert.NoError(t, err)
 
 	//test expected resource
@@ -73,7 +71,7 @@ func TestNewMapperOk(t *testing.T) {
 		},
 		RawData: datatypes.JSON([]byte(`{"Arn":"arn:aws:elasticloadbalancing:us-east-1:0123456789:loadbalancer/net/my-load-balancer/14522ba1bd959dd6","DNSName":"my-load-balancer-14522ba1bd959dd6.elb.us-east-1.amazonaws.com"}`)),
 	}
-	loadBalancers, err := fetchAll(ctx, provider.FetchTestLoadBalancers)
+	loadBalancers, err := testingutil.FetchAll(ctx, t, provider.FetchTestLoadBalancers)
 	assert.NoError(t, err)
 	resourceLB, err := mapper.ToResource(ctx, loadBalancers[0], "us-west-2")
 	assert.NoError(t, err)
@@ -150,7 +148,7 @@ func TestNewMapperError(t *testing.T) {
 }
 
 func TestFetchResourcesAsync(t *testing.T) {
-	typeID := typeStr(TestInstance{})
+	typeID := testingutil.TypeStr(TestInstance{})
 
 	config := buildMapperConfig()
 	provider := TestProvider{}
@@ -174,7 +172,7 @@ func TestFetchResourcesAsync(t *testing.T) {
 }
 
 func TestFetchResourcesAsyncCanceled(t *testing.T) {
-	typeID := typeStr(TestInstance{})
+	typeID := testingutil.TypeStr(TestInstance{})
 
 	config := buildMapperConfig()
 	provider := TestProvider{}
@@ -254,7 +252,7 @@ func TestIsFetchMethodAsync(t *testing.T) {
 				} else {
 					result = "func not async fetch func"
 				}
-				t.Fatalf("%s; signature: %s", result, funcSignature(typ))
+				t.Fatalf("%s; signature: %s", result, testingutil.FuncSignature(typ))
 			}
 		})
 	}
@@ -331,7 +329,7 @@ func TestIsFetchTagSync(t *testing.T) {
 				} else {
 					result = "func not tag func"
 				}
-				t.Fatalf("%s; signature: %s", result, funcSignature(typ))
+				t.Fatalf("%s; signature: %s", result, testingutil.FuncSignature(typ))
 			}
 		})
 	}
@@ -407,13 +405,13 @@ func buildMapperConfig() Config {
 		},
 		Mappings: []Mapping{
 			{
-				Type:         typeStr(TestInstance{}),
+				Type:         testingutil.TypeStr(TestInstance{}),
 				ResourceType: "test.Instance",
 				IdField:      "Id",
 				Impl:         "FetchTestInstances",
 			},
 			{
-				Type:         typeStr(TestLoadBalancer{}),
+				Type:         testingutil.TypeStr(TestLoadBalancer{}),
 				ResourceType: "mapper.LoadBalancer",
 				IdField:      "Arn",
 				Impl:         "FetchTestLoadBalancers",
@@ -423,68 +421,4 @@ func buildMapperConfig() Config {
 	}
 
 	return config
-}
-
-func TestTypeStr(t *testing.T) {
-	assert.Equal(t, "github.com/run-x/cloudgrep/pkg/provider/mapper.TestInstance", typeStr(TestInstance{}))
-}
-
-func typeStr(v any) string {
-	t := reflect.TypeOf(v)
-	return fmt.Sprintf("%v/%v", path.Dir(t.PkgPath()), t.String())
-}
-
-func funcSignature(t reflect.Type) string {
-	// Source: https://stackoverflow.com/a/54129236
-	if t.Kind() != reflect.Func {
-		return "<not a function>"
-	}
-
-	buf := strings.Builder{}
-	buf.WriteString("func (")
-	for i := 0; i < t.NumIn(); i++ {
-		if i > 0 {
-			buf.WriteString(", ")
-		}
-		buf.WriteString(t.In(i).String())
-	}
-	buf.WriteString(")")
-	if numOut := t.NumOut(); numOut > 0 {
-		if numOut > 1 {
-			buf.WriteString(" (")
-		} else {
-			buf.WriteString(" ")
-		}
-		for i := 0; i < t.NumOut(); i++ {
-			if i > 0 {
-				buf.WriteString(", ")
-			}
-			buf.WriteString(t.Out(i).String())
-		}
-		if numOut > 1 {
-			buf.WriteString(")")
-		}
-	}
-
-	return buf.String()
-}
-
-type fetchFunc[T any] func(context.Context, chan<- T) error
-
-func fetchAll[T any](ctx context.Context, f fetchFunc[T]) ([]T, error) {
-	var resources []T
-	resourceChan := make(chan T)
-	doneCh := make(chan struct{})
-	go func() {
-		defer close(doneCh)
-		for r := range resourceChan {
-			resources = append(resources, r)
-		}
-	}()
-
-	err := f(ctx, resourceChan)
-	close(resourceChan)
-	<-doneCh
-
-	return resources, err
 }

@@ -1,43 +1,24 @@
 package testingutil
 
 import (
-	"context"
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/provider/mapper"
 	"github.com/stretchr/testify/assert"
 )
 
 const TestRegion = "us-east-1"
+const TestTag = "test"
 
 func AssertResourceCount(t testing.TB, resources []model.Resource, tagValue string, count int) {
 	t.Helper()
 	if tagValue == "" {
-		resources = ResourceFilterTagKey(resources, "test")
+		resources = ResourceFilterTagKey(resources, TestTag)
 	} else {
-		resources = ResourceFilterTagKeyValue(resources, "test", tagValue)
+		resources = ResourceFilterTagKeyValue(resources, TestTag, tagValue)
 	}
 
-	assert.Lenf(t, resources, count, "expected %d resource(s) with tag test=%s", count, tagValue)
-}
-
-func ConvertToResources[T any](t testing.TB, ctx context.Context, mapper mapper.Mapper, raw []T) []model.Resource {
-	t.Helper()
-	output := make([]model.Resource, 0, len(raw))
-	for _, in := range raw {
-		resource, err := mapper.ToResource(ctx, in, TestRegion)
-		if err != nil {
-			t.Fatalf("cannot convert resource: %v", err)
-		}
-
-		output = append(output, resource)
-	}
-
-	// Make sure we only grab resources meant for integration testing
-	output = ResourceFilterTagKeyValue(output, "IntegrationTest", "true")
-
-	return output
+	assert.Lenf(t, resources, count, "expected %d resource(s) with tag %s=%s", count, TestTag, tagValue)
 }
 
 func ResourceFilterTagKey(in []model.Resource, key string) []model.Resource {
