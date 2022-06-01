@@ -65,3 +65,11 @@ func (m *MemoryStore) Stats(context.Context) (model.Stats, error) {
 func (m *MemoryStore) GetFields(context.Context) (model.FieldGroups, error) {
 	return nil, errors.New("not implemented")
 }
+
+func (m *MemoryStore) WriteEngineStatus(context.Context, model.EngineStatus) error {
+	return errors.New("not implemented")
+}
+
+func (m *MemoryStore) GetEngineStatus(context.Context) (model.EngineStatus, error) {
+	return model.EngineStatus{}, errors.New("not implemented")
+}

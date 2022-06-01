@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	_ "embed"
+	"fmt"
 	"gorm.io/datatypes"
 	"reflect"
 	"testing"
@@ -120,7 +121,11 @@ func (p TestProvider) Region() string {
 }
 
 type Return string
+type ReturnError string
 
 func (TestProvider) FetchTestResources(ctx context.Context, output chan<- TestResource) error {
+	if ctx.Value(ReturnError("ReturnError")) != nil {
+		return fmt.Errorf("FetchTestError")
+	}
 	return util.SendAllFromSlice(ctx, output, ctx.Value(Return("FetchTestResources")).([]TestResource))
 }

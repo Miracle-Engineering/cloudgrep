@@ -33,6 +33,7 @@ func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds d
 	api.POST("/resources", Resources)
 	api.GET("/stats", Stats)
 	api.GET("/fields", Fields)
+	api.GET("/enginestatus", EngineStatus)
 
 	mock_files, err := static.Static.ReadDir("mock")
 	if err != nil {

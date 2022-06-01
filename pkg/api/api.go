@@ -105,3 +105,14 @@ func Fields(c *gin.Context) {
 	}
 	c.JSON(200, fields)
 }
+
+//EngineStatus returns the status of the engine
+func EngineStatus(c *gin.Context) {
+	ds := c.MustGet("datastore").(datastore.Datastore)
+	status, err := ds.GetEngineStatus(c)
+	if err != nil {
+		badRequest(c, err)
+		return
+	}
+	c.JSON(200, status)
+}

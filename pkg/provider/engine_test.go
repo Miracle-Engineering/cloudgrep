@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/run-x/cloudgrep/pkg/model"
+
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/stretchr/testify/assert"
@@ -16,7 +18,7 @@ func NewTestEngine(t *testing.T) Engine {
 	cfg := config.Config{
 		// Datastore: datastoreConfig,
 	}
-	datastore := datastore.NewMemoryStore(ctx, cfg, logger)
+	datastore, _ := datastore.NewSQLiteStore(ctx, cfg, logger)
 
 	engine, err := NewEngine(ctx, cfg, logger, datastore)
 	assert.NoError(t, err)
@@ -51,6 +53,8 @@ func TestEngineRun(t *testing.T) {
 		context.WithValue(ctx, Return("FetchTestResources"), []TestResource{tr1, tr2}),
 	)
 	assert.NoError(t, err)
+	engineStatus, _ := engine.Datastore.GetEngineStatus(ctx)
+	assert.Equal(t, model.EngineStatusSuccess, engineStatus.Status)
 	//check that the resources were stored
 	resources, err := engine.GetResources(ctx, nil)
 	assert.NoError(t, err)
@@ -65,4 +69,16 @@ func TestEngineRun(t *testing.T) {
 	resources, err = engine.GetResources(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(resources))
+}
+
+func TestEngineRunResourceGetFailure(t *testing.T) {
+	ctx := context.Background()
+	//run an engine returns error
+	engine := NewTestEngine(t)
+	err := engine.Run(
+		context.WithValue(ctx, ReturnError("ReturnError"), "FetchTestError"),
+	)
+	assert.Error(t, err)
+	engineStatus, _ := engine.Datastore.GetEngineStatus(ctx)
+	assert.Equal(t, model.EngineStatusFailed, engineStatus.Status)
 }
