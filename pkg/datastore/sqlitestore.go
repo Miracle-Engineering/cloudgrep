@@ -50,7 +50,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	}
 
 	// Migrate the schema
-	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}); err != nil {
+	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.EngineStatus{}); err != nil {
 		return nil, fmt.Errorf("can't create the SQLite data model: %w", err)
 	}
 
@@ -273,4 +273,30 @@ func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) ([]*mo
 		return nil, err
 	}
 	return s.getResourcesById(ctx, ids)
+}
+
+func (s *SQLiteStore) WriteEngineStatus(ctx context.Context, status model.EngineStatus) error {
+	if (model.EngineStatus{}) == status {
+		return nil
+	}
+
+	result := s.db.Create(&status)
+	s.logger.Sugar().Infow("Writing Engine Status: ",
+		zap.Any("status", status),
+		zap.Int("count", int(result.RowsAffected)),
+	)
+	if result.Error != nil {
+		return fmt.Errorf("can't write engine status to database: %w", result.Error)
+	}
+	return nil
+}
+
+func (s *SQLiteStore) GetEngineStatus(context.Context) (model.EngineStatus, error) {
+	var status model.EngineStatus
+	db := s.db.Model(&model.EngineStatus{}).Order("fetched_at desc").Limit(1).Find(&status)
+	if db.Error != nil {
+		return model.EngineStatus{}, fmt.Errorf("can't fetch engine status' : %w", db.Error)
+	}
+
+	return status, nil
 }
