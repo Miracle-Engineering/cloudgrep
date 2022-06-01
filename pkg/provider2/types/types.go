@@ -8,5 +8,5 @@ import (
 type FetchFunc func(context.Context, chan<- model.Resource) error
 type Provider interface {
 	String() string
-	FetchFunctions() (map[string]FetchFunc, error)
+	FetchFunctions() map[string]FetchFunc
 }

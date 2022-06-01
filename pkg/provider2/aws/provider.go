@@ -30,13 +30,13 @@ func (p Provider) String() string {
 	return fmt.Sprintf("AWS Provider for account %v, region %v", p.accountId, realRegion)
 }
 
-func (p Provider) FetchFunctions() (map[string]types.FetchFunc, error) {
+func (p Provider) FetchFunctions() map[string]types.FetchFunc {
 	if p.isGlobal {
-		return nil, nil
+		return nil
 	}
 	return map[string]types.FetchFunc{
 		"ec2.Instance": p.FetchEC2Instances,
-	}, nil
+	}
 }
 
 func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]types.Provider, error) {

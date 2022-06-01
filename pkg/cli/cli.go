@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"github.com/run-x/cloudgrep/pkg/engine"
 	"go.uber.org/zap"
 	"os"
 	"os/exec"
@@ -12,7 +13,6 @@ import (
 	"github.com/run-x/cloudgrep/pkg/api"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/run-x/cloudgrep/pkg/util"
 )
 
@@ -31,11 +31,11 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 	}
 
 	//start the providers to collect cloud data
-	engine, err := provider.NewEngine(ctx, cfg, logger, datastore)
+	eng, err := engine.NewEngine(ctx, cfg, logger, datastore)
 	if err != nil {
 		return fmt.Errorf("failed to start engine: %w", err)
 	}
-	if err = engine.Run(ctx); err != nil {
+	if err = eng.Run(ctx); err != nil {
 		stats, _ := datastore.Stats(ctx)
 		if stats.ResourcesCount > 0 {
 			//log the error but the api can still server with the datastore
