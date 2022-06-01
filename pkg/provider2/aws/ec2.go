@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
-	"github.com/run-x/cloudgrep/pkg/util"
 )
 
 func (p *Provider) FetchEC2Instances(ctx context.Context, output chan<- model.Resource) error {
@@ -46,7 +45,7 @@ func (p *Provider) FetchEBSVolumes(ctx context.Context, output chan<- model.Reso
 	paginator := ec2.NewDescribeVolumesPaginator(ec2Client, input)
 	mapping := p.getTypeMapping()[resourceType]
 
-	resourceConverter := resourceconverter.ReflectionConverter{
+	resourceConverter := &resourceconverter.ReflectionConverter{
 		Region:       p.config.Region,
 		ResourceType: resourceType,
 		TagField:     mapping.TagField,
@@ -58,16 +57,7 @@ func (p *Provider) FetchEBSVolumes(ctx context.Context, output chan<- model.Reso
 			return fmt.Errorf("failed to fetch EC2 EBS Volumes: %w", err)
 		}
 
-		var resources []model.Resource
-		for _, i := range page.Volumes {
-			newResource, err := resourceConverter.ToResource(ctx, i, nil)
-			if err != nil {
-				return err
-			}
-			resources = append(resources, newResource)
-		}
-
-		if err := util.SendAllFromSlice(ctx, output, resources); err != nil {
+		if err := SendAllConverted(ctx, output, resourceConverter, page.Volumes); err != nil {
 			return err
 		}
 	}
