@@ -51,3 +51,8 @@ func AssertEqualsField(t *testing.T, a, b Field) {
 	assert.Equal(t, a.Count, b.Count)
 	assert.ElementsMatch(t, a.Values, b.Values)
 }
+
+func AssertEqualsEngineStatus(t *testing.T, a, b EngineStatus) {
+	assert.Equal(t, a.Status, b.Status)
+	assert.Equal(t, a.ErrorMessage, b.ErrorMessage)
+}
