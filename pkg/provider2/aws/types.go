@@ -29,5 +29,35 @@ func (p *Provider) getTypeMapping() map[string]mapper {
 			TagField:  defaultTagField,
 			FetchFunc: p.FetchEBSVolumes,
 		},
+		"elb.LoadBalancer": {
+			IdField:   "LoadBalancerArn",
+			FetchFunc: p.FetchLoadBalancers,
+		},
+		"s3.Bucket": {
+			IdField:   "Name",
+			FetchFunc: p.FetchS3Buckets,
+		},
+		"rds.DBInstance": {
+			IdField:   "DBInstanceIdentifier",
+			FetchFunc: p.FetchRDSInstances,
+			TagField: resourceconverter.TagField{
+				Key:   "Key",
+				Name:  "TagList",
+				Value: "Value",
+			},
+		},
+		"rds.DBCluster": {
+			IdField:   "DBClusterIdentifier",
+			FetchFunc: p.FetchRDSClusters,
+			TagField: resourceconverter.TagField{
+				Key:   "Key",
+				Name:  "TagList",
+				Value: "Value",
+			},
+		},
+		"lambda.Function": {
+			IdField:   "FunctionArn",
+			FetchFunc: p.FetchLambdaFunctions,
+		},
 	}
 }
