@@ -22,9 +22,6 @@ var datastoreConfigs []config.Datastore
 func newDatastores(t *testing.T, ctx context.Context) []datastore.Datastore {
 	datastoreConfigs = []config.Datastore{
 		{
-			Type: "memory",
-		},
-		{
 			Type:           "sqlite",
 			DataSourceName: "file::memory:",
 		},
@@ -83,12 +80,6 @@ func TestLoad(t *testing.T) {
 
 				test_resources := testdata.GetResources(t)
 				assert.NotZero(t, len(test_resources))
-
-				//do not test result if not implemented
-				_, err := ds.GetFields(ctx)
-				if err != nil && err.Error() == "not implemented" {
-					return
-				}
 
 				for i := 0; i < tc.Resources; i = i + tc.BatchSize {
 

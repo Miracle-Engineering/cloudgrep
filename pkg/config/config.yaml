@@ -9,7 +9,7 @@ web:
 datastore:
   type: sqlite
   # TODO once we support updating existing resources switch to disk
-  dataSourceName: file::memory:?cache=shared
+  dataSourceName: "file::memory:"
 
 providers:
   - cloud: aws
