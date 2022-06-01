@@ -264,7 +264,7 @@ func (s *SQLiteStore) GetFields(context.Context) (model.FieldGroups, error) {
 	}
 	fieldGroups = append(fieldGroups, tagsGroup)
 
-	return fieldGroups, nil
+	return fieldGroups.AddNullValues(), nil
 }
 
 func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) ([]*model.Resource, error) {
