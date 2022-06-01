@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Field } from 'models/Field';
+import { FieldGroup } from 'models/Field';
 import { MockTag } from 'models/Tag';
 import { TagResource } from 'models/TagResource';
 
@@ -22,7 +22,7 @@ const tagsSlice = createSlice({
 			state.tagResource = action.payload;
 			state.tags = action.payload.Tags;
 		},
-		setFields: (state, action: PayloadAction<Field[]>) => {
+		setFields: (state, action: PayloadAction<FieldGroup[]>) => {
 			state.fields = action.payload;
 		},
 	},

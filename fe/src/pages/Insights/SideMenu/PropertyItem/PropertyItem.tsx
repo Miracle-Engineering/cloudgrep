@@ -15,6 +15,17 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 	const renderObjects = (data: Object): React.ReactNode =>
 		Object.entries(data).map(([key, value]) => <PropertyItem key={`${key}${value}`} keyItem={key} value={value} />);
 
+	const renderArrayOrObjects = (data: Object | Array<Object>): React.ReactNode => {
+		console.log('here');
+		if (Array.isArray(data)) {
+			console.log('array');
+			return data.map(item => renderObjects(item));
+		} else {
+			console.log('object');
+			return renderObjects(data);
+		}
+	};
+
 	const handleClick = () => {
 		setExpanded(!expanded);
 	};
@@ -45,7 +56,7 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 						<>
 							<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex' }}>{`{`}</Typography>
 							<Box sx={{ display: 'block' }}>
-								<Box ml={2}>{renderObjects(value)}</Box>
+								<Box ml={2}>{renderArrayOrObjects(value)}</Box>
 								<Typography
 									color={TEXT_COLOR}
 									sx={{ opacity: '0.9', display: 'flex' }}>{`}`}</Typography>
