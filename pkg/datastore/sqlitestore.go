@@ -280,11 +280,10 @@ func (s *SQLiteStore) WriteEngineStatus(ctx context.Context, status model.Engine
 		return nil
 	}
 
-	result := s.db.Create(&status)
 	s.logger.Sugar().Infow("Writing Engine Status: ",
 		zap.Any("status", status),
-		zap.Int("count", int(result.RowsAffected)),
 	)
+	result := s.db.Create(&status)
 	if result.Error != nil {
 		return fmt.Errorf("can't write engine status to database: %w", result.Error)
 	}
