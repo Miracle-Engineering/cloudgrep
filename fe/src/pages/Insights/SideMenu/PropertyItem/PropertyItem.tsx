@@ -16,12 +16,15 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 		Object.entries(data).map(([key, value]) => <PropertyItem key={`${key}${value}`} keyItem={key} value={value} />);
 
 	const renderArrayOrObjects = (data: Object | Array<Object>): React.ReactNode => {
-		console.log('here');
 		if (Array.isArray(data)) {
-			console.log('array');
-			return data.map(item => renderObjects(item));
+			return (
+				<Box sx={{ lineHeight: '1' }}>
+					<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex' }}>{`[`}</Typography>
+					{data.map(item => renderObjects(item))}
+					<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex' }}>{`]`}</Typography>
+				</Box>
+			);
 		} else {
-			console.log('object');
 			return renderObjects(data);
 		}
 	};
@@ -71,7 +74,10 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 			) : (
 				<Box sx={{ display: 'flex' }}>
 					<Typography mr={2} {...sideMenuLeftText}>{`${keyItem} `}</Typography>
-					<Typography {...sideMenuRightText}>{` ${value}`}</Typography>
+					<Typography {...sideMenuRightText}>
+						{Array.isArray(value) ? renderArrayOrObjects(value) : ` ${value}`}
+						{/* {` ${value}`} */}
+					</Typography>
 				</Box>
 			)}
 		</>
