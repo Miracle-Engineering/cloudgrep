@@ -306,3 +306,27 @@ func TestFields(t *testing.T) {
 		})
 	}
 }
+
+func TestEngineStatus(t *testing.T) {
+	engineStatuses := testdata.GetEngineStatus(t)
+	ctx := context.Background()
+	for _, datastore := range newDatastores(t, ctx) {
+		name := fmt.Sprintf("%T", datastore)
+		t.Run(name, func(t *testing.T) {
+			err := datastore.WriteEngineStatus(ctx, engineStatuses[0])
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+
+			status, err := datastore.GetEngineStatus(ctx)
+			//do not test result if not implemented
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+			//check stats
+			assert.NoError(t, err)
+			model.AssertEqualsEngineStatus(t, engineStatuses[0], status)
+
+		})
+	}
+}
