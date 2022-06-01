@@ -159,7 +159,7 @@ func TestSearchByQuery(t *testing.T) {
 			//test exclude - returns the resources without the tag release
 			query = `{
   "filter":{
-    "release": "[null]"
+    "release": "(null)"
   }
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
@@ -170,8 +170,8 @@ func TestSearchByQuery(t *testing.T) {
 			//test 2 exclusions - the s3 bucket is the only one without both tags
 			query = `{
   "filter":{
-    "release": "[null]",
-    "debug:info": "[null]"
+    "release": "(null)",
+    "debug:info": "(null)"
   }
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
@@ -181,7 +181,7 @@ func TestSearchByQuery(t *testing.T) {
 			//mix include and exclude filters
 			query = `{
   "filter":{
-    "release":"[not null]",
+    "release":"(not null)",
     "vpc":"vpc-123"
   }
 }`
@@ -285,6 +285,7 @@ func TestFields(t *testing.T) {
 				Values: model.FieldValues{
 					model.FieldValue{Value: "infra", Count: 1},
 					model.FieldValue{Value: "dev", Count: 1},
+					model.FieldValue{Value: "(null)", Count: 1},
 				}}, *fields.FindField("tags", "team"))
 
 			//test long field
@@ -293,6 +294,7 @@ func TestFields(t *testing.T) {
 				Count: 1,
 				Values: model.FieldValues{
 					model.FieldValue{Value: tagMaxValue, Count: 1},
+					model.FieldValue{Value: "(null)", Count: 2},
 				}}, *fields.FindField("tags", tagMaxKey))
 
 			//test the tag field called "region"
@@ -301,6 +303,7 @@ func TestFields(t *testing.T) {
 				Count: 1,
 				Values: model.FieldValues{
 					model.FieldValue{Value: "us-west-2", Count: 1},
+					model.FieldValue{Value: "(null)", Count: 2},
 				}}, *fields.FindField("tags", "region"))
 
 		})
