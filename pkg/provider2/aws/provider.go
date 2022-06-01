@@ -5,14 +5,10 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/smithy-go"
 	cfg "github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/provider2/types"
-	"github.com/run-x/cloudgrep/pkg/resourceconverter"
-	"github.com/run-x/cloudgrep/pkg/util"
 	"go.uber.org/zap"
 )
 
@@ -31,12 +27,14 @@ func (p Provider) String() string {
 }
 
 func (p Provider) FetchFunctions() map[string]types.FetchFunc {
-	if p.isGlobal {
-		return nil
+	funcMap := make(map[string]types.FetchFunc)
+	for resourceType, mapping := range p.getTypeMapping() {
+		if p.isGlobal != mapping.IsGlobal {
+			continue
+		}
+		funcMap[resourceType] = mapping.FetchFunc
 	}
-	return map[string]types.FetchFunc{
-		"ec2.Instance": p.FetchEC2Instances,
-	}
+	return funcMap
 }
 
 func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]types.Provider, error) {
@@ -84,41 +82,4 @@ func VerifyCreds(ctx context.Context, config aws.Config) (*sts.GetCallerIdentity
 		}
 	}
 	return result, nil
-}
-
-func (p *Provider) FetchEC2Instances(ctx context.Context, output chan<- model.Resource) error {
-	ec2Client := ec2.NewFromConfig(p.config)
-	input := &ec2.DescribeInstancesInput{}
-	paginator := ec2.NewDescribeInstancesPaginator(ec2Client, input)
-	resourceConverter := resourceconverter.ReflectionConverter{
-		Region:       p.config.Region,
-		ResourceType: "ec2.Instance",
-		TagField: resourceconverter.TagField{
-			Name:  "Tags",
-			Key:   "Key",
-			Value: "Value",
-		},
-		IdField: "InstanceId",
-	}
-	for paginator.HasMorePages() {
-		page, err := paginator.NextPage(ctx)
-		if err != nil {
-			return fmt.Errorf("failed to fetch EC2 Instances: %w", err)
-		}
-		var resources []model.Resource
-		for _, r := range page.Reservations {
-			for _, i := range r.Instances {
-				newResource, err := resourceConverter.ToResource(ctx, i, nil)
-				if err != nil {
-					return err
-				}
-				resources = append(resources, newResource)
-			}
-		}
-		if err := util.SendAllFromSlice(ctx, output, resources); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
