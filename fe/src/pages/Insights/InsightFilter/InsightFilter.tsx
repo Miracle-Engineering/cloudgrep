@@ -56,13 +56,13 @@ const InsightFilter: FC = () => {
 						<Typography sx={accordionStyles.accordionHeader}>{field.name}</Typography>
 					</AccordionSummary>
 					<AccordionDetails sx={{ padding: '0px' }}>
-						{field.fields.map((field: Field, index: number) => (
+						{field.fields.map((fieldItem: Field, index: number) => (
 							<AccordionFilter
-								key={field.name + index}
-								field={field}
+								key={fieldItem.name + index}
+								field={fieldItem}
 								hasSearch={true}
-								label={field.name}
-								id={field.name + index}
+								label={fieldItem.name}
+								id={fieldItem.name + index}
 								handleChange={handleChange}
 							/>
 						))}
