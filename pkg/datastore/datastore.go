@@ -22,8 +22,6 @@ type Datastore interface {
 func NewDatastore(ctx context.Context, cfg config.Config, logger *zap.Logger) (Datastore, error) {
 	logger.Sugar().Infow("Creating a datastore", zap.String("type", cfg.Datastore.Type))
 	switch cfg.Datastore.Type {
-	case "memory":
-		return NewMemoryStore(ctx, cfg, logger), nil
 	case "sqlite":
 		return NewSQLiteStore(ctx, cfg, logger)
 	}

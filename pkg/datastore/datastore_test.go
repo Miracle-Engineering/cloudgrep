@@ -21,9 +21,6 @@ const tagMaxValue = "ingress-nginx/ingress-nginx-controllerLDnJObCsNVlgTeMaPEZQl
 func newDatastores(t *testing.T, ctx context.Context) []Datastore {
 	datastoreConfigs = []config.Datastore{
 		{
-			Type: "memory",
-		},
-		{
 			Type:           "sqlite",
 			DataSourceName: "file::memory:",
 		},
@@ -95,10 +92,6 @@ func TestSearchByQuery(t *testing.T) {
 }`
 
 			resourcesRead, err := datastore.GetResources(ctx, []byte(query))
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
 			//check 1 result returned
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(resourcesRead))
@@ -223,10 +216,6 @@ func TestStats(t *testing.T) {
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
 			stats, err := datastore.Stats(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
 			//check stats
 			assert.NoError(t, err)
 			assert.Equal(t, model.Stats{ResourcesCount: 3}, stats)
@@ -245,10 +234,6 @@ func TestFields(t *testing.T) {
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
 			fields, err := datastore.GetFields(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
 			//check fields
 			assert.NoError(t, err)
 			//check number of groups
