@@ -4,6 +4,10 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/aws/smithy-go"
+	"github.com/run-x/cloudgrep/pkg/provider/mapper"
+	"github.com/run-x/cloudgrep/pkg/util"
 	"reflect"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -16,7 +20,6 @@ import (
 	"go.uber.org/zap"
 
 	cfg "github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/provider/mapper"
 )
 
 type AWSProvider struct {
@@ -43,6 +46,21 @@ func NewAWSProvider(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) (
 		return nil, fmt.Errorf("cannot load default config: %w", err)
 	}
 	logger.Sugar().Infow("AWS", "region", provider.Region())
+	stsClient := sts.NewFromConfig(provider.config)
+	input := &sts.GetCallerIdentityInput{}
+
+	result, err := stsClient.GetCallerIdentity(ctx, input)
+	if err != nil {
+		if serr, ok := err.(*smithy.OperationError); ok {
+			return nil, util.NewUserError(
+				fmt.Sprintf(
+					"Encountered the following error when trying to verify AWS credentials: %v",
+					serr.Unwrap().Error()))
+		} else {
+			return nil, err
+		}
+	}
+	logger.Sugar().Infof("Using the following identity: %v", *result.Arn)
 
 	//create the clients
 	provider.ec2Client = ec2.NewFromConfig(provider.config)

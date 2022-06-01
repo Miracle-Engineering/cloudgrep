@@ -33,7 +33,7 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 	//start the providers to collect cloud data
 	engine, err := provider.NewEngine(ctx, cfg, logger, datastore)
 	if err != nil {
-		return fmt.Errorf("failed to start engine: %w", err)
+		return err
 	}
 	if err = engine.Run(ctx); err != nil {
 		stats, _ := datastore.Stats(ctx)

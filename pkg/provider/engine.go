@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-
 	"go.uber.org/zap"
 
 	"github.com/hashicorp/go-multierror"
