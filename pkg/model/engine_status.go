@@ -20,7 +20,6 @@ func MakeEngineStatusFetching() EngineStatus {
 	return EngineStatus{
 		ErrorMessage: "",
 		Status:       EngineStatusFetching,
-		FetchedAt:    time.Now(),
 	}
 }
 
