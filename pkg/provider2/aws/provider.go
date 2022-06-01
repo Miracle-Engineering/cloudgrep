@@ -9,6 +9,7 @@ import (
 	"github.com/aws/smithy-go"
 	cfg "github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/provider2/types"
+	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 	"go.uber.org/zap"
 )
 
@@ -35,6 +36,25 @@ func (p Provider) FetchFunctions() map[string]types.FetchFunc {
 		funcMap[resourceType] = mapping.FetchFunc
 	}
 	return funcMap
+}
+
+func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceConverter {
+	mapping, ok := p.getTypeMapping()[resourceType]
+	if !ok {
+		panic(fmt.Sprintf("Could not find mapping for resource type %v", resourceType))
+	}
+
+	region := p.config.Region
+	if p.isGlobal {
+		region = "global"
+	}
+
+	return &resourceconverter.ReflectionConverter{
+		Region:       region,
+		ResourceType: resourceType,
+		TagField:     mapping.TagField,
+		IdField:      mapping.IdField,
+	}
 }
 
 func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]types.Provider, error) {

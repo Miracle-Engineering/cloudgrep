@@ -30,7 +30,7 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 				err := fetchFunc(ctx, resourceChan)
 				if err != nil {
 					// TODO: Log the error in like the future error table in db or somehow tell the user in the UI idk figure it out
-					as.Logger.Sugar().Infof("Received an error when trying to handle resource %v in provider %v", resourceType, provider)
+					as.Logger.Sugar().Errorf("Received an error when trying to handle resource %v in provider %v: %v", resourceType, provider, err)
 				}
 			}(fetchFunc, provider, resourceType)
 		}
@@ -54,7 +54,7 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 		err := ds.WriteResources(ctx, resources)
 		if err != nil {
 			// TODO: Log the error in like the future error table in db or somehow tell the user in the UI idk figure it out
-			as.Logger.Sugar().Infof("Received an error when trying to write resources to data store %v", err)
+			as.Logger.Sugar().Errorf("Received an error when trying to write resources to data store %v", err)
 		}
 	}()
 

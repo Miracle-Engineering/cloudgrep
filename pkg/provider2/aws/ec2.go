@@ -6,7 +6,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
 func (p *Provider) FetchEC2Instances(ctx context.Context, output chan<- model.Resource) error {
@@ -14,14 +13,8 @@ func (p *Provider) FetchEC2Instances(ctx context.Context, output chan<- model.Re
 	ec2Client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeInstancesInput{}
 	paginator := ec2.NewDescribeInstancesPaginator(ec2Client, input)
-	mapping := p.getTypeMapping()[resourceType]
 
-	resourceConverter := &resourceconverter.ReflectionConverter{
-		Region:       p.config.Region,
-		ResourceType: resourceType,
-		TagField:     mapping.TagField,
-		IdField:      mapping.IdField,
-	}
+	resourceConverter := p.converterFor(resourceType)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 		if err != nil {
@@ -43,14 +36,8 @@ func (p *Provider) FetchEBSVolumes(ctx context.Context, output chan<- model.Reso
 	ec2Client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeVolumesInput{}
 	paginator := ec2.NewDescribeVolumesPaginator(ec2Client, input)
-	mapping := p.getTypeMapping()[resourceType]
 
-	resourceConverter := &resourceconverter.ReflectionConverter{
-		Region:       p.config.Region,
-		ResourceType: resourceType,
-		TagField:     mapping.TagField,
-		IdField:      mapping.IdField,
-	}
+	resourceConverter := p.converterFor(resourceType)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 		if err != nil {
