@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
@@ -16,7 +17,7 @@ func (p *Provider) FetchEC2Instances(ctx context.Context, output chan<- model.Re
 	paginator := ec2.NewDescribeInstancesPaginator(ec2Client, input)
 	mapping := p.getTypeMapping()[resourceType]
 
-	resourceConverter := resourceconverter.ReflectionConverter{
+	resourceConverter := &resourceconverter.ReflectionConverter{
 		Region:       p.config.Region,
 		ResourceType: resourceType,
 		TagField:     mapping.TagField,
@@ -27,18 +28,11 @@ func (p *Provider) FetchEC2Instances(ctx context.Context, output chan<- model.Re
 		if err != nil {
 			return fmt.Errorf("failed to fetch EC2 Instances: %w", err)
 		}
-		var resources []model.Resource
+
 		for _, r := range page.Reservations {
-			for _, i := range r.Instances {
-				newResource, err := resourceConverter.ToResource(ctx, i, nil)
-				if err != nil {
-					return err
-				}
-				resources = append(resources, newResource)
+			if err := SendAllConverted(ctx, output, resourceConverter, r.Instances); err != nil {
+				return err
 			}
-		}
-		if err := util.SendAllFromSlice(ctx, output, resources); err != nil {
-			return err
 		}
 	}
 
