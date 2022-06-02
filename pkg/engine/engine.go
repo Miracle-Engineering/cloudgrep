@@ -15,7 +15,8 @@ import (
 type Engine struct {
 	Providers []provider2.Provider
 	datastore.Datastore
-	Logger *zap.Logger
+	Logger    *zap.Logger
+	Sequencer sequencer.Sequencer
 }
 
 //Setup the providers, make sure configuration is valid
@@ -23,9 +24,10 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 	e := Engine{}
 	e.Datastore = datastore
 	e.Logger = logger
-	for _, config := range cfg.Providers {
+	e.Sequencer = sequencer.AsyncSequencer{Logger: e.Logger}
+	for _, c := range cfg.Providers {
 		// create a provider
-		providers, err := provider2.NewProviders(ctx, config, logger)
+		providers, err := provider2.NewProviders(ctx, c, logger)
 		if err != nil {
 			return Engine{}, err
 		}
@@ -36,6 +38,5 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 
 //Run the providers: fetches data about cloud resources and save them to store
 func (e *Engine) Run(ctx context.Context) error {
-	asyncSequencer := sequencer.AsyncSequencer{Logger: e.Logger}
-	return asyncSequencer.Run(ctx, e, e.Providers)
+	return e.Sequencer.Run(ctx, e, e.Providers)
 }

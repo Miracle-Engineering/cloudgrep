@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 )
@@ -21,7 +22,7 @@ func (p *Provider) FetchRDSInstances(ctx context.Context, output chan<- model.Re
 			return fmt.Errorf("failed to fetch RDS Instances: %w", err)
 		}
 
-		if err := SendAllConverted(ctx, output, resourceConverter, page.DBInstances); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBInstances); err != nil {
 			return err
 		}
 	}
@@ -41,7 +42,7 @@ func (p *Provider) FetchRDSClusters(ctx context.Context, output chan<- model.Res
 			return fmt.Errorf("failed to fetch RDS Clusters: %w", err)
 		}
 
-		if err := SendAllConverted(ctx, output, resourceConverter, page.DBClusters); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBClusters); err != nil {
 			return err
 		}
 	}

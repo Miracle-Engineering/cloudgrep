@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/smithy-go"
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
 func (p *Provider) FetchS3Buckets(ctx context.Context, output chan<- model.Resource) error {
@@ -20,7 +21,7 @@ func (p *Provider) FetchS3Buckets(ctx context.Context, output chan<- model.Resou
 	}
 
 	resourceConverter := p.converterFor(resourceType)
-	if err := SendAllConvertedTags(ctx, output, resourceConverter, result.Buckets, p.FetchS3BucketsTag); err != nil {
+	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, result.Buckets, p.FetchS3BucketsTag); err != nil {
 		return err
 	}
 

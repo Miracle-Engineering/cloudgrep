@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
@@ -23,7 +24,7 @@ func (p *Provider) FetchLambdaFunctions(ctx context.Context, output chan<- model
 			return fmt.Errorf("failed to fetch Lambda Function: %w", err)
 		}
 
-		if err := SendAllConvertedTags(ctx, output, resourceConverter, page.Functions, p.FetchLambdaFunctionTag); err != nil {
+		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Functions, p.FetchLambdaFunctionTag); err != nil {
 			return err
 		}
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 
 	"github.com/run-x/cloudgrep/pkg/model"
 )
@@ -22,7 +23,7 @@ func (p *Provider) FetchLoadBalancers(ctx context.Context, output chan<- model.R
 			return fmt.Errorf("failed to fetch EC2 Instances: %w", err)
 		}
 
-		if err := SendAllConvertedTags(ctx, output, resourceConverter, page.LoadBalancers, p.FetchLoadBalancerTag); err != nil {
+		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.LoadBalancers, p.FetchLoadBalancerTag); err != nil {
 			return err
 		}
 	}

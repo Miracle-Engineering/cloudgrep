@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -22,7 +23,7 @@ func (p *Provider) FetchEC2Instances(ctx context.Context, output chan<- model.Re
 		}
 
 		for _, r := range page.Reservations {
-			if err := SendAllConverted(ctx, output, resourceConverter, r.Instances); err != nil {
+			if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, r.Instances); err != nil {
 				return err
 			}
 		}
@@ -44,7 +45,7 @@ func (p *Provider) FetchEBSVolumes(ctx context.Context, output chan<- model.Reso
 			return fmt.Errorf("failed to fetch EC2 EBS Volumes: %w", err)
 		}
 
-		if err := SendAllConverted(ctx, output, resourceConverter, page.Volumes); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.Volumes); err != nil {
 			return err
 		}
 	}
