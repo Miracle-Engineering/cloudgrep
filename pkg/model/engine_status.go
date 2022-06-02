@@ -11,30 +11,19 @@ const (
 )
 
 type EngineStatus struct {
+	ResourceName string    `json:"resource_name" gorm:"primaryKey"`
 	ErrorMessage string    `json:"error_message"`
 	Status       string    `json:"status"`
 	FetchedAt    time.Time `json:"fetched_at"`
 }
 
-func MakeEngineStatusFetching() EngineStatus {
-	return EngineStatus{
-		ErrorMessage: "",
-		Status:       EngineStatusFetching,
+func NewEngineStatus(status string, resource string, err error) EngineStatus {
+	var engineStatus EngineStatus
+	engineStatus.Status = status
+	engineStatus.ResourceName = resource
+	engineStatus.FetchedAt = time.Now()
+	if err != nil {
+		engineStatus.ErrorMessage = err.Error()
 	}
-}
-
-func MakeEngineStatusSuccess() EngineStatus {
-	return EngineStatus{
-		ErrorMessage: "",
-		Status:       EngineStatusSuccess,
-		FetchedAt:    time.Now(),
-	}
-}
-
-func MakeEngineStatusFailed(err error) EngineStatus {
-	return EngineStatus{
-		ErrorMessage: err.Error(),
-		Status:       EngineStatusFailed,
-		FetchedAt:    time.Now(),
-	}
+	return engineStatus
 }

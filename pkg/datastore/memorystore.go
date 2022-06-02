@@ -66,7 +66,11 @@ func (m *MemoryStore) GetFields(context.Context) (model.FieldGroups, error) {
 	return nil, errors.New("not implemented")
 }
 
-func (m *MemoryStore) WriteEngineStatus(context.Context, model.EngineStatus) error {
+func (m *MemoryStore) WriteEngineStatusStart(context.Context, string) error {
+	return errors.New("not implemented")
+}
+
+func (m *MemoryStore) WriteEngineStatusEnd(context.Context, string, error) error {
 	return errors.New("not implemented")
 }
 
