@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/provider2"
+	"github.com/run-x/cloudgrep/pkg/provider"
 )
 
 // FakeProvider provides mechanisms to test systems that require providers
@@ -19,7 +19,7 @@ type FakeProvider struct {
 	Bar FakeProviderResourceConfig
 }
 
-var _ provider2.Provider = &FakeProvider{}
+var _ provider.Provider = &FakeProvider{}
 var _ fmt.Stringer = &FakeProvider{}
 
 func (p *FakeProvider) String() string {
@@ -37,8 +37,8 @@ func (p *FakeProvider) types() map[string]*FakeProviderResourceConfig {
 	}
 }
 
-func (p *FakeProvider) FetchFunctions() map[string]provider2.FetchFunc {
-	mapping := make(map[string]provider2.FetchFunc)
+func (p *FakeProvider) FetchFunctions() map[string]provider.FetchFunc {
+	mapping := make(map[string]provider.FetchFunc)
 	for typ, config := range p.types() {
 		resourceType := fmt.Sprintf("%s.%s", p.String(), typ)
 
@@ -48,7 +48,7 @@ func (p *FakeProvider) FetchFunctions() map[string]provider2.FetchFunc {
 	return mapping
 }
 
-func (p *FakeProvider) makeFetchFunc(typ string, config *FakeProviderResourceConfig) provider2.FetchFunc {
+func (p *FakeProvider) makeFetchFunc(typ string, config *FakeProviderResourceConfig) provider.FetchFunc {
 	return func(ctx context.Context, output chan<- model.Resource) error {
 		defer config.addRun()
 

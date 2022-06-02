@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/run-x/cloudgrep/pkg/provider2"
+	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/run-x/cloudgrep/pkg/testingutil/datastore"
 	providerutil "github.com/run-x/cloudgrep/pkg/testingutil/provider"
 	"github.com/stretchr/testify/assert"
@@ -82,7 +82,7 @@ func TestAsyncRun_fetchError(t *testing.T) {
 	assert.Equal(t, 3, ds.Count())
 }
 
-func makeProviders() ([]*providerutil.FakeProvider, []provider2.Provider) {
+func makeProviders() ([]*providerutil.FakeProvider, []provider.Provider) {
 	fakeProviders := []*providerutil.FakeProvider{
 		{
 			ID: "spam",
@@ -98,7 +98,7 @@ func makeProviders() ([]*providerutil.FakeProvider, []provider2.Provider) {
 		},
 	}
 
-	providers := make([]provider2.Provider, len(fakeProviders))
+	providers := make([]provider.Provider, len(fakeProviders))
 	for idx, provider := range fakeProviders {
 		providers[idx] = provider
 	}

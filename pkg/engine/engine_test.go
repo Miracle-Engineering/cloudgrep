@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/provider2"
+	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 	"testing"
@@ -53,7 +53,7 @@ type TestSequencer struct {
 	Ran bool
 }
 
-func (ts *TestSequencer) Run(ctx context.Context, ds datastore.Datastore, providers []provider2.Provider) error {
+func (ts *TestSequencer) Run(ctx context.Context, ds datastore.Datastore, providers []provider.Provider) error {
 	ts.Ran = true
 	return nil
 }

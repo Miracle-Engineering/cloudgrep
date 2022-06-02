@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/run-x/cloudgrep/pkg/provider2/types"
+	"github.com/run-x/cloudgrep/pkg/provider/types"
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 

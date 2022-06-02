@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/smithy-go"
 	cfg "github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/provider2/types"
+	"github.com/run-x/cloudgrep/pkg/provider/types"
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 	"go.uber.org/zap"
 )

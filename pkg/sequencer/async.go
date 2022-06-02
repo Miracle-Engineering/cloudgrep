@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/provider2"
+	"github.com/run-x/cloudgrep/pkg/provider"
 	"go.uber.org/zap"
 )
 
@@ -15,18 +15,18 @@ type AsyncSequencer struct {
 	Logger *zap.Logger
 }
 
-func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, providers []provider2.Provider) error {
+func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, providers []provider.Provider) error {
 	resourceChan := make(chan model.Resource)
 	doneChan := make(chan struct{})
 
 	var errors *multierror.Error
 	var errorLock sync.Mutex
 	var wg sync.WaitGroup
-	for _, provider := range providers {
-		newFetchFuncs := provider.FetchFunctions()
+	for _, p := range providers {
+		newFetchFuncs := p.FetchFunctions()
 		for resourceType, fetchFunc := range newFetchFuncs {
 			wg.Add(1)
-			go func(fetchFunc provider2.FetchFunc, provider provider2.Provider, resourceType string) {
+			go func(fetchFunc provider.FetchFunc, provider provider.Provider, resourceType string) {
 				defer wg.Done()
 				err := fetchFunc(ctx, resourceChan)
 				if err != nil {
@@ -36,7 +36,7 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 					errors = multierror.Append(errors, err)
 					errorLock.Unlock()
 				}
-			}(fetchFunc, provider, resourceType)
+			}(fetchFunc, p, resourceType)
 		}
 	}
 

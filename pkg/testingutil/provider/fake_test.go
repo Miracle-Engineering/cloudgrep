@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/provider2"
+	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/run-x/cloudgrep/pkg/testingutil"
 	"github.com/stretchr/testify/assert"
 )
@@ -20,7 +20,7 @@ func TestFakeProvider_String(t *testing.T) {
 	assert.Equal(t, "fake", fmt.Sprintf("%v", &fake))
 
 	// Double check it implements fmt.Stringer properly
-	var p provider2.Provider = &fake
+	var p provider.Provider = &fake
 	assert.Equal(t, "fake", fmt.Sprintf("%v", p))
 }
 
