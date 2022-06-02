@@ -209,3 +209,25 @@ func TestResourceRoute(t *testing.T) {
 		model.AssertEqualsResource(t, actualResource, *resources[0])
 	})
 }
+
+func TestFieldsRoute(t *testing.T) {
+	_, _, router := prepareApiUnitTest(t)
+	path := "/api/fields"
+
+	t.Run("Standard", func(t *testing.T) {
+		var response model.FieldGroups
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", path, nil)
+		require.NoError(t, err)
+		router.ServeHTTP(w, req)
+		require.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		require.Equal(t, http.StatusOK, w.Code)
+		require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
+		require.Equal(t, len(response), 2)
+		//check number of groups
+		require.Equal(t, 2, len(response))
+		//check fields by group
+		require.Equal(t, 2, len(response.FindGroup("core").Fields))
+		require.Equal(t, 9, len(response.FindGroup("tags").Fields))
+	})
+}

@@ -10,13 +10,17 @@ import (
 	"go.uber.org/zap/zaptest"
 )
 
-func NewTestEngine(t *testing.T) Engine {
+func newTestEngine(t *testing.T) Engine {
 	ctx := context.Background()
 	logger := zaptest.NewLogger(t)
 	cfg := config.Config{
-		// Datastore: datastoreConfig,
+		Datastore: config.Datastore{
+			Type:           "sqlite",
+			DataSourceName: "file::memory:",
+		},
 	}
-	datastore := datastore.NewMemoryStore(ctx, cfg, logger)
+	datastore, err := datastore.NewSQLiteStore(ctx, cfg, logger)
+	assert.NoError(t, err)
 
 	engine, err := NewEngine(ctx, cfg, logger, datastore)
 	assert.NoError(t, err)
@@ -46,7 +50,7 @@ func TestEngineRun(t *testing.T) {
 	}
 
 	//run an engine that fetch 2 resources - no error
-	engine := NewTestEngine(t)
+	engine := newTestEngine(t)
 	err := engine.Run(
 		context.WithValue(ctx, Return("FetchTestResources"), []TestResource{tr1, tr2}),
 	)
@@ -57,7 +61,7 @@ func TestEngineRun(t *testing.T) {
 	assert.Equal(t, 2, len(resources))
 
 	//run an engine that fetch 2 resources - one with an error
-	engine = NewTestEngine(t)
+	engine = newTestEngine(t)
 	ctx = context.WithValue(ctx, Return("FetchTestResources"), []TestResource{tr1, trMissingId})
 	err = engine.Run(ctx)
 	assert.ErrorContains(t, err, "could not find id field")

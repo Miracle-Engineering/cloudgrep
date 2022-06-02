@@ -55,14 +55,14 @@ Example of queries:
 //return resources with the tag "team" defined
 {
   "filter":{
-	  "team": "[not null]"
+	  "team": "(not null)"
   }
 }
 
 //return resources missing the tag "team"
 {
   "filter":{
-	  "team": "[null]"
+	  "team": "(null)"
   }
 }
 

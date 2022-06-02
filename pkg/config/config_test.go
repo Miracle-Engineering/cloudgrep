@@ -14,7 +14,7 @@ func Test_Init_Default(t *testing.T) {
 	assert.Equal(t, "aws", config.Providers[0].Cloud)
 
 	assert.Equal(t, "sqlite", config.Datastore.Type)
-	assert.Equal(t, "file::memory:?cache=shared", config.Datastore.DataSourceName)
+	assert.Equal(t, "file::memory:", config.Datastore.DataSourceName)
 
 	assert.Equal(t, "localhost", config.Web.Host)
 	assert.Equal(t, 8080, config.Web.Port)

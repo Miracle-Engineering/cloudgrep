@@ -322,11 +322,11 @@ func (ri *resourceIndexer) parse(jsonQuery []byte) (*rql.Params, error) {
 func replaceNullValues(p *rql.Params) *rql.Params {
 	for i, arg := range p.FilterArgs {
 		if s, ok := arg.(string); ok {
-			if s == "[null]" {
+			if s == model.NullValue {
 				p.FilterExp = replaceWith(p.FilterExp, "=", "is", "?", i)
 				p.FilterArgs[i] = nil
 			}
-			if s == "[not null]" {
+			if s == model.NotNullValue {
 				p.FilterExp = replaceWith(p.FilterExp, "=", "is not", "?", i)
 				p.FilterArgs[i] = nil
 			}

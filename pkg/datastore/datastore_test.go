@@ -21,9 +21,6 @@ const tagMaxValue = "ingress-nginx/ingress-nginx-controllerLDnJObCsNVlgTeMaPEZQl
 func newDatastores(t *testing.T, ctx context.Context) []Datastore {
 	datastoreConfigs = []config.Datastore{
 		{
-			Type: "memory",
-		},
-		{
 			Type:           "sqlite",
 			DataSourceName: "file::memory:",
 		},
@@ -95,10 +92,6 @@ func TestSearchByQuery(t *testing.T) {
 }`
 
 			resourcesRead, err := datastore.GetResources(ctx, []byte(query))
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
 			//check 1 result returned
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(resourcesRead))
@@ -159,7 +152,7 @@ func TestSearchByQuery(t *testing.T) {
 			//test exclude - returns the resources without the tag release
 			query = `{
   "filter":{
-    "release": "[null]"
+    "release": "(null)"
   }
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
@@ -170,8 +163,8 @@ func TestSearchByQuery(t *testing.T) {
 			//test 2 exclusions - the s3 bucket is the only one without both tags
 			query = `{
   "filter":{
-    "release": "[null]",
-    "debug:info": "[null]"
+    "release": "(null)",
+    "debug:info": "(null)"
   }
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
@@ -181,7 +174,7 @@ func TestSearchByQuery(t *testing.T) {
 			//mix include and exclude filters
 			query = `{
   "filter":{
-    "release":"[not null]",
+    "release":"(not null)",
     "vpc":"vpc-123"
   }
 }`
@@ -223,10 +216,6 @@ func TestStats(t *testing.T) {
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
 			stats, err := datastore.Stats(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
 			//check stats
 			assert.NoError(t, err)
 			assert.Equal(t, model.Stats{ResourcesCount: 3}, stats)
@@ -245,10 +234,6 @@ func TestFields(t *testing.T) {
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
 			fields, err := datastore.GetFields(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
 			//check fields
 			assert.NoError(t, err)
 			//check number of groups
@@ -285,6 +270,7 @@ func TestFields(t *testing.T) {
 				Values: model.FieldValues{
 					model.FieldValue{Value: "infra", Count: 1},
 					model.FieldValue{Value: "dev", Count: 1},
+					model.FieldValue{Value: "(null)", Count: 1},
 				}}, *fields.FindField("tags", "team"))
 
 			//test long field
@@ -293,6 +279,7 @@ func TestFields(t *testing.T) {
 				Count: 1,
 				Values: model.FieldValues{
 					model.FieldValue{Value: tagMaxValue, Count: 1},
+					model.FieldValue{Value: "(null)", Count: 2},
 				}}, *fields.FindField("tags", tagMaxKey))
 
 			//test the tag field called "region"
@@ -301,6 +288,7 @@ func TestFields(t *testing.T) {
 				Count: 1,
 				Values: model.FieldValues{
 					model.FieldValue{Value: "us-west-2", Count: 1},
+					model.FieldValue{Value: "(null)", Count: 2},
 				}}, *fields.FindField("tags", "region"))
 
 		})
