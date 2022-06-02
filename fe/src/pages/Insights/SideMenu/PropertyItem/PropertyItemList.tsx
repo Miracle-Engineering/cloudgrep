@@ -31,15 +31,17 @@ const PropertyItemList: FC<PropertyItemListProps> = props => {
 						<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex' }}>{`]`}</Typography>
 					</>
 				) : (
-					<>
+					<Box sx={{ display: 'flex' }}>
 						<AddBoxIcon
 							color={'primary'}
 							fontSize="small"
 							onClick={handleClick}
 							sx={{ cursor: 'pointer', display: 'flex' }}
 						/>
-						<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex' }}>{`[ ... ]`}</Typography>
-					</>
+						<Typography
+							color={TEXT_COLOR}
+							sx={{ opacity: '0.9', display: 'flex', lineHeight: '1' }}>{`[ ... ]`}</Typography>
+					</Box>
 				)}
 			</Box>
 		</>
