@@ -8,6 +8,7 @@ The project structure is inspired by https://github.com/sosedoff/pgweb
 
     .
     ├── pkg                                  # Backend: Golang
+    └── cmd                                  # CLI semi-generated framework (also Golang)
     └── static                               # Frontend: Static assets
     └── main.go                              # Executable main function
     └── Makefile                             # Defines the tasks to be executed - for local or CI run
@@ -27,13 +28,14 @@ make build
 
 ### AWS Resource supported
 
-| Type |  Status |
-| ------------- | ------------- |
-| EC2 Instance |  :white_check_mark: |
-| Load Balancer |  :white_check_mark: |
-| S3 Bucket |  :x: |
-| EBS |  :x: |
-| RDS |  :x: |
+| Type            |  Status |
+|-----------------| ----------- |
+| EC2 Instance    |  :white_check_mark: |
+| Load Balancer   |  :white_check_mark: |
+| S3 Bucket       |  :white_check_mark: |
+| EBS             |  :white_check_mark: |
+| RDS             |  :white_check_mark: |
+| Lambda Function |  :white_check_mark: |
 
 ## Design
 
@@ -108,5 +110,5 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
    * `IsGlobal`: Set to true if this is a global resource (like a Hosted Zone). Otherwise leave empty.
 
 
-This method will be automatically called at startup.
-The mapping definition will be used to convert the returned type to some `model.Resource` objects.
+These methods will be automatically called at startup.
+The mapper definition will be used to convert the returned type to some `model.Resource` objects.
