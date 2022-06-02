@@ -20,6 +20,7 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 	doneChan := make(chan struct{})
 
 	var errors *multierror.Error
+	var errorLock sync.Mutex
 	var wg sync.WaitGroup
 	for _, provider := range providers {
 		newFetchFuncs := provider.FetchFunctions()
@@ -31,7 +32,9 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 				if err != nil {
 					// TODO: Log the error in like the future error table in db or somehow tell the user in the UI idk figure it out
 					as.Logger.Sugar().Errorf("Received an error when trying to handle resource %v in provider %v: %v", resourceType, provider, err)
+					errorLock.Lock()
 					errors = multierror.Append(errors, err)
+					errorLock.Unlock()
 				}
 			}(fetchFunc, provider, resourceType)
 		}

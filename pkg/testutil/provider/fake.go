@@ -20,8 +20,9 @@ type FakeProvider struct {
 }
 
 var _ provider2.Provider = &FakeProvider{}
+var _ fmt.Stringer = &FakeProvider{}
 
-func (p FakeProvider) String() string {
+func (p *FakeProvider) String() string {
 	if p.ID == "" {
 		return "fake"
 	}
@@ -70,7 +71,7 @@ func (p *FakeProvider) makeFetchFunc(typ string, config *FakeProviderResourceCon
 	}
 }
 
-func (p FakeProvider) annotateResources(typ string, resources []model.Resource) {
+func (p *FakeProvider) annotateResources(typ string, resources []model.Resource) {
 	for idx, resource := range resources {
 		id := fmt.Sprintf("%s-%s-%d", p.String(), typ, idx)
 		resource.Id = id
