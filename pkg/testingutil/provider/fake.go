@@ -57,7 +57,11 @@ func (p *FakeProvider) makeFetchFunc(typ string, config *FakeProviderResourceCon
 		p.annotateResources(typ, resources)
 
 		for _, resource := range resources {
-			time.Sleep(config.DelayBefore)
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-time.After(config.DelayBefore):
+			}
 
 			select {
 			case <-ctx.Done():
