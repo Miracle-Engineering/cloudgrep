@@ -12,7 +12,7 @@ import (
 //go:embed resources.json
 var embedResources []byte
 
-//go:embed engine_status.json
+//go:embed engine_statuses.json
 var embedEngineStatus []byte
 
 func GetResources(t *testing.T) []*model.Resource {
