@@ -131,7 +131,8 @@ func TestFakeProvider_FetchFunctions_delayBefore(t *testing.T) {
 
 	go func() {
 		defer close(resourceCh)
-		fetchFoo(ctx, resourceCh)
+		err := fetchFoo(ctx, resourceCh)
+		assert.NoError(t, err)
 	}()
 
 	time.Sleep(2*time.Second + 500*time.Millisecond)
