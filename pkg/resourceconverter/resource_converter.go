@@ -55,6 +55,9 @@ func (rc *ReflectionConverter) ToResource(ctx context.Context, x any, tags model
 	if tags == nil {
 		//use field
 		tagsValue := reflect.ValueOf(x).FieldByName(rc.TagField.Name)
+		if !tagsValue.IsValid() {
+			return model.Resource{}, fmt.Errorf("Could not find tag field '%v' for type '%v", rc.TagField.Name, rc.ResourceType)
+		}
 		tags = getTags(tagsValue, rc.TagField)
 	}
 	marshaledStruct, err := json.Marshal(x)

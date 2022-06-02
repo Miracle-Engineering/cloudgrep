@@ -74,10 +74,6 @@ func TestReflectionConverter(t *testing.T) {
 		model.AssertEqualsResource(t, expectedResource, resource)
 	})
 
-	t.Run("NestedTags", func(t *testing.T) {
-
-	})
-
 	t.Run("MissingTags", func(t *testing.T) {
 		entry := TestEntry{
 			ID:        "id1",
