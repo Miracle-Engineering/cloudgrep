@@ -8,16 +8,15 @@ import (
 )
 
 func TestMakeEngineStatus(t *testing.T) {
-	statusFetching := MakeEngineStatusFetching()
+	mockResourceName := "engine"
+	statusFetching := NewEngineStatus(EngineStatusSuccess, mockResourceName, nil)
 	assert.Equal(t, "", statusFetching.ErrorMessage)
-	assert.Equal(t, EngineStatusFetching, statusFetching.Status)
-
-	statusSuccess := MakeEngineStatusSuccess()
-	assert.Equal(t, "", statusSuccess.ErrorMessage)
-	assert.Equal(t, EngineStatusSuccess, statusSuccess.Status)
+	assert.Equal(t, EngineStatusSuccess, statusFetching.Status)
+	assert.Equal(t, mockResourceName, statusFetching.ResourceName)
 
 	statusFailedError := errors.New("failed")
-	statusFailed := MakeEngineStatusFailed(statusFailedError)
+	statusFailed := NewEngineStatus(EngineStatusFailed, mockResourceName, statusFailedError)
 	assert.Equal(t, statusFailedError.Error(), statusFailed.ErrorMessage)
 	assert.Equal(t, EngineStatusFailed, statusFailed.Status)
+	assert.Equal(t, mockResourceName, statusFetching.ResourceName)
 }

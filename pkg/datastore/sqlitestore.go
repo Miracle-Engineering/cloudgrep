@@ -275,15 +275,39 @@ func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) ([]*mo
 	return s.getResourcesById(ctx, ids)
 }
 
-func (s *SQLiteStore) WriteEngineStatus(ctx context.Context, status model.EngineStatus) error {
-	if (model.EngineStatus{}) == status {
-		return nil
-	}
-
+func (s *SQLiteStore) WriteEngineStatusStart(ctx context.Context, resource string) error {
+	status := model.NewEngineStatus(model.EngineStatusFetching, resource, nil)
 	s.logger.Sugar().Infow("Writing Engine Status: ",
 		zap.Any("status", status),
 	)
-	result := s.db.Create(&status)
+	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
+	if result.RowsAffected == 1 {
+		result = s.db.Model(&status).Updates(status)
+	} else {
+		result = s.db.Create(&status)
+	}
+	if result.Error != nil {
+		return fmt.Errorf("can't write engine status to database: %w", result.Error)
+	}
+	return nil
+}
+
+func (s *SQLiteStore) WriteEngineStatusEnd(ctx context.Context, resource string, err error) error {
+	var status model.EngineStatus
+	if err != nil {
+		status = model.NewEngineStatus(model.EngineStatusFailed, resource, err)
+	} else {
+		status = model.NewEngineStatus(model.EngineStatusSuccess, resource, nil)
+	}
+	s.logger.Sugar().Infow("Writing Engine Status: ",
+		zap.Any("status", status),
+	)
+	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
+	if result.RowsAffected == 1 {
+		result = s.db.Model(&status).Updates(status)
+	} else {
+		result = s.db.Create(&status)
+	}
 	if result.Error != nil {
 		return fmt.Errorf("can't write engine status to database: %w", result.Error)
 	}
@@ -292,10 +316,9 @@ func (s *SQLiteStore) WriteEngineStatus(ctx context.Context, status model.Engine
 
 func (s *SQLiteStore) GetEngineStatus(context.Context) (model.EngineStatus, error) {
 	var status model.EngineStatus
-	db := s.db.Model(&model.EngineStatus{}).Order("fetched_at desc").Limit(1).Find(&status)
+	db := s.db.Model(&model.EngineStatus{}).Select("*").Order("fetched_at desc").Last(&status)
 	if db.Error != nil {
 		return model.EngineStatus{}, fmt.Errorf("can't fetch engine status' : %w", db.Error)
 	}
-
 	return status, nil
 }

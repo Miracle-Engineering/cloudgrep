@@ -57,7 +57,8 @@ func TestEngineRun(t *testing.T) {
 		context.WithValue(ctx, Return("FetchTestResources"), []TestResource{tr1, tr2}),
 	)
 	assert.NoError(t, err)
-	engineStatus, _ := engine.Datastore.GetEngineStatus(ctx)
+	engineStatus, err := engine.Datastore.GetEngineStatus(ctx)
+	assert.NoError(t, err)
 	assert.Equal(t, model.EngineStatusSuccess, engineStatus.Status)
 	//check that the resources were stored
 	resources, err := engine.GetResources(ctx, nil)
@@ -83,6 +84,7 @@ func TestEngineRunResourceGetFailure(t *testing.T) {
 		context.WithValue(ctx, ReturnError("ReturnError"), "FetchTestError"),
 	)
 	assert.Error(t, err)
-	engineStatus, _ := engine.Datastore.GetEngineStatus(ctx)
+	engineStatus, err := engine.Datastore.GetEngineStatus(ctx)
+	assert.NoError(t, err)
 	assert.Equal(t, model.EngineStatusFailed, engineStatus.Status)
 }
