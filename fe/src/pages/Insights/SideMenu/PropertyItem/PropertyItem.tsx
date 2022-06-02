@@ -16,9 +16,9 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 	const renderObjects = (data: Object): React.ReactNode =>
 		Object.entries(data).map(([key, value]) => <PropertyItem key={`${key}${value}`} keyItem={key} value={value} />);
 
-	const renderArrayOrObjects = (data: Object | Array<Object>): React.ReactNode => {
+	const renderArrayOrObjects = (data: Object | Array<Object>, keyItem: string): React.ReactNode => {
 		if (Array.isArray(data)) {
-			return <PropertyItemList data={data} renderObjects={renderObjects} />;
+			return <PropertyItemList data={data} renderObjects={renderObjects} keyItem={keyItem} />;
 		} else {
 			return renderObjects(data);
 		}
@@ -54,7 +54,7 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 						<>
 							<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex' }}>{`{`}</Typography>
 							<Box sx={{ display: 'block' }}>
-								<Box ml={2}>{renderArrayOrObjects(value)}</Box>
+								<Box ml={2}>{renderObjects(value)}</Box>
 								<Typography
 									color={TEXT_COLOR}
 									sx={{ opacity: '0.9', display: 'flex' }}>{`}`}</Typography>
@@ -67,12 +67,19 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 					)}
 				</Box>
 			) : (
-				<Box sx={{ display: 'flex' }}>
-					<Typography mr={2} {...sideMenuLeftText}>{`${keyItem} `}</Typography>
-					<Typography {...sideMenuRightText}>
-						{Array.isArray(value) ? renderArrayOrObjects(value) : ` ${value}`}
-					</Typography>
-				</Box>
+				<>
+					{Array.isArray(value) ? (
+						renderArrayOrObjects(value, keyItem)
+					) : (
+						<Box sx={{ display: 'flex' }}>
+							<Typography
+								mr={2}
+								{...sideMenuLeftText}
+								sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
+							<Typography {...sideMenuRightText}> {value} </Typography>
+						</Box>
+					)}
+				</>
 			)}
 		</>
 	);
