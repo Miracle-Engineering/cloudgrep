@@ -6,6 +6,7 @@ import { TEXT_COLOR } from 'constants/colors';
 import React, { FC, useState } from 'react';
 
 import { sideMenuLeftText, sideMenuRightText } from '../style';
+import PropertyItemList from './PropertyItemList';
 import { PropertyItemProps } from './types';
 
 const PropertyItem: FC<PropertyItemProps> = props => {
@@ -17,13 +18,7 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 
 	const renderArrayOrObjects = (data: Object | Array<Object>): React.ReactNode => {
 		if (Array.isArray(data)) {
-			return (
-				<Box sx={{ lineHeight: '1' }}>
-					<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex' }}>{`[`}</Typography>
-					{data.map(item => renderObjects(item))}
-					<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex' }}>{`]`}</Typography>
-				</Box>
-			);
+			return <PropertyItemList data={data} renderObjects={renderObjects} />;
 		} else {
 			return renderObjects(data);
 		}
@@ -76,7 +71,6 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 					<Typography mr={2} {...sideMenuLeftText}>{`${keyItem} `}</Typography>
 					<Typography {...sideMenuRightText}>
 						{Array.isArray(value) ? renderArrayOrObjects(value) : ` ${value}`}
-						{/* {` ${value}`} */}
 					</Typography>
 				</Box>
 			)}
