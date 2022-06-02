@@ -311,10 +311,11 @@ func TestFields(t *testing.T) {
 func TestEngineStatus(t *testing.T) {
 	engineStatuses := testdata.GetEngineStatus(t)
 	ctx := context.Background()
+	mockResourceName := "mock_resource"
 	for _, datastore := range newDatastores(t, ctx) {
 		name := fmt.Sprintf("%T", datastore)
 		t.Run(name, func(t *testing.T) {
-			err := datastore.WriteEngineStatusStart(ctx, "mock")
+			err := datastore.WriteEngineStatusStart(ctx, mockResourceName)
 			if err != nil && err.Error() == "not implemented" {
 				return
 			}
@@ -328,7 +329,7 @@ func TestEngineStatus(t *testing.T) {
 			assert.NoError(t, err)
 			model.AssertEqualsEngineStatus(t, engineStatuses[0], status)
 
-			err = datastore.WriteEngineStatusEnd(ctx, "mock", nil)
+			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, nil)
 			if err != nil && err.Error() == "not implemented" {
 				return
 			}
@@ -342,7 +343,7 @@ func TestEngineStatus(t *testing.T) {
 			assert.NoError(t, err)
 			model.AssertEqualsEngineStatus(t, engineStatuses[1], status)
 
-			err = datastore.WriteEngineStatusStart(ctx, "mock")
+			err = datastore.WriteEngineStatusStart(ctx, mockResourceName)
 			if err != nil && err.Error() == "not implemented" {
 				return
 			}
@@ -356,7 +357,7 @@ func TestEngineStatus(t *testing.T) {
 			assert.NoError(t, err)
 			model.AssertEqualsEngineStatus(t, engineStatuses[0], status)
 
-			err = datastore.WriteEngineStatusEnd(ctx, "mock", errors.New(engineStatuses[2].ErrorMessage))
+			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, errors.New(engineStatuses[2].ErrorMessage))
 			if err != nil && err.Error() == "not implemented" {
 				return
 			}
