@@ -59,7 +59,7 @@ func TestNewMapperOk(t *testing.T) {
 	}
 	instance, err := mapper.ToResource(ctx, instances[0], "us-west-2")
 	assert.NoError(t, err)
-	model.AssertEqualsResource(t, expectedInstance, instance)
+	testingutil.AssertEqualsResource(t, expectedInstance, instance)
 
 	expectedLB := model.Resource{
 		Id:     "arn:aws:elasticloadbalancing:us-east-1:0123456789:loadbalancer/net/my-load-balancer/14522ba1bd959dd6",
@@ -75,7 +75,7 @@ func TestNewMapperOk(t *testing.T) {
 	assert.NoError(t, err)
 	resourceLB, err := mapper.ToResource(ctx, loadBalancers[0], "us-west-2")
 	assert.NoError(t, err)
-	model.AssertEqualsResource(t, expectedLB, resourceLB)
+	testingutil.AssertEqualsResource(t, expectedLB, resourceLB)
 }
 
 func TestNewMapperError(t *testing.T) {
