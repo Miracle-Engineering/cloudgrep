@@ -2,13 +2,12 @@ package provider
 
 import (
 	"context"
-
-	"go.uber.org/zap"
-
 	"github.com/hashicorp/go-multierror"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/model"
+	"go.uber.org/zap"
+	"log"
 )
 
 //Engine configures and starts the providers
@@ -35,6 +34,10 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 //Run the providers: fetches data about cloud resources and save them to store
 func (e *Engine) Run(ctx context.Context) error {
 	var errors error
+	err := e.Datastore.WriteEngineStatusStart(ctx, "engine")
+	if err != nil {
+		log.Default().Println(err.Error())
+	}
 	for _, provider := range e.Providers {
 		// fetch the resources
 		resources, err := fetchResources(ctx, provider)
@@ -46,6 +49,11 @@ func (e *Engine) Run(ctx context.Context) error {
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		}
+	}
+
+	err = e.Datastore.WriteEngineStatusEnd(ctx, "engine", errors)
+	if err != nil {
+		log.Default().Println(err.Error())
 	}
 
 	return errors

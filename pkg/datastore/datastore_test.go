@@ -3,6 +3,7 @@ package datastore
 import (
 	"context"
 	_ "embed"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -290,6 +291,73 @@ func TestFields(t *testing.T) {
 					model.FieldValue{Value: "us-west-2", Count: 1},
 					model.FieldValue{Value: "(null)", Count: 2},
 				}}, *fields.FindField("tags", "region"))
+
+		})
+	}
+}
+
+func TestEngineStatus(t *testing.T) {
+	engineStatuses := testdata.GetEngineStatus(t)
+	ctx := context.Background()
+	mockResourceName := "mock_resource"
+	for _, datastore := range newDatastores(t, ctx) {
+		name := fmt.Sprintf("%T", datastore)
+		t.Run(name, func(t *testing.T) {
+			err := datastore.WriteEngineStatusStart(ctx, mockResourceName)
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+
+			status, err := datastore.GetEngineStatus(ctx)
+			//do not test result if not implemented
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+			//check stats
+			assert.NoError(t, err)
+			model.AssertEqualsEngineStatus(t, engineStatuses[0], status)
+
+			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, nil)
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+
+			status, err = datastore.GetEngineStatus(ctx)
+			//do not test result if not implemented
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+			//check stats
+			assert.NoError(t, err)
+			model.AssertEqualsEngineStatus(t, engineStatuses[1], status)
+
+			err = datastore.WriteEngineStatusStart(ctx, mockResourceName)
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+
+			status, err = datastore.GetEngineStatus(ctx)
+			//do not test result if not implemented
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+			//check stats
+			assert.NoError(t, err)
+			model.AssertEqualsEngineStatus(t, engineStatuses[0], status)
+
+			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, errors.New(engineStatuses[2].ErrorMessage))
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+
+			status, err = datastore.GetEngineStatus(ctx)
+			//do not test result if not implemented
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+			//check stats
+			assert.NoError(t, err)
+			model.AssertEqualsEngineStatus(t, engineStatuses[2], status)
 
 		})
 	}
