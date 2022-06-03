@@ -51,7 +51,7 @@ make build
 
 All of these boxes are implemented as distinct Go packages, except for UI which is a JS app.
 
-## Configure a new aws resource
+## Configure a new AWS resource
 
 1. Implement a new AWS provider method (in pkg/provider/aws) to fetch your resources. It must have the type
    signature of a FetchFunction like so: `type FetchFunc func(context.Context, chan<- model.Resource) error`.
@@ -108,6 +108,14 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
    * `TagField`: A struct of the TagField type used to dictate where. Leave this empty if passing the tagfields separately like with the load balancer
    * `FetchFunc`: The fetch function created in step 1
    * `IsGlobal`: Set to true if this is a global resource (like a Hosted Zone). Otherwise leave empty.
+   Example:
+   ```go
+   "ec2.Instance": {
+       IdField:   "InstanceId",
+       Field:  defaultTagField,
+       chFunc: p.FetchEC2Instances,
+   }
+   ```
 
 
 These methods will be automatically called at startup.
