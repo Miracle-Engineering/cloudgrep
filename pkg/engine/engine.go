@@ -27,7 +27,7 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 	e.Logger = logger
 	e.Sequencer = sequencer.AsyncSequencer{Logger: e.Logger}
 	for _, c := range cfg.Providers {
-		// create a provider
+		// create a providers
 		providers, err := provider.NewProviders(ctx, c, logger)
 		if err != nil {
 			return Engine{}, err
