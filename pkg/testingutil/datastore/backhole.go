@@ -18,6 +18,18 @@ type Blackhole struct {
 
 var _ datastore.Datastore = &Blackhole{}
 
+func (s *Blackhole) WriteEngineStatusStart(ctx context.Context, s2 string) error {
+	return nil
+}
+
+func (s *Blackhole) WriteEngineStatusEnd(ctx context.Context, s2 string, err error) error {
+	return nil
+}
+
+func (s *Blackhole) GetEngineStatus(ctx context.Context) (model.EngineStatus, error) {
+	return model.EngineStatus{}, nil
+}
+
 func (s *Blackhole) Ping() error {
 	return nil
 }
