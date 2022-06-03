@@ -29,9 +29,10 @@ const InsightFilter: FC = () => {
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>, field: Field, item: ValueType) => {
 		const tag = { key: field.name, value: item.value };
 		const existingTag = filterTags?.some(filterTag => filterTag.key === tag.key && filterTag.value === tag.value);
+
 		if (event.target.checked && !existingTag) {
 			setFilterTags([...filterTags, tag]);
-		} else if (!event.target.checked && existingTag && filterTags) {
+		} else if (!event.target.checked && existingTag && filterTags?.length > 0) {
 			setFilterTags(filterTags.filter(filterTag => filterTag.key !== tag.key && filterTag.value !== tag.value));
 		}
 	};
