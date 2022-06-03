@@ -50,6 +50,16 @@ func TestBlackholeEmptyFuncs(t *testing.T) {
 	fields, err := ds.GetFields(ctx)
 	assert.NoError(t, err)
 	assert.Empty(t, fields)
+
+	err = ds.WriteEngineStatusStart(ctx, "")
+	assert.NoError(t, err)
+
+	err = ds.WriteEngineStatusEnd(ctx, "", nil)
+	assert.NoError(t, err)
+
+	status, err := ds.GetEngineStatus(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, model.EngineStatus{}, status)
 }
 
 func TestBlackholeWriteError(t *testing.T) {

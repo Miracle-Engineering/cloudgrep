@@ -18,18 +18,6 @@ type Blackhole struct {
 
 var _ datastore.Datastore = &Blackhole{}
 
-func (s *Blackhole) WriteEngineStatusStart(ctx context.Context, s2 string) error {
-	return nil
-}
-
-func (s *Blackhole) WriteEngineStatusEnd(ctx context.Context, s2 string, err error) error {
-	return nil
-}
-
-func (s *Blackhole) GetEngineStatus(ctx context.Context) (model.EngineStatus, error) {
-	return model.EngineStatus{}, nil
-}
-
 func (s *Blackhole) Ping() error {
 	return nil
 }
@@ -63,16 +51,14 @@ func (s *Blackhole) GetFields(context.Context) (model.FieldGroups, error) {
 	return nil, nil
 }
 
-func (s *Blackhole) Count() int {
-	s.l.Lock()
-	defer s.l.Unlock()
-
-	return s.count
+func (s *Blackhole) WriteEngineStatusStart(ctx context.Context, resource string) error {
+	return nil
 }
 
-func (s *Blackhole) SetWriteError(err error) {
-	s.l.Lock()
-	defer s.l.Unlock()
+func (s *Blackhole) WriteEngineStatusEnd(ctx context.Context, resource string, err error) error {
+	return nil
+}
 
-	s.writeError = err
+func (s *Blackhole) GetEngineStatus(ctx context.Context) (model.EngineStatus, error) {
+	return model.EngineStatus{}, nil
 }
