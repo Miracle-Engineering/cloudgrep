@@ -129,7 +129,9 @@ func TestFakeProvider_FetchFunctions_delayBefore(t *testing.T) {
 		}
 	}()
 
+	done := make(chan struct{})
 	go func() {
+		defer close(done)
 		defer close(resourceCh)
 		err := fetchFoo(ctx, resourceCh)
 		assert.NoError(t, err)
@@ -139,4 +141,5 @@ func TestFakeProvider_FetchFunctions_delayBefore(t *testing.T) {
 
 	count := atomic.LoadInt32(&atomicCount)
 	assert.Zero(t, count)
+	<-done
 }
