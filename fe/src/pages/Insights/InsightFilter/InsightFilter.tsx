@@ -33,7 +33,10 @@ const InsightFilter: FC = () => {
 		if (event.target.checked && !existingTag) {
 			setFilterTags([...filterTags, tag]);
 		} else if (!event.target.checked && existingTag && filterTags?.length > 0) {
-			setFilterTags(filterTags.filter(filterTag => filterTag.key !== tag.key && filterTag.value !== tag.value));
+			const newFilters = filterTags.filter(
+				filterTag => !(filterTag.key === tag.key && filterTag.value === tag.value)
+			);
+			setFilterTags(newFilters);
 		}
 	};
 

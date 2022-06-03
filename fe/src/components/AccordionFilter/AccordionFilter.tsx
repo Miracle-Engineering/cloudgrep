@@ -85,7 +85,7 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 												control={
 													<Checkbox
 														size={'small'}
-														defaultChecked
+														// TODO defaultChecked
 														onChange={e => handleChange(e, field, item)}
 													/>
 												}
