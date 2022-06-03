@@ -35,7 +35,7 @@ export const getResourcesFilters = (data: Tag[], offset = 0) => {
 			const existingValue = filter[tag.key];
 			filter[OR_OPERATOR] = [
 				...(filter[OR_OPERATOR] || []),
-				{ [tag.key]: existingValue },
+				...(!tagsToRemove.includes(tag.key) ? [{ [tag.key]: existingValue }] : []),
 				{ [tag.key]: tag.value },
 			];
 			tagsToRemove.push(tag.key);
