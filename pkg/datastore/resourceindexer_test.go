@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/a8m/rql"
+	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest"
 )
@@ -116,25 +117,25 @@ func TestReplaceNullValues(t *testing.T) {
 	}{
 		{
 			"col_17 = ? AND region = ? AND type = ?",
-			[]interface{}{"[null]", "us-east-1", "ec2.instance"},
+			[]interface{}{model.NullValue, "us-east-1", "ec2.instance"},
 			"col_17 is ? AND region = ? AND type = ?",
 			[]interface{}{nil, "us-east-1", "ec2.instance"},
 		},
 		{
 			"col_17 = ? AND region = ? AND type = ?",
-			[]interface{}{"[null]", "us-east-1", "[null]"},
+			[]interface{}{model.NullValue, "us-east-1", model.NullValue},
 			"col_17 is ? AND region = ? AND type is ?",
 			[]interface{}{nil, "us-east-1", nil},
 		},
 		{
 			"(col_17 = ? OR col_17 = ?) AND type = ?",
-			[]interface{}{"[null]", "[null]", "[null]"},
+			[]interface{}{model.NullValue, model.NullValue, model.NullValue},
 			"(col_17 is ? OR col_17 is ?) AND type is ?",
 			[]interface{}{nil, nil, nil},
 		},
 		{
 			"(col_17 = ? OR col_17 = ?) AND type = ?",
-			[]interface{}{"[null]", "[not null]", "[null]"},
+			[]interface{}{model.NullValue, model.NotNullValue, model.NullValue},
 			"(col_17 is ? OR col_17 is not ?) AND type is ?",
 			[]interface{}{nil, nil, nil},
 		},

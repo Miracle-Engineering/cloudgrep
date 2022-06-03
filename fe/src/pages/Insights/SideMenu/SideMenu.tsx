@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { toggleMenuVisible } from 'store/resources/slice';
 
+import PropertyItem from './PropertyItem/';
 import { boxFirstLine, boxSecondLine, boxStyle, sideMenuLeftText, sideMenuRightText, sideMenuStyle } from './style';
 import TabPanel from './TabPanel';
 
@@ -49,6 +50,9 @@ const SideMenu = () => {
 			'aria-controls': `simple-tabpanel-${index}`,
 		};
 	};
+
+	const renderObjects = (data: Object): React.ReactNode =>
+		Object.entries(data).map(([key, value]) => <PropertyItem key={`${key}${value}`} keyItem={key} value={value} />);
 
 	return (
 		<>
@@ -93,18 +97,7 @@ const SideMenu = () => {
 							</Box>
 						</TabPanel>
 						<TabPanel value={value} index={1}>
-							<Box>
-								{currentResource.properties ? (
-									currentResource.properties.map((item: Property, index: number) => (
-										<Box key={index} sx={{ display: 'flex' }}>
-											<Typography mr={2} {...sideMenuLeftText}>{`${item.name} `}</Typography>
-											<Typography {...sideMenuRightText}>{` ${item.value}`}</Typography>
-										</Box>
-									))
-								) : (
-									<></>
-								)}
-							</Box>
+							<Box>{currentResource.rawData ? renderObjects(currentResource.rawData) : <></>}</Box>
 						</TabPanel>
 					</Box>
 				</Box>

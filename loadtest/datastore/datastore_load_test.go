@@ -22,9 +22,6 @@ var datastoreConfigs []config.Datastore
 func newDatastores(t *testing.T, ctx context.Context) []datastore.Datastore {
 	datastoreConfigs = []config.Datastore{
 		{
-			Type: "memory",
-		},
-		{
 			Type:           "sqlite",
 			DataSourceName: "file::memory:",
 		},
@@ -84,12 +81,6 @@ func TestLoad(t *testing.T) {
 				test_resources := testdata.GetResources(t)
 				assert.NotZero(t, len(test_resources))
 
-				//do not test result if not implemented
-				_, err := ds.GetFields(ctx)
-				if err != nil && err.Error() == "not implemented" {
-					return
-				}
-
 				for i := 0; i < tc.Resources; i = i + tc.BatchSize {
 
 					//for every batch generate some tag keys
@@ -135,8 +126,7 @@ func TestLoad(t *testing.T) {
 				//test all fields
 				fields, err := ds.GetFields(ctx)
 				assert.NoError(t, err)
-				//the +2 is for region, type
-				assert.Equal(t, tc.Tags+2, len(fields))
+				assert.Equal(t, tc.Tags, len(fields.FindGroup("tags").Fields))
 
 				//test some queries
 				for i := 0; i < tc.Queries; i = i + 1 {

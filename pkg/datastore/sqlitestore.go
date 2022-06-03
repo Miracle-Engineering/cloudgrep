@@ -50,7 +50,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	}
 
 	// Migrate the schema
-	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}); err != nil {
+	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.EngineStatus{}); err != nil {
 		return nil, fmt.Errorf("can't create the SQLite data model: %w", err)
 	}
 
@@ -145,8 +145,7 @@ func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 	}
 	defer rows.Close()
 	field := model.Field{
-		Name:  name,
-		Group: "core",
+		Name: name,
 	}
 	var totalCount int
 	for rows.Next() {
@@ -208,7 +207,6 @@ func (s *SQLiteStore) getTagKeys() (model.Fields, error) {
 			return nil, err
 		}
 		field := model.Field{
-			Group: "tags",
 			Name:  key,
 			Count: count,
 		}
@@ -239,26 +237,34 @@ func (s *SQLiteStore) getTagValues(key string) (model.FieldValues, error) {
 	return values, nil
 }
 
-func (s *SQLiteStore) GetFields(context.Context) (model.Fields, error) {
-	var fields model.Fields
+func (s *SQLiteStore) GetFields(context.Context) (model.FieldGroups, error) {
+	var fieldGroups model.FieldGroups
 
-	//get fields on resources
+	//get core fields
+	coreGroup := model.FieldGroup{
+		Name: "core",
+	}
 	for _, name := range []string{"region", "type"} {
 		field, err := s.getResourceField(name)
 		if err != nil {
 			return nil, err
 		}
-		fields = append(fields, field)
+		coreGroup.Fields = append(coreGroup.Fields, field)
 	}
+	fieldGroups = append(fieldGroups, coreGroup)
 
-	//get fields on tags
+	//get tag fields
 	tagFields, err := s.getTagFields()
 	if err != nil {
 		return nil, err
 	}
-	fields = append(fields, tagFields...)
+	tagsGroup := model.FieldGroup{
+		Name:   "tags",
+		Fields: tagFields,
+	}
+	fieldGroups = append(fieldGroups, tagsGroup)
 
-	return fields, nil
+	return fieldGroups.AddNullValues(), nil
 }
 
 func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) ([]*model.Resource, error) {
@@ -267,4 +273,52 @@ func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) ([]*mo
 		return nil, err
 	}
 	return s.getResourcesById(ctx, ids)
+}
+
+func (s *SQLiteStore) WriteEngineStatusStart(ctx context.Context, resource string) error {
+	status := model.NewEngineStatus(model.EngineStatusFetching, resource, nil)
+	s.logger.Sugar().Infow("Writing Engine Status: ",
+		zap.Any("status", status),
+	)
+	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
+	if result.RowsAffected == 1 {
+		result = s.db.Model(&status).Updates(status)
+	} else {
+		result = s.db.Create(&status)
+	}
+	if result.Error != nil {
+		return fmt.Errorf("can't write engine status to database: %w", result.Error)
+	}
+	return nil
+}
+
+func (s *SQLiteStore) WriteEngineStatusEnd(ctx context.Context, resource string, err error) error {
+	var status model.EngineStatus
+	if err != nil {
+		status = model.NewEngineStatus(model.EngineStatusFailed, resource, err)
+	} else {
+		status = model.NewEngineStatus(model.EngineStatusSuccess, resource, nil)
+	}
+	s.logger.Sugar().Infow("Writing Engine Status: ",
+		zap.Any("status", status),
+	)
+	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
+	if result.RowsAffected == 1 {
+		result = s.db.Model(&status).Updates(status)
+	} else {
+		result = s.db.Create(&status)
+	}
+	if result.Error != nil {
+		return fmt.Errorf("can't write engine status to database: %w", result.Error)
+	}
+	return nil
+}
+
+func (s *SQLiteStore) GetEngineStatus(context.Context) (model.EngineStatus, error) {
+	var status model.EngineStatus
+	db := s.db.Model(&model.EngineStatus{}).Select("*").Order("fetched_at desc").Last(&status)
+	if db.Error != nil {
+		return model.EngineStatus{}, fmt.Errorf("can't fetch engine status' : %w", db.Error)
+	}
+	return status, nil
 }

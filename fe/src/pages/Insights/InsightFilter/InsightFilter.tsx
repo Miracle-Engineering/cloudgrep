@@ -1,31 +1,22 @@
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import AccordionFilter from 'components/AccordionFilter';
-import { Field, ValueType } from 'models/Field';
+import { Field, FieldGroup, ValueType } from 'models/Field';
 import { Tag } from 'models/Tag';
-import React, { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { FC, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getFilteredResources, getResources } from 'store/resources/thunks';
 
+import { accordionStyles, filterStyles, overrideSummaryClasses } from '../style';
+
 const InsightFilter: FC = () => {
-	const { fields, tagResource } = useAppSelector(state => state.tags);
-	const { t } = useTranslation();
-	const [searchTerm, setSearchTerm] = useState('');
-	const [searchTypeTerm, setSearchTypeTerm] = useState('');
+	const { fields } = useAppSelector(state => state.tags);
 	const [filterTags, setFilterTags] = useState<Tag[]>([]);
 	const dispatch = useAppDispatch();
-
-	const regions = useMemo((): Set<string> => {
-		return new Set(tagResource?.Resources?.map(resource => resource.Region) || ['']);
-	}, [tagResource.Resources?.length]);
-
-	const types = useMemo((): Set<string> => {
-		return new Set(
-			tagResource?.Resources?.filter(resource =>
-				resource.Type.toUpperCase().includes(searchTypeTerm.toUpperCase())
-			)?.map(resource => resource.Type) || ['']
-		);
-	}, [tagResource.Resources?.length, searchTypeTerm]);
 
 	useEffect(() => {
 		if (filterTags?.length) {
@@ -35,21 +26,17 @@ const InsightFilter: FC = () => {
 		}
 	}, [filterTags]);
 
-	const handleSearchTags = (e: ChangeEvent<HTMLInputElement>): void => {
-		setSearchTerm(e.target.value);
-	};
-
-	const handleSearchTypes = (e: ChangeEvent<HTMLInputElement>): void => {
-		setSearchTypeTerm(e.target.value);
-	};
-
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>, field: Field, item: ValueType) => {
 		const tag = { key: field.name, value: item.value };
-		const existingTag = filterTags?.some(item => item.key === tag.key && item.value === tag.value);
+		const existingTag = filterTags?.some(filterTag => filterTag.key === tag.key && filterTag.value === tag.value);
+
 		if (event.target.checked && !existingTag) {
 			setFilterTags([...filterTags, tag]);
-		} else if (!event.target.checked && existingTag && filterTags) {
-			setFilterTags(filterTags.filter(item => item.key !== tag.key && item.value !== tag.value));
+		} else if (!event.target.checked && existingTag && filterTags?.length > 0) {
+			const newFilters = filterTags.filter(
+				filterTag => !(filterTag.key === tag.key && filterTag.value === tag.value)
+			);
+			setFilterTags(newFilters);
 		}
 	};
 
@@ -61,18 +48,31 @@ const InsightFilter: FC = () => {
 				backgroundColor: '#F9F7F6',
 				overflowY: 'scroll',
 			}}>
-			{fields
-				.filter(field => field.name.toUpperCase().includes(searchTerm.toUpperCase()))
-				.map((field: Field, index: number) => (
-					<AccordionFilter
-						key={field.name + index}
-						field={field}
-						hasSearch={true}
-						label={field.name}
-						id={field.name + index}
-						handleChange={handleChange}
-					/>
-				))}
+			{fields.map((field: FieldGroup) => (
+				<Accordion key={field.name}>
+					<AccordionSummary
+						sx={filterStyles.filterHeader}
+						expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+						aria-controls={`${field.name}-content`}
+						id={`${field.name}-header`}
+						key={field.name}
+						classes={overrideSummaryClasses}>
+						<Typography sx={accordionStyles.accordionHeader}>{field.name}</Typography>
+					</AccordionSummary>
+					<AccordionDetails sx={{ padding: '0px' }}>
+						{field.fields.map((fieldItem: Field, index: number) => (
+							<AccordionFilter
+								key={fieldItem.name + index}
+								field={fieldItem}
+								hasSearch={true}
+								label={fieldItem.name}
+								id={fieldItem.name + index}
+								handleChange={handleChange}
+							/>
+						))}
+					</AccordionDetails>
+				</Accordion>
+			))}
 		</Box>
 	);
 };

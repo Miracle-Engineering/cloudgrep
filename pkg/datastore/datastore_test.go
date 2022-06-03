@@ -3,6 +3,7 @@ package datastore
 import (
 	"context"
 	_ "embed"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -21,9 +22,6 @@ const tagMaxValue = "ingress-nginx/ingress-nginx-controllerLDnJObCsNVlgTeMaPEZQl
 
 func newDatastores(t *testing.T, ctx context.Context) []Datastore {
 	datastoreConfigs = []config.Datastore{
-		{
-			Type: "memory",
-		},
 		{
 			Type:           "sqlite",
 			DataSourceName: "file::memory:",
@@ -96,10 +94,6 @@ func TestSearchByQuery(t *testing.T) {
 }`
 
 			resourcesRead, err := datastore.GetResources(ctx, []byte(query))
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
 			//check 1 result returned
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(resourcesRead))
@@ -160,7 +154,7 @@ func TestSearchByQuery(t *testing.T) {
 			//test exclude - returns the resources without the tag release
 			query = `{
   "filter":{
-    "release": "[null]"
+    "release": "(null)"
   }
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
@@ -171,8 +165,8 @@ func TestSearchByQuery(t *testing.T) {
 			//test 2 exclusions - the s3 bucket is the only one without both tags
 			query = `{
   "filter":{
-    "release": "[null]",
-    "debug:info": "[null]"
+    "release": "(null)",
+    "debug:info": "(null)"
   }
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
@@ -182,7 +176,7 @@ func TestSearchByQuery(t *testing.T) {
 			//mix include and exclude filters
 			query = `{
   "filter":{
-    "release":"[not null]",
+    "release":"(not null)",
     "vpc":"vpc-123"
   }
 }`
@@ -224,10 +218,6 @@ func TestStats(t *testing.T) {
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
 			stats, err := datastore.Stats(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
 			//check stats
 			assert.NoError(t, err)
 			assert.Equal(t, model.Stats{ResourcesCount: 3}, stats)
@@ -246,26 +236,24 @@ func TestFields(t *testing.T) {
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
 			fields, err := datastore.GetFields(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
 			//check fields
 			assert.NoError(t, err)
-			assert.Equal(t, 11, len(fields))
+			//check number of groups
+			assert.Equal(t, 2, len(fields))
+			//check fields by group
+			assert.Equal(t, 2, len(fields.FindGroup("core").Fields))
+			assert.Equal(t, 9, len(fields.FindGroup("tags").Fields))
 
 			//test a few fields
 			testingutil.AssertEqualsField(t, model.Field{
-				Group: "core",
 				Name:  "region",
 				Count: 3,
 				Values: model.FieldValues{
 					model.FieldValue{Value: "us-east-1", Count: 3},
-				}}, *fields.Find("core", "region"))
+				}}, *fields.FindField("core", "region"))
 
-			typeField := *fields.Find("core", "type")
+			typeField := *fields.FindField("core", "type")
 			testingutil.AssertEqualsField(t, model.Field{
-				Group: "core",
 				Name:  "type",
 				Count: 3,
 				Values: model.FieldValues{
@@ -279,32 +267,98 @@ func TestFields(t *testing.T) {
 			assert.Equal(t, typeField.Values[1].Count, 1)
 
 			testingutil.AssertEqualsField(t, model.Field{
-				Group: "tags",
 				Name:  "team",
 				Count: 2,
 				Values: model.FieldValues{
 					model.FieldValue{Value: "infra", Count: 1},
 					model.FieldValue{Value: "dev", Count: 1},
-				}}, *fields.Find("tags", "team"))
+					model.FieldValue{Value: "(null)", Count: 1},
+				}}, *fields.FindField("tags", "team"))
 
 			//test long field
 			testingutil.AssertEqualsField(t, model.Field{
-				Group: "tags",
 				Name:  tagMaxKey,
 				Count: 1,
 				Values: model.FieldValues{
 					model.FieldValue{Value: tagMaxValue, Count: 1},
-				}}, *fields.Find("tags", tagMaxKey))
+					model.FieldValue{Value: "(null)", Count: 2},
+				}}, *fields.FindField("tags", tagMaxKey))
 
 			//test the tag field called "region"
 			testingutil.AssertEqualsField(t, model.Field{
-				Group: "tags",
 				Name:  "region",
 				Count: 1,
 				Values: model.FieldValues{
 					model.FieldValue{Value: "us-west-2", Count: 1},
-				}}, *fields.Find("tags", "region"))
+					model.FieldValue{Value: "(null)", Count: 2},
+				}}, *fields.FindField("tags", "region"))
 
+		})
+	}
+}
+
+func TestEngineStatus(t *testing.T) {
+	engineStatuses := testdata.GetEngineStatus(t)
+	ctx := context.Background()
+	mockResourceName := "mock_resource"
+	for _, datastore := range newDatastores(t, ctx) {
+		name := fmt.Sprintf("%T", datastore)
+		t.Run(name, func(t *testing.T) {
+			err := datastore.WriteEngineStatusStart(ctx, mockResourceName)
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+
+			status, err := datastore.GetEngineStatus(ctx)
+			//do not test result if not implemented
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+			//check stats
+			assert.NoError(t, err)
+			testingutil.AssertEqualsEngineStatus(t, engineStatuses[0], status)
+
+			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, nil)
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+
+			status, err = datastore.GetEngineStatus(ctx)
+			//do not test result if not implemented
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+			//check stats
+			assert.NoError(t, err)
+			testingutil.AssertEqualsEngineStatus(t, engineStatuses[1], status)
+
+			err = datastore.WriteEngineStatusStart(ctx, mockResourceName)
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+
+			status, err = datastore.GetEngineStatus(ctx)
+			//do not test result if not implemented
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+			//check stats
+			assert.NoError(t, err)
+			testingutil.AssertEqualsEngineStatus(t, engineStatuses[0], status)
+
+			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, errors.New(engineStatuses[2].ErrorMessage))
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+
+			status, err = datastore.GetEngineStatus(ctx)
+			//do not test result if not implemented
+			if err != nil && err.Error() == "not implemented" {
+				return
+			}
+			//check stats
+			assert.NoError(t, err)
+			testingutil.AssertEqualsEngineStatus(t, engineStatuses[2], status)
 		})
 	}
 }

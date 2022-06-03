@@ -8,3 +8,8 @@ export interface Field {
 	count: number;
 	values: ValueType[];
 }
+
+export interface FieldGroup {
+	name: string;
+	fields: Field[];
+}

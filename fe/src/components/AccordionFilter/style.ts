@@ -1,4 +1,4 @@
-import { DARK_BLUE } from 'constants/colors';
+import { BLACK, WHITE } from 'constants/colors';
 import { CSSProperties } from 'react';
 
 export const overrideSummaryClasses = {
@@ -17,19 +17,16 @@ const accordionHeader: CSSProperties = {
 	textOverflow: 'ellipsis',
 };
 
-const accordionDetails: CSSProperties = {
-	overflow: 'hidden',
-};
-
-export const accordionStyles = { accordionHeader, accordionDetails };
+export const accordionStyles = { accordionHeader };
 
 export const labelClasses = {
 	label: 'label_label',
 };
 
 export const filterHeader = {
-	backgroundColor: `${DARK_BLUE}`,
-	color: '#FFFFFF',
+	backgroundColor: `${WHITE}`,
+	color: `${BLACK}`,
+	opacity: '0.8',
 	borderRadius: '4px',
 	minHeight: '42px !important',
 };

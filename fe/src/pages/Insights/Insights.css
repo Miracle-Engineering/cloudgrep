@@ -21,4 +21,7 @@
     font-size: 13px !important;
     color: rgba(28, 43, 52, 0.98);
     font-family: "Montserrat" !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }

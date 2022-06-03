@@ -38,12 +38,18 @@ const Insights: FC = () => {
 			<Box
 				sx={{
 					backgroundColor: BACKGROUND_COLOR,
-					display: 'flex',
+					display: 'none', // todo replace with flex
 					justifyContent: 'end',
 					paddingRight: '44px',
+					flexDirection: 'row-reverse',
 				}}
 				p={2}>
-				<SearchInput width={'400px'} height={'32px'} onChange={handleChange} />
+				<SearchInput
+					width={'400px'}
+					height={'32px'}
+					onChange={handleChange}
+					rest={{ flexDirection: 'row-reverse' }}
+				/>
 			</Box>
 			<Box sx={{ display: 'flex', height: 'calc(100% - 136px)' }}>
 				<InsightFilter />

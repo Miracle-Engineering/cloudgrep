@@ -9,7 +9,7 @@ export interface Resource {
 	type: string;
 	id: string;
 	region: string;
-	properties?: Property[];
+	rawData: Object;
 	tags?: Tag[];
 }
 
