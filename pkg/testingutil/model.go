@@ -1,8 +1,6 @@
 package testingutil
 
 import (
-	"encoding/json"
-	"reflect"
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -65,18 +63,6 @@ func AssertEqualsResources(t *testing.T, a, b model.Resources) {
 
 func AssertEqualsResourcePter(t *testing.T, a, b *model.Resource) {
 	AssertEqualsResource(t, *a, *b)
-}
-
-// JSONBytesEqual compares the JSON in two byte slices.
-func JSONBytesEqual(a, b []byte) (bool, error) {
-	var j, j2 interface{}
-	if err := json.Unmarshal(a, &j); err != nil {
-		return false, err
-	}
-	if err := json.Unmarshal(b, &j2); err != nil {
-		return false, err
-	}
-	return reflect.DeepEqual(j2, j), nil
 }
 
 func AssertEqualsResource(t *testing.T, a, b model.Resource) {
