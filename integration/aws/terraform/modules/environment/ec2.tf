@@ -9,6 +9,10 @@ resource "aws_launch_template" "amz_arm" {
   image_id      = "ami-0e449176cecc3e577"
   instance_type = "t4g.nano"
 
+  network_interfaces {
+    associate_public_ip_address = false
+  }
+
   tag_specifications {
     resource_type = "instance"
 

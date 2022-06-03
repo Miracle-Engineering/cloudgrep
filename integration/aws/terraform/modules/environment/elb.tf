@@ -7,6 +7,7 @@ resource "aws_lb" "alb" {
 
   name_prefix        = "test-"
   load_balancer_type = "application"
+  internal = true
   security_groups    = [aws_default_security_group.default.id]
   subnets            = data.aws_subnets.default.ids
 
