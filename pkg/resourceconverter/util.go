@@ -78,6 +78,9 @@ func SendAllConvertedTags[T any](ctx context.Context, output chan<- model.Resour
 		if err != nil {
 			return err
 		}
+		if tags == nil {
+			tags = []model.Tag{}
+		}
 		resource, err := converter.ToResource(ctx, raw, tags)
 		if err != nil {
 			return err
