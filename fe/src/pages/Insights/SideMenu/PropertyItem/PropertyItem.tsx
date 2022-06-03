@@ -6,6 +6,7 @@ import { TEXT_COLOR } from 'constants/colors';
 import React, { FC, useState } from 'react';
 
 import { sideMenuLeftText, sideMenuRightText } from '../style';
+import PropertyItemList from './PropertyItemList';
 import { PropertyItemProps } from './types';
 
 const PropertyItem: FC<PropertyItemProps> = props => {
@@ -14,6 +15,14 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 
 	const renderObjects = (data: Object): React.ReactNode =>
 		Object.entries(data).map(([key, value]) => <PropertyItem key={`${key}${value}`} keyItem={key} value={value} />);
+
+	const renderArrayOrObjects = (data: Object | Array<Object>, keyItem: string): React.ReactNode => {
+		if (Array.isArray(data)) {
+			return <PropertyItemList data={data} renderObjects={renderObjects} keyItem={keyItem} />;
+		} else {
+			return renderObjects(data);
+		}
+	};
 
 	const handleClick = () => {
 		setExpanded(!expanded);
@@ -58,10 +67,19 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 					)}
 				</Box>
 			) : (
-				<Box sx={{ display: 'flex' }}>
-					<Typography mr={2} {...sideMenuLeftText}>{`${keyItem} `}</Typography>
-					<Typography {...sideMenuRightText}>{` ${value}`}</Typography>
-				</Box>
+				<>
+					{Array.isArray(value) ? (
+						renderArrayOrObjects(value, keyItem)
+					) : (
+						<Box sx={{ display: 'flex' }}>
+							<Typography
+								mr={2}
+								{...sideMenuLeftText}
+								sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
+							<Typography {...sideMenuRightText}> {value} </Typography>
+						</Box>
+					)}
+				</>
 			)}
 		</>
 	);
