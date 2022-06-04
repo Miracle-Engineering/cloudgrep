@@ -8,7 +8,7 @@ import (
 
 func RegisterAll(r registry.Registry) {
     {{- range .Services }}
-    register_{{ . }}(r)
+    register_{{ .Name }}(r)
     {{- end }}
 }
 
