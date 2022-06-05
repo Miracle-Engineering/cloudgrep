@@ -6,14 +6,16 @@ import (
 )
 
 type listFuncConfig struct {
-	Name        string
-	Action      string
-	Paginated   bool
-	Description string
-	Type        string
-	Client      string
-	Service     string
-	OutputKey   util.RecursiveAppend
+	ResourceName string
+	FuncName     string
+	Action       string
+	Paginated    bool
+	Description  string
+	Type         string
+	Client       string
+	ServicePkg   string
+	ProviderName string
+	OutputKey    util.RecursiveAppend
 }
 
 func (g Generator) generateListFunction(config listFuncConfig) string {

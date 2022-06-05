@@ -10,6 +10,17 @@ type Import struct {
 	As   string
 }
 
+func simpleImports(raw []string) []Import {
+	imports := make([]Import, 0, len(raw))
+	for _, path := range raw {
+		imports = append(imports, Import{
+			Path: path,
+		})
+	}
+
+	return imports
+}
+
 func linenumbers(in string) string {
 	b := strings.Builder{}
 	lines := strings.Split(in, "\n")

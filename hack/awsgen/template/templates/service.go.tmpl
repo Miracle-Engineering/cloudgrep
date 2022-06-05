@@ -1,29 +1,17 @@
-package {{.Package}}
-
-import (
-    "reflect"
-
-    "github.com/run-x/cloudgrep/pkg/provider/awsgen/registry"
-
-    {{- range .Imports }}
-    {{- if .As }}
-    {{ .As }} "{{ .Path }}"
-    {{- else }}
-    "{{ .Path }}"
-    {{- end }}
-    {{- end }}
-)
-
-func register_{{.Service}}(r registry.Registry) {
-    r.RegisterService({{ .Service | quote }}, []registry.TypeRegistration{
-        {{- range .Types }}
-        {{- $type := (cat "reflect.TypeOf(types." .Type "{})") }}
-        {
-            Name:     {{ .Name | quote }},
-            APIType:  {{ $type }},
-            IDField:  mustFieldByName({{ $type }}, {{ .ID | quote }}),
-            TagField: mustFieldByName({{ $type }}, {{ .Tag | quote }}),
+func (p *Provider) register_{{.Service}}(mapping map[string]mapper) {
+    {{- $svc := .Service }}
+    {{- range .Types }}
+    mapping[{{ .Name | quote }}] = mapper{
+        FetchFunc: p.{{ .FuncName }},
+        IdField: {{ .ID | quote }},
+        IsGlobal: {{ .Global }},
+        {{- if (not .Tags.IsZero) }}
+        TagField: resourceconverter.TagField{
+            Name: {{ .Tags.Field | quote }},
+            Key: {{ .Tags.Key | quote }},
+            Value: {{ .Tags.Value | quote }},
         },
-        {{- end }}
-    })
+        {{ end }}
+    }
+    {{- end }}
 }

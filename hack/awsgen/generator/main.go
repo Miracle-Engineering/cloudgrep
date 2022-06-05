@@ -7,12 +7,24 @@ import (
 
 func (g *Generator) generateMainFile(services []config.ServiceConfig) string {
 	c := struct {
-		Package  string
 		Services []config.ServiceConfig
 	}{
-		Package:  "generated",
 		Services: services,
 	}
 
-	return template.RenderTemplate("all.go", c)
+	header := g.generateFileHeader(fileHeader{
+		Package: "aws",
+		Imports: []Import{
+			// {
+			// 	Path: "reflect",
+			// },
+			// {
+			// 	Path: "github.com/run-x/cloudgrep/pkg/provider/awsgen/registry",
+			// },
+		},
+	})
+
+	body := template.RenderTemplate("all.go", c)
+
+	return header + "\n" + body
 }

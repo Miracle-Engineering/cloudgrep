@@ -8,8 +8,10 @@ for _, {{ .NextIterVar }} := range {{ .IterVar }}.{{ .Current }} {
 {{- end }}
 {{- end }}
 
-func (p *AWSProvider) {{.Name}}(ctx context.Context) ([]types.{{.Type}}, error) {
-	input := &{{.Service}}.{{.Action}}Input{}
+func (p *Provider) {{.Name}}(ctx context.Context) ([]types.{{.Type}}, error) {
+	client := {{.ServicePkg}}.NewFromConfig(p.config)
+
+	input := &{{.ServicePkg}}.{{.Action}}Input{}
 
 	output, err := {{.Service}}.{{.Action}}(ctx, input)
 	if err != nil {

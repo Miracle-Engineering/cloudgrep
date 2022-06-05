@@ -42,9 +42,14 @@ func (w *dirWriter) WriteFile(name string, contents []byte) error {
 	defer f.Close()
 	w.written = append(w.written, name)
 
-	_, err = f.Write(contents)
+	size, err := f.Write(contents)
 	if err != nil {
 		return fmt.Errorf("cannot write to %s: %w", filePath, err)
+	}
+
+	err = f.Truncate(int64(size))
+	if err != nil {
+		return fmt.Errorf("cannot truncate %s to %d: %w", filePath, size, err)
 	}
 
 	return nil

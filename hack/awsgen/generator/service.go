@@ -8,39 +8,50 @@ import (
 )
 
 func (g Generator) generateServiceHeader(svc config.ServiceConfig) string {
-	importPath := "github.com/aws/aws-sdk-go-v2/service/%s/types"
+	importPath := "github.com/aws/aws-sdk-go-v2/service/%s"
+
+	header := g.generateFileHeader(fileHeader{
+		Package: "aws",
+		Imports: simpleImports([]string{
+			fmt.Sprintf(importPath, svc.Name),
+			"context",
+			"fmt",
+
+			"github.com/run-x/cloudgrep/pkg/resourceconverter",
+			"github.com/run-x/cloudgrep/pkg/model",
+		}),
+	})
+
 	c := serviceHeaderConfig{
-		Package: "generated",
 		Service: svc.Name,
-	}
-	c.Imports = []Import{
-		{
-			Path: fmt.Sprintf(importPath, svc.Name),
-		},
 	}
 
 	for _, t := range svc.Types {
 		c.Types = append(c.Types, serviceHeaderTypeConfig{
-			Name: svc.Name + "." + t.Name,
-			Type: t.Name,
-			ID:   t.ListAPI.IDField,
-			Tag:  t.ListAPI.TagField,
+			Name:     svc.Name + "." + t.Name,
+			FuncName: fetchFuncName(svc, t),
+			Type:     t.Name,
+			ID:       t.ListAPI.IDField,
+			Tags:     t.Tags,
+			Global:   t.Global,
 		})
 	}
 
-	return template.RenderTemplate("service.go", c)
+	body := template.RenderTemplate("service.go", c)
+
+	return header + "\n" + body
 }
 
 type serviceHeaderConfig struct {
-	Package string
-	Imports []Import
 	Service string
 	Types   []serviceHeaderTypeConfig
 }
 
 type serviceHeaderTypeConfig struct {
-	Name string
-	Type string
-	ID   string
-	Tag  string
+	Name     string
+	FuncName string
+	Type     string
+	ID       string
+	Tags     config.TagField
+	Global   bool
 }

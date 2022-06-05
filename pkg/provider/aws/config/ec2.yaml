@@ -6,4 +6,7 @@ types:
       pagination: true
       outputKey: [Reservations, Instances]
       id: InstanceId
-      tags: Tags
+    tags:
+      field: Tags
+      key: Key
+      value: Value

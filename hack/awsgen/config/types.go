@@ -10,6 +10,18 @@ type TypeConfig struct {
 	ListAPI     ListAPIConfig   `yaml:"listApi"`
 	GetTagsAPI  GetTagAPIConfig `yaml:"getTagsApi"`
 	Description string          `yaml:"description"`
+	Global      bool            `yaml:"global"`
+	Tags        TagField        `yaml:"tags"`
+}
+
+type TagField struct {
+	Field string `yaml:"field"`
+	Key   string `yaml:"key"`
+	Value string `yaml:"value"`
+}
+
+func (t TagField) IsZero() bool {
+	return t.Field == ""
 }
 
 type ListAPIConfig struct {
@@ -17,7 +29,6 @@ type ListAPIConfig struct {
 	Pagination bool     `yaml:"pagination"`
 	OutputKey  []string `yaml:"outputKey"`
 	IDField    string   `yaml:"id"`
-	TagField   string   `yaml:"tags"`
 }
 
 type GetTagAPIConfig struct {

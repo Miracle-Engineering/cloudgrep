@@ -1,6 +1,8 @@
 {{- define "output" }}
 {{- if .IsLast }}
-resources = append(resources, {{ .IterVar }}.{{ .Current }}...)
+if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, {{ .IterVar }}.{{ .Current }}); err != nil {
+	return err
+}
 {{- else }}
 for _, {{ .NextIterVar }} := range {{ .IterVar }}.{{ .Current }} {
 	{{- tabindent 1 (include "output" .Next) }}
@@ -8,20 +10,22 @@ for _, {{ .NextIterVar }} := range {{ .IterVar }}.{{ .Current }} {
 {{- end }}
 {{- end }}
 
-func (p *AWSProvider) {{.Name}}(ctx context.Context) ([]types.{{.Type}}, error) {
-	input := &{{.Service}}.{{.Action}}Input{}
-	paginator := {{.Service}}.New{{.Action}}Paginator(p.{{.Client}}, input)
+func (p *{{.ProviderName}}) {{.FuncName}}(ctx context.Context, output chan<- model.Resource) error {
+	client := {{.ServicePkg}}.NewFromConfig(p.config)
 
-	var resources []types.{{.Type}}
+	input := &{{.ServicePkg}}.{{.Action}}Input{}
 
+	paginator := {{.ServicePkg}}.New{{.Action}}Paginator(client, input)
+
+	resourceConverter := p.converterFor({{ .ResourceName | quote }})
 	for paginator.HasMorePages() {
-		output, err := paginator.NextPage(ctx)
+		page, err := paginator.NextPage(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("failed to fetch {{.Description}}: %w", err)
+			return fmt.Errorf("failed to fetch {{.Description}}: %w", err)
 		}
 
-		{{ include "output" (.OutputKey.WithRoot "output") | tabindent 2 }}
+		{{ include "output" (.OutputKey.WithRoot "page") | tabindent 2 }}
 	}
 
-	return resources, nil
+	return nil
 }

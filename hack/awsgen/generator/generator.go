@@ -18,11 +18,17 @@ type Generator struct {
 func (g *Generator) Generate(w writer.Writer, cfg config.Config) error {
 	for _, service := range cfg.Services {
 		text := g.generateService(service)
-		g.writeFile(w, service.Name, text)
+		err := g.writeFile(w, service.Name, text)
+		if err != nil {
+			return fmt.Errorf("cannot generate %s: %w", service.Name, err)
+		}
 	}
 
 	text := g.generateMainFile(cfg.Services)
-	g.writeFile(w, "services", text)
+	err := g.writeFile(w, "services", text)
+	if err != nil {
+		return fmt.Errorf("cannot generate all services file: %w", err)
+	}
 
 	return nil
 }
@@ -56,13 +62,14 @@ func (g *Generator) generateService(service config.ServiceConfig) string {
 
 	for _, t := range service.Types {
 		c := listFuncConfig{
-			Name:        "Fetch" + t.Name,
-			Action:      t.ListAPI.Call,
-			Paginated:   t.ListAPI.Pagination,
-			Description: t.Description,
-			Type:        t.Name,
-			Client:      service.Name + "Client",
-			Service:     service.Name,
+			ResourceName: fmt.Sprintf("%s.%s", service.Name, t.Name),
+			FuncName:     fetchFuncName(service, t),
+			Action:       t.ListAPI.Call,
+			Paginated:    t.ListAPI.Pagination,
+			Description:  t.Description,
+			Type:         t.Name,
+			ServicePkg:   service.Name,
+			ProviderName: "Provider",
 			OutputKey: util.RecursiveAppend{
 				Keys: t.ListAPI.OutputKey,
 				Root: "output",
@@ -79,4 +86,12 @@ func (g *Generator) generateService(service config.ServiceConfig) string {
 	}
 
 	return buf.String()
+}
+
+func fetchFuncName(svc config.ServiceConfig, typ config.TypeConfig) string {
+	return fmt.Sprintf(
+		"fetch_%s_%s",
+		svc.Name,
+		typ.Name,
+	)
 }
