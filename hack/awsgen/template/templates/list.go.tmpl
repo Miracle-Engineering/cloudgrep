@@ -1,6 +1,8 @@
 {{- define "output" }}
 {{- if .IsLast }}
-resources = append(resources, {{ .IterVar }}.{{ .Current }}...)
+if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, {{ .IterVar }}.{{ .Current }}); err != nil {
+	return err
+}
 {{- else }}
 for _, {{ .NextIterVar }} := range {{ .IterVar }}.{{ .Current }} {
 	{{- tabindent 1 (include "output" .Next) }}
@@ -8,19 +10,19 @@ for _, {{ .NextIterVar }} := range {{ .IterVar }}.{{ .Current }} {
 {{- end }}
 {{- end }}
 
-func (p *Provider) {{.Name}}(ctx context.Context) ([]types.{{.Type}}, error) {
+func (p *{{.ProviderName}}) {{.FuncName}}(ctx context.Context, output chan<- model.Resource) error {
 	client := {{.ServicePkg}}.NewFromConfig(p.config)
 
 	input := &{{.ServicePkg}}.{{.Action}}Input{}
 
-	output, err := {{.Service}}.{{.Action}}(ctx, input)
+	resourceConverter := p.converterFor({{ .ResourceName | quote }})
+
+	results, err := {{.Service}}.{{.Action}}(ctx, input)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch {{.Description}}: %w", err)
 	}
 
-	var resources []types.{{.Type}}
+	{{- include "output" (.OutputKey.WithRoot "results") | tabindent 1 }}
 
-	{{- include "output" (.OutputKey.WithRoot "output") | tabindent 1 }}
-
-	return resources, nil
+	return nil
 }
