@@ -21,7 +21,7 @@ func TestUpdateQueryFields(t *testing.T) {
 	assert.Error(t, err, "no DB provided")
 	ri.fieldColumns.addExplicitFields("type", "region", "id")
 	assert.True(t,
-		ri.fieldColumns.addDynamicFields("aws:ec2:fleet-id", "team-name"),
+		ri.fieldColumns.addDynamicFields("aws:ec2:fleet-id", "team-name", "cluster", "env"),
 	)
 
 	testCases := []testCase{
@@ -97,6 +97,47 @@ func TestUpdateQueryFields(t *testing.T) {
 			`{
   "filter2":{
     "aws:ec2:fleet-id":"fleet-bafee5d7-215d-addb-2632-290ab09da4e7"
+  }
+}`,
+		},
+		//test multiple ORs
+		{
+			`{
+  "filter":{
+    "type":"ec2.Volume",
+    "$or": [
+      { "team-name": "marketplace" },
+      { "team-name": "shipping" }
+    ],
+	"$and": [
+		{ "$or": [
+			{ "cluster": "dev" },
+			{ "cluster": "prod" }
+		] },
+		{ "$or": [
+			{ "env": "staging" },
+			{ "env": "prod" }
+		] }
+	]
+  }
+}`,
+			`{
+  "filter":{
+    "type":"ec2.Volume",
+    "$or": [
+      { "col_2": "marketplace" },
+      { "col_2": "shipping" }
+    ],
+	"$and": [
+		{ "$or": [
+			{ "col_3": "dev" },
+			{ "col_3": "prod" }
+		] },
+		{ "$or": [
+			{ "col_4": "staging" },
+			{ "col_4": "prod" }
+		] }
+	]
   }
 }`,
 		},

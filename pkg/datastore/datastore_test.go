@@ -128,6 +128,66 @@ func TestSearchByQuery(t *testing.T) {
 			assert.Equal(t, 2, len(resourcesRead))
 			model.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, resourcesRead)
 
+			//test 2 filters $or - both ec2 instances have these tags team and enabled
+			//first $or returns 2 instances
+			//second $or returns 1 instance --> result should be 1
+			query = `{
+  "filter":{
+    "$or":[
+      {
+        "team":"infra"
+      },
+      {
+        "team":"dev"
+      }
+    ],
+        "$and": [
+            { "$or": [
+                { "enabled": "true" },
+                { "enabled": "not-found" }
+            ] }
+        ]
+  }
+}`
+			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(resourcesRead))
+			model.AssertEqualsResources(t, model.Resources{resourceInst1}, resourcesRead)
+
+			//test 3 filter ors
+			//1. "team":"(not null)" -> select both instances
+			//2. "enabled": "(not null) -> select both instances
+			//3. "id": "i-123" -> select 1 instance --> result should be 1
+			query = `{
+  "filter":{
+    "$or":[
+      {
+        "team":"(not null)"
+      }
+    ],
+    "$and":[
+      {
+        "$or":[
+          {
+            "enabled":"(not null)"
+          }
+        ]
+      },
+      {
+        "$or":[
+          {
+            "id":"i-123"
+          }
+        ]
+      }
+    ]
+  }
+}`
+			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(resourcesRead))
+			model.AssertEqualsResources(t, model.Resources{resourceInst1}, resourcesRead)
+
 			//check 2 distinct tags - but no resource has both - 0 result
 			query = `{
   "filter":{
