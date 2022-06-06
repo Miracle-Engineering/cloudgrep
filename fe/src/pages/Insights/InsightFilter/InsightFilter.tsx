@@ -13,6 +13,8 @@ import { getFilteredResources, getResources } from 'store/resources/thunks';
 
 import { accordionStyles, filterStyles, overrideSummaryClasses } from '../style';
 
+const CHECKED_BY_DEFAULT = false;
+
 const InsightFilter: FC = () => {
 	const { fields } = useAppSelector(state => state.tags);
 	const [filterTags, setFilterTags] = useState<Tag[]>([]);
@@ -25,6 +27,19 @@ const InsightFilter: FC = () => {
 			dispatch(getResources());
 		}
 	}, [filterTags]);
+
+	useEffect(() => {
+		if (fields && !filterTags?.length && CHECKED_BY_DEFAULT) {
+			const tags = fields.flatMap(field =>
+				field.fields.flatMap((fieldItem: Field) =>
+					fieldItem.values.flatMap((valueItem: ValueType) => {
+						return { key: fieldItem.name, value: valueItem.value };
+					})
+				)
+			);
+			setFilterTags(tags);
+		}
+	}, [fields, filterTags]);
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>, field: Field, item: ValueType) => {
 		const tag = { key: field.name, value: item.value };
@@ -68,6 +83,7 @@ const InsightFilter: FC = () => {
 								label={fieldItem.name}
 								id={fieldItem.name + index}
 								handleChange={handleChange}
+								checkedByDefault={CHECKED_BY_DEFAULT}
 							/>
 						))}
 					</AccordionDetails>
