@@ -16,7 +16,7 @@ function Header() {
 		<Box sx={headerStyle}>
 			<Box>
 				<img
-					style={{ marginLeft: '24px', width: '160px', height: '40px', cursor: 'pointer' }}
+					style={{ marginLeft: '24px', height: '40px', cursor: 'pointer' }}
 					src={`${process.env.REACT_APP_PATH_PREFIX}/logo.png`}
 				/>
 			</Box>

@@ -28,3 +28,6 @@ __debug_bin
 
 # local config
 .config/
+
+# compiled assets
+static
