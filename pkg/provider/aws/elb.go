@@ -3,24 +3,27 @@ package aws
 import (
 	"context"
 	"fmt"
-
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 
 	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/util"
 )
 
-func (p *AWSProvider) FetchLoadBalancers(ctx context.Context, output chan<- types.LoadBalancer) error {
-	// lbOutput, err := p.elbClient.DescribeLoadBalancers(ctx, &elbv2.DescribeLoadBalancersInput{})
-	pages := elbv2.NewDescribeLoadBalancersPaginator(p.elbClient, &elbv2.DescribeLoadBalancersInput{})
-	for pages.HasMorePages() {
-		page, err := pages.NextPage(ctx)
+func (p *Provider) FetchLoadBalancers(ctx context.Context, output chan<- model.Resource) error {
+	resourceType := "elb.LoadBalancer"
+	elbClient := elbv2.NewFromConfig(p.config)
+	input := &elbv2.DescribeLoadBalancersInput{}
+	paginator := elbv2.NewDescribeLoadBalancersPaginator(elbClient, input)
+
+	resourceConverter := p.converterFor(resourceType)
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
 		if err != nil {
-			return fmt.Errorf("failed to fetch Load Balancers: %w", err)
+			return fmt.Errorf("failed to fetch EC2 Instances: %w", err)
 		}
 
-		if err := util.SendAllFromSlice(ctx, output, page.LoadBalancers); err != nil {
+		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.LoadBalancers, p.FetchLoadBalancerTag); err != nil {
 			return err
 		}
 	}
@@ -28,8 +31,9 @@ func (p *AWSProvider) FetchLoadBalancers(ctx context.Context, output chan<- type
 	return nil
 }
 
-func (p *AWSProvider) FetchLoadBalancerTag(ctx context.Context, lb types.LoadBalancer) (model.Tags, error) {
-	tagsResponse, err := p.elbClient.DescribeTags(
+func (p *Provider) FetchLoadBalancerTag(ctx context.Context, lb types.LoadBalancer) (model.Tags, error) {
+	elbClient := elbv2.NewFromConfig(p.config)
+	tagsResponse, err := elbClient.DescribeTags(
 		ctx,
 		&elbv2.DescribeTagsInput{ResourceArns: []string{*lb.LoadBalancerArn}},
 	)

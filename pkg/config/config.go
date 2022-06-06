@@ -15,7 +15,8 @@ type Config struct {
 }
 
 type Provider struct {
-	Cloud string `yaml:"cloud"`
+	Cloud   string   `yaml:"cloud"`
+	Regions []string `yaml:"regions"`
 }
 
 type Datastore struct {
