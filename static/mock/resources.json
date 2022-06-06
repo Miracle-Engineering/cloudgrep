@@ -1,0 +1,189 @@
+[
+  {
+    "id": "i-024c4971f7f510c8f",
+    "region": "us-east-1",
+    "type": "ec2.Instance",
+    "tags": [
+      {
+        "key": "k8s.io/cluster-autoscaler/opta-staging",
+        "value": "owned"
+      },
+      {
+        "key": "aws:autoscaling:groupName",
+        "value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
+      },
+      {
+        "key": "k8s.io/cluster-autoscaler/enabled",
+        "value": "true"
+      },
+      {
+        "key": "aws:ec2launchtemplate:version",
+        "value": "1"
+      },
+      {
+        "key": "eks:cluster-name",
+        "value": "opta-staging"
+      },
+      {
+        "key": "eks:nodegroup-name",
+        "value": "opta-staging-default-0f40b67a876a6e47"
+      },
+      {
+        "key": "aws:ec2:fleet-id",
+        "value": "fleet-bafee5d7-215d-addb-2632-290ab09da4e7"
+      },
+      {
+        "key": "kubernetes.io/cluster/opta-staging",
+        "value": "owned"
+      },
+      {
+        "key": "aws:ec2launchtemplate:id",
+        "value": "lt-0330c4c2536531e3b"
+      }
+    ],
+    "properties_json": {
+      "AmiLaunchIndex": "0",
+      "InstanceId": "i-024c4971f7f510c8f",
+      "IamInstanceProfile": {
+        "Arn": "arn:aws:iam::248233625043:instance-profile/eks-48bfa186-1f3b-f6b7-735a-f0cb611e6148",
+        "Id": "AIPATTS7AQXJUXEPIKDD7"
+      },
+      "BlockDeviceMappings": [
+        {
+          "DeviceName": "/dev/xvda",
+          "Status": "attached"
+        },
+        {
+          "DeviceName": "/dev/fda",
+          "Status": "detached"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "EC2-Instance",
+    "Id": "i-0ce5fd258122ee34b",
+    "Region": "us-east-1",
+    "tags": [
+      {
+        "key": "k8s.io/cluster-autoscaler/opta-staging",
+        "value": "owned"
+      },
+      {
+        "key": "aws:autoscaling:groupName",
+        "value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
+      },
+      {
+        "key": "k8s.io/cluster-autoscaler/enabled",
+        "value": "true"
+      },
+      {
+        "key": "aws:ec2launchtemplate:version",
+        "value": "1"
+      },
+      {
+        "key": "eks:cluster-name",
+        "value": "opta-staging"
+      },
+      {
+        "key": "eks:nodegroup-name",
+        "value": "opta-staging-default-0f40b67a876a6e47"
+      },
+      {
+        "key": "aws:ec2:fleet-id",
+        "value": "fleet-bafee5d7-215d-addb-2632-290ab09da4e7"
+      },
+      {
+        "key": "kubernetes.io/cluster/opta-staging",
+        "value": "owned"
+      },
+      {
+        "key": "aws:ec2launchtemplate:id",
+        "value": "lt-0330c4c2536531e3b"
+      }
+    ],
+    "properties_json": {
+      "AmiLaunchIndex": "0",
+      "InstanceId": "i-024c4971f7f510c8f",
+      "IamInstanceProfile": {
+        "Arn": "arn:aws:iam::248233625043:instance-profile/eks-48bfa186-1f3b-f6b7-735a-f0cb611e6148",
+        "Id": "AIPATTS7AQXJUXEPIKDD7"
+      },
+      "BlockDeviceMappings": [
+        {
+          "DeviceName": "/dev/xvda",
+          "Status": "attached"
+        },
+        {
+          "DeviceName": "/dev/fda",
+          "Status": "detached"
+        }
+      ]
+    }
+  },
+  {
+    "id": "i-046b8584f97edce25",
+    "region": "us-east-1",
+    "type": "ec2.Instance",
+    "tags": [
+      {
+        "key": "eks:cluster-name",
+        "value": "opta-staging"
+      },
+      {
+        "key": "kubernetes.io/cluster/opta-staging",
+        "value": "owned"
+      },
+      {
+        "key": "aws:autoscaling:groupName",
+        "value": "eks-opta-staging-default-0f40b67a876a6e47-48bfa186-1f3b-f6b7-735a-f0cb611e6148"
+      },
+      {
+        "key": "k8s.io/cluster-autoscaler/opta-staging",
+        "value": "owned"
+      },
+      {
+        "key": "aws:ec2launchtemplate:id",
+        "value": "lt-0330c4c2536531e3b"
+      },
+      {
+        "key": "aws:ec2launchtemplate:version",
+        "value": "1"
+      },
+      {
+        "key": "k8s.io/cluster-autoscaler/enabled",
+        "value": "true"
+      },
+      {
+        "key": "aws:ec2:fleet-id",
+        "value": "fleet-38dc45d7-2b57-ad53-26b0-a120b80d203a"
+      },
+      {
+        "key": "eks:nodegroup-name",
+        "value": "opta-staging-default-0f40b67a876a6e47"
+      },
+      {
+        "key": "service.k8s.aws/stack-XVlBzgbaiCMRAjWwhTHctcuAxhxKQFDaFpLSjFbcXoEFfRsWxPLDnJObCsNVlgTeMaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBEmfdzdcEkXBAkjQZLCtTMtTCoaNatyyiNKAReKJyiXJrscctNswYNsGRussVmaozFZBsbOJiFQGZsnwTKSmVoiGLOpbUOpEdKupdOMeRVjaRzL-----END",
+        "value": "ingress-nginx/ingress-nginx-controller"
+      }
+    ],
+    "properties_json": {
+      "AmiLaunchIndex": "0",
+      "InstanceId": "i-024c4971f7f510c8f",
+      "IamInstanceProfile": {
+        "Arn": "arn:aws:iam::248233625043:instance-profile/eks-48bfa186-1f3b-f6b7-735a-f0cb611e6148",
+        "Id": "AIPATTS7AQXJUXEPIKDD7"
+      },
+      "BlockDeviceMappings": [
+        {
+          "DeviceName": "/dev/xvda",
+          "Status": "attached"
+        },
+        {
+          "DeviceName": "/dev/fda",
+          "Status": "detached"
+        }
+      ]
+    }
+  }
+]
