@@ -26,7 +26,7 @@ const InsightFilter: FC = () => {
 		} else {
 			dispatch(getResources());
 		}
-	}, [filterTags]);
+	}, [dispatch, filterTags]);
 
 	useEffect(() => {
 		if (fields && !filterTags?.length && CHECKED_BY_DEFAULT) {
