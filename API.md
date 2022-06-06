@@ -66,14 +66,35 @@ Example of queries:
   }
 }
 
-//filter with more than one value for a field
-// will return resources with type=ec2.Volume AND team IN ("marketplace", "shipping")
+//filter with more than one value for a field using a OR
+// will return resources with type=ec2.Volume AND (team="marketplace" OR team="shipping")
 {
   "filter":{
     "type":"ec2.Volume",
     "$or": [
       { "team": "marketplace" },
       { "team": "shipping" }
+    ]
+  }
+}
+
+//Using multiple OR sections
+// will return resources with (team="marketplace" OR team="shipping") AND (cluster="dev" OR cluster="prod")  AND (size="large" OR size="medium") 
+{
+  "filter":{
+    "$or": [
+      { "team": "marketplace" },
+      { "team": "shipping" }
+    ],
+    "$and": [
+      { "$or": [
+        { "cluster": "dev" },
+        { "cluster": "prod" }
+      ] },
+      { "$or": [
+        { "size": "large" },
+        { "size": "medium" }
+      ] }
     ]
   }
 }

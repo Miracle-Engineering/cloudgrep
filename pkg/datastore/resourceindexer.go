@@ -219,7 +219,7 @@ func updateQueryFilter(filter map[string]interface{}, f func(string) string) map
 	*/
 	result := make(map[string]interface{}, len(filter))
 	for k, v := range filter {
-		if k == "$or" {
+		if k == "$or" || k == "$and" {
 			if slice, ok := v.([]interface{}); ok {
 				for i, val := range slice {
 					if _map, ok := val.(map[string]interface{}); ok {
@@ -231,7 +231,7 @@ func updateQueryFilter(filter map[string]interface{}, f func(string) string) map
 			//update key
 			k = f(k)
 		}
-		//update the values
+		//update the result
 		result[k] = v
 	}
 	return result
