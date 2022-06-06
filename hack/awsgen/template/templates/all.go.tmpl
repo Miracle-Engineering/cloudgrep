@@ -1,6 +1,0 @@
-
-func (p *Provider) registerAllTypes(mapping map[string]mapper) {
-    {{- range .Services }}
-    p.register_{{ .Name }}(mapping)
-    {{- end }}
-}

@@ -1,0 +1,19 @@
+types:
+  - name: Bucket
+    description: S3 Buckets
+    listApi:
+      call: ListBuckets
+      outputKey: [Buckets]
+      id: Name
+    getTagsApi:
+      type: Bucket
+      call: GetBucketTagging
+      inputIDField: Bucket
+      allowedApiErrorCodes:
+        - NoSuchTagSet
+      tags:
+        style: struct
+        pointer: true
+        field: [TagSet]
+        key: Key
+        value: Value

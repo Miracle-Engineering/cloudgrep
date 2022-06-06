@@ -2,11 +2,15 @@ package template
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 )
 
+//go:embed templates
+var content embed.FS
+
 func RenderTemplate(name string, config interface{}) string {
-	tmpl := fetchTemplate(name)
+	tmpl := getTemplate(name)
 	buf := &bytes.Buffer{}
 
 	err := tmpl.Execute(buf, config)

@@ -7,6 +7,9 @@ types:
       outputKey: [Functions]
       id: FunctionArn
     getTagsApi:
+      type: FunctionConfiguration
       call: GetFunction
       inputIDField: FunctionName
-      outputKey: [Tags]
+      tags:
+        style: map
+        field: [Tags]

@@ -23,14 +23,13 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 
 func (p *Provider) fetch_ec2_Instance(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
-
 	input := &ec2.DescribeInstancesInput{}
 
-	paginator := ec2.NewDescribeInstancesPaginator(client, input)
-
 	resourceConverter := p.converterFor("ec2.Instance")
+	paginator := ec2.NewDescribeInstancesPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
+
 		if err != nil {
 			return fmt.Errorf("failed to fetch EC2 Instances: %w", err)
 		}

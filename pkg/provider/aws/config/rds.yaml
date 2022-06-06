@@ -6,10 +6,10 @@ types:
       pagination: true
       outputKey: [DBInstances]
       id: DBInstanceIdentifier
-    tags:
-      field: TagList
-      key: Key
-      value: Value
+      tags:
+        field: [TagList]
+        key: Key
+        value: Value
   - name: DBCluster
     description: RDS Auora DB Clusters
     listApi:
@@ -17,7 +17,7 @@ types:
       pagination: true
       outputKey: [DBClusters]
       id: DBClusterIdentifier
-    tags:
-      field: TagList
-      key: Key
-      value: Value
+      tags:
+        field: [TagList]
+        key: Key
+        value: Value

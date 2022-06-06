@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"path"
 	"text/template"
-
-	"github.com/Masterminds/sprig"
 )
 
-func fetchTemplate(name string) *template.Template {
+func getTemplate(name string) *template.Template {
 	if tmpl, ok := templates[name]; ok {
 		return tmpl
 	}
@@ -29,7 +27,7 @@ func loadTemplate(name string) *template.Template {
 
 	t := template.New(name)
 
-	addFuncs(t)
+	addTemplateFuncs(t)
 
 	_, err = t.Parse(string(templateContents))
 	if err != nil {
@@ -39,12 +37,4 @@ func loadTemplate(name string) *template.Template {
 	t.Option("missingkey=error")
 
 	return t
-}
-
-func addFuncs(t *template.Template) {
-	t.Funcs(sprig.TxtFuncMap())
-	t.Funcs(template.FuncMap{
-		"include":   buildIncludeFunc(t),
-		"tabindent": templateFuncTabIndent,
-	})
 }

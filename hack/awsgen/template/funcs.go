@@ -4,7 +4,18 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
+
+	"github.com/Masterminds/sprig"
 )
+
+func addTemplateFuncs(t *template.Template) {
+	t.Funcs(sprig.TxtFuncMap())
+	t.Funcs(template.FuncMap{
+		"include":   buildIncludeFunc(t),
+		"quiet":     templateFuncQuiet,
+		"tabindent": templateFuncTabIndent,
+	})
+}
 
 const recursionMaxNums = 1000
 
@@ -30,4 +41,8 @@ func buildIncludeFunc(t *template.Template) any {
 func templateFuncTabIndent(levels int, v string) string {
 	pad := strings.Repeat("\t", levels)
 	return pad + strings.Replace(v, "\n", "\n"+pad, -1)
+}
+
+func templateFuncQuiet(_ ...any) string {
+	return ""
 }

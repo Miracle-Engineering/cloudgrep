@@ -2,11 +2,14 @@ package generator
 
 import "github.com/run-x/cloudgrep/hack/awsgen/template"
 
-type fileHeader struct {
-	Package string
-	Imports []Import
-}
+func (g *Generator) generateFileHeader(pkg string, imports []Import) string {
+	data := struct {
+		Package string
+		Imports []Import
+	}{
+		Package: pkg,
+		Imports: imports,
+	}
 
-func (g *Generator) generateFileHeader(header fileHeader) string {
-	return template.RenderTemplate("header.go", header)
+	return template.RenderTemplate("header.go", data)
 }

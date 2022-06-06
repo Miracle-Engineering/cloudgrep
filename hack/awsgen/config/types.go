@@ -1,8 +1,9 @@
 package config
 
 type ServiceConfig struct {
-	Name  string
-	Types []TypeConfig `yaml:"types"`
+	Name           string
+	ServicePackage string       `yaml:"servicePackage"`
+	Types          []TypeConfig `yaml:"types"`
 }
 
 type TypeConfig struct {
@@ -11,30 +12,46 @@ type TypeConfig struct {
 	GetTagsAPI  GetTagAPIConfig `yaml:"getTagsApi"`
 	Description string          `yaml:"description"`
 	Global      bool            `yaml:"global"`
-	Tags        TagField        `yaml:"tags"`
 }
+
+// type TagStyle string
+
+// const (
+// 	TagStyleMap   TagStyle = "map"
+// 	TagStyleField TagStyle = "field"
+// )
 
 type TagField struct {
-	Field string `yaml:"field"`
-	Key   string `yaml:"key"`
-	Value string `yaml:"value"`
+	Style   string      `yaml:"style"`
+	Pointer bool        `yaml:"pointer"`
+	Field   NestedField `yaml:"field"`
+	Key     string      `yaml:"key"`
+	Value   string      `yaml:"value"`
 }
 
-func (t TagField) IsZero() bool {
-	return t.Field == ""
+func (t TagField) Zero() bool {
+	return t.Field.Empty()
 }
 
 type ListAPIConfig struct {
 	Call       string   `yaml:"call"`
 	Pagination bool     `yaml:"pagination"`
 	OutputKey  []string `yaml:"outputKey"`
-	IDField    string   `yaml:"id"`
+	IDField    Field    `yaml:"id"`
+	Tags       TagField `yaml:"tags"`
 }
 
 type GetTagAPIConfig struct {
-	Call         string `yaml:"call"`
-	InputIDField string `yaml:"inputIDField"`
-	OutputKey    string `yaml:"outputKey"`
+	ResourceType         string      `yaml:"type"`
+	Call                 string      `yaml:"call"`
+	InputIDField         Field       `yaml:"inputIDField"`
+	OutputKey            NestedField `yaml:"outputKey"`
+	TagField             TagField    `yaml:"tags"`
+	AllowedAPIErrorCodes []string    `yaml:"allowedApiErrorCodes"`
+}
+
+func (c GetTagAPIConfig) Has() bool {
+	return c.Call != ""
 }
 
 type RootConfig struct {
@@ -49,4 +66,20 @@ func newConfig() *Config {
 	return &Config{
 		// Services: map[string]ServiceConfig{},
 	}
+}
+
+type NestedField []Field
+
+func (f NestedField) Last() Field {
+	if len(f) == 0 {
+		return Field{}
+	}
+
+	return f[len(f)-1]
+}
+
+type Field struct {
+	Name      string `yaml:"name"`
+	SliceType string `yaml:"sliceType"`
+	Pointer   bool   `yaml:"pointer"`
 }

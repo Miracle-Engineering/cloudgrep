@@ -1,7 +1,8 @@
 package {{.Package}}
 
+{{- with .Imports }}
 import (
-    {{- range .Imports }}
+    {{- range . }}
     {{- if .As }}
     {{ .As }} "{{ .Path }}"
     {{- else }}
@@ -9,3 +10,4 @@ import (
     {{- end }}
     {{- end }}
 )
+{{- end }}

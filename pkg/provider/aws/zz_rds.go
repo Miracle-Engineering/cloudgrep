@@ -33,14 +33,13 @@ func (p *Provider) register_rds(mapping map[string]mapper) {
 
 func (p *Provider) fetch_rds_DBInstance(ctx context.Context, output chan<- model.Resource) error {
 	client := rds.NewFromConfig(p.config)
-
 	input := &rds.DescribeDBInstancesInput{}
 
-	paginator := rds.NewDescribeDBInstancesPaginator(client, input)
-
 	resourceConverter := p.converterFor("rds.DBInstance")
+	paginator := rds.NewDescribeDBInstancesPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
+
 		if err != nil {
 			return fmt.Errorf("failed to fetch RDS DB Instances: %w", err)
 		}
@@ -55,14 +54,13 @@ func (p *Provider) fetch_rds_DBInstance(ctx context.Context, output chan<- model
 
 func (p *Provider) fetch_rds_DBCluster(ctx context.Context, output chan<- model.Resource) error {
 	client := rds.NewFromConfig(p.config)
-
 	input := &rds.DescribeDBClustersInput{}
 
-	paginator := rds.NewDescribeDBClustersPaginator(client, input)
-
 	resourceConverter := p.converterFor("rds.DBCluster")
+	paginator := rds.NewDescribeDBClustersPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
+
 		if err != nil {
 			return fmt.Errorf("failed to fetch RDS Auora DB Clusters: %w", err)
 		}

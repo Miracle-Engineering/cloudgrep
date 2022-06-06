@@ -1,18 +1,70 @@
-func (p *AWSProvider) {{.Name}}(ctx context.Context, resource types.{{ .Type }}) (model.Tags, error) {
-	input := &{{ .Service }}.{{ .Action }}Input{}
-	input.{{ .InputIDField }} = resource.{{ .IDField }}
+func (p *{{ .ProviderName }}) {{ .FuncName }}(ctx context.Context, resource types.{{ .SDKType }}) (model.Tags, error) {
+	client := {{ .ServicePkg }}.NewFromConfig(p.config)
+	input := &{{ .ServicePkg }}.{{ .APIAction }}Input{}
 
-	output, err := {{.Service}}.{{.Action}}(ctx, input)
+	input.{{ .InputIDField.Name }} =
+	{{- with .InputIDField.SliceType -}}
+	[]{{ . }}{
+	{{- end -}}
+	{{- if .ResourceIDField.Pointer -}} * {{- end -}}
+	resource.{{ .ResourceIDField.Name }}
+	{{- if .InputIDField.SliceType -}} } {{- end }}
+
+	output, err := client.{{ .APIAction }}(ctx, input)
 	if err != nil {
+		{{- with .AllowedAPIErrorCodes }}
+		var apiErr smithy.APIError
+		if errors.As(err, &apiErr) {
+			{{- range . }}
+			if apiErr.ErrorCode() == {{ . | quote }} {
+				return nil, nil
+			}
+			{{- end }}
+		}
+		{{- end }}
 		return nil, fmt.Errorf("failed to fetch {{.Description}} tags: %w", err)
 	}
 
-	var tags model.Tags
-
-	var tags model.Tags
-	for key, value := range tagsResponse.Tags {
-		tags = append(tags, model.Tag{Key: key, Value: value})
+	{{- range $idx, $field := .TagField.Field }}
+	{{- $parent := (eq $idx 0) | ternary "output" (list "tagField_" (sub $idx 1) | join "") }}
+	{{- if $field.Pointer }}
+	if {{ $parent }}.{{ $field.Name}} == nil {
+		return nil, nil
 	}
+	{{- end }}
 
-	return resources, nil
+	{{- if $field.SliceType }}
+	var tagField_{{ $idx }} []{{ $field.SliceType }}
+	for _, field := range {{ $parent }} {
+		tagField_{{ $idx }} = append(tagField_{{ $idx }}, field.{{ $field.Name }}...)
+	}
+	{{- else }}
+	tagField_{{ $idx }} := {{ if $field.Pointer -}} * {{- end -}} {{ $parent }}.{{ $field.Name }}
+	{{- end }}
+	{{- end }}
+
+	var tags model.Tags
+
+	{{ include (list "style-" .TagField.Style | join "") .TagField | tabindent 1 }}
+
+	return tags, nil
 }
+
+{{- define "style-map" }}
+for key, value := range tagField_{{ sub (len .Field) 1 }} {
+	tags = append(tags, model.Tag{
+		Key: key,
+		Value: value,
+	})
+}
+{{- end }}
+
+{{- define "style-struct" }}
+{{- $field := .Field.Last }}
+for _, field := range tagField_{{ sub (len .Field) 1 }} {
+	tags = append(tags, model.Tag{
+		Key: {{ if .Pointer -}} * {{- end -}} field.{{ .Key }},
+		Value: {{ if .Pointer -}} * {{- end -}} field.{{ .Value }},
+	})
+}
+{{- end }}

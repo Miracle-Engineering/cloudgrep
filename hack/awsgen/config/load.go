@@ -39,7 +39,8 @@ func loadRoot(configPath string) (RootConfig, error) {
 
 func loadService(dir string, name string) (ServiceConfig, error) {
 	c := ServiceConfig{
-		Name: name,
+		Name:           name,
+		ServicePackage: name,
 	}
 
 	configPath := path.Join(dir, name+".yaml")

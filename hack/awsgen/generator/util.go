@@ -1,25 +1,12 @@
 package generator
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/run-x/cloudgrep/hack/awsgen/config"
 )
-
-type Import struct {
-	Path string
-	As   string
-}
-
-func simpleImports(raw []string) []Import {
-	imports := make([]Import, 0, len(raw))
-	for _, path := range raw {
-		imports = append(imports, Import{
-			Path: path,
-		})
-	}
-
-	return imports
-}
 
 func linenumbers(in string) string {
 	b := strings.Builder{}
@@ -40,4 +27,38 @@ func linenumbers(in string) string {
 	}
 
 	return b.String()
+}
+
+func fetchFuncName(svc config.ServiceConfig, typ config.TypeConfig) string {
+	return fmt.Sprintf(
+		"fetch_%s_%s",
+		svc.Name,
+		typ.Name,
+	)
+}
+
+func tagFuncName(svc config.ServiceConfig, typ config.TypeConfig) string {
+	return fmt.Sprintf(
+		"getTags_%s_%s",
+		svc.Name,
+		typ.Name,
+	)
+}
+
+func awsServicePackage(service string, subPackages ...string) string {
+	pkg := "github.com/aws/aws-sdk-go-v2/service/" + service
+
+	for _, subPackage := range subPackages {
+		pkg += "/" + subPackage
+	}
+
+	return pkg
+}
+
+func resourceName(service config.ServiceConfig, typ config.TypeConfig) string {
+	return fmt.Sprintf("%s.%s", service.Name, typ.Name)
+}
+
+func registerFuncName(svc config.ServiceConfig) string {
+	return "register_" + svc.Name
 }

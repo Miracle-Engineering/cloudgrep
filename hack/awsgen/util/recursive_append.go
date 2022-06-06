@@ -9,6 +9,7 @@ type RecursiveAppend struct {
 	Idx  int
 	Keys []string
 	Root string
+	Data map[string]any
 }
 
 func (r RecursiveAppend) IsLast() bool {
@@ -47,4 +48,14 @@ func (r RecursiveAppend) Next() (RecursiveAppend, error) {
 func (r RecursiveAppend) WithRoot(root string) RecursiveAppend {
 	r.Root = root
 	return r
+}
+
+func (r *RecursiveAppend) SetData(key string, value any) error {
+	if r.Data == nil {
+		r.Data = make(map[string]any)
+	}
+
+	r.Data[key] = value
+
+	return nil
 }

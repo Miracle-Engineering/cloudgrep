@@ -1,57 +1,69 @@
 package generator
 
 import (
-	"fmt"
+	"strings"
 
 	"github.com/run-x/cloudgrep/hack/awsgen/config"
 	"github.com/run-x/cloudgrep/hack/awsgen/template"
 )
 
-func (g Generator) generateServiceHeader(svc config.ServiceConfig) string {
-	importPath := "github.com/aws/aws-sdk-go-v2/service/%s"
+func (g *Generator) generateService(service config.ServiceConfig) string {
+	var imports ImportSet
 
-	header := g.generateFileHeader(fileHeader{
-		Package: "aws",
-		Imports: simpleImports([]string{
-			fmt.Sprintf(importPath, svc.Name),
-			"context",
-			"fmt",
+	buf := &strings.Builder{}
 
-			"github.com/run-x/cloudgrep/pkg/resourceconverter",
-			"github.com/run-x/cloudgrep/pkg/model",
-		}),
-	})
+	reg, regImports := g.generateServiceRegister(service)
+	buf.WriteString(reg)
+	imports.Merge(regImports)
 
-	c := serviceHeaderConfig{
-		Service: svc.Name,
+	for _, t := range service.Types {
+		f, typeImports := g.generateType(service, t)
+		buf.WriteString(f)
+		imports.Merge(typeImports)
 	}
 
-	for _, t := range svc.Types {
-		c.Types = append(c.Types, serviceHeaderTypeConfig{
-			Name:     svc.Name + "." + t.Name,
-			FuncName: fetchFuncName(svc, t),
-			Type:     t.Name,
-			ID:       t.ListAPI.IDField,
-			Tags:     t.Tags,
-			Global:   t.Global,
+	header := g.generateFileHeader("aws", imports.Get())
+
+	return header + "\n" + buf.String()
+}
+
+func (g Generator) generateServiceRegister(service config.ServiceConfig) (string, ImportSet) {
+	data := struct {
+		ProviderName string
+		ServiceName  string
+		FuncName     string
+
+		Types []typeRegisterInfo
+	}{
+		ProviderName: "Provider",
+		ServiceName:  service.Name,
+		FuncName:     registerFuncName(service),
+	}
+
+	var imports ImportSet
+
+	for _, typ := range service.Types {
+		data.Types = append(data.Types, typeRegisterInfo{
+			ResourceName:  resourceName(service, typ),
+			FetchFuncName: fetchFuncName(service, typ),
+			IDField:       typ.ListAPI.IDField,
+			Global:        typ.Global,
+			TagField:      typ.ListAPI.Tags,
 		})
+
+		if !typ.GetTagsAPI.TagField.Zero() {
+			imports.AddPath("github.com/run-x/cloudgrep/pkg/resourceconverter")
+		}
 	}
 
-	body := template.RenderTemplate("service.go", c)
-
-	return header + "\n" + body
+	return template.RenderTemplate("service-register.go", data), imports
 }
 
-type serviceHeaderConfig struct {
-	Service string
-	Types   []serviceHeaderTypeConfig
-}
+type typeRegisterInfo struct {
+	ResourceName  string
+	FetchFuncName string
 
-type serviceHeaderTypeConfig struct {
-	Name     string
-	FuncName string
-	Type     string
-	ID       string
-	Tags     config.TagField
+	IDField  config.Field
 	Global   bool
+	TagField config.TagField
 }
