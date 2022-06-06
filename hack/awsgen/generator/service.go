@@ -5,10 +5,11 @@ import (
 
 	"github.com/run-x/cloudgrep/hack/awsgen/config"
 	"github.com/run-x/cloudgrep/hack/awsgen/template"
+	"github.com/run-x/cloudgrep/hack/awsgen/util"
 )
 
-func (g *Generator) generateService(service config.ServiceConfig) string {
-	var imports ImportSet
+func (g Generator) generateService(service config.Service) string {
+	var imports util.ImportSet
 
 	buf := &strings.Builder{}
 
@@ -22,12 +23,12 @@ func (g *Generator) generateService(service config.ServiceConfig) string {
 		imports.Merge(typeImports)
 	}
 
-	header := g.generateFileHeader("aws", imports.Get())
+	header := g.generateFileHeader(PackageName, imports.Get())
 
 	return header + "\n" + buf.String()
 }
 
-func (g Generator) generateServiceRegister(service config.ServiceConfig) (string, ImportSet) {
+func (g Generator) generateServiceRegister(service config.Service) (string, util.ImportSet) {
 	data := struct {
 		ProviderName string
 		ServiceName  string
@@ -35,12 +36,12 @@ func (g Generator) generateServiceRegister(service config.ServiceConfig) (string
 
 		Types []typeRegisterInfo
 	}{
-		ProviderName: "Provider",
+		ProviderName: ProviderStructName,
 		ServiceName:  service.Name,
 		FuncName:     registerFuncName(service),
 	}
 
-	var imports ImportSet
+	var imports util.ImportSet
 
 	for _, typ := range service.Types {
 		data.Types = append(data.Types, typeRegisterInfo{

@@ -8,6 +8,9 @@ import (
 	"github.com/run-x/cloudgrep/hack/awsgen/config"
 )
 
+const PackageName = "aws"
+const ProviderStructName = "Provider"
+
 func linenumbers(in string) string {
 	b := strings.Builder{}
 	lines := strings.Split(in, "\n")
@@ -29,7 +32,7 @@ func linenumbers(in string) string {
 	return b.String()
 }
 
-func fetchFuncName(svc config.ServiceConfig, typ config.TypeConfig) string {
+func fetchFuncName(svc config.Service, typ config.Type) string {
 	return fmt.Sprintf(
 		"fetch_%s_%s",
 		svc.Name,
@@ -37,7 +40,7 @@ func fetchFuncName(svc config.ServiceConfig, typ config.TypeConfig) string {
 	)
 }
 
-func tagFuncName(svc config.ServiceConfig, typ config.TypeConfig) string {
+func tagFuncName(svc config.Service, typ config.Type) string {
 	return fmt.Sprintf(
 		"getTags_%s_%s",
 		svc.Name,
@@ -55,10 +58,10 @@ func awsServicePackage(service string, subPackages ...string) string {
 	return pkg
 }
 
-func resourceName(service config.ServiceConfig, typ config.TypeConfig) string {
+func resourceName(service config.Service, typ config.Type) string {
 	return fmt.Sprintf("%s.%s", service.Name, typ.Name)
 }
 
-func registerFuncName(svc config.ServiceConfig) string {
+func registerFuncName(svc config.Service) string {
 	return "register_" + svc.Name
 }

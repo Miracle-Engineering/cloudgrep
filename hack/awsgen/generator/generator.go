@@ -31,7 +31,7 @@ func (g *Generator) Generate(w writer.Writer, cfg config.Config) error {
 	return nil
 }
 
-func (g *Generator) writeFile(w writer.Writer, name, text string) error {
+func (g Generator) writeFile(w writer.Writer, name, text string) error {
 	if g.Format {
 		formatted, err := format.Source([]byte(text))
 		if err != nil {

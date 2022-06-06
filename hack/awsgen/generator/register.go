@@ -5,17 +5,17 @@ import (
 	"github.com/run-x/cloudgrep/hack/awsgen/template"
 )
 
-func (g Generator) generateRegisterFile(services []config.ServiceConfig) string {
+func (g Generator) generateRegisterFile(services []config.Service) string {
 	data := struct {
 		ProviderName      string
 		RegisterFuncNames []string
 	}{
-		ProviderName: "Provider",
+		ProviderName: ProviderStructName,
 	}
 
 	for _, service := range services {
 		data.RegisterFuncNames = append(data.RegisterFuncNames, registerFuncName(service))
 	}
 
-	return template.RenderTemplate("register.go", data)
+	return g.generateFileHeader(PackageName, nil) + template.RenderTemplate("register.go", data)
 }

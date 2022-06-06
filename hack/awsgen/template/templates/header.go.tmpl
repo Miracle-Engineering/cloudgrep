@@ -1,13 +1,20 @@
-package {{.Package}}
+package {{.Package }}
 
 {{- with .Imports }}
 import (
-    {{- range . }}
-    {{- if .As }}
-    {{ .As }} "{{ .Path }}"
-    {{- else }}
-    "{{ .Path }}"
-    {{- end }}
-    {{- end }}
+{{- range . }}
+{{ include "import" . | tabindent 1 }}
+
+{{- end }}
 )
+{{- end }}
+
+{{- define "import" }}
+{{- range . }}
+{{- if .As }}
+{{ .As }} "{{ .Path }}"
+{{- else }}
+"{{ .Path }}"
+{{- end }}
+{{- end }}
 {{- end }}

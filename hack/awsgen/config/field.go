@@ -4,6 +4,14 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+func (f NestedField) Last() Field {
+	if len(f) == 0 {
+		return Field{}
+	}
+
+	return f[len(f)-1]
+}
+
 func (f *Field) Zero() bool {
 	if f == nil {
 		return true
@@ -59,4 +67,8 @@ func (f *Field) decodeMappingNode(value *yaml.Node) error {
 
 	*f = field
 	return nil
+}
+
+func (t TagField) Zero() bool {
+	return t.Field.Empty()
 }

@@ -19,7 +19,7 @@ func TestFieldDecoding_string(t *testing.T) {
 
 func TestFieldDecoding_mapping(t *testing.T) {
 	var actual Field
-	in := `{name: foo, slice: string}`
+	in := `{name: foo, sliceType: string}`
 	expected := Field{Name: "foo", SliceType: "string"}
 
 	err := yaml.Unmarshal([]byte(in), &actual)
@@ -40,7 +40,7 @@ func TestFieldDecoding_sequence(t *testing.T) {
 
 func TestFieldDecoding_noName(t *testing.T) {
 	var actual Field
-	in := `{slice: true}`
+	in := `{sliceType: string}`
 	expected := Field{}
 
 	err := yaml.Unmarshal([]byte(in), &actual)

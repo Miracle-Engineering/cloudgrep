@@ -8,8 +8,8 @@ import (
 	"github.com/run-x/cloudgrep/hack/awsgen/util"
 )
 
-func (g Generator) generateType(service config.ServiceConfig, typ config.TypeConfig) (string, ImportSet) {
-	var imports ImportSet
+func (g Generator) generateType(service config.Service, typ config.Type) (string, util.ImportSet) {
+	var imports util.ImportSet
 
 	buf := &strings.Builder{}
 
@@ -24,7 +24,7 @@ func (g Generator) generateType(service config.ServiceConfig, typ config.TypeCon
 	return buf.String(), imports
 }
 
-func (g Generator) generateTypeListFunction(service config.ServiceConfig, typ config.TypeConfig) (string, ImportSet) {
+func (g Generator) generateTypeListFunction(service config.Service, typ config.Type) (string, util.ImportSet) {
 	data := struct {
 		ResourceName string
 		Description  string
@@ -43,7 +43,7 @@ func (g Generator) generateTypeListFunction(service config.ServiceConfig, typ co
 		Description:  typ.Description,
 
 		FuncName:     fetchFuncName(service, typ),
-		ProviderName: "Provider",
+		ProviderName: ProviderStructName,
 
 		ServicePkg: service.ServicePackage,
 		APIAction:  typ.ListAPI.Call,
@@ -53,7 +53,7 @@ func (g Generator) generateTypeListFunction(service config.ServiceConfig, typ co
 		},
 	}
 
-	var imports ImportSet
+	var imports util.ImportSet
 	imports.AddPath("context")
 	imports.AddPath("fmt")
 	imports.AddPath(awsServicePackage(service.ServicePackage))
@@ -67,7 +67,7 @@ func (g Generator) generateTypeListFunction(service config.ServiceConfig, typ co
 	return template.RenderTemplate("list.go", data), imports
 }
 
-func (g Generator) generateTypeTagFunction(service config.ServiceConfig, typ config.TypeConfig) (string, ImportSet) {
+func (g Generator) generateTypeTagFunction(service config.Service, typ config.Type) (string, util.ImportSet) {
 	if !typ.GetTagsAPI.Has() {
 		return "", nil
 	}
@@ -92,7 +92,7 @@ func (g Generator) generateTypeTagFunction(service config.ServiceConfig, typ con
 		Description:  typ.Description,
 
 		FuncName:     tagFuncName(service, typ),
-		ProviderName: "Provider",
+		ProviderName: ProviderStructName,
 
 		ServicePkg:           service.ServicePackage,
 		APIAction:            typ.GetTagsAPI.Call,
@@ -104,7 +104,7 @@ func (g Generator) generateTypeTagFunction(service config.ServiceConfig, typ con
 		TagField:        typ.GetTagsAPI.TagField,
 	}
 
-	var imports ImportSet
+	var imports util.ImportSet
 	imports.AddPath("context")
 	imports.AddPath("fmt")
 	imports.AddPath(awsServicePackage(service.ServicePackage))

@@ -1,25 +1,18 @@
 package config
 
-type ServiceConfig struct {
+type Service struct {
 	Name           string
-	ServicePackage string       `yaml:"servicePackage"`
-	Types          []TypeConfig `yaml:"types"`
+	ServicePackage string `yaml:"servicePackage"`
+	Types          []Type `yaml:"types"`
 }
 
-type TypeConfig struct {
-	Name        string          `yaml:"name"`
-	ListAPI     ListAPIConfig   `yaml:"listApi"`
-	GetTagsAPI  GetTagAPIConfig `yaml:"getTagsApi"`
-	Description string          `yaml:"description"`
-	Global      bool            `yaml:"global"`
+type Type struct {
+	Name        string    `yaml:"name"`
+	ListAPI     ListAPI   `yaml:"listApi"`
+	GetTagsAPI  GetTagAPI `yaml:"getTagsApi"`
+	Description string    `yaml:"description"`
+	Global      bool      `yaml:"global"`
 }
-
-// type TagStyle string
-
-// const (
-// 	TagStyleMap   TagStyle = "map"
-// 	TagStyleField TagStyle = "field"
-// )
 
 type TagField struct {
 	Style   string      `yaml:"style"`
@@ -29,11 +22,7 @@ type TagField struct {
 	Value   string      `yaml:"value"`
 }
 
-func (t TagField) Zero() bool {
-	return t.Field.Empty()
-}
-
-type ListAPIConfig struct {
+type ListAPI struct {
 	Call       string   `yaml:"call"`
 	Pagination bool     `yaml:"pagination"`
 	OutputKey  []string `yaml:"outputKey"`
@@ -41,7 +30,7 @@ type ListAPIConfig struct {
 	Tags       TagField `yaml:"tags"`
 }
 
-type GetTagAPIConfig struct {
+type GetTagAPI struct {
 	ResourceType         string      `yaml:"type"`
 	Call                 string      `yaml:"call"`
 	InputIDField         Field       `yaml:"inputIDField"`
@@ -50,33 +39,19 @@ type GetTagAPIConfig struct {
 	AllowedAPIErrorCodes []string    `yaml:"allowedApiErrorCodes"`
 }
 
-func (c GetTagAPIConfig) Has() bool {
+func (c GetTagAPI) Has() bool {
 	return c.Call != ""
 }
 
-type RootConfig struct {
+type Root struct {
 	Services []string `yaml:"services"`
 }
 
 type Config struct {
-	Services []ServiceConfig
-}
-
-func newConfig() *Config {
-	return &Config{
-		// Services: map[string]ServiceConfig{},
-	}
+	Services []Service
 }
 
 type NestedField []Field
-
-func (f NestedField) Last() Field {
-	if len(f) == 0 {
-		return Field{}
-	}
-
-	return f[len(f)-1]
-}
 
 type Field struct {
 	Name      string `yaml:"name"`

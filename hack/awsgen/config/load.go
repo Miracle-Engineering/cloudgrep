@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"sort"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -16,7 +18,9 @@ func Load(rootConfigPath string) (*Config, error) {
 
 	rootDir := path.Dir(rootConfigPath)
 
-	config := newConfig()
+	config := &Config{}
+
+	sort.Strings(root.Services)
 
 	for _, serviceName := range root.Services {
 		service, err := loadService(rootDir, serviceName)
@@ -30,15 +34,15 @@ func Load(rootConfigPath string) (*Config, error) {
 	return config, nil
 }
 
-func loadRoot(configPath string) (RootConfig, error) {
-	c := RootConfig{}
+func loadRoot(configPath string) (Root, error) {
+	c := Root{}
 
 	err := loadConfigYaml(configPath, &c)
 	return c, err
 }
 
-func loadService(dir string, name string) (ServiceConfig, error) {
-	c := ServiceConfig{
+func loadService(dir string, name string) (Service, error) {
+	c := Service{
 		Name:           name,
 		ServicePackage: name,
 	}
@@ -46,6 +50,13 @@ func loadService(dir string, name string) (ServiceConfig, error) {
 	configPath := path.Join(dir, name+".yaml")
 
 	err := loadConfigYaml(configPath, &c)
+	if err != nil {
+		return c, err
+	}
+
+	sort.Slice(c.Types, func(i, j int) bool {
+		return strings.Compare(c.Types[i].Name, c.Types[j].Name) < 0
+	})
 
 	return c, err
 }
