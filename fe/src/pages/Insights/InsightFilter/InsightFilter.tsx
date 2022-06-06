@@ -13,7 +13,7 @@ import { getFilteredResources, getResources } from 'store/resources/thunks';
 
 import { accordionStyles, filterStyles, overrideSummaryClasses } from '../style';
 
-const CHECKED_BY_DEFAULT = false;
+const CHECKED_BY_DEFAULT = true;
 
 const InsightFilter: FC = () => {
 	const { fields } = useAppSelector(state => state.tags);
