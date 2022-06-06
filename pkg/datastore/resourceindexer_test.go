@@ -21,7 +21,7 @@ func TestUpdateQueryFields(t *testing.T) {
 	assert.Error(t, err, "no DB provided")
 	ri.fieldColumns.addExplicitFields("type", "region", "id")
 	assert.True(t,
-		ri.fieldColumns.addDynamicFields("aws:ec2:fleet-id", "team-name", "cluster"),
+		ri.fieldColumns.addDynamicFields("aws:ec2:fleet-id", "team-name", "cluster", "env"),
 	)
 
 	testCases := []testCase{
@@ -100,7 +100,7 @@ func TestUpdateQueryFields(t *testing.T) {
   }
 }`,
 		},
-		//test 2 ORs
+		//test multiple ORs
 		{
 			`{
   "filter":{
@@ -113,6 +113,10 @@ func TestUpdateQueryFields(t *testing.T) {
 		{ "$or": [
 			{ "cluster": "dev" },
 			{ "cluster": "prod" }
+		] },
+		{ "$or": [
+			{ "env": "staging" },
+			{ "env": "prod" }
 		] }
 	]
   }
@@ -128,6 +132,10 @@ func TestUpdateQueryFields(t *testing.T) {
 		{ "$or": [
 			{ "col_3": "dev" },
 			{ "col_3": "prod" }
+		] },
+		{ "$or": [
+			{ "col_4": "staging" },
+			{ "col_4": "prod" }
 		] }
 	]
   }

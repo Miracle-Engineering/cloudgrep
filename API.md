@@ -79,7 +79,7 @@ Example of queries:
 }
 
 //Using multiple OR sections
-// will return resources with (team="marketplace" OR team="shipping") AND (cluster="dev" OR cluster="prod") 
+// will return resources with (team="marketplace" OR team="shipping") AND (cluster="dev" OR cluster="prod")  AND (size="large" OR size="medium") 
 {
   "filter":{
     "$or": [
@@ -90,6 +90,10 @@ Example of queries:
       { "$or": [
         { "cluster": "dev" },
         { "cluster": "prod" }
+      ] },
+      { "$or": [
+        { "size": "large" },
+        { "size": "medium" }
       ] }
     ]
   }
