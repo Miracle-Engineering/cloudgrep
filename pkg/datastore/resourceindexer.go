@@ -10,6 +10,7 @@ import (
 	dynamicstruct "github.com/ompluscator/dynamic-struct"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"go.uber.org/zap"
+	"golang.org/x/exp/slices"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"gorm.io/gorm"
@@ -138,8 +139,11 @@ func (qb *resourceIndexer) rebuildDataModel(ctx context.Context, db *gorm.DB) er
 	if len(qb.fieldColumns) == 0 {
 		//first call
 		var fieldColumns []fieldColumn
-		//load existing fields from the DB
-		db.Find(&fieldColumns)
+		tables, _ := db.Migrator().GetTables()
+		if slices.Contains(tables, "field_columns") {
+			//load existing fields from the DB
+			db.Find(&fieldColumns)
+		}
 		qb.fieldColumns = newFieldColumns(fieldColumns)
 		//always include these
 		qb.fieldColumns.addExplicitFields("id", "type", "region")
