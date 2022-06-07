@@ -12,18 +12,6 @@ export const getArrayOfObjects = (data: Tag[]) => {
 	});
 };
 
-export const getResourcesRequestData = (data: Tag[], offset = 0) => {
-	const filter: {
-		[key: string]: string;
-	} = {};
-
-	data.forEach((tag: Tag) => {
-		filter[tag.key] = tag.value;
-	});
-
-	return { filter, limit: PAGE_LIMIT, offset: offset };
-};
-
 export const getResourcesFilters = (data: Tag[], offset = 0) => {
 	const filter: {
 		[key: string]: Array<Object>;
@@ -33,7 +21,7 @@ export const getResourcesFilters = (data: Tag[], offset = 0) => {
 
 	uniqueTags.forEach((key: string) => {
 		const currentTags = data.filter((tag: Tag) => tag.key === key);
-		let currentFilters: any = [];
+		let currentFilters: { [key: string]: string }[] = [];
 
 		currentTags.forEach((tag: Tag) => {
 			currentFilters = [...currentFilters, { [tag.key]: tag.value }];
