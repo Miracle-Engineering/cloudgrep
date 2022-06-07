@@ -21,13 +21,14 @@ const Insights: FC = () => {
 		if (!fields?.length) {
 			dispatch(getFields());
 		}
-	}, []);
+	}, [dispatch, fields?.length]);
 
 	useEffect(() => {
 		if (!resources?.length) {
 			dispatch(getResources());
 		}
-	}, []);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [dispatch]);
 
 	const handleChange = () => {
 		// TODO
@@ -46,12 +47,12 @@ const Insights: FC = () => {
 				p={2}>
 				<SearchInput
 					width={'400px'}
-					height={'32px'}
+					height={'32px'} // todo if visible substract from page height below
 					onChange={handleChange}
 					rest={{ flexDirection: 'row-reverse' }}
 				/>
 			</Box>
-			<Box sx={{ display: 'flex', height: 'calc(100% - 136px)' }}>
+			<Box sx={{ display: 'flex', height: 'calc(100% - 70px)' }}>
 				<InsightFilter />
 				<InsightTable />
 				{sideMenuVisible ? <SideMenu /> : <></>}
