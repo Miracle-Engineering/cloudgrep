@@ -53,7 +53,7 @@ func AssertEqualsField(t *testing.T, a, b Field) {
 }
 
 func AssertEqualsEngineStatus(t *testing.T, expectedEngineStatus, actualEngineStatus EngineStatus) {
-	assert.Equal(t, expectedEngineStatus.ResourceName, actualEngineStatus.ResourceName)
+	assert.Equal(t, expectedEngineStatus.ResourceType, actualEngineStatus.ResourceType)
 	assert.Equal(t, expectedEngineStatus.Status, actualEngineStatus.Status)
 	assert.Equal(t, expectedEngineStatus.ErrorMessage, actualEngineStatus.ErrorMessage)
 }

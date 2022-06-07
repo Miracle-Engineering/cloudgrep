@@ -11,7 +11,7 @@ const (
 )
 
 type EngineStatus struct {
-	ResourceName string    `json:"resource_name" gorm:"primaryKey"`
+	ResourceType string    `json:"resource_type" gorm:"primaryKey"`
 	ErrorMessage string    `json:"error_message"`
 	Status       string    `json:"status"`
 	FetchedAt    time.Time `json:"fetched_at"`
@@ -20,7 +20,7 @@ type EngineStatus struct {
 func NewEngineStatus(status string, resource string, err error) EngineStatus {
 	var engineStatus EngineStatus
 	engineStatus.Status = status
-	engineStatus.ResourceName = resource
+	engineStatus.ResourceType = resource
 	engineStatus.FetchedAt = time.Now()
 	if err != nil {
 		engineStatus.ErrorMessage = err.Error()
