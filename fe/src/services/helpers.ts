@@ -12,7 +12,7 @@ export const getArrayOfObjects = (data: Tag[]) => {
 	});
 };
 
-export const getResourcesFilters = (data: Tag[], offset = 0) => {
+export const getResourcesFilters = (data: Tag[], offset = 0, limit = PAGE_LIMIT) => {
 	const filter: {
 		[key: string]: Array<Object>;
 	} = {};
@@ -30,5 +30,5 @@ export const getResourcesFilters = (data: Tag[], offset = 0) => {
 		filter[AND_OPERATOR] = [...(filter[AND_OPERATOR] || []), { [OR_OPERATOR]: currentFilters }];
 	});
 
-	return { filter, limit: PAGE_LIMIT, offset: offset };
+	return { filter, limit: limit, offset: offset };
 };
