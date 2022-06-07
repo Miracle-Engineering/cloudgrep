@@ -3,32 +3,15 @@ import './Insights.css';
 import Box from '@mui/material/Box';
 import SearchInput from 'components/SearchInput/SearchInput';
 import { BACKGROUND_COLOR } from 'constants/colors';
-import React, { FC, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { getResources } from 'store/resources/thunks';
-import { getFields } from 'store/tags/thunks';
+import React, { FC } from 'react';
+import { useAppSelector } from 'store/hooks';
 
 import InsightFilter from './InsightFilter';
 import InsightTable from './InsightTable';
 import SideMenu from './SideMenu';
 
 const Insights: FC = () => {
-	const dispatch = useAppDispatch();
-	const { fields } = useAppSelector(state => state.tags);
-	const { resources, sideMenuVisible } = useAppSelector(state => state.resources);
-
-	useEffect(() => {
-		if (!fields?.length) {
-			dispatch(getFields());
-		}
-	}, [dispatch, fields?.length]);
-
-	useEffect(() => {
-		if (!resources?.length) {
-			dispatch(getResources());
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dispatch]);
+	const { sideMenuVisible } = useAppSelector(state => state.resources);
 
 	const handleChange = () => {
 		// TODO

@@ -17,19 +17,20 @@ const CHECKED_BY_DEFAULT = true;
 
 const InsightFilter: FC = () => {
 	const { fields } = useAppSelector(state => state.tags);
+	const { resources } = useAppSelector(state => state.resources);
 	const [filterTags, setFilterTags] = useState<Tag[]>([]);
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		if (filterTags?.length) {
 			dispatch(getFilteredResources(filterTags));
-		} else {
+		} else if (filterTags?.length === 0 && resources?.length === 0) {
 			dispatch(getResources());
 		}
-	}, [dispatch, filterTags]);
+	}, [dispatch, filterTags, resources?.length]);
 
 	useEffect(() => {
-		if (fields && !filterTags?.length && CHECKED_BY_DEFAULT) {
+		if (fields?.length && !filterTags?.length && CHECKED_BY_DEFAULT) {
 			const tags = fields.flatMap(field =>
 				field.fields.flatMap((fieldItem: Field) =>
 					fieldItem.values.flatMap((valueItem: ValueType) => {

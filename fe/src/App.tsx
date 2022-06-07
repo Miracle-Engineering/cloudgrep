@@ -2,13 +2,24 @@ import './App.css';
 import 'utils/localisation/index';
 
 import ErrorBoundary from 'components/ErrorHandling/ErrorBoundary';
-import React from 'react';
+import React, { FC, useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Routes from 'routes/Routes';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { getFields } from 'store/tags/thunks';
 
 import Header from './components/Header';
 
-function App() {
+const App: FC = () => {
+	const dispatch = useAppDispatch();
+	const { fields } = useAppSelector(state => state.tags);
+
+	useEffect(() => {
+		if (!fields?.length) {
+			dispatch(getFields());
+		}
+	}, [dispatch, fields?.length]);
+
 	return (
 		<div className="App">
 			<Router>
@@ -19,6 +30,6 @@ function App() {
 			</Router>
 		</div>
 	);
-}
+};
 
 export default App;
