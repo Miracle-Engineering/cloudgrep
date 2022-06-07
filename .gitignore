@@ -28,8 +28,3 @@ __debug_bin
 
 # local config
 .config/
-
-# static
-static
-!static/data.go
-!static/mock
