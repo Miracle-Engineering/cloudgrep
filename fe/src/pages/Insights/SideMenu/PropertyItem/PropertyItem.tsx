@@ -80,7 +80,7 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 								mr={2}
 								{...sideMenuLeftText}
 								sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
-							<Typography {...sideMenuRightText}> {value} </Typography>
+							<Typography {...sideMenuRightText}> {value !== null ? value : 'null'} </Typography>
 						</Box>
 					)}
 				</>
