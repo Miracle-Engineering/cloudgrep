@@ -18,6 +18,7 @@ require (
 	github.com/spf13/viper v1.11.0
 	github.com/tcnksm/go-gitconfig v0.1.2
 	go.uber.org/zap v1.21.0
+	golang.org/x/exp v0.0.0-20220602145555-4a0574d9293f
 	golang.org/x/text v0.3.7
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/datatypes v1.0.6
