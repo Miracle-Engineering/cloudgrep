@@ -49,10 +49,14 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 							/>
 						)}
 						<Typography mr={2} {...sideMenuLeftText} sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
+						{expanded && (
+							<Typography
+								color={TEXT_COLOR}
+								sx={{ opacity: '0.9', display: 'flex', lineHeight: '1' }}>{`{`}</Typography>
+						)}
 					</Box>
 					{expanded ? (
 						<>
-							<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex' }}>{`{`}</Typography>
 							<Box sx={{ display: 'block' }}>
 								<Box ml={2}>{renderObjects(value)}</Box>
 								<Typography
@@ -76,7 +80,7 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 								mr={2}
 								{...sideMenuLeftText}
 								sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
-							<Typography {...sideMenuRightText}> {value} </Typography>
+							<Typography {...sideMenuRightText}> {value !== null ? value : 'null'} </Typography>
 						</Box>
 					)}
 				</>

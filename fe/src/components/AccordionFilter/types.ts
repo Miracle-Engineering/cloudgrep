@@ -6,4 +6,5 @@ export interface AccordionFilterProps {
 	field: Field;
 	hasSearch: boolean;
 	handleChange: (event: React.ChangeEvent<HTMLInputElement>, field: Field, item: ValueType) => void;
+	checkedByDefault?: boolean;
 }

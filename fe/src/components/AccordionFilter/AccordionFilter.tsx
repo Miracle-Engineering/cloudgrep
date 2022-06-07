@@ -18,7 +18,7 @@ import { AccordionFilterProps } from './types';
 const SEARCH_ELEMENTS_NUMBER = 3;
 
 const AccordionFilter: FC<AccordionFilterProps> = props => {
-	const { label, hasSearch, id, field, handleChange } = props;
+	const { label, hasSearch, id, field, handleChange, checkedByDefault } = props;
 	const [searchTerm, setSearchTerm] = useState('');
 	const [applyHover, setApplyHover] = useState(false);
 	const [boxHeight, setBoxHeight] = useState('unset');
@@ -85,7 +85,7 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 												control={
 													<Checkbox
 														size={'small'}
-														// TODO defaultChecked
+														defaultChecked={checkedByDefault}
 														onChange={e => handleChange(e, field, item)}
 													/>
 												}

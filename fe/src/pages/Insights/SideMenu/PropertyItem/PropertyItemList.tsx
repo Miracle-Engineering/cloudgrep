@@ -16,6 +16,17 @@ const PropertyItemList: FC<PropertyItemListProps> = props => {
 		setExpanded(!expanded);
 	};
 
+	if (data?.length === 0) {
+		return (
+			<Box sx={{ display: 'flex' }}>
+				<Typography mr={2} {...sideMenuLeftText} sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
+				<Typography
+					color={TEXT_COLOR}
+					sx={{ opacity: '0.9', display: 'flex', lineHeight: '1' }}>{`[ ]`}</Typography>
+			</Box>
+		);
+	}
+
 	return (
 		<>
 			{expanded ? (
