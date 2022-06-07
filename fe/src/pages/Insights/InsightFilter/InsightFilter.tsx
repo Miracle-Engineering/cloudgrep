@@ -39,7 +39,7 @@ const InsightFilter: FC = () => {
 			);
 			setFilterTags(tags);
 		}
-	}, [fields, filterTags]);
+	}, [fields]);
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>, field: Field, item: ValueType) => {
 		const tag = { key: field.name, value: item.value };
