@@ -21,13 +21,8 @@ export const getResourcesFilters = (data: Tag[], offset = 0, limit = PAGE_LIMIT)
 
 	uniqueTags.forEach((key: string) => {
 		const currentTags = data.filter((tag: Tag) => tag.key === key);
-		let currentFilters: { [key: string]: string }[] = [];
-
-		currentTags.forEach((tag: Tag) => {
-			currentFilters = [...currentFilters, { [tag.key]: tag.value }];
-		});
-
-		filter[AND_OPERATOR] = [...(filter[AND_OPERATOR] || []), { [OR_OPERATOR]: currentFilters }];
+		const currentFilters = getArrayOfObjects(currentTags);
+		filter[AND_OPERATOR] = [...(filter[AND_OPERATOR] || []), { [OR_OPERATOR]: [...currentFilters] }];
 	});
 
 	return { filter, limit: limit, offset: offset };

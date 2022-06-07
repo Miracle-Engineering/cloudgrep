@@ -17,17 +17,16 @@ const CHECKED_BY_DEFAULT = true;
 
 const InsightFilter: FC = () => {
 	const { fields } = useAppSelector(state => state.tags);
-	const { resources } = useAppSelector(state => state.resources);
 	const [filterTags, setFilterTags] = useState<Tag[]>([]);
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		if (filterTags?.length) {
 			dispatch(getFilteredResources(filterTags));
-		} else if (filterTags?.length === 0 && resources?.length === 0) {
+		} else if (filterTags?.length === 0) {
 			dispatch(getResources());
 		}
-	}, [dispatch, filterTags, resources?.length]);
+	}, [dispatch, filterTags]);
 
 	useEffect(() => {
 		if (fields?.length && !filterTags?.length && CHECKED_BY_DEFAULT) {
