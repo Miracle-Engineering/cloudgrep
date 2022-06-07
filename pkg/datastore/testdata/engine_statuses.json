@@ -1,20 +1,20 @@
 [
     {
-        "resource_type": "mock_resource",
-        "error_message": "",
+        "resourceType": "mock_resource",
+        "errorMessage": "",
         "status": "fetching",
-        "fetched_at": "2020-04-01T12:30:00.000Z"
+        "fetchedAt": "2020-04-01T12:30:00.000Z"
     },
     {
-        "resource_type": "mock_resource",
-        "error_message": "",
+        "resourceType": "mock_resource",
+        "errorMessage": "",
         "status": "success",
-        "fetched_at": "2020-04-01T12:31:00.000Z"
+        "fetchedAt": "2020-04-01T12:31:00.000Z"
     },
     {
-        "resource_type": "mock_resource",
-        "error_message": "Error fetching data",
+        "resourceType": "mock_resource",
+        "errorMessage": "Error fetching data",
         "status": "failed",
-        "fetched_at": "2020-04-01T12:32:00.000Z"
+        "fetchedAt": "2020-04-01T12:32:00.000Z"
     }
 ]

@@ -2,11 +2,12 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/run-x/cloudgrep/pkg/version"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/run-x/cloudgrep/pkg/version"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHomeRoute(t *testing.T) {
@@ -33,7 +34,7 @@ func TestInfoRoute(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.True(t, body["version"] == version.Version)
-	assert.True(t, body["go_version"] == version.GoVersion)
-	assert.True(t, body["git_sha"] == version.GitCommit)
-	assert.True(t, body["build_time"] == version.BuildTime)
+	assert.True(t, body["goVersion"] == version.GoVersion)
+	assert.True(t, body["gitSha"] == version.GitCommit)
+	assert.True(t, body["buildTime"] == version.BuildTime)
 }

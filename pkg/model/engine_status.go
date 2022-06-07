@@ -11,10 +11,10 @@ const (
 )
 
 type EngineStatus struct {
-	ResourceType string    `json:"resource_type" gorm:"primaryKey"`
-	ErrorMessage string    `json:"error_message"`
+	ResourceType string    `json:"resourceType" gorm:"primaryKey"`
+	ErrorMessage string    `json:"errorMessage"`
 	Status       string    `json:"status"`
-	FetchedAt    time.Time `json:"fetched_at"`
+	FetchedAt    time.Time `json:"fetchedAt"`
 }
 
 func NewEngineStatus(status string, resource string, err error) EngineStatus {
