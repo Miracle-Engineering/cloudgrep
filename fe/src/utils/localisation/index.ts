@@ -37,9 +37,9 @@ i18n.use(initReactI18next).init({
 				PROPERTIES: 'Properties',
 
 				// Resources
-				TYPE: 'Type',
-				ID: 'Id',
-				REGION: 'Region',
+				TYPE: 'TYPE',
+				ID: 'ID',
+				REGION: 'REGION',
 				REGIONS: 'Regions',
 				TYPES: 'Types',
 			},

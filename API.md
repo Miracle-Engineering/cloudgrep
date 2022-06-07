@@ -234,6 +234,33 @@ Example of response:
 ]
 ```
 
+## Get Engine Status
+
+Returns the Status of the Cloudgrep run.
+
+| Route                                                   | Method | Description              |  Status |
+|---------------------------------------------------------| ------------- |--------------------------| ------------- |
+| [/enginestatus](http://localhost:8080/api/enginestatus) | GET  | Return the Engine status |  :white_check_mark: |
+
+Sample Responses:
+```js
+// Successfully got all the resources
+{
+  "resource_name":"engine",
+  "error_message":"",
+  "status":"success",
+  "fetched_at":"2022-06-07T19:53:10.570698+05:30"
+}
+
+// Failed to get resources
+{
+  "resource_name":"engine",
+  "error_message":"Failed to get Load Balancer Resources.",
+  "status":"failed",
+  "fetched_at":"2022-06-07T19:53:10.570698+05:30"
+}
+```
+
 
 ## Mocked data
 

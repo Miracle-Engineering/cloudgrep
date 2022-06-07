@@ -4,9 +4,11 @@ import { CSSProperties } from 'react';
 const headerStyle: CSSProperties = {
 	backgroundColor: DARK_BLUE,
 	color: 'white',
-	height: 56,
+	height: 46,
 	fontFamily: 'Montserrat',
-	fontSize: 32,
+	fontSize: 18,
+	paddingTop: 0,
+	paddingBottom: 0,
 };
 
 const hoverStyle: CSSProperties = {

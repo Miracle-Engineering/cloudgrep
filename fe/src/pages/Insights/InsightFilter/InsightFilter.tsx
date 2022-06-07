@@ -61,7 +61,7 @@ const InsightFilter: FC = () => {
 				width: '20%',
 				height: '100%',
 				backgroundColor: '#F9F7F6',
-				overflowY: 'scroll',
+				overflowY: 'auto',
 			}}>
 			{fields.map((field: FieldGroup) => (
 				<Accordion key={field.name}>
@@ -72,7 +72,7 @@ const InsightFilter: FC = () => {
 						id={`${field.name}-header`}
 						key={field.name}
 						classes={overrideSummaryClasses}>
-						<Typography sx={accordionStyles.accordionHeader}>{field.name}</Typography>
+						<Typography sx={accordionStyles.accordionHeader}>{field.name.toUpperCase()}</Typography>
 					</AccordionSummary>
 					<AccordionDetails sx={{ padding: '0px' }}>
 						{field.fields.map((fieldItem: Field, index: number) => (
