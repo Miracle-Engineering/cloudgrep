@@ -34,7 +34,7 @@ lint:
 	golangci-lint run ./...
 
 test:
-	go test -race ./pkg/... ./cmd/... -coverprofile=coverage.out -covermode=atomic
+	go test -race ./hack/... ./pkg/... ./cmd/... -coverprofile=coverage.out -covermode=atomic
 
 load-test:
 	go test ./loadtest/...
