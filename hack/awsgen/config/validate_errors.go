@@ -42,14 +42,6 @@ func (err validationErr) Unwrap() error {
 	return err.wrapped
 }
 
-func serviceValidationError(svc Service, wrapped error) error {
-	return validationErr{svc: &svc, wrapped: wrapped}
-}
-
-func serviceValidationErrorS(svc Service, msg string) error {
-	return serviceValidationError(svc, errors.New(msg))
-}
-
 func typeValidationError(typ Type, wrapped error) error {
 	return validationErr{typ: &typ, wrapped: wrapped}
 }
@@ -78,19 +70,6 @@ func setErrContextType(typ Type, errs []error) {
 			validErr.typ = &typ
 		} else {
 			validErr = validationErr{typ: &typ, wrapped: err}
-		}
-
-		errs[idx] = validErr
-	}
-}
-
-func setErrContextExtra(extraContext string, errs []error) {
-	for idx, err := range errs {
-		var validErr validationErr
-		if errors.As(err, &validErr) {
-			validErr.extraContext = extraContext
-		} else {
-			validErr = validationErr{extraContext: extraContext, wrapped: err}
 		}
 
 		errs[idx] = validErr
