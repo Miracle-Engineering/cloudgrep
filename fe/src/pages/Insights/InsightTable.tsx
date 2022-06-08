@@ -20,7 +20,7 @@ import { isScrolledForInfiniteScroll } from 'utils/uiHelper';
 
 import { tableStyles } from './style';
 
-const TOTAL_RECORDS = 10000;
+const TOTAL_RECORDS = 10000; // todo update with real value from API response when available
 
 const InsightTable: FC = () => {
 	const { resources } = useAppSelector(state => state.resources);
