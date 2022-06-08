@@ -18,7 +18,7 @@ func Run(args []string) {
 		return
 	}
 
-	fmt.Printf("error while running:\n%v", err)
+	fmt.Printf("error while running:\n%v\n", err)
 	os.Exit(1)
 }
 

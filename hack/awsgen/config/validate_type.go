@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"regexp"
-	"strings"
 
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
@@ -14,7 +13,6 @@ func (t Type) Validate() []error {
 
 	errs = append(errs, validateFuncs(t,
 		validateTypeName,
-		validateTypeDescription,
 		validateTypeTags,
 	)...)
 
@@ -43,16 +41,6 @@ func validateTypeName(typ Type) []error {
 	return nil
 }
 
-func validateTypeDescription(typ Type) []error {
-	if strings.TrimSpace(typ.Description) == "" {
-		return []error{
-			typeValidationErrorS(typ, "type description cannot be empty"),
-		}
-	}
-
-	return nil
-}
-
 func validateTypeTags(typ Type) []error {
 	var errs []error
 
@@ -60,7 +48,7 @@ func validateTypeTags(typ Type) []error {
 
 	m := map[string]*TagField{
 		"listApi": typ.ListAPI.Tags,
-		name:      typ.GetTagsAPI.TagField,
+		name:      typ.GetTagsAPI.Tags,
 	}
 
 	hasTags := typ.GetTagsAPI.Has()

@@ -53,6 +53,10 @@ func (f TagField) Validate() []error {
 				errs = append(errs, fmt.Errorf("%s must not be set with style=map", name))
 			}
 		}
+
+		if f.Pointer {
+			errs = append(errs, errors.New("pointer not supported with style=map"))
+		}
 	} else if f.Style == "struct" {
 		v = func(name, val string) {
 			if val == "" {

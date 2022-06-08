@@ -1,6 +1,5 @@
 types:
   - name: Bucket
-    description: S3 Buckets
     listApi:
       call: ListBuckets
       outputKey: [Buckets]

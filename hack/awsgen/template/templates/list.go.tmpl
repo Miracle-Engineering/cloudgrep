@@ -1,6 +1,6 @@
 {{- define "handleErr" }}
 if err != nil {
-	return fmt.Errorf("failed to fetch {{ . }}: %w", err)
+	return fmt.Errorf("failed to fetch %s: %w", {{ . | quote }}, err)
 }
 {{- end }}
 
@@ -37,13 +37,13 @@ func (p *{{ .ProviderName}}) {{ .FuncName }}(ctx context.Context, output chan<- 
 	paginator := {{ .ServicePkg }}.New{{ .APIAction }}Paginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
-		{{ include "handleErr" .Description | tabindent 2 }}
+		{{ include "handleErr" .ResourceName | tabindent 2 }}
 
 		{{ include "output" (.OutputKey.WithRoot "page") | tabindent 2 }}
 	}
 	{{- else }}
 	results, err := client.{{ .APIAction }}(ctx, input)
-	{{- include "handleErr" .Description | tabindent 1 }}
+	{{- include "handleErr" .ResourceName | tabindent 1 }}
 
 	{{- include "output" (.OutputKey.WithRoot "results") | tabindent 1 }}
 	{{- end }}

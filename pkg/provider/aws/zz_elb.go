@@ -29,7 +29,7 @@ func (p *Provider) fetch_elb_LoadBalancer(ctx context.Context, output chan<- mod
 		page, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return fmt.Errorf("failed to fetch Elastic Load Balancers: %w", err)
+			return fmt.Errorf("failed to fetch %s: %w", "elb.LoadBalancer", err)
 		}
 
 		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.LoadBalancers, p.getTags_elb_LoadBalancer); err != nil {
@@ -47,7 +47,7 @@ func (p *Provider) getTags_elb_LoadBalancer(ctx context.Context, resource types.
 
 	output, err := client.DescribeTags(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch Elastic Load Balancers tags: %w", err)
+		return nil, fmt.Errorf("failed to fetch %s tags: %w", "elb.LoadBalancer", err)
 	}
 	tagField_0 := output.TagDescriptions
 	var tagField_1 []types.Tag

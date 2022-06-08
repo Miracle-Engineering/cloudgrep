@@ -43,7 +43,7 @@ func (p *Provider) fetch_rds_DBCluster(ctx context.Context, output chan<- model.
 		page, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return fmt.Errorf("failed to fetch RDS Auora DB Clusters: %w", err)
+			return fmt.Errorf("failed to fetch %s: %w", "rds.DBCluster", err)
 		}
 
 		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBClusters); err != nil {
@@ -64,7 +64,7 @@ func (p *Provider) fetch_rds_DBInstance(ctx context.Context, output chan<- model
 		page, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return fmt.Errorf("failed to fetch RDS DB Instances: %w", err)
+			return fmt.Errorf("failed to fetch %s: %w", "rds.DBInstance", err)
 		}
 
 		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBInstances); err != nil {

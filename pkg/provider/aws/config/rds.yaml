@@ -1,6 +1,5 @@
 types:
   - name: DBInstance
-    description: RDS DB Instances
     listApi:
       call: DescribeDBInstances
       pagination: true
@@ -11,7 +10,6 @@ types:
         key: Key
         value: Value
   - name: DBCluster
-    description: RDS Auora DB Clusters
     listApi:
       call: DescribeDBClusters
       pagination: true

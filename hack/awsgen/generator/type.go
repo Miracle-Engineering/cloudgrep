@@ -27,7 +27,6 @@ func (g Generator) generateType(service config.Service, typ config.Type) (string
 func (g Generator) generateTypeListFunction(service config.Service, typ config.Type) (string, util.ImportSet) {
 	data := struct {
 		ResourceName string
-		Description  string
 
 		FuncName     string
 		ProviderName string
@@ -40,7 +39,6 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 		TagFuncName string
 	}{
 		ResourceName: resourceName(service, typ),
-		Description:  typ.Description,
 
 		FuncName:     fetchFuncName(service, typ),
 		ProviderName: ProviderStructName,
@@ -72,13 +70,12 @@ func (g Generator) generateTypeTagFunction(service config.Service, typ config.Ty
 		return "", nil
 	}
 
-	if typ.GetTagsAPI.TagField == nil {
+	if typ.GetTagsAPI.Tags == nil {
 		panic("unexpected nil getTagsApi.tags")
 	}
 
 	data := struct {
 		ResourceName string
-		Description  string
 
 		FuncName     string
 		ProviderName string
@@ -90,10 +87,9 @@ func (g Generator) generateTypeTagFunction(service config.Service, typ config.Ty
 
 		InputIDField    config.Field
 		ResourceIDField config.Field
-		TagField        config.TagField
+		Tags            config.TagField
 	}{
 		ResourceName: resourceName(service, typ),
-		Description:  typ.Description,
 
 		FuncName:     tagFuncName(service, typ),
 		ProviderName: ProviderStructName,
@@ -105,7 +101,7 @@ func (g Generator) generateTypeTagFunction(service config.Service, typ config.Ty
 
 		InputIDField:    typ.GetTagsAPI.InputIDField,
 		ResourceIDField: typ.ListAPI.IDField,
-		TagField:        *typ.GetTagsAPI.TagField,
+		Tags:            *typ.GetTagsAPI.Tags,
 	}
 
 	var imports util.ImportSet

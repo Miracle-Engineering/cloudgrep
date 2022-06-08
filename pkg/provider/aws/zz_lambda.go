@@ -29,7 +29,7 @@ func (p *Provider) fetch_lambda_Function(ctx context.Context, output chan<- mode
 		page, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return fmt.Errorf("failed to fetch Lambda Functions: %w", err)
+			return fmt.Errorf("failed to fetch %s: %w", "lambda.Function", err)
 		}
 
 		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Functions, p.getTags_lambda_Function); err != nil {
@@ -47,7 +47,7 @@ func (p *Provider) getTags_lambda_Function(ctx context.Context, resource types.F
 
 	output, err := client.GetFunction(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch Lambda Functions tags: %w", err)
+		return nil, fmt.Errorf("failed to fetch %s tags: %w", "lambda.Function", err)
 	}
 	tagField_0 := output.Tags
 

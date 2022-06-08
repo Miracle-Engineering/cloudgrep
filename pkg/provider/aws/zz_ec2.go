@@ -33,7 +33,7 @@ func (p *Provider) fetch_ec2_Instance(ctx context.Context, output chan<- model.R
 		page, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return fmt.Errorf("failed to fetch EC2 Instances: %w", err)
+			return fmt.Errorf("failed to fetch %s: %w", "ec2.Instance", err)
 		}
 
 		for _, item_0 := range page.Reservations {

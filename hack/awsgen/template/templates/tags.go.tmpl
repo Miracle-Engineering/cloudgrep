@@ -22,10 +22,10 @@ func (p *{{ .ProviderName }}) {{ .FuncName }}(ctx context.Context, resource type
 			{{- end }}
 		}
 		{{- end }}
-		return nil, fmt.Errorf("failed to fetch {{.Description}} tags: %w", err)
+		return nil, fmt.Errorf("failed to fetch %s tags: %w", {{ .ResourceName | quote }}, err)
 	}
 
-	{{- range $idx, $field := .TagField.Field }}
+	{{- range $idx, $field := .Tags.Field }}
 	{{- $parent := (eq $idx 0) | ternary "output" (list "tagField_" (sub $idx 1) | join "") }}
 	{{- if $field.Pointer }}
 	if {{ $parent }}.{{ $field.Name}} == nil {
@@ -45,7 +45,7 @@ func (p *{{ .ProviderName }}) {{ .FuncName }}(ctx context.Context, resource type
 
 	var tags model.Tags
 
-	{{ include (list "style-" .TagField.Style | join "") .TagField | tabindent 1 }}
+	{{ include (list "style-" .Tags.Style | join "") .Tags | tabindent 1 }}
 
 	return tags, nil
 }

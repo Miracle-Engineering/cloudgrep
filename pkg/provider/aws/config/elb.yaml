@@ -2,7 +2,6 @@ servicePackage: elasticloadbalancingv2
 
 types:
   - name: LoadBalancer
-    description: Elastic Load Balancers
     listApi:
       call: DescribeLoadBalancers
       pagination: true

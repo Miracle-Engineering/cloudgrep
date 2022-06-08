@@ -1,6 +1,5 @@
 types:
   - name: Function
-    description: Lambda Functions
     listApi:
       call: ListFunctions
       pagination: true

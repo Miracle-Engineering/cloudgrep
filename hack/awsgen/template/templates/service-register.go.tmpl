@@ -4,11 +4,11 @@ func (p *{{ .ProviderName }}) {{ .FuncName }}(mapping map[string]mapper) {
 		FetchFunc: p.{{ .FetchFuncName }},
 		IdField: {{ .IDField.Name | quote }},
 		IsGlobal: {{ .Global }},
-		{{- if (not .TagField.Zero) }}
+		{{- if (not .Tags.Zero) }}
 		TagField: resourceconverter.TagField{
-			Name: {{ .TagField.Field.Last.Name | quote }},
-			Key: {{ .TagField.Key | quote }},
-			Value: {{ .TagField.Value | quote }},
+			Name: {{ .Tags.Field.Last.Name | quote }},
+			Key: {{ .Tags.Key | quote }},
+			Value: {{ .Tags.Value | quote }},
 		},
 		{{- end }}
 	}

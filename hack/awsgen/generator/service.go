@@ -54,10 +54,10 @@ func (g Generator) generateServiceRegister(service config.Service) (string, util
 			FetchFuncName: fetchFuncName(service, typ),
 			IDField:       typ.ListAPI.IDField,
 			Global:        global,
-			TagField:      typ.ListAPI.Tags,
+			Tags:          typ.ListAPI.Tags,
 		})
 
-		if !typ.GetTagsAPI.TagField.Zero() {
+		if !typ.GetTagsAPI.Tags.Zero() {
 			imports.AddPath("github.com/run-x/cloudgrep/pkg/resourceconverter")
 		}
 	}
@@ -69,7 +69,7 @@ type typeRegisterInfo struct {
 	ResourceName  string
 	FetchFuncName string
 
-	IDField  config.Field
-	Global   bool
-	TagField *config.TagField
+	IDField config.Field
+	Global  bool
+	Tags    *config.TagField
 }

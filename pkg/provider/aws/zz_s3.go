@@ -28,7 +28,7 @@ func (p *Provider) fetch_s3_Bucket(ctx context.Context, output chan<- model.Reso
 	resourceConverter := p.converterFor("s3.Bucket")
 	results, err := client.ListBuckets(ctx, input)
 	if err != nil {
-		return fmt.Errorf("failed to fetch S3 Buckets: %w", err)
+		return fmt.Errorf("failed to fetch %s: %w", "s3.Bucket", err)
 	}
 	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, results.Buckets, p.getTags_s3_Bucket); err != nil {
 		return err
@@ -50,7 +50,7 @@ func (p *Provider) getTags_s3_Bucket(ctx context.Context, resource types.Bucket)
 				return nil, nil
 			}
 		}
-		return nil, fmt.Errorf("failed to fetch S3 Buckets tags: %w", err)
+		return nil, fmt.Errorf("failed to fetch %s tags: %w", "s3.Bucket", err)
 	}
 	tagField_0 := output.TagSet
 
