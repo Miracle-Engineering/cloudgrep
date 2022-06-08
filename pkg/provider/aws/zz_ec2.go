@@ -26,6 +26,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 func (p *Provider) fetch_ec2_Instance(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeInstancesInput{}
+	input.Filters = describeInstancesFilters()
 
 	resourceConverter := p.converterFor("ec2.Instance")
 	paginator := ec2.NewDescribeInstancesPaginator(client, input)

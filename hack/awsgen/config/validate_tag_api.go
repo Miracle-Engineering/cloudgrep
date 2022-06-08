@@ -15,7 +15,7 @@ func (api GetTagsAPI) Validate() []error {
 			validateTagAPIInputIDField,
 			validateTagAPITags,
 			validateTagAPIAllowedAPIErrorCodes,
-			validateTagAPIUnset,
+			validateTagAPIInputOverrides,
 		)...)
 	} else {
 		errs = append(errs, validateFuncs(api,
@@ -68,11 +68,11 @@ func validateTagAPIAllowedAPIErrorCodes(api GetTagsAPI) []error {
 	return errs
 }
 
-func validateTagAPIUnset(api GetTagsAPI) []error {
-	if api.Has() {
-		return nil
-	}
+func validateTagAPIInputOverrides(api GetTagsAPI) []error {
+	return validateInputOverrides(api.InputOverrides)
+}
 
+func validateTagAPIUnset(api GetTagsAPI) []error {
 	var errs []error
 
 	msgFmt := "expected `call` to be set when %s is set"

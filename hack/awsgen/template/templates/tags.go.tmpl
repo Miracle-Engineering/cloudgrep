@@ -10,6 +10,19 @@ func (p *{{ .ProviderName }}) {{ .FuncName }}(ctx context.Context, resource type
 	resource.{{ .ResourceIDField.Name }}
 	{{- if .InputIDField.SliceType -}} } {{- end }}
 
+	{{- range $name, $funcName := .InputOverrides.FieldFuncs }}
+	input.{{ $name }} = {{ $funcName }}()
+	{{- end }}
+
+	{{- range .InputOverrides.FullFuncs }}
+	{
+		var err error {{/* make sure the func returns an error */}}
+		if err = {{ . }}(input); err != nil {
+			return fmt.Errorf("error overriding input with %s(input) for %s", {{ . | quote }}, {{ $.ResourceName | quote }})
+		}
+	}
+	{{- end }}
+
 	output, err := client.{{ .APIAction }}(ctx, input)
 	if err != nil {
 		{{- with .AllowedAPIErrorCodes }}

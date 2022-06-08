@@ -20,6 +20,19 @@ func (p *{{ .ProviderName}}) {{ .FuncName }}(ctx context.Context, output chan<- 
 	client := {{ .ServicePkg }}.NewFromConfig(p.config)
 	input := &{{ .ServicePkg }}.{{ .APIAction }}Input{}
 
+	{{- range $name, $funcName := .InputOverrides.FieldFuncs }}
+	input.{{ $name }} = {{ $funcName }}()
+	{{- end }}
+
+	{{- range .InputOverrides.FullFuncs }}
+	{
+		var err error {{/* make sure the func returns an error */}}
+		if err = {{ . }}(input); err != nil {
+			return fmt.Errorf("error overriding input with %s(input) for %s", {{ . | quote }}, {{ $.ResourceName | quote }})
+		}
+	}
+	{{- end }}
+
 	resourceConverter := p.converterFor({{ .ResourceName | quote }})
 
 	{{- $convertCall := "SendAllConverted" }}

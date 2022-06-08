@@ -51,6 +51,9 @@ type ListAPI struct {
 	// Call is the AWS API call to make within the service
 	Call string `yaml:"call"`
 
+	// InputOverrides stores configuration for setting input fields
+	InputOverrides InputOverrides `yaml:"inputOverrides"`
+
 	// Pagination should be set to true if this API has pagination support.
 	Pagination bool `yaml:"pagination"`
 
@@ -78,6 +81,9 @@ type GetTagsAPI struct {
 
 	// InputIDField is the field within the API call's input where we put the resource's ID (from the ListAPI.IDField)
 	InputIDField Field `yaml:"inputIDField"`
+
+	// InputOverrides stores configuration for setting input fields
+	InputOverrides InputOverrides `yaml:"inputOverrides"`
 
 	// Tags defines where tags are present in the API call output.
 	Tags *TagField `yaml:"tags"`
@@ -124,4 +130,15 @@ type Field struct {
 	// Pointer controls if this field is a pointer that must be dereferenced.
 	// Cannot be used with SliceType
 	Pointer bool `yaml:"pointer"`
+}
+
+// InputOverrides configures functions to call to set values in the API input struct.
+type InputOverrides struct {
+	// FieldFuncs is a mapping of input field names to function names for setting single fields on the input struct.
+	// Each function is called without any arguments, and its return type must be the type of the field.
+	FieldFuncs map[string]string `yaml:"fieldFuncs"`
+
+	// FullFuncs is a list functions to call with a pointer to the input struct.
+	// Each function must have a return type of an error.
+	FullFuncs []string `yaml:"fullFuncs"`
 }

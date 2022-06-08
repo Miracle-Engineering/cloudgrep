@@ -2,6 +2,9 @@ types:
   - name: Instance
     listApi:
       call: DescribeInstances
+      inputOverrides:
+        fieldFuncs:
+          Filters: describeInstancesFilters
       pagination: true
       outputKey: [Reservations, Instances]
       id: InstanceId

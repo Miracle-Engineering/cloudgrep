@@ -13,6 +13,7 @@ func (api ListAPI) Validate() []error {
 		validateListAPIOutputKey,
 		validateListAPIIDField,
 		validateListAPITagField,
+		validateListAPIInputOverrides,
 	)...)
 
 	return errs
@@ -80,4 +81,8 @@ func validateListAPITagField(api ListAPI) []error {
 	setErrContextExtraPrepend("tags", errs)
 
 	return errs
+}
+
+func validateListAPIInputOverrides(api ListAPI) []error {
+	return validateInputOverrides(api.InputOverrides)
 }

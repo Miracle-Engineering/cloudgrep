@@ -36,6 +36,18 @@ func isValidTypeRef(typ string) bool {
 	return true
 }
 
+func isValidNameRef(name string) bool {
+	parts := strings.Split(name, ".")
+
+	for _, part := range parts {
+		if !token.IsIdentifier(part) {
+			return false
+		}
+	}
+
+	return true
+}
+
 func validateFuncs[T any](val T, funcs ...func(T) []error) []error {
 	var errs []error
 	for _, f := range funcs {

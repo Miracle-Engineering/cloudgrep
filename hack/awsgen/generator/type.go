@@ -31,9 +31,10 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 		FuncName     string
 		ProviderName string
 
-		ServicePkg string
-		APIAction  string
-		Paginated  bool
+		ServicePkg     string
+		APIAction      string
+		Paginated      bool
+		InputOverrides config.InputOverrides
 
 		OutputKey   *util.RecursiveAppend
 		TagFuncName string
@@ -43,9 +44,11 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 		FuncName:     fetchFuncName(service, typ),
 		ProviderName: ProviderStructName,
 
-		ServicePkg: service.ServicePackage,
-		APIAction:  typ.ListAPI.Call,
-		Paginated:  typ.ListAPI.Pagination,
+		ServicePkg:     service.ServicePackage,
+		APIAction:      typ.ListAPI.Call,
+		Paginated:      typ.ListAPI.Pagination,
+		InputOverrides: typ.ListAPI.InputOverrides,
+
 		OutputKey: &util.RecursiveAppend{
 			Keys: typ.ListAPI.OutputKey,
 		},
@@ -84,6 +87,7 @@ func (g Generator) generateTypeTagFunction(service config.Service, typ config.Ty
 		APIAction            string
 		SDKType              string
 		AllowedAPIErrorCodes []string
+		InputOverrides       config.InputOverrides
 
 		InputIDField    config.Field
 		ResourceIDField config.Field
@@ -98,6 +102,7 @@ func (g Generator) generateTypeTagFunction(service config.Service, typ config.Ty
 		APIAction:            typ.GetTagsAPI.Call,
 		SDKType:              typ.GetTagsAPI.ResourceType,
 		AllowedAPIErrorCodes: typ.GetTagsAPI.AllowedAPIErrorCodes,
+		InputOverrides:       typ.GetTagsAPI.InputOverrides,
 
 		InputIDField:    typ.GetTagsAPI.InputIDField,
 		ResourceIDField: typ.ListAPI.IDField,
