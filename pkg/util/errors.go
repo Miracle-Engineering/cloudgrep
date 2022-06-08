@@ -31,7 +31,7 @@ func GetStackTrace(e error) string {
 	return ""
 }
 
-func AddStackStrace(e error) error {
+func AddStackTrace(e error) error {
 	if showErrorStackTrace {
 		return stackTraceError{
 			StackTrace: string(debug.Stack()),
