@@ -12,8 +12,16 @@ import (
 //go:embed resources.json
 var embedResources []byte
 
-//go:embed engine_statuses.json
+//go:embed resource_events.json
+var embedResourceEvents []byte
+
+//go:embed engine_status.json
 var embedEngineStatus []byte
+
+type TestEngineStatusResourceEvents struct {
+	ResourceEvents []model.ResourceEvent `json:"resourceEvents"`
+	EngineStatus   model.EngineStatus    `json:"engineStatus"`
+}
 
 func GetResources(t *testing.T) []*model.Resource {
 	resources := []*model.Resource{}
@@ -23,9 +31,16 @@ func GetResources(t *testing.T) []*model.Resource {
 	return resources
 }
 
-func GetEngineStatus(t *testing.T) []model.EngineStatus {
-	engineStatus := []model.EngineStatus{}
-	err := json.Unmarshal(embedEngineStatus, &engineStatus)
+func GetResourceEvents(t *testing.T) []model.ResourceEvent {
+	resourceEvents := model.ResourceEvents{}
+	err := json.Unmarshal(embedResourceEvents, &resourceEvents)
 	assert.NoError(t, err)
-	return engineStatus
+	return resourceEvents
+}
+
+func GetEngineStatusesResourceEvents(t *testing.T) []TestEngineStatusResourceEvents {
+	var engineStatusesResourceEvents []TestEngineStatusResourceEvents
+	err := json.Unmarshal(embedEngineStatus, &engineStatusesResourceEvents)
+	assert.NoError(t, err)
+	return engineStatusesResourceEvents
 }

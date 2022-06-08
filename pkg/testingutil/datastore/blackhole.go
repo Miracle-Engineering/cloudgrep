@@ -51,11 +51,14 @@ func (s *Blackhole) GetFields(context.Context) (model.FieldGroups, error) {
 	return nil, nil
 }
 
-func (s *Blackhole) WriteEngineStatusStart(ctx context.Context, resource string) error {
+func (s *Blackhole) CaptureEngineStart(ctx context.Context) {
+}
+
+func (s *Blackhole) CaptureEngineEnd(ctx context.Context) error {
 	return nil
 }
 
-func (s *Blackhole) WriteEngineStatusEnd(ctx context.Context, resource string, err error) error {
+func (s *Blackhole) WriteResourceEvent(ctx context.Context, resourceEvent model.ResourceEvent) error {
 	return nil
 }
 

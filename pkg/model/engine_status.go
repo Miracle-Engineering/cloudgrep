@@ -1,29 +1,29 @@
 package model
 
-import (
-	"time"
-)
+import "time"
 
 const (
-	EngineStatusFetching = "fetching"
-	EngineStatusSuccess  = "success"
-	EngineStatusFailed   = "failed"
+	EngineStatusSuccess          = "success"
+	EngineStatusFailed           = "failed"
+	EngineStatusFetching         = "fetching"
+	EngineStatusFailedAtCreation = "failedAtCreation"
 )
 
 type EngineStatus struct {
-	ResourceType string    `json:"resourceType" gorm:"primaryKey"`
-	ErrorMessage string    `json:"errorMessage"`
-	Status       string    `json:"status"`
-	FetchedAt    time.Time `json:"fetchedAt"`
+	FetchStatus    string         `json:"fetchStatus"`
+	FetchedAt      time.Time      `json:"fetchedAt"`
+	ResourceEvents ResourceEvents `json:"resourceEvents"`
 }
 
-func NewEngineStatus(status string, resource string, err error) EngineStatus {
-	var engineStatus EngineStatus
-	engineStatus.Status = status
-	engineStatus.ResourceType = resource
-	engineStatus.FetchedAt = time.Now()
-	if err != nil {
-		engineStatus.ErrorMessage = err.Error()
+func NewEngineStatus(resourceEvents ResourceEvents, failedAtCreation bool) EngineStatus {
+	if failedAtCreation {
+		return EngineStatus{
+			FetchStatus: EngineStatusFailedAtCreation,
+		}
 	}
-	return engineStatus
+	return EngineStatus{
+		FetchStatus:    resourceEvents.GetStatus(),
+		FetchedAt:      time.Now(),
+		ResourceEvents: resourceEvents,
+	}
 }

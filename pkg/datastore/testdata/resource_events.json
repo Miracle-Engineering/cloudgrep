@@ -1,0 +1,32 @@
+[
+    {
+        "resourceType": "ec2.Volume",
+        "fetchStatus":  "fetching",
+        "errorMessage": ""
+    },
+    {
+        "resourceType": "ec2.Instances",
+        "fetchStatus":  "fetching",
+        "errorMessage": ""
+    },
+    {
+        "resourceType": "lambda.Function",
+        "fetchStatus":  "fetching",
+        "errorMessage": ""
+    },
+    {
+        "resourceType": "ec2.Volume",
+        "fetchStatus":  "success",
+        "errorMessage": ""
+    },
+    {
+        "resourceType": "ec2.Instances",
+        "fetchStatus":  "success",
+        "errorMessage": ""
+    },
+    {
+        "resourceType": "lambda.Function",
+        "fetchStatus":  "error",
+        "errorMessage": "Error fetching lambda function"
+    }
+]

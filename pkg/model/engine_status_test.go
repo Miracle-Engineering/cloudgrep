@@ -1,22 +1,100 @@
 package model
 
 import (
-	"errors"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestMakeEngineStatus(t *testing.T) {
-	mockResourceName := "engine"
-	statusFetching := NewEngineStatus(EngineStatusSuccess, mockResourceName, nil)
-	assert.Equal(t, "", statusFetching.ErrorMessage)
-	assert.Equal(t, EngineStatusSuccess, statusFetching.Status)
-	assert.Equal(t, mockResourceName, statusFetching.ResourceType)
-
-	statusFailedError := errors.New("failed")
-	statusFailed := NewEngineStatus(EngineStatusFailed, mockResourceName, statusFailedError)
-	assert.Equal(t, statusFailedError.Error(), statusFailed.ErrorMessage)
-	assert.Equal(t, EngineStatusFailed, statusFailed.Status)
-	assert.Equal(t, mockResourceName, statusFetching.ResourceType)
+func TestEngineStatusNewEngineStatus(t *testing.T) {
+	type args struct {
+		resourceEvents   ResourceEvents
+		failedAtCreation bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want EngineStatus
+	}{
+		{
+			name: "failedAtCreation",
+			args: args{
+				resourceEvents:   ResourceEvents(nil),
+				failedAtCreation: true,
+			},
+			want: EngineStatus{
+				FetchStatus:    EngineStatusFailedAtCreation,
+				ResourceEvents: ResourceEvents(nil),
+			},
+		},
+		{
+			name: "success",
+			args: args{
+				resourceEvents: ResourceEvents{
+					{
+						FetchStatus:  ResourceEventStatusSuccess,
+						ResourceType: "ec2.Volume",
+						ErrorMessage: "",
+					},
+					{
+						FetchStatus:  ResourceEventStatusSuccess,
+						ResourceType: "ec2.Instance",
+						ErrorMessage: "",
+					},
+				},
+				failedAtCreation: false,
+			},
+			want: EngineStatus{
+				FetchStatus: EngineStatusSuccess,
+				ResourceEvents: ResourceEvents{
+					{
+						FetchStatus:  ResourceEventStatusSuccess,
+						ResourceType: "ec2.Volume",
+						ErrorMessage: "",
+					},
+					{
+						FetchStatus:  ResourceEventStatusSuccess,
+						ResourceType: "ec2.Instance",
+						ErrorMessage: "",
+					},
+				},
+			},
+		},
+		{
+			name: "failed",
+			args: args{
+				resourceEvents: ResourceEvents{
+					{
+						FetchStatus:  ResourceEventStatusSuccess,
+						ResourceType: "ec2.Volume",
+						ErrorMessage: "",
+					},
+					{
+						FetchStatus:  ResourceEventStatusFailed,
+						ResourceType: "ec2.Instance",
+						ErrorMessage: "Unable to fetch EC2.Instances",
+					},
+				},
+				failedAtCreation: false,
+			},
+			want: EngineStatus{
+				FetchStatus: EngineStatusFailed,
+				ResourceEvents: ResourceEvents{
+					{
+						FetchStatus:  ResourceEventStatusSuccess,
+						ResourceType: "ec2.Volume",
+						ErrorMessage: "",
+					},
+					{
+						FetchStatus:  ResourceEventStatusFailed,
+						ResourceType: "ec2.Instance",
+						ErrorMessage: "Unable to fetch EC2.Instances",
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			AssertEqualsEngineStatus(t, tt.want, NewEngineStatus(tt.args.resourceEvents, tt.args.failedAtCreation))
+		})
+	}
 }

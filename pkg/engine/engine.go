@@ -20,7 +20,7 @@ type Engine struct {
 	Sequencer sequencer.Sequencer
 }
 
-//Setup the providers, make sure configuration is valid
+// NewEngine Set up the providers, make sure configuration is valid
 func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datastore datastore.Datastore) (Engine, error) {
 	e := Engine{}
 	e.Datastore = datastore
@@ -39,13 +39,13 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 
 //Run the providers: fetches data about cloud resources and save them to store
 func (e *Engine) Run(ctx context.Context) error {
-	err := e.Datastore.WriteEngineStatusStart(ctx, "engine")
+	e.Datastore.CaptureEngineStart(ctx)
+	err := e.Sequencer.Run(ctx, e, e.Providers)
 	if err != nil {
 		log.Default().Println(err.Error())
 		return err
 	}
-	err = e.Sequencer.Run(ctx, e, e.Providers)
-	err = e.Datastore.WriteEngineStatusEnd(ctx, "engine", err)
+	err = e.Datastore.CaptureEngineEnd(ctx)
 	if err != nil {
 		log.Default().Println(err.Error())
 		return err

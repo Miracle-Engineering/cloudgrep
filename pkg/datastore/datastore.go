@@ -16,8 +16,9 @@ type Datastore interface {
 	WriteResources(context.Context, model.Resources) error
 	Stats(context.Context) (model.Stats, error)
 	GetFields(context.Context) (model.FieldGroups, error)
-	WriteEngineStatusStart(context.Context, string) error
-	WriteEngineStatusEnd(context.Context, string, error) error
+	CaptureEngineStart(context.Context)
+	CaptureEngineEnd(context.Context) error
+	WriteResourceEvent(ctx context.Context, resourceEvent model.ResourceEvent) error
 	GetEngineStatus(context.Context) (model.EngineStatus, error)
 	Ping() error
 }

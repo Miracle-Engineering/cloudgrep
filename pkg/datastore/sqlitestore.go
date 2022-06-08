@@ -22,8 +22,9 @@ type SQLiteStore struct {
 	db      *gorm.DB
 	indexer resourceIndexer
 	//fetchedAt is the last time the resources were fetched
-	fetchedAt  time.Time
-	muResource sync.Mutex
+	fetchedAt       time.Time
+	muResource      sync.Mutex
+	muResourceEvent sync.Mutex
 }
 
 func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLiteStore, error) {
@@ -53,7 +54,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	}
 
 	// Migrate the schema
-	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.EngineStatus{}); err != nil {
+	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.ResourceEvent{}); err != nil {
 		return nil, fmt.Errorf("can't create the SQLite data model: %w", err)
 	}
 
@@ -298,46 +299,23 @@ func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) (model
 	return s.getResourcesById(ctx, ids)
 }
 
-func (s *SQLiteStore) WriteEngineStatusStart(ctx context.Context, resource string) error {
-	status := model.NewEngineStatus(model.EngineStatusFetching, resource, nil)
-	s.logger.Sugar().Infow("Writing Engine Status: ",
-		zap.Any("status", status),
-	)
-	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
-	if result.RowsAffected == 1 {
-		result = s.db.Model(&status).Updates(status)
-	} else {
-		result = s.db.Create(&status)
-	}
+func (s *SQLiteStore) WriteResourceEvent(ctx context.Context, resourceEvent model.ResourceEvent) error {
+	s.muResourceEvent.Lock()
+	defer s.muResourceEvent.Unlock()
+	result := s.db.Create(&resourceEvent)
 	if result.Error != nil {
-		return fmt.Errorf("can't write engine status to database: %w", result.Error)
+		return fmt.Errorf("can't write resource event to database: %w", result.Error)
 	}
-	s.fetchedAt = time.Now()
 	return nil
 }
 
-func (s *SQLiteStore) WriteEngineStatusEnd(ctx context.Context, resource string, err error) error {
-	var status model.EngineStatus
-	if err != nil {
-		status = model.NewEngineStatus(model.EngineStatusFailed, resource, err)
-	} else {
-		status = model.NewEngineStatus(model.EngineStatusSuccess, resource, nil)
-	}
-	s.logger.Sugar().Infow("Writing Engine Status: ",
-		zap.Any("status", status),
-	)
-	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
-	if result.RowsAffected == 1 {
-		result = s.db.Model(&status).Updates(status)
-	} else {
-		result = s.db.Create(&status)
-	}
-	if result.Error != nil {
-		return fmt.Errorf("can't write engine status to database: %w", result.Error)
-	}
+func (s *SQLiteStore) CaptureEngineStart(ctx context.Context) {
+	s.fetchedAt = time.Now()
+}
 
+func (s *SQLiteStore) CaptureEngineEnd(ctx context.Context) error {
 	//once engine is complete, we delete all the resources that no longer exist
-	_, err = s.deleteResourcesBefore(s.fetchedAt)
+	_, err := s.deleteResourcesBefore(s.fetchedAt)
 	if err != nil {
 		return err
 	}
@@ -406,10 +384,20 @@ func (s *SQLiteStore) deleteResourcesBefore(before time.Time) (int, error) {
 }
 
 func (s *SQLiteStore) GetEngineStatus(context.Context) (model.EngineStatus, error) {
-	var status model.EngineStatus
-	db := s.db.Model(&model.EngineStatus{}).Select("*").Order("fetched_at desc").Last(&status)
-	if db.Error != nil {
-		return model.EngineStatus{}, fmt.Errorf("can't fetch engine status' : %w", db.Error)
+	var resourceEvents model.ResourceEvents
+	result := s.db.
+		Model(&model.ResourceEvent{}).
+		Where("id in (?)",
+			s.db.
+				Model(&model.ResourceEvents{}).
+				Select("max(id)").
+				Group("resource_type")).
+		Find(&resourceEvents)
+
+	if result.Error != nil {
+		return model.NewEngineStatus(nil, true),
+			fmt.Errorf("unable to fetch the resource events: %w", result.Error)
 	}
-	return status, nil
+
+	return model.NewEngineStatus(resourceEvents, false), nil
 }
