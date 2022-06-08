@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/run-x/cloudgrep/pkg/util"
+	"golang.org/x/exp/slices"
 )
 
 type dirWriter struct {
@@ -83,7 +83,7 @@ func (w *dirWriter) Clean() error {
 		name = strings.TrimPrefix(name, FileNamePrefix)
 		name = strings.TrimSuffix(name, FileNameSuffix)
 
-		if util.Contains(w.written, name) {
+		if slices.Contains(w.written, name) {
 			continue
 		}
 
