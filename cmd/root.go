@@ -72,7 +72,7 @@ their cloud accounts.`,
 func Execute() {
 	err := NewRootCmd(os.Stdout).Execute()
 	if err != nil {
-		util.PrintStacktrace(err, os.Stderr)
+		util.PrintStackTrace(err, os.Stderr)
 		os.Exit(1)
 	}
 }

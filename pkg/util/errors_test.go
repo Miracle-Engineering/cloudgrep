@@ -44,14 +44,14 @@ func TestAddStackStrace(t *testing.T) {
 		defer mu.Unlock()
 		showErrorStackTrace = false
 		err := errors.New("hi")
-		require.Equal(t, err, AddStackStrace(err))
+		require.Equal(t, err, AddStackTrace(err))
 	})
 	t.Run("WithStackTrace", func(t *testing.T) {
 		mu.Lock()
 		defer mu.Unlock()
 		showErrorStackTrace = true
 		err := errors.New("hi")
-		newerr := AddStackStrace(err)
+		newerr := AddStackTrace(err)
 		require.NotEqual(t, err, newerr)
 		var sTE stackTraceError
 		require.True(t, errors.As(newerr, &sTE))
@@ -66,7 +66,7 @@ func TestPrintStacktrace(t *testing.T) {
 	t.Run("NoStackTrace", func(t *testing.T) {
 		err := errors.New("hi")
 		var b bytes.Buffer
-		PrintStacktrace(err, &b)
+		PrintStackTrace(err, &b)
 		require.Equal(t, 0, b.Len())
 	})
 	t.Run("WithStackTrace", func(t *testing.T) {
@@ -75,7 +75,7 @@ func TestPrintStacktrace(t *testing.T) {
 			StackTrace: "blah",
 		}
 		var b bytes.Buffer
-		PrintStacktrace(err, &b)
+		PrintStackTrace(err, &b)
 		require.Equal(t, "Stack Trace:\nblah\nhi", b.String())
 
 	})

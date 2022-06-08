@@ -33,7 +33,8 @@ func GetStackTrace(e error) string {
 
 func AddStackTrace(e error) error {
 	if showErrorStackTrace {
-		if errors.As(e, &stackTraceError) {
+		var cgerr stackTraceError
+		if errors.As(e, &cgerr) {
 			return e
 		}
 		return stackTraceError{

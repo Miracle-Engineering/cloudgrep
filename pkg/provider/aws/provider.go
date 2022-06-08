@@ -94,16 +94,16 @@ func VerifyCreds(ctx context.Context, config aws.Config) (*sts.GetCallerIdentity
 	input := &sts.GetCallerIdentityInput{}
 	creds, err := config.Credentials.Retrieve(ctx)
 	if err != nil || !creds.HasKeys() {
-		return nil, util.AddStackStrace(fmt.Errorf("no AWS credentials found"))
+		return nil, util.AddStackTrace(fmt.Errorf("no AWS credentials found"))
 	}
 	result, err := stsClient.GetCallerIdentity(ctx, input)
 	if err != nil {
 		var apiErr smithy.APIError
 		if errors.As(err, &apiErr) {
-			return nil, util.AddStackStrace(fmt.Errorf(
+			return nil, util.AddStackTrace(fmt.Errorf(
 				"invalid AWS credentials (try running aws sts get-caller-identity). Error code: %v", apiErr.ErrorCode()))
 		} else {
-			return nil, util.AddStackStrace(err)
+			return nil, util.AddStackTrace(err)
 		}
 	}
 	return result, nil
