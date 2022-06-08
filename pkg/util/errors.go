@@ -41,7 +41,7 @@ func AddStackTrace(e error) error {
 	return e
 }
 
-func PrintStacktrace(e error, w io.Writer) {
+func PrintStackTrace(e error, w io.Writer) {
 	var err error
 	stackTrace := GetStackTrace(e)
 	if stackTrace != "" {
