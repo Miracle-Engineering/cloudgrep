@@ -19,7 +19,7 @@ const accordionHeader: CSSProperties = {
 
 const details: CSSProperties = {
 	overflowY: 'auto',
-	maxHeight: '120px', // todo increase height to about 5 elements
+	maxHeight: '180px',
 	marginTop: '10px',
 };
 
