@@ -44,11 +44,16 @@ func (g Generator) generateServiceRegister(service config.Service) (string, util
 	var imports util.ImportSet
 
 	for _, typ := range service.Types {
+		global := service.Global
+		if typ.Global != nil {
+			global = *typ.Global
+		}
+
 		data.Types = append(data.Types, typeRegisterInfo{
 			ResourceName:  resourceName(service, typ),
 			FetchFuncName: fetchFuncName(service, typ),
 			IDField:       typ.ListAPI.IDField,
-			Global:        typ.Global,
+			Global:        global,
 			TagField:      typ.ListAPI.Tags,
 		})
 
@@ -66,5 +71,5 @@ type typeRegisterInfo struct {
 
 	IDField  config.Field
 	Global   bool
-	TagField config.TagField
+	TagField *config.TagField
 }

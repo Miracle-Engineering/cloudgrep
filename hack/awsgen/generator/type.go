@@ -72,6 +72,10 @@ func (g Generator) generateTypeTagFunction(service config.Service, typ config.Ty
 		return "", nil
 	}
 
+	if typ.GetTagsAPI.TagField == nil {
+		panic("unexpected nil getTagsApi.tags")
+	}
+
 	data := struct {
 		ResourceName string
 		Description  string
@@ -101,7 +105,7 @@ func (g Generator) generateTypeTagFunction(service config.Service, typ config.Ty
 
 		InputIDField:    typ.GetTagsAPI.InputIDField,
 		ResourceIDField: typ.ListAPI.IDField,
-		TagField:        typ.GetTagsAPI.TagField,
+		TagField:        *typ.GetTagsAPI.TagField,
 	}
 
 	var imports util.ImportSet

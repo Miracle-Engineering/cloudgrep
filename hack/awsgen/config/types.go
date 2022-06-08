@@ -3,6 +3,7 @@ package config
 type Service struct {
 	Name           string
 	ServicePackage string `yaml:"servicePackage"`
+	Global         bool   `yaml:"global"`
 	Types          []Type `yaml:"types"`
 }
 
@@ -11,7 +12,7 @@ type Type struct {
 	ListAPI     ListAPI   `yaml:"listApi"`
 	GetTagsAPI  GetTagAPI `yaml:"getTagsApi"`
 	Description string    `yaml:"description"`
-	Global      bool      `yaml:"global"`
+	Global      *bool     `yaml:"global"`
 }
 
 type TagField struct {
@@ -23,11 +24,11 @@ type TagField struct {
 }
 
 type ListAPI struct {
-	Call       string   `yaml:"call"`
-	Pagination bool     `yaml:"pagination"`
-	OutputKey  []string `yaml:"outputKey"`
-	IDField    Field    `yaml:"id"`
-	Tags       TagField `yaml:"tags"`
+	Call       string    `yaml:"call"`
+	Pagination bool      `yaml:"pagination"`
+	OutputKey  []string  `yaml:"outputKey"`
+	IDField    Field     `yaml:"id"`
+	Tags       *TagField `yaml:"tags"`
 }
 
 type GetTagAPI struct {
@@ -35,7 +36,7 @@ type GetTagAPI struct {
 	Call                 string      `yaml:"call"`
 	InputIDField         Field       `yaml:"inputIDField"`
 	OutputKey            NestedField `yaml:"outputKey"`
-	TagField             TagField    `yaml:"tags"`
+	TagField             *TagField   `yaml:"tags"`
 	AllowedAPIErrorCodes []string    `yaml:"allowedApiErrorCodes"`
 }
 

@@ -41,13 +41,22 @@ func Do(args []string) error {
 		return err
 	}
 
-	config, err := config.Load(opts.ConfigPath)
+	cfg, err := config.Load(opts.ConfigPath)
 	if err != nil {
 		return err
 	}
 
-	if config == nil {
+	if cfg == nil {
 		panic("unexpected nil config")
+	}
+
+	err = config.AggregateValidationErrors(cfg.Validate())
+	if err != nil {
+		return err
+	}
+
+	if opts.ValidateOnly {
+		return nil
 	}
 
 	writer, err := getWriter(opts)
@@ -60,7 +69,7 @@ func Do(args []string) error {
 		LineNumbers: opts.LineNumbers,
 	}
 
-	err = gen.Generate(writer, *config)
+	err = gen.Generate(writer, *cfg)
 	if err != nil {
 		return fmt.Errorf("error generating code: %w", err)
 	}

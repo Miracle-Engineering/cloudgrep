@@ -9,10 +9,11 @@ import (
 )
 
 type Options struct {
-	OutputPath  string
-	ConfigPath  string
-	Format      bool
-	LineNumbers bool
+	OutputPath   string
+	ConfigPath   string
+	Format       bool
+	LineNumbers  bool
+	ValidateOnly bool
 }
 
 func (o *Options) Default() {
@@ -24,6 +25,7 @@ func (o *Options) Bind(flags *pflag.FlagSet) {
 	flags.StringVarP(&o.ConfigPath, "config", "c", o.ConfigPath, "Location to root config file")
 	flags.BoolVar(&o.Format, "format", o.Format, "If true, run generated code through \"go fmt\" before returning")
 	flags.BoolVar(&o.LineNumbers, "line-numbers", o.LineNumbers, "If true, append line numbers to each line")
+	flags.BoolVar(&o.ValidateOnly, "validate-only", o.LineNumbers, "If true, append line numbers to each line")
 }
 
 func (o *Options) Validate() error {

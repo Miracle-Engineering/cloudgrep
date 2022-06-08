@@ -69,6 +69,17 @@ func (f *Field) decodeMappingNode(value *yaml.Node) error {
 	return nil
 }
 
-func (t TagField) Zero() bool {
+func (t *TagField) Zero() bool {
+	if t == nil {
+		return true
+	}
+
 	return t.Field.Empty()
+}
+
+func TagFieldValidStyles() []string {
+	return []string{
+		"map",
+		"struct",
+	}
 }

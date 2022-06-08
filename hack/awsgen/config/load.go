@@ -67,6 +67,8 @@ func loadConfigYaml(path string, val any) error {
 		return fmt.Errorf("cannot load config at %s: %w", path, err)
 	}
 
+	defer f.Close()
+
 	d := yaml.NewDecoder(f)
 	d.KnownFields(true)
 
