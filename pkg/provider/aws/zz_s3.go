@@ -13,6 +13,8 @@ import (
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
+// temp ci test
+
 func (p *Provider) register_s3(mapping map[string]mapper) {
 	mapping["s3.Bucket"] = mapper{
 		FetchFunc: p.fetch_s3_Bucket,
