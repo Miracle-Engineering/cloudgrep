@@ -37,10 +37,10 @@ func StartWebServer(ctx context.Context, cfg config.Config, logger *zap.Logger, 
 // Info renders the system information
 func Info(c *gin.Context) {
 	successResponse(c, gin.H{
-		"version":    version.Version,
-		"go_version": version.GoVersion,
-		"git_sha":    version.GitCommit,
-		"build_time": version.BuildTime,
+		"version":   version.Version,
+		"goVersion": version.GoVersion,
+		"gitSha":    version.GitCommit,
+		"buildTime": version.BuildTime,
 	})
 }
 

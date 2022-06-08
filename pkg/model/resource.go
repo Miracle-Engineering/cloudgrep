@@ -1,7 +1,9 @@
 package model
 
-import "go.uber.org/zap/zapcore"
-import "gorm.io/datatypes"
+import (
+	"go.uber.org/zap/zapcore"
+	"gorm.io/datatypes"
+)
 
 //TODO store provider info in resource (needed when we can have more than one provider)
 type Resource struct {
