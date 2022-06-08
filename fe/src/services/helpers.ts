@@ -1,8 +1,5 @@
+import { AND_OPERATOR, OR_OPERATOR, PAGE_LENGTH } from 'constants/globals';
 import { Tag } from 'models/Tag';
-
-const PAGE_LIMIT = 100;
-const OR_OPERATOR = '$or';
-const AND_OPERATOR = '$and';
 
 export const getArrayOfObjects = (data: Tag[]) => {
 	return data.map((tag: Tag) => {
@@ -12,7 +9,7 @@ export const getArrayOfObjects = (data: Tag[]) => {
 	});
 };
 
-export const getResourcesFilters = (data: Tag[], offset = 0, limit = PAGE_LIMIT) => {
+export const getResourcesFilters = (data: Tag[], offset = 0, limit = PAGE_LENGTH) => {
 	const filter: {
 		[key: string]: Array<Object>;
 	} = {};

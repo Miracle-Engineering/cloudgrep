@@ -9,8 +9,8 @@ class ResourceService {
 		return ApiClient.get<string | undefined, Resource[]>(getResourcesPath());
 	}
 
-	static async getFilteredResources(data: Tag[]): Promise<Response<Resource[]>> {
-		const requestData = getResourcesFilters(data);
+	static async getFilteredResources(data: Tag[], offset: number, limit: number): Promise<Response<Resource[]>> {
+		const requestData = getResourcesFilters(data, offset, limit);
 		return ApiClient.post<string | undefined, Resource[]>(getResourcesPath(), requestData);
 	}
 }

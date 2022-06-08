@@ -5,6 +5,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AccordionFilter from 'components/AccordionFilter';
+import { PAGE_LENGTH, PAGE_START } from 'constants/globals';
 import { Field, FieldGroup, ValueType } from 'models/Field';
 import { Tag } from 'models/Tag';
 import React, { FC, useEffect, useState } from 'react';
@@ -22,7 +23,7 @@ const InsightFilter: FC = () => {
 
 	useEffect(() => {
 		if (filterTags?.length) {
-			dispatch(getFilteredResources(filterTags));
+			dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
 		} else if (filterTags?.length === 0) {
 			dispatch(getResources());
 		}

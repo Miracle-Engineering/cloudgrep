@@ -1,10 +1,10 @@
 import { FieldGroup } from 'models/Field';
-import { MockTag } from 'models/Tag';
+import { Tag } from 'models/Tag';
 import { TagResource } from 'models/TagResource';
 
 export interface TagState {
 	tagResource: TagResource;
-	tags: MockTag[];
+	filterTags: Tag[];
 	fields: FieldGroup[];
 }
 
