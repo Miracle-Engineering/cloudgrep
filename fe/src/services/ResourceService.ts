@@ -3,14 +3,14 @@ import { Resource } from 'models/Resource';
 import { Tag } from 'models/Tag';
 import ApiClient, { Response } from 'utils/apiClient/ApiClient';
 
-import { getResourcesFilters, getResourcesRequestData } from './helpers';
+import { getResourcesFilters } from './helpers';
 class ResourceService {
 	static async getResources(): Promise<Response<Resource[]>> {
 		return ApiClient.get<string | undefined, Resource[]>(getResourcesPath());
 	}
 
-	static async getFilteredResources(data: Tag[]): Promise<Response<Resource[]>> {
-		const requestData = getResourcesFilters(data);
+	static async getFilteredResources(data: Tag[], offset: number, limit: number): Promise<Response<Resource[]>> {
+		const requestData = getResourcesFilters(data, offset, limit);
 		return ApiClient.post<string | undefined, Resource[]>(getResourcesPath(), requestData);
 	}
 }

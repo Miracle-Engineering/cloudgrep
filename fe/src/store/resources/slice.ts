@@ -16,6 +16,9 @@ const resourcesSlice = createSlice({
 		setResources: (state, action: PayloadAction<Resource[]>) => {
 			state.resources = action.payload;
 		},
+		addResources: (state, action: PayloadAction<Resource[]>) => {
+			state.resources = state.resources.concat(action.payload);
+		},
 		setCurrentResource: (state, action: PayloadAction<Resource>) => {
 			state.currentResource = action.payload;
 		},
@@ -25,6 +28,6 @@ const resourcesSlice = createSlice({
 	},
 });
 
-export const { setCurrentResource, setResources, toggleMenuVisible } = resourcesSlice.actions;
+export const { addResources, setCurrentResource, setResources, toggleMenuVisible } = resourcesSlice.actions;
 
 export default resourcesSlice;

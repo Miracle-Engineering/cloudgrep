@@ -1,8 +1,5 @@
+import { AND_OPERATOR, OR_OPERATOR, PAGE_LENGTH } from 'constants/globals';
 import { Tag } from 'models/Tag';
-
-const PAGE_LIMIT = 100;
-const OR_OPERATOR = '$or';
-const AND_OPERATOR = '$and';
 
 export const getArrayOfObjects = (data: Tag[]) => {
 	return data.map((tag: Tag) => {
@@ -12,19 +9,7 @@ export const getArrayOfObjects = (data: Tag[]) => {
 	});
 };
 
-export const getResourcesRequestData = (data: Tag[], offset = 0) => {
-	const filter: {
-		[key: string]: string;
-	} = {};
-
-	data.forEach((tag: Tag) => {
-		filter[tag.key] = tag.value;
-	});
-
-	return { filter, limit: PAGE_LIMIT, offset: offset };
-};
-
-export const getResourcesFilters = (data: Tag[], offset = 0) => {
+export const getResourcesFilters = (data: Tag[], offset = 0, limit = PAGE_LENGTH) => {
 	const filter: {
 		[key: string]: Array<Object>;
 	} = {};
@@ -33,14 +18,9 @@ export const getResourcesFilters = (data: Tag[], offset = 0) => {
 
 	uniqueTags.forEach((key: string) => {
 		const currentTags = data.filter((tag: Tag) => tag.key === key);
-		let currentFilters: any = [];
-
-		currentTags.forEach((tag: Tag) => {
-			currentFilters = [...currentFilters, { [tag.key]: tag.value }];
-		});
-
-		filter[AND_OPERATOR] = [...(filter[AND_OPERATOR] || []), { [OR_OPERATOR]: currentFilters }];
+		const currentFilters = getArrayOfObjects(currentTags);
+		filter[AND_OPERATOR] = [...(filter[AND_OPERATOR] || []), { [OR_OPERATOR]: [...currentFilters] }];
 	});
 
-	return { filter, limit: PAGE_LIMIT, offset: offset };
+	return { filter, limit: limit, offset: offset };
 };

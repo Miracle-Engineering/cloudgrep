@@ -61,7 +61,7 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 					{hasSearch && field?.values?.length > SEARCH_ELEMENTS_NUMBER && (
 						<SearchInput onChange={handleSearchTerm} />
 					)}
-					<Typography>
+					<Box sx={accordionStyles.details}>
 						<FormGroup>
 							{field?.values &&
 								field?.values
@@ -97,7 +97,7 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 										</Box>
 									))}
 						</FormGroup>
-					</Typography>
+					</Box>
 				</AccordionDetails>
 			</Accordion>
 		</Box>
