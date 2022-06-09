@@ -59,7 +59,7 @@ func TestTemplateFuncQuiet(t *testing.T) {
 }
 
 //go:embed testdata/include.tmpl
-var testData string
+var includeTemplate string
 
 func TestIncludeFunc(t *testing.T) {
 	tmpl := includeFuncPrep(t)
@@ -108,7 +108,7 @@ func includeFuncPrep(t *testing.T) *template.Template {
 		"include": buildIncludeFunc(tmpl),
 	})
 
-	tmpl = template.Must(tmpl.Parse(testData))
+	tmpl = template.Must(tmpl.Parse(includeTemplate))
 
 	return tmpl
 }

@@ -4,6 +4,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+func (f NestedField) Empty() bool {
+	return len(f) == 0
+}
+
 func (f NestedField) Last() Field {
 	if len(f) == 0 {
 		return Field{}

@@ -1,0 +1,26 @@
+servicePackage: elasticloadbalancingv2
+
+types:
+  - name: LoadBalancer
+    listApi:
+      call: DescribeLoadBalancers
+      pagination: true
+      outputKey: [LoadBalancers]
+      id:
+        name: LoadBalancerArn
+        pointer: true
+    getTagsApi:
+      type: LoadBalancer
+      call: DescribeTags
+      inputIDField:
+        name: ResourceArns
+        sliceType: string
+      tags:
+        style: struct
+        pointer: true
+        field:
+          - TagDescriptions
+          - name: Tags
+            sliceType: types.Tag
+        key: Key
+        value: Value
