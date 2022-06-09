@@ -57,5 +57,6 @@ func (r *RecursiveAppend) SetData(key string, value any) error {
 
 	r.Data[key] = value
 
+	// Returns an error so it can be used in templates
 	return nil
 }

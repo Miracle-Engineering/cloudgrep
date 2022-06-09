@@ -16,6 +16,7 @@ type dirWriter struct {
 	written []string
 }
 
+// NewDirWriter returns a Writer that writes to the specified directory.
 func NewDirWriter(dir string) (Writer, error) {
 	stat, err := os.Stat(dir)
 	if err != nil {
@@ -29,6 +30,7 @@ func NewDirWriter(dir string) (Writer, error) {
 	return &dirWriter{path: dir}, nil
 }
 
+// WriteFile implements Writer.WriteFile
 func (w *dirWriter) WriteFile(name string, contents []byte) error {
 	filePath := w.pathFor(name)
 
@@ -55,6 +57,7 @@ func (w *dirWriter) WriteFile(name string, contents []byte) error {
 	return nil
 }
 
+// Clean implements Writer.Clean
 func (w *dirWriter) Clean() error {
 	var err error
 
@@ -90,11 +93,9 @@ func (w *dirWriter) Clean() error {
 		fmt.Printf("Removing %s\n", filePath)
 		err = os.Remove(filePath)
 		if err != nil {
-			removeErrors = multierror.Append(err, fmt.Errorf("cannot remove %s: %w", filePath, err))
+			removeErrors = multierror.Append(removeErrors, fmt.Errorf("cannot remove %s: %w", filePath, err))
 		}
 	}
-
-	w.written = nil
 
 	return removeErrors
 }
