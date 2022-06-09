@@ -184,7 +184,7 @@ func TestDirWriter_Clean_cannotRemove(t *testing.T) {
 
 	err := os.Chmod(dir, 0555)
 	require.NoError(t, err)
-	defer os.Chmod(dir, 0755)
+	defer chmodReadAll(t, dir)
 
 	err = w.Clean()
 	assert.ErrorContains(t, err, "cannot remove")
@@ -196,8 +196,15 @@ func TestDirWriter_Clean_cannotList(t *testing.T) {
 
 	err := os.Chmod(dir, 0444)
 	require.NoError(t, err)
-	defer os.Chmod(dir, 0755)
+	defer chmodReadAll(t, dir)
 
 	err = w.Clean()
 	assert.ErrorContains(t, err, "cannot list contents")
+}
+
+func chmodReadAll(t *testing.T, dir string) {
+	t.Helper()
+
+	err := os.Chmod(dir, 0755)
+	assert.NoError(t, err)
 }
