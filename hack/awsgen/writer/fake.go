@@ -9,7 +9,7 @@ var _ Writer = &FakeWriter{}
 
 func NewFakeWriter() *FakeWriter {
 	w := &FakeWriter{}
-	w.Clean()
+	_ = w.Clean()
 
 	return w
 }
