@@ -12,8 +12,8 @@ import (
 //Datastore provides an interface to read/write/update to a store
 type Datastore interface {
 	GetResource(context.Context, string) (*model.Resource, error)
-	GetResources(context.Context, []byte) ([]*model.Resource, error)
-	WriteResources(context.Context, []*model.Resource) error
+	GetResources(context.Context, []byte) (model.Resources, error)
+	WriteResources(context.Context, model.Resources) error
 	Stats(context.Context) (model.Stats, error)
 	GetFields(context.Context) (model.FieldGroups, error)
 	WriteEngineStatusStart(context.Context, string) error

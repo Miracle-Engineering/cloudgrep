@@ -1,8 +1,6 @@
 package model
 
 import (
-	"strings"
-
 	"go.uber.org/zap/zapcore"
 )
 
@@ -29,27 +27,6 @@ func (t Tags) MarshalLogArray(enc zapcore.ArrayEncoder) error {
 	return nil
 }
 
-func newTags(m map[string]string) Tags {
-	var tags []Tag
-	for k, str := range m {
-		//a filter on a tag can have multiple values
-		values := strings.Split(str, ",")
-		for _, v := range values {
-			tags = append(tags, Tag{Key: k, Value: v})
-		}
-	}
-	return tags
-}
-
-//DistinctKeys returns number of distinct keys - if one tag is specified with two values - it counts as 1 distinct
-func (t Tags) DistinctKeys() int {
-	counter := make(map[string]int)
-	for _, tag := range t {
-		counter[tag.Key]++
-	}
-	return len(counter)
-}
-
 //clean removes unexported fields
 func (t Tag) clean() Tag {
 	return Tag{
@@ -67,4 +44,23 @@ func (t Tags) Clean() Tags {
 
 func (t Tags) Empty() bool {
 	return len(t) == 0
+}
+func (t Tags) Find(key string) *Tag {
+	for _, tag := range t {
+		if tag.Key == key {
+			return &tag
+		}
+	}
+	return nil
+}
+
+//Delete deletes a tag from the list by it's key
+func (t Tags) Delete(key string) Tags {
+	var result Tags
+	for _, tag := range t {
+		if tag.Key != key {
+			result = append(result, tag)
+		}
+	}
+	return result
 }
