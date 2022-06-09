@@ -26,7 +26,7 @@ func buildIncludeFunc(t *template.Template) any {
 		var buf strings.Builder
 		if v, ok := includedNames[name]; ok {
 			if v > recursionMaxNums {
-				return "", fmt.Errorf("rendering template has a nested reference name: %s", name)
+				return "", fmt.Errorf("max recursion limit reached for %s", name)
 			}
 			includedNames[name]++
 		} else {

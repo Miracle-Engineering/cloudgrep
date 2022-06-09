@@ -1,0 +1,6 @@
+{{- define "foo" -}}
+foo
+{{- if gt . 0 }}
+{{ include "foo" (sub . 1) }}{{ end }}
+{{- end }}
+{{- include "foo" . }}

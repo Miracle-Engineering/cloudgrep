@@ -1,9 +1,39 @@
 package template
 
-import "text/template"
+import (
+	"sync"
+)
 
-var templates map[string]*template.Template
+var cache templateCache
 
-func init() {
-	templates = make(map[string]*template.Template)
+type templateCache struct {
+	templates map[string]*Template
+	l         sync.Mutex
+}
+
+func (c *templateCache) get(name string) *Template {
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	t, has := c.templates[name]
+	if !has {
+		return nil
+	}
+
+	return t
+}
+
+func (c *templateCache) put(t *Template) {
+	if t == nil {
+		return
+	}
+
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	if c.templates == nil {
+		c.templates = make(map[string]*Template)
+	}
+
+	c.templates[t.name] = t
 }

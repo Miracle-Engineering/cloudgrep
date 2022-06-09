@@ -1,22 +1,19 @@
 package template
 
 import (
-	"bytes"
-	"embed"
 	"fmt"
 )
 
-//go:embed templates
-var content embed.FS
-
-func RenderTemplate(name string, config interface{}) string {
-	tmpl := getTemplate(name)
-	buf := &bytes.Buffer{}
-
-	err := tmpl.Execute(buf, config)
+func RenderTemplate(name string, data any) string {
+	tmpl, err := NewTemplate(name)
 	if err != nil {
-		panic(fmt.Errorf("cannot render template %s: %w", config, err))
+		panic(fmt.Errorf("error loading template %s: %w", name, err))
 	}
 
-	return buf.String()
+	result, err := tmpl.Render(data)
+	if err != nil {
+		panic(fmt.Errorf("error rendering template %s: %w", name, err))
+	}
+
+	return result
 }
