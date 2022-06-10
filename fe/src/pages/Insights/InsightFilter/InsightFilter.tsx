@@ -5,7 +5,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AccordionFilter from 'components/AccordionFilter';
-import { PAGE_LENGTH, PAGE_START } from 'constants/globals';
+import { CHECKED_BY_DEFAULT, PAGE_LENGTH, PAGE_START } from 'constants/globals';
 import { Field, FieldGroup, ValueType } from 'models/Field';
 import { Tag } from 'models/Tag';
 import React, { FC, useEffect, useState } from 'react';
@@ -13,8 +13,6 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getFilteredResources, getResources } from 'store/resources/thunks';
 
 import { accordionStyles, filterStyles, overrideSummaryClasses } from '../style';
-
-const CHECKED_BY_DEFAULT = true;
 
 const InsightFilter: FC = () => {
 	const { fields } = useAppSelector(state => state.tags);

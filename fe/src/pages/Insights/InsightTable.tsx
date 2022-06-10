@@ -7,7 +7,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { PAGE_LENGTH } from 'constants/globals';
+import { PAGE_LENGTH, TOTAL_RECORDS } from 'constants/globals';
 import { Resource } from 'models/Resource';
 import React, { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,8 +19,6 @@ import usePagination from 'utils/hooks/usePagination';
 import { isScrolledForInfiniteScroll } from 'utils/uiHelper';
 
 import { tableStyles } from './style';
-
-const TOTAL_RECORDS = 10000; // todo update with real value from API response when available
 
 const InsightTable: FC = () => {
 	const { resources } = useAppSelector(state => state.resources);
@@ -53,7 +51,13 @@ const InsightTable: FC = () => {
 			);
 			if (response?.data && response.data.length > 0) {
 				setHasNext(true);
-				dispatch(getFilteredResourcesNextPage(response.data));
+				dispatch(
+					getFilteredResourcesNextPage({
+						resources: response.data,
+						limit: PAGE_LENGTH,
+						offset: currentPage * PAGE_LENGTH,
+					})
+				);
 			} else {
 				setHasNext(false);
 			}
