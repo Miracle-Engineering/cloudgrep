@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/run-x/cloudgrep/pkg/config"
@@ -21,7 +22,8 @@ type SQLiteStore struct {
 	db      *gorm.DB
 	indexer resourceIndexer
 	//fetchedAt is the last time the resources were fetched
-	fetchedAt time.Time
+	fetchedAt  time.Time
+	muResource sync.Mutex
 }
 
 func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLiteStore, error) {
@@ -105,6 +107,8 @@ func (s *SQLiteStore) WriteResources(ctx context.Context, resources model.Resour
 		//nothing to write
 		return nil
 	}
+	s.muResource.Lock()
+	defer s.muResource.Unlock()
 
 	var count int64
 	err := s.db.Transaction(func(tx *gorm.DB) error {
