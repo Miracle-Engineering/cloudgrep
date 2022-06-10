@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import { DARK_BLUE } from 'constants/colors';
+import { PAGE_START } from 'constants/globals';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -24,7 +25,7 @@ function Header() {
 	const handleClick = () => {
 		setOpen(true);
 		dispatch(getFields());
-		dispatch(getFilteredResources({ data: filterTags, offset: offset, limit: limit }));
+		dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: limit + offset }));
 	};
 
 	const handleClose = () => {
