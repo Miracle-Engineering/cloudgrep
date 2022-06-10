@@ -39,7 +39,7 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 					errorLock.Unlock()
 					resourceEvent = model.NewResourceEvent(resourceType, false, err)
 				} else {
-					resourceEvent = model.NewResourceEvent(resourceType, true, nil)
+					resourceEvent = model.NewResourceEvent(resourceType, false, nil)
 				}
 				_ = ds.WriteResourceEvent(ctx, resourceEvent)
 			}(fetchFunc, p, resourceType)
