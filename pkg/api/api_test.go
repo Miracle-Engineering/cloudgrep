@@ -3,6 +3,11 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
 	"github.com/gin-gonic/gin"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
@@ -11,10 +16,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
-	"net/http"
-	"net/http/httptest"
-	"strings"
-	"testing"
 )
 
 func prepareApiUnitTest(t *testing.T) (*zap.Logger, datastore.Datastore, *gin.Engine) {
@@ -228,6 +229,6 @@ func TestFieldsRoute(t *testing.T) {
 		require.Equal(t, 2, len(response))
 		//check fields by group
 		require.Equal(t, 2, len(response.FindGroup("core").Fields))
-		require.Equal(t, 9, len(response.FindGroup("tags").Fields))
+		require.Equal(t, 10, len(response.FindGroup("tags").Fields))
 	})
 }
