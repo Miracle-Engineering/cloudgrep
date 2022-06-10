@@ -6,9 +6,16 @@ export interface TagState {
 	tagResource: TagResource;
 	filterTags: Tag[];
 	fields: FieldGroup[];
+	limit: number;
+	offset: number;
 }
 
 export interface ErrorType {
 	response?: { status: string };
 	message: string;
+}
+
+export interface Paging {
+	limit: number;
+	offset: number;
 }

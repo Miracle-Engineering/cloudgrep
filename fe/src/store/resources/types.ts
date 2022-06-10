@@ -12,3 +12,9 @@ export interface FilterResourcesApiParams {
 	offset: number;
 	limit: number;
 }
+
+export interface ResourcesNextPageParams {
+	resources: Resource[];
+	offset: number;
+	limit: number;
+}

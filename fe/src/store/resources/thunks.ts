@@ -2,9 +2,9 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Resource } from 'models/Resource';
 import ResourceService from 'services/ResourceService';
 
-import { setFilterTags } from '../tags/slice';
+import { setFilterTags, setPaging } from '../tags/slice';
 import { addResources, setResources } from './slice';
-import { FilterResourcesApiParams } from './types';
+import { FilterResourcesApiParams, ResourcesNextPageParams } from './types';
 
 const getResources = createAsyncThunk('resources/getResources', async (_, thunkAPI) => {
 	try {
@@ -33,10 +33,11 @@ const getFilteredResources = createAsyncThunk(
 
 const getFilteredResourcesNextPage = createAsyncThunk(
 	'resources/getFilteredResourcesNextPage',
-	async (resources: Resource[], thunkAPI) => {
+	async (nextPageParams: ResourcesNextPageParams, thunkAPI) => {
 		try {
-			thunkAPI.dispatch(addResources(resources));
-			return resources;
+			thunkAPI.dispatch(addResources(nextPageParams.resources));
+			thunkAPI.dispatch(setPaging({ limit: nextPageParams.limit, offset: nextPageParams.offset }));
+			return nextPageParams.resources;
 		} catch (error: any) {
 			return thunkAPI.rejectWithValue({ status: error.response?.status, error: error.message });
 		}

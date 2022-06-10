@@ -51,7 +51,13 @@ const InsightTable: FC = () => {
 			);
 			if (response?.data && response.data.length > 0) {
 				setHasNext(true);
-				dispatch(getFilteredResourcesNextPage(response.data));
+				dispatch(
+					getFilteredResourcesNextPage({
+						resources: response.data,
+						limit: PAGE_LENGTH,
+						offset: currentPage * PAGE_LENGTH,
+					})
+				);
 			} else {
 				setHasNext(false);
 			}
