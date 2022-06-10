@@ -16,12 +16,19 @@ func (s Service) Validate() []error {
 		validateServiceTypesUnique,
 	)...)
 
+	errs = append(errs, s.subValidate()...)
+
+	setErrContextService(s, errs)
+
+	return errs
+}
+
+func (s Service) subValidate() []error {
+	var errs []error
 	for _, typ := range s.Types {
 		typErrs := typ.Validate()
 		errs = append(errs, typErrs...)
 	}
-
-	setErrContextService(s, errs)
 
 	return errs
 }

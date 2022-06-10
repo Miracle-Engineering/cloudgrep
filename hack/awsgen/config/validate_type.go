@@ -16,6 +16,16 @@ func (t Type) Validate() []error {
 		validateTypeTags,
 	)...)
 
+	errs = append(errs, t.subValidate()...)
+
+	setErrContextType(t, errs)
+
+	return errs
+}
+
+func (t Type) subValidate() []error {
+	var errs []error
+
 	listErrs := t.ListAPI.Validate()
 	setErrContextExtraPrepend("listApi", listErrs)
 	errs = append(errs, listErrs...)
@@ -23,8 +33,6 @@ func (t Type) Validate() []error {
 	tagErrs := t.GetTagsAPI.Validate()
 	setErrContextExtraPrepend("getTagsApi", tagErrs)
 	errs = append(errs, tagErrs...)
-
-	setErrContextType(t, errs)
 
 	return errs
 }

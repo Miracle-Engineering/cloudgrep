@@ -28,6 +28,10 @@ func (f Field) Validate() []error {
 func (nf NestedField) Validate(ctx string) []error {
 	var errs []error
 
+	if nf.Empty() {
+		errs = append(errs, fmt.Errorf("%s cannot be empty", ctx))
+	}
+
 	for idx, f := range nf {
 		fieldErrs := f.Validate()
 		ctx := fmt.Sprintf("%s[%d]", ctx, idx)
