@@ -19,8 +19,7 @@ const accordionHeader: CSSProperties = {
 
 const details: CSSProperties = {
 	overflowY: 'auto',
-	maxHeight: '180px',
-	marginTop: '10px',
+	maxHeight: '210px', // 5 elements visible before scroll and overflow
 };
 
 export const accordionStyles = { accordionHeader, details };

@@ -8,14 +8,13 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
 import SearchInput from 'components/SearchInput/SearchInput';
+import { SEARCH_ELEMENTS_NUMBER } from 'constants/globals';
 import { ValueType } from 'models/Field';
 import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import useHover from 'utils/hooks/useHover';
 
 import { accordionStyles, filterStyles, labelClasses, overrideSummaryClasses } from './style';
 import { AccordionFilterProps } from './types';
-
-const SEARCH_ELEMENTS_NUMBER = 3;
 
 const AccordionFilter: FC<AccordionFilterProps> = props => {
 	const { label, hasSearch, id, field, handleChange, checkedByDefault } = props;
@@ -57,11 +56,11 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 					classes={overrideSummaryClasses}>
 					<Typography sx={accordionStyles.accordionHeader}>{label}</Typography>
 				</AccordionSummary>
-				<AccordionDetails ref={containerRef}>
+				<AccordionDetails ref={containerRef} sx={accordionStyles.details}>
 					{hasSearch && field?.values?.length > SEARCH_ELEMENTS_NUMBER && (
 						<SearchInput onChange={handleSearchTerm} />
 					)}
-					<Box sx={accordionStyles.details}>
+					<Box>
 						<FormGroup>
 							{field?.values &&
 								field?.values
