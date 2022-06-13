@@ -77,7 +77,7 @@ func (f ResourceFilter) Matches(resource model.Resource) bool {
 					return false
 				}
 
-				if val != tag.Value {
+				if strings.TrimSpace(val) != strings.TrimSpace(tag.Value) {
 					return false
 				}
 			}

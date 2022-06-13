@@ -3,6 +3,7 @@ package aws
 import (
 	"testing"
 
+	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/testingutil"
 	testprovider "github.com/run-x/cloudgrep/pkg/testingutil/provider"
 )
@@ -15,5 +16,17 @@ func TestFetchFunctions(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "lambda.Function")
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
-	testingutil.AssertResourceCount(t, resources, "lambda-function-0", 1)
+	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
+		Type:   "lambda.Function",
+		Region: defaultRegion,
+		Tags: model.Tags{
+			{
+				Key:   testingutil.TestTag,
+				Value: "lambda-function-0",
+			},
+		},
+		RawData: map[string]any{
+			"Runtime": "nodejs16.x",
+		},
+	})
 }

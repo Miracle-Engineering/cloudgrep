@@ -16,7 +16,7 @@ func TestFetchEC2Instances(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.Instance")
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
-	testingutil.AssertResourceFilteredCount(t, resources, testingutil.ResourceFilter{
+	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
 		Type:   "ec2.Instance",
 		Region: defaultRegion,
 		Tags: model.Tags{
@@ -28,7 +28,7 @@ func TestFetchEC2Instances(t *testing.T) {
 		RawData: map[string]any{
 			"ImageId": "ami-0e449176cecc3e577",
 		},
-	}, 1)
+	})
 }
 
 func TestFetchEBSVolumes(t *testing.T) {
@@ -39,5 +39,17 @@ func TestFetchEBSVolumes(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.Volume")
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
-	testingutil.AssertResourceCount(t, resources, "ec2-volume-0", 1)
+	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
+		Type:   "ec2.Volume",
+		Region: defaultRegion,
+		Tags: model.Tags{
+			{
+				Key:   testingutil.TestTag,
+				Value: "ec2-volume-0",
+			},
+		},
+		RawData: map[string]any{
+			"VolumeType": "gp2",
+		},
+	})
 }

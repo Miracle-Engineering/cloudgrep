@@ -107,7 +107,7 @@ func AssertEqualsTags(t *testing.T, a, b model.Tags) {
 	}
 }
 
-func AssertResourceFilteredCount(t testing.TB, resources []model.Resource, filter ResourceFilter, count int) {
+func AssertResourceFilteredCount(t testing.TB, resources []model.Resource, count int, filter ResourceFilter) {
 	t.Helper()
 
 	filtered := filter.Filter(resources)
