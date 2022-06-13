@@ -5,7 +5,7 @@ export const OR_OPERATOR = '$or';
 export const AND_OPERATOR = '$and';
 
 // Pagination constants
-export const PAGE_LENGTH = 13;
+export const PAGE_LENGTH = 30;
 export const PAGE_START = 0;
 export const INFINITE_SCROLL_VALUE = 0.75; // If 75% of table is scrolled then fetch next page of results
 export const TOTAL_RECORDS = 10000; // todo update with real value from API response when available

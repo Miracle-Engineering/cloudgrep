@@ -35,11 +35,6 @@ const InsightTable: FC = () => {
 		}
 	}, [resources]);
 
-	const handleClick = (resource: Resource) => {
-		dispatch(setCurrentResource(resource));
-		dispatch(toggleMenuVisible());
-	};
-
 	const handleInfiniteScroll = async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 		if (isScrolledForInfiniteScroll(e) && hasNext) {
 			setIsInfiniteScroll(true);
@@ -64,27 +59,28 @@ const InsightTable: FC = () => {
 		}
 	};
 
+	const handleClick = (resource: Resource) => {
+		dispatch(setCurrentResource(resource));
+		dispatch(toggleMenuVisible());
+	};
+
 	return (
 		<Box
 			sx={{
 				width: '80%',
-				height: '100%',
 				backgroundColor: '#F9F7F6',
 				paddingLeft: '28px',
 				paddingRight: '44px',
 			}}>
 			<TableContainer
+				sx={{ maxHeight: '200vH' }}
 				component={Paper}
-				sx={{ height: '100%' }}
 				onScroll={async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 					if (!isInfiniteScroll) {
 						await handleInfiniteScroll(e);
 					}
 				}}>
-				<Table
-					sx={{ minWidth: 650, maxHeight: '100%', overflowY: 'scroll' }}
-					size="small"
-					aria-label="a dense table">
+				<Table sx={{ minWidth: 650, overflowY: 'scroll' }} size="small" aria-label="a dense table">
 					<TableHead>
 						<TableRow>
 							<TableCell sx={tableStyles.headerStyle}>{t('TYPE')} </TableCell>

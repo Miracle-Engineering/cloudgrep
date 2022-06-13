@@ -35,7 +35,7 @@ const Insights: FC = () => {
 					rest={{ flexDirection: 'row-reverse' }}
 				/>
 			</Box>
-			<Box sx={{ display: 'flex', backgroundColor: BACKGROUND_COLOR, height: 'calc(100% - 70px)' }}>
+			<Box sx={{ display: 'flex', backgroundColor: BACKGROUND_COLOR }}>
 				<InsightFilter />
 				<InsightTable />
 				{sideMenuVisible ? <SideMenu /> : <></>}
