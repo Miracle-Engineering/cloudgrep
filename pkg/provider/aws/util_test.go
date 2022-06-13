@@ -169,7 +169,7 @@ func regionsToTest() []string {
 	}
 
 	if len(regions) == 0 {
-		regions = []string{"us-east-1"}
+		regions = []string{defaultRegion}
 	}
 
 	// Always run tests on the global region
