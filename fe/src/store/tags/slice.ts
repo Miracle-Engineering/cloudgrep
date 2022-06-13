@@ -3,7 +3,7 @@ import { FieldGroup } from 'models/Field';
 import { Tag } from 'models/Tag';
 import { TagResource } from 'models/TagResource';
 
-import { Paging, TagState } from './types';
+import { TagState } from './types';
 
 const initialState: TagState = {
 	tagResource: { Tags: [], Resources: [] },
@@ -26,13 +26,9 @@ const tagsSlice = createSlice({
 		setFields: (state, action: PayloadAction<FieldGroup[]>) => {
 			state.fields = action.payload;
 		},
-		setPaging: (state, action: PayloadAction<Paging>) => {
-			state.limit = action.payload.limit;
-			state.offset = action.payload.offset;
-		},
 	},
 });
 
-export const { setFields, setFilterTags, setPaging, setTagResource } = tagsSlice.actions;
+export const { setFields, setFilterTags, setTagResource } = tagsSlice.actions;
 
 export default tagsSlice;
