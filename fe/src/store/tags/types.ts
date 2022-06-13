@@ -14,4 +14,3 @@ export interface ErrorType {
 	response?: { status: string };
 	message: string;
 }
-
