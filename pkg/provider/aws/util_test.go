@@ -18,11 +18,9 @@ import (
 	"github.com/run-x/cloudgrep/pkg/testingutil"
 )
 
+// Default region to run tests against if AWS_REGION is not set.
+// Always runs integration tests for the "global" region.
 const defaultRegion = "us-east-1"
-
-// Set this env var to force enable the integration tests (will fail tests if creds aren't available)
-const testEnvVar = "CLOUD_INTEGRATION_TESTS"
-const ciEnvVar = "CI"
 
 const (
 	accountIntegrationDev  = "316817240772"
@@ -31,6 +29,13 @@ const (
 
 // Only run the integration tests on these specially preparred accounts
 var integrationAwsAccounts = []string{accountIntegrationDev, accountIntegrationProd}
+
+// Set any of these env vars to a non-empty value to force-enable the integration tests
+// (they will fail tests if creds aren't available)
+var integrationTestVars = []string{
+	"CLOUD_INTEGRATION_TESTS",
+	"CI",
+}
 
 // Cache the checks for credentials so it doesn't run for every test
 var credCheck credChecker
@@ -69,10 +74,14 @@ func checkShouldRunIntegrationTests(t testing.TB, ctx *integrationTestContext) {
 	cfg := ctx.p[0].config
 
 	creds := credCheck.HasAWSCreds(t, cfg)
-	_, hasIntegrationEnvVar := os.LookupEnv(testEnvVar)
-	_, hasCiEnvVar := os.LookupEnv(ciEnvVar)
 
-	hasEnvVar := hasIntegrationEnvVar || hasCiEnvVar
+	hasEnvVar := false
+	for _, key := range integrationTestVars {
+		val := os.Getenv(key)
+		if len(val) > 0 {
+			hasEnvVar = true
+		}
+	}
 
 	if hasEnvVar && !creds {
 		t.Fatalf("cannot run integration tests without creds")
@@ -158,18 +167,17 @@ func (c *credChecker) HasAWSCreds(t testing.TB, cfg aws.Config) bool {
 }
 
 func regionsToTest() []string {
-	regions := []string{}
+	var regions []string
 
-	regionEnvVarVal, has := os.LookupEnv("AWS_REGION")
-	if has {
-		envRegions := strings.Split(regionEnvVarVal, ",")
-		for _, envRegion := range envRegions {
-			regions = append(regions, strings.TrimSpace(envRegion))
+	regionEnvVarVal := os.Getenv("AWS_REGION")
+	if len(regionEnvVarVal) > 0 {
+		regions = []string{
+			regionEnvVarVal,
 		}
-	}
-
-	if len(regions) == 0 {
-		regions = []string{defaultRegion}
+	} else {
+		regions = []string{
+			defaultRegion,
+		}
 	}
 
 	// Always run tests on the global region

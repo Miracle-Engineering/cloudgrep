@@ -29,13 +29,13 @@ func FetchResources[T types.Provider](ctx context.Context, t *testing.T, provide
 			return
 		}
 
-		fetchFunc := testingutil.FetchAllFunc[model.Resource](f)
-
-		funcResources, err := testingutil.FetchAll(ctx, t, fetchFunc)
+		funcResources, err := testingutil.FetchAll(ctx, t, f)
 		if err != nil {
 			t.Errorf("failed to fetch %s on provider %s", name, p.String())
 			return
 		}
+
+		funcResources = testingutil.ResourceFilterTagKeyValue(funcResources, "IntegrationTest", "true")
 
 		for _, resource := range funcResources {
 			resourceLock.Lock()
