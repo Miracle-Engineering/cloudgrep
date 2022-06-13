@@ -11,3 +11,20 @@ func FilterFunc[T any](in []T, predicate func(T) bool) []T {
 
 	return out
 }
+
+// Unique returns a new slice with duplicate elements removed and the order preserved.
+func Unique[T comparable](in []T) []T {
+	out := make([]T, 0, len(in))
+	seen := make(map[T]struct{})
+
+	for _, val := range in {
+		if _, has := seen[val]; has {
+			continue
+		}
+
+		seen[val] = struct{}{}
+		out = append(out, val)
+	}
+
+	return out
+}

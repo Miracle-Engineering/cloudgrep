@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/testingutil"
+	testprovider "github.com/run-x/cloudgrep/pkg/testingutil/provider"
 )
 
 func TestFetchEC2Instances(t *testing.T) {
@@ -11,7 +12,7 @@ func TestFetchEC2Instances(t *testing.T) {
 
 	ctx := setupIntegrationTest(t)
 
-	resources := testingutil.MustFetchAll(ctx.ctx, t, ctx.p.FetchEC2Instances)
+	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.Instance")
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
 	testingutil.AssertResourceCount(t, resources, "ec2-instance-0", 1)
@@ -22,7 +23,7 @@ func TestFetchEBSVolumes(t *testing.T) {
 
 	ctx := setupIntegrationTest(t)
 
-	resources := testingutil.MustFetchAll(ctx.ctx, t, ctx.p.FetchEBSVolumes)
+	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.Volume")
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
 	testingutil.AssertResourceCount(t, resources, "ec2-volume-0", 1)

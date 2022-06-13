@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const TestRegion = "us-east-1"
 const TestTag = "test"
 
 // AssertResourceCount asserts that there is a specific number of given resources with the "test" tag.

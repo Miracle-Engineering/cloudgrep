@@ -11,12 +11,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/run-x/cloudgrep/pkg/testingutil"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
 
 	cfg "github.com/run-x/cloudgrep/pkg/config"
+	"github.com/run-x/cloudgrep/pkg/testingutil"
 )
+
+const defaultRegion = "us-east-1"
 
 // Set this env var to force enable the integration tests (will fail tests if creds aren't available)
 const testEnvVar = "CLOUD_INTEGRATION_TESTS"
@@ -34,7 +36,7 @@ var integrationAwsAccounts = []string{accountIntegrationDev, accountIntegrationP
 var credCheck credChecker
 
 type integrationTestContext struct {
-	p   *Provider
+	p   []Provider
 	log *zap.Logger
 	ctx context.Context
 }
@@ -59,7 +61,14 @@ func setupIntegrationTest(t testing.TB) *integrationTestContext {
 func checkShouldRunIntegrationTests(t testing.TB, ctx *integrationTestContext) {
 	t.Helper()
 
-	creds := credCheck.HasAWSCreds(t, ctx.p.config)
+	if len(ctx.p) == 0 {
+		t.Skip("no providers configured")
+		return
+	}
+
+	cfg := ctx.p[0].config
+
+	creds := credCheck.HasAWSCreds(t, cfg)
 	_, hasIntegrationEnvVar := os.LookupEnv(testEnvVar)
 	_, hasCiEnvVar := os.LookupEnv(ciEnvVar)
 
@@ -79,22 +88,20 @@ func setupIntegrationProvider(t testing.TB, ctx *integrationTestContext) {
 
 	c := cfg.Provider{}
 	c.Cloud = "aws"
-	c.Regions = []string{
-		testingutil.TestRegion,
-	}
+	c.Regions = regionsToTest()
 
 	providers, err := NewProviders(ctx.ctx, c, ctx.log)
 	if err != nil {
 		t.Fatalf("unable to instantiate new providers: %v", err)
 	}
 
-	if len(providers) != 1 {
-		t.Fatal("currently only have support for single provider in tests")
+	var awsProviders []Provider
+	for _, provider := range providers {
+		awsProvdier := provider.(Provider)
+		awsProviders = append(awsProviders, awsProvdier)
 	}
 
-	provider := providers[0].(Provider)
-
-	ctx.p = &provider
+	ctx.p = awsProviders
 }
 
 func setupIntegrationLogs(t testing.TB, ctx *integrationTestContext) {
@@ -148,4 +155,25 @@ func (c *credChecker) HasAWSCreds(t testing.TB, cfg aws.Config) bool {
 	}
 
 	return false
+}
+
+func regionsToTest() []string {
+	regions := []string{}
+
+	regionEnvVarVal, has := os.LookupEnv("AWS_REGION")
+	if has {
+		envRegions := strings.Split(regionEnvVarVal, ",")
+		for _, envRegion := range envRegions {
+			regions = append(regions, strings.TrimSpace(envRegion))
+		}
+	}
+
+	if len(regions) == 0 {
+		regions = []string{"us-east-1"}
+	}
+
+	// Always run tests on the global region
+	regions = append(regions, "global")
+
+	return testingutil.Unique(regions)
 }
