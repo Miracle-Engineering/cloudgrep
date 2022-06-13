@@ -17,8 +17,11 @@ func addTemplateFuncs(t *template.Template) {
 	})
 }
 
+// recursionMaxNums is the maximum allowed recursion level for the "include" template function.
 const recursionMaxNums = 1000
 
+// buildIncludeFunc generates the "include" template function implementation.
+// It returns the function because the function depends on the template.Template value to be created.
 func buildIncludeFunc(t *template.Template) any {
 	includedNames := make(map[string]int)
 
@@ -38,11 +41,15 @@ func buildIncludeFunc(t *template.Template) any {
 	}
 }
 
+// templateFuncTabIndent (or "tabindent" within templates) indents each line in the input
+// (including the first and last, even if empty) a certain number of levels using tab characters.
 func templateFuncTabIndent(levels int, v string) string {
 	pad := strings.Repeat("\t", levels)
 	return pad + strings.Replace(v, "\n", "\n"+pad, -1)
 }
 
+// templateFuncQuiet (or "quiet" within templates) acts as a /dev/null for the input.
+// Useful for silencing the output from a variable assignment.
 func templateFuncQuiet(_ ...any) string {
 	return ""
 }

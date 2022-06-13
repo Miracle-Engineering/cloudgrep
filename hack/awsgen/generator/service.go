@@ -8,6 +8,7 @@ import (
 	"github.com/run-x/cloudgrep/hack/awsgen/util"
 )
 
+// generateService generates the file for a specific resource
 func (g Generator) generateService(service config.Service) string {
 	var imports util.ImportSet
 
@@ -28,6 +29,7 @@ func (g Generator) generateService(service config.Service) string {
 	return header + "\n" + buf.String()
 }
 
+// generateServiceRegister generates the services "registration" function that returns data on each type defined in a specific service.
 func (g Generator) generateServiceRegister(service config.Service) (string, util.ImportSet) {
 	data := struct {
 		ProviderName string

@@ -5,6 +5,7 @@ import (
 	"github.com/run-x/cloudgrep/hack/awsgen/template"
 )
 
+// generateRegisterFile defines the provider-wide file that calls each service's registration function.
 func (g Generator) generateRegisterFile(services []config.Service) string {
 	data := struct {
 		ProviderName      string

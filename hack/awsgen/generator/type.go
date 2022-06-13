@@ -8,6 +8,7 @@ import (
 	"github.com/run-x/cloudgrep/hack/awsgen/util"
 )
 
+// generateType generates the functions for a specific type
 func (g Generator) generateType(service config.Service, typ config.Type) (string, util.ImportSet) {
 	var imports util.ImportSet
 
@@ -24,6 +25,7 @@ func (g Generator) generateType(service config.Service, typ config.Type) (string
 	return buf.String(), imports
 }
 
+// generateTypeListFunction generates the code for listing a specific type
 func (g Generator) generateTypeListFunction(service config.Service, typ config.Type) (string, util.ImportSet) {
 	data := struct {
 		ResourceName string
@@ -68,6 +70,7 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 	return template.RenderTemplate("list.go", data), imports
 }
 
+// generateTypeTagFunction generates the code for fetching tags for a specific type
 func (g Generator) generateTypeTagFunction(service config.Service, typ config.Type) (string, util.ImportSet) {
 	if !typ.GetTagsAPI.Has() {
 		return "", nil

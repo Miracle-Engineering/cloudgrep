@@ -5,6 +5,7 @@ import (
 	"strconv"
 )
 
+// RecursiveAppend is used in templates to give a way to concisely reference nested fields.
 type RecursiveAppend struct {
 	Idx  int
 	Keys []string
