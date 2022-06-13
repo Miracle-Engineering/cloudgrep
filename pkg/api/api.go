@@ -131,7 +131,7 @@ func Refresh(c *gin.Context) {
 		return
 	}
 	if status.Status == model.EngineStatusFetching {
-		badRequest(c, fmt.Errorf("engine is already running"))
+		errorResponse(c, http.StatusAccepted, fmt.Errorf("engine is already running"))
 		return
 	}
 	engineFunc := c.MustGet("engineFunc").(EngineFunc)
