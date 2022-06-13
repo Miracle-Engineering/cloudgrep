@@ -2,6 +2,8 @@ package engine
 
 import (
 	"context"
+	"github.com/hashicorp/go-multierror"
+	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/run-x/cloudgrep/pkg/sequencer"
 	"log"
@@ -28,9 +30,13 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 	e.Sequencer = sequencer.AsyncSequencer{Logger: e.Logger}
 	for _, c := range cfg.Providers {
 		// create a providers
+		var errors *multierror.Error
 		providers, err := provider.NewProviders(ctx, c, logger)
-		if err != nil {
-			return Engine{}, err
+		errors = multierror.Append(errors, err)
+		updateError := e.Datastore.UpdateProviderStatus(ctx, model.NewProviderStatus(c.Cloud, nil, err))
+		errors = multierror.Append(errors, updateError)
+		if errors.ErrorOrNil() != nil {
+			return Engine{}, errors.ErrorOrNil()
 		}
 		e.Providers = append(e.Providers, providers...)
 	}

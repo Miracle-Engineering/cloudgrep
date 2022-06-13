@@ -28,7 +28,7 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 			wg.Add(1)
 			go func(fetchFunc provider.FetchFunc, provider provider.Provider, resourceType string) {
 				defer wg.Done()
-				resourceEvent := model.NewResourceEvent(resourceType, true, nil)
+				resourceEvent := model.NewResourceEvent(resourceType, provider.String(), true, nil)
 				_ = ds.WriteResourceEvent(ctx, resourceEvent)
 				err := fetchFunc(ctx, resourceChan)
 				if err != nil {
@@ -37,9 +37,9 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 					errorLock.Lock()
 					errors = multierror.Append(errors, err)
 					errorLock.Unlock()
-					resourceEvent = model.NewResourceEvent(resourceType, false, err)
+					resourceEvent = model.NewResourceEvent(resourceType, provider.String(), false, err)
 				} else {
-					resourceEvent = model.NewResourceEvent(resourceType, false, nil)
+					resourceEvent = model.NewResourceEvent(resourceType, provider.String(), false, nil)
 				}
 				_ = ds.WriteResourceEvent(ctx, resourceEvent)
 			}(fetchFunc, p, resourceType)

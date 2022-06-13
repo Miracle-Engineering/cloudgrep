@@ -54,17 +54,19 @@ func AssertEqualsField(t *testing.T, a, b Field) {
 
 func AssertEqualsResourceEvent(t *testing.T, expectedResourceEvent, actualResourceEvent ResourceEvent) {
 	assert.Equal(t, expectedResourceEvent.ResourceType, actualResourceEvent.ResourceType)
+	//assert.Equal(t, expectedResourceEvent.Provider, actualResourceEvent.Provider)
 	assert.Equal(t, expectedResourceEvent.FetchStatus, actualResourceEvent.FetchStatus)
 	assert.Equal(t, expectedResourceEvent.ErrorMessage, actualResourceEvent.ErrorMessage)
 }
 
-func AssertEqualsEngineStatus(t *testing.T, expectedEngineStatus, actualEngineStatus EngineStatus) {
-	assert.Equal(t, expectedEngineStatus.FetchStatus, actualEngineStatus.FetchStatus)
-	assert.Equal(t, len(actualEngineStatus.ResourceEvents), len(expectedEngineStatus.ResourceEvents))
-
-	for _, actualResourceEvent := range actualEngineStatus.ResourceEvents {
+func AssertEqualsProviderStatus(t *testing.T, expectedProviderStatus, actualProviderStatus ProviderStatus) {
+	assert.Equal(t, expectedProviderStatus.ProviderType, actualProviderStatus.ProviderType)
+	assert.Equal(t, expectedProviderStatus.FetchStatus, actualProviderStatus.FetchStatus)
+	assert.Equal(t, expectedProviderStatus.ErrorMessage, actualProviderStatus.ErrorMessage)
+	assert.Equal(t, len(expectedProviderStatus.ResourceEvents), len(actualProviderStatus.ResourceEvents))
+	for _, actualResourceEvent := range actualProviderStatus.ResourceEvents {
 		var expectedResourceEvent ResourceEvent
-		for _, resourceEvent := range expectedEngineStatus.ResourceEvents {
+		for _, resourceEvent := range expectedProviderStatus.ResourceEvents {
 			if resourceEvent.ResourceType == actualResourceEvent.ResourceType {
 				expectedResourceEvent = resourceEvent
 				break
@@ -72,6 +74,24 @@ func AssertEqualsEngineStatus(t *testing.T, expectedEngineStatus, actualEngineSt
 		}
 		assert.NotNil(t, expectedResourceEvent)
 		AssertEqualsResourceEvent(t, expectedResourceEvent, actualResourceEvent)
+	}
+
+}
+
+func AssertEqualsEngineStatus(t *testing.T, expectedEngineStatus, actualEngineStatus EngineStatus) {
+	assert.Equal(t, expectedEngineStatus.FetchStatus, actualEngineStatus.FetchStatus)
+	assert.Equal(t, len(actualEngineStatus.ProviderStatuses), len(expectedEngineStatus.ProviderStatuses))
+
+	for _, actualProviderStatus := range actualEngineStatus.ProviderStatuses {
+		var expectedProviderStatus ProviderStatus
+		for _, providerStatus := range expectedEngineStatus.ProviderStatuses {
+			if providerStatus.ProviderType == actualProviderStatus.ProviderType {
+				expectedProviderStatus = providerStatus
+				break
+			}
+		}
+		assert.NotNil(t, expectedProviderStatus)
+		AssertEqualsProviderStatus(t, expectedProviderStatus, actualProviderStatus)
 	}
 }
 

@@ -11,6 +11,7 @@ func TestResourceEventNewResourceEvent(t *testing.T) {
 	err := errors.New("failed to fetch")
 	type args struct {
 		resourceType string
+		provider     string
 		isFetching   bool
 		err          error
 	}
@@ -23,11 +24,13 @@ func TestResourceEventNewResourceEvent(t *testing.T) {
 			name: "NewResourceEventFetching",
 			args: args{
 				resourceType: "ec2.Volume",
+				provider:     "AWS Account: 000000000000, Region: Mock",
 				isFetching:   true,
 				err:          nil,
 			},
 			want: ResourceEvent{
 				ResourceType: "ec2.Volume",
+				Provider:     "AWS Account: 000000000000, Region: Mock",
 				FetchStatus:  ResourceEventStatusFetching,
 			},
 		},
@@ -35,11 +38,13 @@ func TestResourceEventNewResourceEvent(t *testing.T) {
 			name: "NewResourceEventSuccess",
 			args: args{
 				resourceType: "ec2.Volume",
+				provider:     "AWS Account: 000000000000, Region: Mock",
 				isFetching:   false,
 				err:          nil,
 			},
 			want: ResourceEvent{
 				ResourceType: "ec2.Volume",
+				Provider:     "AWS Account: 000000000000, Region: Mock",
 				FetchStatus:  ResourceEventStatusSuccess,
 			},
 		},
@@ -47,11 +52,13 @@ func TestResourceEventNewResourceEvent(t *testing.T) {
 			name: "NewResourceEventFailure",
 			args: args{
 				resourceType: "ec2.Volume",
+				provider:     "AWS Account: 000000000000, Region: Mock",
 				isFetching:   false,
 				err:          err,
 			},
 			want: ResourceEvent{
 				ResourceType: "ec2.Volume",
+				Provider:     "AWS Account: 000000000000, Region: Mock",
 				FetchStatus:  ResourceEventStatusFailed,
 				ErrorMessage: err.Error(),
 			},
@@ -59,7 +66,7 @@ func TestResourceEventNewResourceEvent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertEqualsResourceEvent(t, tt.want, NewResourceEvent(tt.args.resourceType, tt.args.isFetching, tt.args.err))
+			AssertEqualsResourceEvent(t, tt.want, NewResourceEvent(tt.args.resourceType, tt.args.provider, tt.args.isFetching, tt.args.err))
 		})
 	}
 }
@@ -77,39 +84,39 @@ func TestResourceEventsGetStatus(t *testing.T) {
 			name: "GetStatusSuccess",
 			args: args{
 				resourceEvents: ResourceEvents{
-					NewResourceEvent("ec2.Volume", false, nil),
-					NewResourceEvent("ec2.Instance", false, nil),
-					NewResourceEvent("Lambda.Function", false, nil),
+					NewResourceEvent("ec2.Volume", "AWS Account: 000000000000, Region: Mock", false, nil),
+					NewResourceEvent("ec2.Instance", "AWS Account: 000000000000, Region: Mock", false, nil),
+					NewResourceEvent("Lambda.Function", "AWS Account: 000000000000, Region: Mock", false, nil),
 				},
 			},
-			want: EngineStatusSuccess,
+			want: ProviderStatusSuccess,
 		},
 		{
 			name: "GetStatusFailed",
 			args: args{
 				resourceEvents: ResourceEvents{
-					NewResourceEvent("ec2.Volume", false, nil),
-					NewResourceEvent("ec2.Instance", true, nil),
-					NewResourceEvent("Lambda.Function", false, errors.New("failed to fetch")),
+					NewResourceEvent("ec2.Volume", "AWS Account: 000000000000, Region: Mock", false, nil),
+					NewResourceEvent("ec2.Instance", "AWS Account: 000000000000, Region: Mock", true, nil),
+					NewResourceEvent("Lambda.Function", "AWS Account: 000000000000, Region: Mock", false, errors.New("failed to fetch")),
 				},
 			},
-			want: EngineStatusFailed,
+			want: ProviderStatusFailed,
 		},
 		{
 			name: "GetStatusFetching",
 			args: args{
 				resourceEvents: ResourceEvents{
-					NewResourceEvent("ec2.Volume", true, nil),
-					NewResourceEvent("ec2.Instance", false, nil),
-					NewResourceEvent("Lambda.Function", false, nil),
+					NewResourceEvent("ec2.Volume", "AWS Account: 000000000000, Region: Mock", true, nil),
+					NewResourceEvent("ec2.Instance", "AWS Account: 000000000000, Region: Mock", false, nil),
+					NewResourceEvent("Lambda.Function", "AWS Account: 000000000000, Region: Mock", false, nil),
 				},
 			},
-			want: EngineStatusFetching,
+			want: ProviderStatusFetching,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.args.resourceEvents.GetStatus()
+			got := tt.args.resourceEvents.GetAggregatedStatus()
 			assert.Equal(t, tt.want, got)
 		})
 	}

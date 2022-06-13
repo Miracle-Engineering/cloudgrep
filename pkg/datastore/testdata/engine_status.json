@@ -3,114 +3,73 @@
         "resourceEvents" : [
             {
                 "resourceType": "ec2.Volume",
+                "Provider": "AWS Provider for account 000000000000, region us-east-2",
                 "fetchStatus":  "fetching",
                 "errorMessage": ""
             },
             {
                 "resourceType": "ec2.Instances",
+                "Provider": "AWS Provider for account 000000000000, region us-east-2",
                 "fetchStatus":  "fetching",
                 "errorMessage": ""
             },
             {
                 "resourceType": "lambda.Function",
+                "Provider": "AWS Provider for account 000000000000, region us-east-2",
                 "fetchStatus":  "fetching",
                 "errorMessage": ""
             },
             {
                 "resourceType": "ec2.Volume",
+                "provider": "AWS Provider for account 000000000000, region us-east-2",
                 "fetchStatus":  "success",
                 "errorMessage": ""
             },
             {
                 "resourceType": "ec2.Instances",
+                "provider": "AWS Provider for account 000000000000, region us-east-2",
                 "fetchStatus":  "success",
                 "errorMessage": ""
             },
             {
                 "resourceType": "lambda.Function",
+                "provider": "AWS Provider for account 000000000000, region us-east-2",
                 "fetchStatus":  "success",
                 "errorMessage": ""
             }
         ],
         "engineStatus": {
             "fetchStatus": "success",
-            "updatedAt": "2022-06-08T14:02:10.387765+05:30",
-            "resourceEvents": [
+            "fetchedAt": "2022-06-13T22:04:10.901969+05:30",
+            "providerStatuses": [
                 {
-                    "resourceType": "ec2.Volume",
-                    "errorMessage": "",
+                    "providerType": "AWS Provider for account 000000000000, region us-east-2",
                     "fetchStatus": "success",
-                    "updatedAt": "2022-06-08T14:00:38.6457+05:30"
-                },
-                {
-                    "resourceType": "ec2.Instances",
+                    "resourceEvents": [
+                        {
+                            "id": 8,
+                            "resourceType": "ec2.Instances",
+                            "fetchStatus": "success",
+                            "errorMessage": "",
+                            "createdAt": "2022-06-13T22:03:57.779125+05:30"
+                        },
+                        {
+                            "id": 12,
+                            "resourceType": "lambda.Function",
+                            "fetchStatus": "success",
+                            "errorMessage": "",
+                            "createdAt": "2022-06-13T22:03:58.853059+05:30"
+                        },
+                        {
+                            "id": 13,
+                            "resourceType": "ec2.Volume",
+                            "fetchStatus": "success",
+                            "errorMessage": "",
+                            "createdAt": "2022-06-13T22:03:59.341186+05:30"
+                        }
+                    ],
                     "errorMessage": "",
-                    "fetchStatus": "success",
-                    "updatedAt": "2022-06-08T14:00:36.254431+05:30"
-                },
-                {
-                    "resourceType": "lambda.Function",
-                    "errorMessage": "",
-                    "fetchStatus": "success",
-                    "updatedAt": "2022-06-08T14:00:36.255093+05:30"
-                }
-            ]
-        }
-    },
-    {
-        "resourceEvents": [
-            {
-                "resourceType": "ec2.Volume",
-                "fetchStatus":  "fetching",
-                "errorMessage": ""
-            },
-            {
-                "resourceType": "ec2.Instances",
-                "fetchStatus":  "fetching",
-                "errorMessage": ""
-            },
-            {
-                "resourceType": "lambda.Function",
-                "fetchStatus":  "fetching",
-                "errorMessage": ""
-            },
-            {
-                "resourceType": "ec2.Volume",
-                "fetchStatus":  "success",
-                "errorMessage": ""
-            },
-            {
-                "resourceType": "ec2.Instances",
-                "fetchStatus":  "failed",
-                "errorMessage": "Error fetching ec2.Instances"
-            },
-            {
-                "resourceType": "lambda.Function",
-                "fetchStatus":  "failed",
-                "errorMessage": "Error fetching lambda.Function"
-            }
-        ],
-        "engineStatus": {
-            "fetchStatus": "failed",
-            "updatedAt": "2022-06-08T14:02:10.387765+05:30",
-            "resourceEvents": [
-                {
-                    "resourceType": "ec2.Volume",
-                    "errorMessage": "",
-                    "fetchStatus": "success",
-                    "updatedAt": "2022-06-08T14:00:38.6457+05:30"
-                },
-                {
-                    "resourceType": "ec2.Instances",
-                    "errorMessage": "Error fetching ec2.Instances",
-                    "fetchStatus": "failed",
-                    "updatedAt": "2022-06-08T14:00:36.254431+05:30"
-                },
-                {
-                    "resourceType": "lambda.Function",
-                    "errorMessage": "Error fetching lambda.Function",
-                    "fetchStatus": "failed",
-                    "updatedAt": "2022-06-08T14:00:36.255093+05:30"
+                    "fetchedAt": "2022-06-13T22:04:10.901969+05:30"
                 }
             ]
         }

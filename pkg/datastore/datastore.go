@@ -3,7 +3,6 @@ package datastore
 import (
 	"context"
 	"fmt"
-
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"go.uber.org/zap"
@@ -18,6 +17,7 @@ type Datastore interface {
 	GetFields(context.Context) (model.FieldGroups, error)
 	CaptureEngineStart(context.Context)
 	CaptureEngineEnd(context.Context) error
+	UpdateProviderStatus(ctx context.Context, status model.ProviderStatus) error
 	WriteResourceEvent(ctx context.Context, resourceEvent model.ResourceEvent) error
 	GetEngineStatus(context.Context) (model.EngineStatus, error)
 	Ping() error

@@ -54,7 +54,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	}
 
 	// Migrate the schema
-	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.ResourceEvent{}); err != nil {
+	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.ResourceEvent{}, &model.ProviderStatus{}); err != nil {
 		return nil, fmt.Errorf("can't create the SQLite data model: %w", err)
 	}
 
@@ -309,6 +309,25 @@ func (s *SQLiteStore) WriteResourceEvent(ctx context.Context, resourceEvent mode
 	return nil
 }
 
+func (s *SQLiteStore) UpdateProviderStatus(ctx context.Context, providerStatus model.ProviderStatus) error {
+	if providerStatus.HasError() {
+		result := s.db.Model(&providerStatus).Updates(providerStatus)
+		if result.Error != nil {
+			return fmt.Errorf("can't update provider status to database: %w", result.Error)
+		}
+		return nil
+	}
+	result := s.db.Model(&model.ProviderStatus{}).Find(&model.ProviderStatus{}, [1]string{providerStatus.ProviderType})
+	if result.Error != nil {
+		return fmt.Errorf("can't update provider status to database: %w", result.Error)
+	}
+	if result.RowsAffected == 1 {
+		result = s.db.Model(&model.ProviderStatus{}).Delete(providerStatus)
+		return nil
+	}
+	return nil
+}
+
 func (s *SQLiteStore) CaptureEngineStart(ctx context.Context) {
 	s.fetchedAt = time.Now()
 }
@@ -385,19 +404,27 @@ func (s *SQLiteStore) deleteResourcesBefore(before time.Time) (int, error) {
 
 func (s *SQLiteStore) GetEngineStatus(context.Context) (model.EngineStatus, error) {
 	var resourceEvents model.ResourceEvents
+	var providerStatuses model.ProviderStatuses
 	result := s.db.
 		Model(&model.ResourceEvent{}).
-		Where("id in (?)",
+		Where("id in (?) AND created_at > (?)",
 			s.db.
 				Model(&model.ResourceEvents{}).
 				Select("max(id)").
-				Group("resource_type")).
+				Group("resource_type"),
+			s.fetchedAt).
 		Find(&resourceEvents)
 
 	if result.Error != nil {
-		return model.NewEngineStatus(nil, true),
+		return model.EngineStatus{},
 			fmt.Errorf("unable to fetch the resource events: %w", result.Error)
 	}
 
-	return model.NewEngineStatus(resourceEvents, false), nil
+	result = s.db.Model(&model.ProviderStatus{}).Find(&providerStatuses)
+	if result.Error != nil {
+		return model.EngineStatus{},
+			fmt.Errorf("unable to fetch the provider statuses: %w", result.Error)
+	}
+
+	return model.GetEngineStatus(providerStatuses, resourceEvents), nil
 }

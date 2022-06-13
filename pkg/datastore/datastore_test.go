@@ -389,6 +389,8 @@ func TestWriteResourceEvents(t *testing.T) {
 
 func TestGetEngineStatus(t *testing.T) {
 	ctx := context.Background()
+	// Mock Provider to be set manually as we are not exposing it.
+	mockProvider := "AWS Provider for account 000000000000, region us-east-2"
 	testEngineStatusesResourceEvents := testdata.GetEngineStatusesResourceEvents(t)
 	datastores, _ := newDatastores(t, ctx)
 	for _, datastore := range datastores {
@@ -396,6 +398,7 @@ func TestGetEngineStatus(t *testing.T) {
 		for _, testData := range testEngineStatusesResourceEvents {
 			t.Run(name, func(t *testing.T) {
 				for _, resourceEvent := range testData.ResourceEvents {
+					resourceEvent.Provider = mockProvider
 					assert.NoError(t, datastore.WriteResourceEvent(ctx, resourceEvent))
 				}
 				engineStatus, err := datastore.GetEngineStatus(ctx)

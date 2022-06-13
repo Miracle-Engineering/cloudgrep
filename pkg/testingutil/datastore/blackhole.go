@@ -65,3 +65,7 @@ func (s *Blackhole) WriteResourceEvent(ctx context.Context, resourceEvent model.
 func (s *Blackhole) GetEngineStatus(ctx context.Context) (model.EngineStatus, error) {
 	return model.EngineStatus{}, nil
 }
+
+func (s *Blackhole) UpdateProviderStatus(ctx context.Context, status model.ProviderStatus) error {
+	return nil
+}

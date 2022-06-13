@@ -13,6 +13,7 @@ const (
 type ResourceEvent struct {
 	Id           uint64    `json:"id" gorm:"primaryKey;autoIncrement"`
 	ResourceType string    `json:"resourceType"`
+	Provider     string    `json:"-"`
 	FetchStatus  string    `json:"fetchStatus"`
 	ErrorMessage string    `json:"errorMessage"`
 	CreatedAt    time.Time `json:"createdAt"`
@@ -20,9 +21,10 @@ type ResourceEvent struct {
 
 type ResourceEvents []ResourceEvent
 
-func NewResourceEvent(resourceType string, isFetching bool, err error) ResourceEvent {
+func NewResourceEvent(resourceType string, provider string, isFetching bool, err error) ResourceEvent {
 	var resourceEvent ResourceEvent
 	resourceEvent.ResourceType = resourceType
+	resourceEvent.Provider = provider
 	if isFetching {
 		resourceEvent.FetchStatus = ResourceEventStatusFetching
 	} else {
@@ -36,14 +38,14 @@ func NewResourceEvent(resourceType string, isFetching bool, err error) ResourceE
 	return resourceEvent
 }
 
-func (resourceEvents ResourceEvents) GetStatus() string {
-	fetchStatus := EngineStatusSuccess
+func (resourceEvents ResourceEvents) GetAggregatedStatus() string {
+	fetchStatus := ProviderStatusSuccess
 	for _, resourceEvent := range resourceEvents {
 		if resourceEvent.FetchStatus == ResourceEventStatusFailed {
-			fetchStatus = EngineStatusFailed
+			fetchStatus = ProviderStatusFailed
 			break
 		} else if resourceEvent.FetchStatus == ResourceEventStatusFetching {
-			fetchStatus = EngineStatusFetching
+			fetchStatus = ProviderStatusFetching
 		}
 	}
 	return fetchStatus
