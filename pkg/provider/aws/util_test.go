@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"os"
@@ -11,27 +10,33 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/run-x/cloudgrep/pkg/testingutil"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest"
+
+	cfg "github.com/run-x/cloudgrep/pkg/config"
 )
 
 // Set this env var to force enable the integration tests (will fail tests if creds aren't available)
 const testEnvVar = "CLOUD_INTEGRATION_TESTS"
+const ciEnvVar = "CI"
+
+const (
+	accountIntegrationDev  = "316817240772"
+	accountIntegrationProd = "438881294876"
+)
 
 // Only run the integration tests on these specially preparred accounts
-var integrationAwsAccounts = []string{"316817240772", "438881294876"}
+var integrationAwsAccounts = []string{accountIntegrationDev, accountIntegrationProd}
 
 // Cache the checks for credentials so it doesn't run for every test
 var credCheck credChecker
 
 type integrationTestContext struct {
-	p         *Provider
-	log       *zap.Logger
-	logBuffer *bytes.Buffer
-	ctx       context.Context
+	p   *Provider
+	log *zap.Logger
+	ctx context.Context
 }
 
 func setupIntegrationTest(t testing.TB) *integrationTestContext {
@@ -55,7 +60,10 @@ func checkShouldRunIntegrationTests(t testing.TB, ctx *integrationTestContext) {
 	t.Helper()
 
 	creds := credCheck.HasAWSCreds(t, ctx.p.config)
-	_, hasEnvVar := os.LookupEnv(testEnvVar)
+	_, hasIntegrationEnvVar := os.LookupEnv(testEnvVar)
+	_, hasCiEnvVar := os.LookupEnv(ciEnvVar)
+
+	hasEnvVar := hasIntegrationEnvVar || hasCiEnvVar
 
 	if hasEnvVar && !creds {
 		t.Fatalf("cannot run integration tests without creds")
@@ -69,38 +77,29 @@ func checkShouldRunIntegrationTests(t testing.TB, ctx *integrationTestContext) {
 func setupIntegrationProvider(t testing.TB, ctx *integrationTestContext) {
 	t.Helper()
 
-	var err error
-	provider := &Provider{}
-	provider.config, err = config.LoadDefaultConfig(ctx.ctx, func(lo *config.LoadOptions) error {
-		lo.Region = testingutil.TestRegion
-		return nil
-	})
-	if err != nil {
-		t.Fatalf("cannot load config: %v", err)
+	c := cfg.Provider{}
+	c.Cloud = "aws"
+	c.Regions = []string{
+		testingutil.TestRegion,
 	}
 
+	providers, err := NewProviders(ctx.ctx, c, ctx.log)
 	if err != nil {
-		t.Fatalf("cannot instantiate mapper: %v", err)
+		t.Fatalf("unable to instantiate new providers: %v", err)
 	}
 
-	ctx.p = provider
+	if len(providers) != 1 {
+		t.Fatal("currently only have support for single provider in tests")
+	}
+
+	provider := providers[0].(Provider)
+
+	ctx.p = &provider
 }
 
 func setupIntegrationLogs(t testing.TB, ctx *integrationTestContext) {
 	t.Helper()
-	buf, ws := logBuffer()
-	ctx.logBuffer = buf
-
-	log, err := zap.NewDevelopment(zap.ErrorOutput(ws))
-	if err != nil {
-		t.Fatalf("cannot create zap logger: %v", err)
-	}
-	ctx.log = log
-}
-
-func logBuffer() (*bytes.Buffer, zapcore.WriteSyncer) {
-	buf := &bytes.Buffer{}
-	return buf, zapcore.Lock(zapcore.AddSync(buf))
+	ctx.log = zaptest.NewLogger(t)
 }
 
 type credChecker struct {

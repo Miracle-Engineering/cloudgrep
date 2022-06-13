@@ -39,7 +39,6 @@ jobs:
       - run: make test
         env:
           CGO_ENABLED: 1
-          CLOUD_INTEGRATION_TESTS: 1
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
