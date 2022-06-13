@@ -15,8 +15,8 @@ type Datastore interface {
 	WriteResources(context.Context, model.Resources) error
 	Stats(context.Context) (model.Stats, error)
 	GetFields(context.Context) (model.FieldGroups, error)
-	CaptureEngineStart(context.Context)
-	CaptureEngineEnd(context.Context) error
+	EngineStart(context.Context)
+	EngineEnd(context.Context) error
 	UpdateProviderStatus(ctx context.Context, status model.ProviderStatus) error
 	WriteResourceEvent(ctx context.Context, resourceEvent model.ResourceEvent) error
 	GetEngineStatus(context.Context) (model.EngineStatus, error)

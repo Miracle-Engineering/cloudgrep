@@ -319,20 +319,23 @@ func (s *SQLiteStore) UpdateProviderStatus(ctx context.Context, providerStatus m
 	}
 	result := s.db.Model(&model.ProviderStatus{}).Find(&model.ProviderStatus{}, [1]string{providerStatus.ProviderType})
 	if result.Error != nil {
-		return fmt.Errorf("can't update provider status to database: %w", result.Error)
+		return fmt.Errorf("can't connect to the database: %w", result.Error)
 	}
 	if result.RowsAffected == 1 {
 		result = s.db.Model(&model.ProviderStatus{}).Delete(providerStatus)
+		if result.Error != nil {
+			return fmt.Errorf("can't update provider status to database: %w", result.Error)
+		}
 		return nil
 	}
 	return nil
 }
 
-func (s *SQLiteStore) CaptureEngineStart(ctx context.Context) {
+func (s *SQLiteStore) EngineStart(ctx context.Context) {
 	s.fetchedAt = time.Now()
 }
 
-func (s *SQLiteStore) CaptureEngineEnd(ctx context.Context) error {
+func (s *SQLiteStore) EngineEnd(ctx context.Context) error {
 	//once engine is complete, we delete all the resources that no longer exist
 	_, err := s.deleteResourcesBefore(s.fetchedAt)
 	if err != nil {

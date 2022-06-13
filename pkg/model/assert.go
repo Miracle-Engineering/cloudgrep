@@ -52,21 +52,21 @@ func AssertEqualsField(t *testing.T, a, b Field) {
 	assert.ElementsMatch(t, a.Values, b.Values)
 }
 
-func AssertEqualsResourceEvent(t *testing.T, expectedResourceEvent, actualResourceEvent ResourceEvent) {
-	assert.Equal(t, expectedResourceEvent.ResourceType, actualResourceEvent.ResourceType)
-	//assert.Equal(t, expectedResourceEvent.Provider, actualResourceEvent.Provider)
-	assert.Equal(t, expectedResourceEvent.FetchStatus, actualResourceEvent.FetchStatus)
-	assert.Equal(t, expectedResourceEvent.ErrorMessage, actualResourceEvent.ErrorMessage)
+func AssertEqualsResourceEvent(t *testing.T, re1, re2 ResourceEvent) {
+	assert.Equal(t, re1.ResourceType, re2.ResourceType)
+	//assert.Equal(t, re1.Provider, re2.Provider)
+	assert.Equal(t, re1.FetchStatus, re2.FetchStatus)
+	assert.Equal(t, re1.ErrorMessage, re2.ErrorMessage)
 }
 
-func AssertEqualsProviderStatus(t *testing.T, expectedProviderStatus, actualProviderStatus ProviderStatus) {
-	assert.Equal(t, expectedProviderStatus.ProviderType, actualProviderStatus.ProviderType)
-	assert.Equal(t, expectedProviderStatus.FetchStatus, actualProviderStatus.FetchStatus)
-	assert.Equal(t, expectedProviderStatus.ErrorMessage, actualProviderStatus.ErrorMessage)
-	assert.Equal(t, len(expectedProviderStatus.ResourceEvents), len(actualProviderStatus.ResourceEvents))
-	for _, actualResourceEvent := range actualProviderStatus.ResourceEvents {
+func AssertEqualsProviderStatus(t *testing.T, ps1, ps2 ProviderStatus) {
+	assert.Equal(t, ps1.ProviderType, ps2.ProviderType)
+	assert.Equal(t, ps1.FetchStatus, ps2.FetchStatus)
+	assert.Equal(t, ps1.ErrorMessage, ps2.ErrorMessage)
+	assert.Equal(t, len(ps1.ResourceEvents), len(ps2.ResourceEvents))
+	for _, actualResourceEvent := range ps2.ResourceEvents {
 		var expectedResourceEvent ResourceEvent
-		for _, resourceEvent := range expectedProviderStatus.ResourceEvents {
+		for _, resourceEvent := range ps1.ResourceEvents {
 			if resourceEvent.ResourceType == actualResourceEvent.ResourceType {
 				expectedResourceEvent = resourceEvent
 				break
@@ -78,13 +78,13 @@ func AssertEqualsProviderStatus(t *testing.T, expectedProviderStatus, actualProv
 
 }
 
-func AssertEqualsEngineStatus(t *testing.T, expectedEngineStatus, actualEngineStatus EngineStatus) {
-	assert.Equal(t, expectedEngineStatus.FetchStatus, actualEngineStatus.FetchStatus)
-	assert.Equal(t, len(actualEngineStatus.ProviderStatuses), len(expectedEngineStatus.ProviderStatuses))
+func AssertEqualsEngineStatus(t *testing.T, es1, es2 EngineStatus) {
+	assert.Equal(t, es1.FetchStatus, es2.FetchStatus)
+	assert.Equal(t, len(es2.ProviderStatuses), len(es1.ProviderStatuses))
 
-	for _, actualProviderStatus := range actualEngineStatus.ProviderStatuses {
+	for _, actualProviderStatus := range es2.ProviderStatuses {
 		var expectedProviderStatus ProviderStatus
-		for _, providerStatus := range expectedEngineStatus.ProviderStatuses {
+		for _, providerStatus := range es1.ProviderStatuses {
 			if providerStatus.ProviderType == actualProviderStatus.ProviderType {
 				expectedProviderStatus = providerStatus
 				break

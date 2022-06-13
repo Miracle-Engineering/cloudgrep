@@ -373,20 +373,6 @@ func TestFields(t *testing.T) {
 	}
 }
 
-func TestWriteResourceEvents(t *testing.T) {
-	ctx := context.Background()
-	resourceEvents := testdata.GetResourceEvents(t)
-	datastores, _ := newDatastores(t, ctx)
-	for _, datastore := range datastores {
-		name := fmt.Sprintf("%T", datastore)
-		t.Run(name, func(t *testing.T) {
-			for _, resourceEvent := range resourceEvents {
-				assert.NoError(t, datastore.WriteResourceEvent(ctx, resourceEvent))
-			}
-		})
-	}
-}
-
 func TestGetEngineStatus(t *testing.T) {
 	ctx := context.Background()
 	// Mock Provider to be set manually as we are not exposing it.
@@ -507,9 +493,9 @@ func TestPurgeResources(t *testing.T) {
 
 			//1nd run: write 3 resources
 			resources := testdata.GetResources(t)[:3]
-			ds.CaptureEngineStart(ctx)
+			ds.EngineStart(ctx)
 			require.NoError(t, ds.WriteResources(ctx, resources))
-			require.NoError(t, ds.CaptureEngineEnd(ctx))
+			require.NoError(t, ds.EngineEnd(ctx))
 			r1, err := ds.GetResource(ctx, resources[0].Id)
 			require.NoError(t, err)
 			r2, err := ds.GetResource(ctx, resources[1].Id)
@@ -519,9 +505,9 @@ func TestPurgeResources(t *testing.T) {
 			testQuery(t, ctx, ds, tagUniqueKey, tagUniqueValue, r1)
 
 			//2nd run: one resource is removed
-			ds.CaptureEngineStart(ctx)
+			ds.EngineStart(ctx)
 			require.NoError(t, ds.WriteResources(ctx, model.Resources{r2, r3}.Clean()))
-			require.NoError(t, ds.CaptureEngineEnd(ctx))
+			require.NoError(t, ds.EngineEnd(ctx))
 			resourcesRead, err := ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			model.AssertEqualsResources(t, model.Resources{r2, r3}, resourcesRead)
@@ -530,17 +516,17 @@ func TestPurgeResources(t *testing.T) {
 			testQueryUnrecognizedKey(t, ctx, ds, tagUniqueKey, tagUniqueValue)
 
 			//3rd run: an error happened - there is a built-in protection to not delete all resources
-			ds.CaptureEngineStart(ctx)
-			require.NoError(t, ds.CaptureEngineEnd(ctx))
+			ds.EngineStart(ctx)
+			require.NoError(t, ds.EngineEnd(ctx))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			model.AssertEqualsResources(t, model.Resources{r2, r3}, resourcesRead)
 			testQuery(t, ctx, ds, "id", r2.Id, r2)
 
 			//4th run: add back the resource previously deleted
-			ds.CaptureEngineStart(ctx)
+			ds.EngineStart(ctx)
 			require.NoError(t, ds.WriteResources(ctx, model.Resources{r2, r1, r3}.Clean()))
-			require.NoError(t, ds.CaptureEngineEnd(ctx))
+			require.NoError(t, ds.EngineEnd(ctx))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			model.AssertEqualsResources(t, model.Resources{r1, r2, r3}, resourcesRead)

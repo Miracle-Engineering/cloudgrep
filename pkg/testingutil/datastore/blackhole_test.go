@@ -51,9 +51,9 @@ func TestBlackholeEmptyFuncs(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Empty(t, fields)
 
-	ds.CaptureEngineStart(ctx)
+	ds.EngineStart(ctx)
 
-	assert.NoError(t, ds.CaptureEngineEnd(ctx))
+	assert.NoError(t, ds.EngineEnd(ctx))
 
 	status, err := ds.GetEngineStatus(ctx)
 	assert.NoError(t, err)
