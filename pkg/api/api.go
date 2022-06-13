@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 
 	"go.uber.org/zap"
@@ -10,10 +11,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
+	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/version"
 )
 
-func StartWebServer(ctx context.Context, cfg config.Config, logger *zap.Logger, ds datastore.Datastore) {
+type EngineFunc func(context.Context) error
+
+func StartWebServer(ctx context.Context, cfg config.Config, logger *zap.Logger, ds datastore.Datastore, engineF EngineFunc) {
 	router := gin.Default()
 
 	if logger.Core().Enabled(zap.DebugLevel) {
@@ -22,7 +26,7 @@ func StartWebServer(ctx context.Context, cfg config.Config, logger *zap.Logger, 
 		gin.SetMode("release")
 	}
 
-	SetupRoutes(router, cfg, logger, ds)
+	SetupRoutes(router, cfg, logger, ds, engineF)
 
 	fmt.Println("Starting server...")
 	go func() {
@@ -115,4 +119,28 @@ func EngineStatus(c *gin.Context) {
 		return
 	}
 	c.JSON(200, status)
+}
+
+//Refresh trigger the engine to fetch the resources
+func Refresh(c *gin.Context) {
+
+	ds := c.MustGet("datastore").(datastore.Datastore)
+	status, err := ds.GetEngineStatus(c)
+	if err != nil {
+		badRequest(c, err)
+		return
+	}
+	if status.Status == model.EngineStatusFetching {
+		badRequest(c, fmt.Errorf("engine is already running"))
+		return
+	}
+	engineFunc := c.MustGet("engineFunc").(EngineFunc)
+	//TODO run this process async (and test)
+	err = engineFunc(c)
+	if err != nil {
+		badRequest(c, err)
+		return
+	}
+	c.Status(http.StatusOK)
+
 }

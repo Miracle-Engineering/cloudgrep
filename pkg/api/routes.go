@@ -14,17 +14,19 @@ import (
 	"github.com/run-x/cloudgrep/static"
 )
 
-func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds datastore.Datastore) {
+func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds datastore.Datastore, engineF EngineFunc) {
 	root := router.Group(cfg.Web.Prefix)
 
 	root.GET("/", gin.WrapH(GetHome(cfg.Web.Prefix)))
 	root.GET("/static/*path", gin.WrapH(GetAssets(cfg.Web.Prefix)))
 
 	api := root.Group("/api")
-	setupMiddlewares(api, cfg, logger, ds)
+	setupMiddlewares(api, cfg, logger, ds, engineF)
 
 	healthz := root.Group("/healthz")
-	setupMiddlewares(healthz, cfg, logger, ds)
+	healthz.Use(setSharedObjects(map[string]interface{}{
+		"datastore": ds,
+	}))
 	healthz.GET("", Healthz)
 
 	api.GET("/info", Info)
@@ -34,6 +36,7 @@ func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds d
 	api.GET("/stats", Stats)
 	api.GET("/fields", Fields)
 	api.GET("/enginestatus", EngineStatus)
+	api.POST("/refresh", Refresh)
 
 	mock_files, err := static.Static.ReadDir("mock")
 	if err != nil {
