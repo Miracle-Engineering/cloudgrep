@@ -28,10 +28,6 @@ function Header() {
 		dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
 	};
 
-	const handleClose = () => {
-		setOpen(false);
-	};
-
 	useEffect(() => {
 		if (resources) {
 			setOpen(false);
@@ -66,10 +62,7 @@ function Header() {
 					{t('REFRESH')}
 				</Button>
 			</Box>
-			<Backdrop
-				sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
-				open={open}
-				onClick={handleClose}>
+			<Backdrop sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }} open={open}>
 				<CircularProgress color="inherit" />
 			</Backdrop>
 		</Box>

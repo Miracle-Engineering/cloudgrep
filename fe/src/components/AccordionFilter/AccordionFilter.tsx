@@ -35,7 +35,7 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 
 	useEffect(() => {
 		if (expanded && isHovered && accordionRef?.current?.clientHeight) {
-			setBoxHeight(`${accordionRef?.current.clientHeight}px`);
+			setBoxHeight(`${accordionRef?.current.clientHeight + 4}px`);
 			setApplyHover(true);
 		} else {
 			setBoxHeight('unset');
@@ -44,61 +44,61 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 	}, [isHovered, accordionRef?.current?.clientHeight, expanded, accordionRef]);
 
 	return (
-		<Box ref={accordionRef} key={id} sx={{ height: boxHeight, position: 'relative' }}>
-			<Accordion expanded={expanded} onChange={handleExpand}>
-				{/* <Accordion expanded={expanded} onChange={handleExpand} sx={expanded ? filterStyles.filterHover : undefined}> */}
-				{/* sx={expanded && applyHover ? filterStyles.filterHover : undefined}> */}
-				<AccordionSummary
-					sx={filterStyles.filterHeader}
-					expandIcon={<ExpandMoreIcon />}
-					aria-controls={`${id}-content`}
-					id={`${id}-header`}
-					classes={overrideSummaryClasses}>
-					<Typography sx={accordionStyles.accordionHeader}>{label}</Typography>
-				</AccordionSummary>
-				<AccordionDetails ref={containerRef} sx={accordionStyles.details}>
-					{hasSearch && field?.values?.length > SEARCH_ELEMENTS_NUMBER && (
-						<SearchInput onChange={handleSearchTerm} />
-					)}
-					<Box>
-						<FormGroup>
-							{field?.values &&
-								field?.values
-									.filter(item => item.value?.toLowerCase()?.includes(searchTerm?.toLowerCase()))
-									.map((item: ValueType) => (
-										<Box
-											key={item.value}
-											sx={{
-												display: 'flex',
-												alignItems: 'center',
-												justifyContent: 'space-between',
-												maxWidth: '100%',
-											}}>
-											<FormControlLabel
+		<Box ref={accordionRef} key={id} sx={{ position: 'relative', height: boxHeight }}>
+			<Box sx={expanded && applyHover ? { ...filterStyles.filterHover } : undefined}>
+				<Accordion expanded={expanded} onChange={handleExpand}>
+					<AccordionSummary
+						sx={filterStyles.filterHeader}
+						expandIcon={<ExpandMoreIcon />}
+						aria-controls={`${id}-content`}
+						id={`${id}-header`}
+						classes={overrideSummaryClasses}>
+						<Typography sx={accordionStyles.accordionHeader}>{label}</Typography>
+					</AccordionSummary>
+					<AccordionDetails ref={containerRef} sx={accordionStyles.details}>
+						{hasSearch && field?.values?.length > SEARCH_ELEMENTS_NUMBER && (
+							<SearchInput onChange={handleSearchTerm} />
+						)}
+						<Box>
+							<FormGroup>
+								{field?.values &&
+									field?.values
+										.filter(item => item.value?.toLowerCase()?.includes(searchTerm?.toLowerCase()))
+										.map((item: ValueType) => (
+											<Box
+												key={item.value}
 												sx={{
-													overflow: 'hidden',
-													textOverflow: 'ellipsis',
-													whiteSpace: 'nowrap',
-												}}
-												classes={labelClasses}
-												control={
-													<Checkbox
-														size={'small'}
-														defaultChecked={checkedByDefault}
-														onChange={e => handleChange(e, field, item)}
-													/>
-												}
-												label={item.value}
-											/>
-											<Typography sx={{ fontSize: '13px', fontWeight: 600 }}>
-												{item.count}
-											</Typography>
-										</Box>
-									))}
-						</FormGroup>
-					</Box>
-				</AccordionDetails>
-			</Accordion>
+													display: 'flex',
+													alignItems: 'center',
+													justifyContent: 'space-between',
+													maxWidth: '100%',
+												}}>
+												<FormControlLabel
+													sx={{
+														overflow: 'hidden',
+														textOverflow: 'ellipsis',
+														whiteSpace: 'nowrap',
+													}}
+													classes={labelClasses}
+													control={
+														<Checkbox
+															size={'small'}
+															defaultChecked={checkedByDefault}
+															onChange={e => handleChange(e, field, item)}
+														/>
+													}
+													label={item.value}
+												/>
+												<Typography sx={{ fontSize: '13px', fontWeight: 600 }}>
+													{item.count}
+												</Typography>
+											</Box>
+										))}
+							</FormGroup>
+						</Box>
+					</AccordionDetails>
+				</Accordion>
+			</Box>
 		</Box>
 	);
 };

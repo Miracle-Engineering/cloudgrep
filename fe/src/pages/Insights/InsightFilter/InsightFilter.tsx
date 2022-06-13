@@ -57,37 +57,38 @@ const InsightFilter: FC = () => {
 	return (
 		<Box
 			sx={{
-				width: '20%',
-				height: '100%',
 				backgroundColor: '#F9F7F6',
-				overflowY: 'auto',
+				width: '20%',
+				overflowX: 'visible',
 			}}>
-			{fields.map((field: FieldGroup) => (
-				<Accordion key={field.name}>
-					<AccordionSummary
-						sx={filterStyles.filterHeader}
-						expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-						aria-controls={`${field.name}-content`}
-						id={`${field.name}-header`}
-						key={field.name}
-						classes={overrideSummaryClasses}>
-						<Typography sx={accordionStyles.accordionHeader}>{field.name.toUpperCase()}</Typography>
-					</AccordionSummary>
-					<AccordionDetails sx={{ padding: '0px' }}>
-						{field.fields.map((fieldItem: Field, index: number) => (
-							<AccordionFilter
-								key={fieldItem.name + index}
-								field={fieldItem}
-								hasSearch={true}
-								label={fieldItem.name}
-								id={fieldItem.name + index}
-								handleChange={handleChange}
-								checkedByDefault={CHECKED_BY_DEFAULT}
-							/>
-						))}
-					</AccordionDetails>
-				</Accordion>
-			))}
+			<Box>
+				{fields.map((field: FieldGroup) => (
+					<Accordion key={field.name}>
+						<AccordionSummary
+							sx={filterStyles.filterHeader}
+							expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+							aria-controls={`${field.name}-content`}
+							id={`${field.name}-header`}
+							key={field.name}
+							classes={overrideSummaryClasses}>
+							<Typography sx={accordionStyles.accordionHeader}>{field.name.toUpperCase()}</Typography>
+						</AccordionSummary>
+						<AccordionDetails sx={{ padding: '0px' }}>
+							{field.fields.map((fieldItem: Field, index: number) => (
+								<AccordionFilter
+									key={fieldItem.name + index}
+									field={fieldItem}
+									hasSearch={true}
+									label={fieldItem.name}
+									id={fieldItem.name + index}
+									handleChange={handleChange}
+									checkedByDefault={CHECKED_BY_DEFAULT}
+								/>
+							))}
+						</AccordionDetails>
+					</Accordion>
+				))}
+			</Box>
 		</Box>
 	);
 };
