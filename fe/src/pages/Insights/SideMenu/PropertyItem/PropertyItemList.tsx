@@ -6,6 +6,7 @@ import { TEXT_COLOR } from 'constants/colors';
 import React, { FC, useState } from 'react';
 
 import { sideMenuLeftText } from '../style';
+import { iconStyle, textDefaultStyle } from './style';
 import { PropertyItemListProps } from './types';
 
 const PropertyItemList: FC<PropertyItemListProps> = props => {
@@ -16,42 +17,42 @@ const PropertyItemList: FC<PropertyItemListProps> = props => {
 		setExpanded(!expanded);
 	};
 
-	return (
-		<>
-			{expanded ? (
-				<>
-					<Box sx={{ display: 'flex' }}>
-						<Typography mr={2} {...sideMenuLeftText} sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
-						<IndeterminateCheckBoxIcon
-							color={'primary'}
-							fontSize="small"
-							onClick={handleClick}
-							sx={{ cursor: 'pointer', display: 'flex' }}
-						/>
-						<Typography
-							color={TEXT_COLOR}
-							sx={{ opacity: '0.9', display: 'flex', lineHeight: '1' }}>{`[`}</Typography>
-					</Box>
-					<Box>
-						<Box ml={2}>{data.map(item => renderObjects(item))}</Box>
-						<Typography color={TEXT_COLOR} sx={{ opacity: '0.9', display: 'flex' }}>{`]`}</Typography>
-					</Box>
-				</>
-			) : (
+	if (data?.length === 0) {
+		return (
+			<Box sx={{ display: 'flex' }}>
+				<Typography mr={2} {...sideMenuLeftText} sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
+				<Typography color={TEXT_COLOR} sx={textDefaultStyle}>{`[ ]`}</Typography>
+			</Box>
+		);
+	}
+
+	if (expanded) {
+		return (
+			<>
 				<Box sx={{ display: 'flex' }}>
 					<Typography mr={2} {...sideMenuLeftText} sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
-					<AddBoxIcon
+					<IndeterminateCheckBoxIcon
 						color={'primary'}
 						fontSize="small"
 						onClick={handleClick}
-						sx={{ cursor: 'pointer', display: 'flex' }}
+						sx={iconStyle}
 					/>
-					<Typography
-						color={TEXT_COLOR}
-						sx={{ opacity: '0.9', display: 'flex', lineHeight: '1' }}>{`[ ... ]`}</Typography>
+					<Typography color={TEXT_COLOR} sx={textDefaultStyle}>{`[`}</Typography>
 				</Box>
-			)}
-		</>
+				<Box>
+					<Box ml={2}>{data.map(item => renderObjects(item))}</Box>
+					<Typography color={TEXT_COLOR} sx={textDefaultStyle}>{`]`}</Typography>
+				</Box>
+			</>
+		);
+	}
+
+	return (
+		<Box sx={{ display: 'flex' }}>
+			<Typography mr={2} {...sideMenuLeftText} sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
+			<AddBoxIcon color={'primary'} fontSize="small" onClick={handleClick} sx={iconStyle} />
+			<Typography color={TEXT_COLOR} sx={textDefaultStyle}>{`[ ... ]`}</Typography>
+		</Box>
 	);
 };
 

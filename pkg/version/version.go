@@ -24,11 +24,11 @@ type BuildInfo struct {
 	// Version is the current semver.
 	Version string `json:"version,omitempty"`
 	// GitCommit is the git sha1.
-	GitCommit string `json:"git_commit,omitempty"`
+	GitCommit string `json:"gitCommit,omitempty"`
 	// BuildTime is the state of the git tree.
-	BuildTime string `json:"build_time,omitempty"`
+	BuildTime string `json:"buildTime,omitempty"`
 	// GoVersion is the version of the Go compiler used.
-	GoVersion string `json:"go_version,omitempty"`
+	GoVersion string `json:"goVersion,omitempty"`
 }
 
 // Get returns build info

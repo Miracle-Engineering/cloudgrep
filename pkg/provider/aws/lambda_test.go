@@ -11,8 +11,7 @@ func TestFetchFunctions(t *testing.T) {
 
 	ctx := setupIntegrationTest(t)
 
-	raw := testingutil.MustFetchAll(ctx.ctx, t, ctx.p.FetchFunctions)
-	resources := testingutil.ConvertToResources(t, ctx.ctx, ctx.p.mapper, raw)
+	resources := testingutil.MustFetchAll(ctx.ctx, t, ctx.p.FetchLambdaFunctions)
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
 	testingutil.AssertResourceCount(t, resources, "lambda-function-0", 1)

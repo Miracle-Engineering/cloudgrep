@@ -11,8 +11,7 @@ func TestFetchRDSInstances(t *testing.T) {
 
 	ctx := setupIntegrationTest(t)
 
-	raw := testingutil.MustFetchAll(ctx.ctx, t, ctx.p.FetchRDSInstances)
-	resources := testingutil.ConvertToResources(t, ctx.ctx, ctx.p.mapper, raw)
+	resources := testingutil.MustFetchAll(ctx.ctx, t, ctx.p.FetchRDSInstances)
 
 	testingutil.AssertResourceCount(t, resources, "rds-instance-0", 1)
 }
@@ -22,8 +21,7 @@ func TestFetchRDSClusters(t *testing.T) {
 
 	ctx := setupIntegrationTest(t)
 
-	raw := testingutil.MustFetchAll(ctx.ctx, t, ctx.p.FetchRDSClusters)
-	resources := testingutil.ConvertToResources(t, ctx.ctx, ctx.p.mapper, raw)
+	resources := testingutil.MustFetchAll(ctx.ctx, t, ctx.p.FetchRDSClusters)
 
 	testingutil.AssertResourceCount(t, resources, "rds-cluster-0", 1)
 }

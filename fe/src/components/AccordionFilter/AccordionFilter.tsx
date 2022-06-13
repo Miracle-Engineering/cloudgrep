@@ -8,6 +8,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
 import SearchInput from 'components/SearchInput/SearchInput';
+import { SEARCH_ELEMENTS_NUMBER } from 'constants/globals';
 import { ValueType } from 'models/Field';
 import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import useHover from 'utils/hooks/useHover';
@@ -15,10 +16,8 @@ import useHover from 'utils/hooks/useHover';
 import { accordionStyles, filterStyles, labelClasses, overrideSummaryClasses } from './style';
 import { AccordionFilterProps } from './types';
 
-const SEARCH_ELEMENTS_NUMBER = 3;
-
 const AccordionFilter: FC<AccordionFilterProps> = props => {
-	const { label, hasSearch, id, field, handleChange } = props;
+	const { label, hasSearch, id, field, handleChange, checkedByDefault } = props;
 	const [searchTerm, setSearchTerm] = useState('');
 	const [applyHover, setApplyHover] = useState(false);
 	const [boxHeight, setBoxHeight] = useState('unset');
@@ -57,11 +56,11 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 					classes={overrideSummaryClasses}>
 					<Typography sx={accordionStyles.accordionHeader}>{label}</Typography>
 				</AccordionSummary>
-				<AccordionDetails ref={containerRef}>
+				<AccordionDetails ref={containerRef} sx={accordionStyles.details}>
 					{hasSearch && field?.values?.length > SEARCH_ELEMENTS_NUMBER && (
 						<SearchInput onChange={handleSearchTerm} />
 					)}
-					<Typography>
+					<Box>
 						<FormGroup>
 							{field?.values &&
 								field?.values
@@ -85,7 +84,7 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 												control={
 													<Checkbox
 														size={'small'}
-														// TODO defaultChecked
+														defaultChecked={checkedByDefault}
 														onChange={e => handleChange(e, field, item)}
 													/>
 												}
@@ -97,7 +96,7 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 										</Box>
 									))}
 						</FormGroup>
-					</Typography>
+					</Box>
 				</AccordionDetails>
 			</Accordion>
 		</Box>

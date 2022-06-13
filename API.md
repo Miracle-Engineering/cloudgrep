@@ -66,14 +66,35 @@ Example of queries:
   }
 }
 
-//filter with more than one value for a field
-// will return resources with type=ec2.Volume AND team IN ("marketplace", "shipping")
+//filter with more than one value for a field using a OR
+// will return resources with type=ec2.Volume AND (team="marketplace" OR team="shipping")
 {
   "filter":{
     "type":"ec2.Volume",
     "$or": [
       { "team": "marketplace" },
       { "team": "shipping" }
+    ]
+  }
+}
+
+//Using multiple OR sections
+// will return resources with (team="marketplace" OR team="shipping") AND (cluster="dev" OR cluster="prod")  AND (size="large" OR size="medium") 
+{
+  "filter":{
+    "$or": [
+      { "team": "marketplace" },
+      { "team": "shipping" }
+    ],
+    "$and": [
+      { "$or": [
+        { "cluster": "dev" },
+        { "cluster": "prod" }
+      ] },
+      { "$or": [
+        { "size": "large" },
+        { "size": "medium" }
+      ] }
     ]
   }
 }
@@ -211,6 +232,33 @@ Example of response:
     ]
   }
 ]
+```
+
+## Get Engine Status
+
+Returns the Status of the Cloudgrep run.
+
+| Route                                                   | Method | Description              |  Status |
+|---------------------------------------------------------| ------------- |--------------------------| ------------- |
+| [/enginestatus](http://localhost:8080/api/enginestatus) | GET  | Return the Engine status |  :white_check_mark: |
+
+Sample Responses:
+```js
+// Successfully got all the resources
+{
+  "resource_name":"engine",
+  "error_message":"",
+  "status":"success",
+  "fetched_at":"2022-06-07T19:53:10.570698+05:30"
+}
+
+// Failed to get resources
+{
+  "resource_name":"engine",
+  "error_message":"Failed to get Load Balancer Resources.",
+  "status":"failed",
+  "fetched_at":"2022-06-07T19:53:10.570698+05:30"
+}
 ```
 
 

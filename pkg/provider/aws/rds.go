@@ -3,45 +3,48 @@ package aws
 import (
 	"context"
 	"fmt"
+	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 
 	"github.com/aws/aws-sdk-go-v2/service/rds"
-	"github.com/aws/aws-sdk-go-v2/service/rds/types"
-
-	"github.com/run-x/cloudgrep/pkg/util"
 )
 
-func (p *AWSProvider) FetchRDSInstances(ctx context.Context, output chan<- types.DBInstance) error {
+func (p *Provider) FetchRDSInstances(ctx context.Context, output chan<- model.Resource) error {
+	resourceType := "rds.DBInstance"
+	rdsClient := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBInstancesInput{}
-	paginator := rds.NewDescribeDBInstancesPaginator(p.rdsClient, input)
+	paginator := rds.NewDescribeDBInstancesPaginator(rdsClient, input)
 
+	resourceConverter := p.converterFor(resourceType)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 		if err != nil {
-			return fmt.Errorf("failed to fetch RDS DB Instances: %w", err)
+			return fmt.Errorf("failed to fetch RDS Instances: %w", err)
 		}
 
-		if err := util.SendAllFromSlice(ctx, output, page.DBInstances); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBInstances); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
-func (p *AWSProvider) FetchRDSClusters(ctx context.Context, output chan<- types.DBCluster) error {
+func (p *Provider) FetchRDSClusters(ctx context.Context, output chan<- model.Resource) error {
+	resourceType := "rds.DBCluster"
+	rdsClient := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBClustersInput{}
-	paginator := rds.NewDescribeDBClustersPaginator(p.rdsClient, input)
+	paginator := rds.NewDescribeDBClustersPaginator(rdsClient, input)
 
+	resourceConverter := p.converterFor(resourceType)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 		if err != nil {
-			return fmt.Errorf("failed to fetch RDS DB Clusters: %w", err)
+			return fmt.Errorf("failed to fetch RDS Clusters: %w", err)
 		}
 
-		if err := util.SendAllFromSlice(ctx, output, page.DBClusters); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBClusters); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }

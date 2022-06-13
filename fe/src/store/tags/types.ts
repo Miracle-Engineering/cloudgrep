@@ -1,14 +1,21 @@
 import { FieldGroup } from 'models/Field';
-import { MockTag } from 'models/Tag';
+import { Tag } from 'models/Tag';
 import { TagResource } from 'models/TagResource';
 
 export interface TagState {
 	tagResource: TagResource;
-	tags: MockTag[];
+	filterTags: Tag[];
 	fields: FieldGroup[];
+	limit: number;
+	offset: number;
 }
 
 export interface ErrorType {
 	response?: { status: string };
 	message: string;
+}
+
+export interface Paging {
+	limit: number;
+	offset: number;
 }

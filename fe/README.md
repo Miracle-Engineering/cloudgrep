@@ -1,7 +1,11 @@
 ## Prerequisites
 
 Set AWS profile (credentials) in terminal. Export AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
-Set browser to disable Cross-origin check.
+
+## Configuration settings and contstants
+
+Majority of configuration constants are placed in "constants/globals.ts" file. Most of them are related to filtering and paging adjustmenst.
+That file contains comments and description for constants (how and what for are they used)
 
 ## Install and run
 
@@ -15,9 +19,6 @@ Installs all needed dependency packages.
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
 
 ### `npm test`
 

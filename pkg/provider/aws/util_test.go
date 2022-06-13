@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"os"
-	"reflect"
 	"strings"
 	"sync"
 	"testing"
@@ -14,7 +13,6 @@ import (
 	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/run-x/cloudgrep/pkg/provider/mapper"
 	"github.com/run-x/cloudgrep/pkg/testingutil"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -30,7 +28,7 @@ var integrationAwsAccounts = []string{"316817240772", "438881294876"}
 var credCheck credChecker
 
 type integrationTestContext struct {
-	p         *AWSProvider
+	p         *Provider
 	log       *zap.Logger
 	logBuffer *bytes.Buffer
 	ctx       context.Context
@@ -72,8 +70,7 @@ func setupIntegrationProvider(t testing.TB, ctx *integrationTestContext) {
 	t.Helper()
 
 	var err error
-	provider := &AWSProvider{}
-	provider.logger = ctx.log
+	provider := &Provider{}
 	provider.config, err = config.LoadDefaultConfig(ctx.ctx, func(lo *config.LoadOptions) error {
 		lo.Region = testingutil.TestRegion
 		return nil
@@ -82,8 +79,6 @@ func setupIntegrationProvider(t testing.TB, ctx *integrationTestContext) {
 		t.Fatalf("cannot load config: %v", err)
 	}
 
-	provider.initClients()
-	provider.mapper, err = mapper.New(embedConfig, ctx.log, reflect.ValueOf(provider))
 	if err != nil {
 		t.Fatalf("cannot instantiate mapper: %v", err)
 	}

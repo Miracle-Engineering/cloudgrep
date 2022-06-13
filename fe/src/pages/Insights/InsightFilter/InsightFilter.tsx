@@ -5,6 +5,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AccordionFilter from 'components/AccordionFilter';
+import { CHECKED_BY_DEFAULT, PAGE_LENGTH, PAGE_START } from 'constants/globals';
 import { Field, FieldGroup, ValueType } from 'models/Field';
 import { Tag } from 'models/Tag';
 import React, { FC, useEffect, useState } from 'react';
@@ -20,11 +21,24 @@ const InsightFilter: FC = () => {
 
 	useEffect(() => {
 		if (filterTags?.length) {
-			dispatch(getFilteredResources(filterTags));
-		} else {
+			dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
+		} else if (filterTags?.length === 0) {
 			dispatch(getResources());
 		}
-	}, [filterTags]);
+	}, [dispatch, filterTags]);
+
+	useEffect(() => {
+		if (fields?.length && !filterTags?.length && CHECKED_BY_DEFAULT) {
+			const tags = fields.flatMap(field =>
+				field.fields.flatMap((fieldItem: Field) =>
+					fieldItem.values.flatMap((valueItem: ValueType) => {
+						return { key: fieldItem.name, value: valueItem.value };
+					})
+				)
+			);
+			setFilterTags(tags);
+		}
+	}, [fields, filterTags?.length]);
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>, field: Field, item: ValueType) => {
 		const tag = { key: field.name, value: item.value };
@@ -46,7 +60,7 @@ const InsightFilter: FC = () => {
 				width: '20%',
 				height: '100%',
 				backgroundColor: '#F9F7F6',
-				overflowY: 'scroll',
+				overflowY: 'auto',
 			}}>
 			{fields.map((field: FieldGroup) => (
 				<Accordion key={field.name}>
@@ -57,7 +71,7 @@ const InsightFilter: FC = () => {
 						id={`${field.name}-header`}
 						key={field.name}
 						classes={overrideSummaryClasses}>
-						<Typography sx={accordionStyles.accordionHeader}>{field.name}</Typography>
+						<Typography sx={accordionStyles.accordionHeader}>{field.name.toUpperCase()}</Typography>
 					</AccordionSummary>
 					<AccordionDetails sx={{ padding: '0px' }}>
 						{field.fields.map((fieldItem: Field, index: number) => (
@@ -68,6 +82,7 @@ const InsightFilter: FC = () => {
 								label={fieldItem.name}
 								id={fieldItem.name + index}
 								handleChange={handleChange}
+								checkedByDefault={CHECKED_BY_DEFAULT}
 							/>
 						))}
 					</AccordionDetails>

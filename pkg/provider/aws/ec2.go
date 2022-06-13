@@ -4,14 +4,17 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/run-x/cloudgrep/pkg/resourceconverter"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-
-	"github.com/run-x/cloudgrep/pkg/util"
+	"github.com/run-x/cloudgrep/pkg/model"
 )
 
-func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context, output chan<- types.Instance) error {
+func (p *Provider) FetchEC2Instances(ctx context.Context, output chan<- model.Resource) error {
+	resourceType := "ec2.Instance"
+	ec2Client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeInstancesInput{
 		// Ignore terminated (and other) instances
 		Filters: []types.Filter{
@@ -27,15 +30,17 @@ func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context, output chan<- 
 			},
 		},
 	}
-	p := ec2.NewDescribeInstancesPaginator(awsPrv.ec2Client, input)
-	for p.HasMorePages() {
-		page, err := p.NextPage(ctx)
+	paginator := ec2.NewDescribeInstancesPaginator(ec2Client, input)
+
+	resourceConverter := p.converterFor(resourceType)
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
 		if err != nil {
 			return fmt.Errorf("failed to fetch EC2 Instances: %w", err)
 		}
 
 		for _, r := range page.Reservations {
-			if err := util.SendAllFromSlice(ctx, output, r.Instances); err != nil {
+			if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, r.Instances); err != nil {
 				return err
 			}
 		}
@@ -44,17 +49,20 @@ func (awsPrv *AWSProvider) FetchEC2Instances(ctx context.Context, output chan<- 
 	return nil
 }
 
-func (p *AWSProvider) FetchEBSVolumes(ctx context.Context, output chan<- types.Volume) error {
+func (p *Provider) FetchEBSVolumes(ctx context.Context, output chan<- model.Resource) error {
+	resourceType := "ec2.Volume"
+	ec2Client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeVolumesInput{}
-	paginator := ec2.NewDescribeVolumesPaginator(p.ec2Client, input)
+	paginator := ec2.NewDescribeVolumesPaginator(ec2Client, input)
 
+	resourceConverter := p.converterFor(resourceType)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 		if err != nil {
 			return fmt.Errorf("failed to fetch EC2 EBS Volumes: %w", err)
 		}
 
-		if err := util.SendAllFromSlice(ctx, output, page.Volumes); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.Volumes); err != nil {
 			return err
 		}
 	}

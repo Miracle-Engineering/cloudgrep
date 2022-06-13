@@ -82,7 +82,28 @@ func AssertEqualsField(t *testing.T, a, b model.Field) {
 }
 
 func AssertEqualsEngineStatus(t *testing.T, expectedEngineStatus, actualEngineStatus model.EngineStatus) {
-	assert.Equal(t, expectedEngineStatus.ResourceName, actualEngineStatus.ResourceName)
+	assert.Equal(t, expectedEngineStatus.ResourceType, actualEngineStatus.ResourceType)
 	assert.Equal(t, expectedEngineStatus.Status, actualEngineStatus.Status)
 	assert.Equal(t, expectedEngineStatus.ErrorMessage, actualEngineStatus.ErrorMessage)
+}
+
+func AssertEqualsTag(t *testing.T, a, b *model.Tag) {
+	if a == nil {
+		assert.Nil(t, b)
+		return
+	}
+	assert.Equal(t, a.Key, b.Key)
+	assert.Equal(t, a.Value, b.Value)
+}
+
+func AssertEqualsTags(t *testing.T, a, b model.Tags) {
+	assert.Equal(t, len(a), len(b))
+	for _, tagA := range a {
+		tagB := b.Find(tagA.Key)
+		if tagB == nil {
+			t.Errorf("can't find a tag with key %v", tagA.Key)
+			return
+		}
+		AssertEqualsTag(t, &tagA, tagB)
+	}
 }

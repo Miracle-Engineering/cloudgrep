@@ -1,33 +1,38 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FieldGroup } from 'models/Field';
-import { MockTag } from 'models/Tag';
+import { Tag } from 'models/Tag';
 import { TagResource } from 'models/TagResource';
 
-import { TagState } from './types';
+import { Paging, TagState } from './types';
 
 const initialState: TagState = {
 	tagResource: { Tags: [], Resources: [] },
-	tags: [],
 	fields: [],
+	filterTags: [],
+	limit: 0,
+	offset: 0,
 };
 
 const tagsSlice = createSlice({
 	name: 'tags',
 	initialState,
 	reducers: {
-		setTags: (state, action: PayloadAction<MockTag[]>) => {
-			state.tags = action.payload;
+		setFilterTags: (state, action: PayloadAction<Tag[]>) => {
+			state.filterTags = action.payload;
 		},
 		setTagResource: (state, action: PayloadAction<TagResource>) => {
 			state.tagResource = action.payload;
-			state.tags = action.payload.Tags;
 		},
 		setFields: (state, action: PayloadAction<FieldGroup[]>) => {
 			state.fields = action.payload;
 		},
+		setPaging: (state, action: PayloadAction<Paging>) => {
+			state.limit = action.payload.limit;
+			state.offset = action.payload.offset;
+		},
 	},
 });
 
-export const { setFields, setTags, setTagResource } = tagsSlice.actions;
+export const { setFields, setFilterTags, setPaging, setTagResource } = tagsSlice.actions;
 
 export default tagsSlice;

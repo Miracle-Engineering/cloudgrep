@@ -230,6 +230,6 @@ func TestFieldsRoute(t *testing.T) {
 		require.Equal(t, 2, len(response))
 		//check fields by group
 		require.Equal(t, 2, len(response.FindGroup("core").Fields))
-		require.Equal(t, 9, len(response.FindGroup("tags").Fields))
+		require.Equal(t, 10, len(response.FindGroup("tags").Fields))
 	})
 }

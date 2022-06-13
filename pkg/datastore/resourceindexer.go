@@ -10,10 +10,10 @@ import (
 	dynamicstruct "github.com/ompluscator/dynamic-struct"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"go.uber.org/zap"
+	"golang.org/x/exp/slices"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 const (
@@ -22,7 +22,7 @@ const (
 	LimitMaxValue      = 2000
 	resourceIndexTable = "resource_index"
 	//the name the dynamic columns
-	columnDynamicName = "col_%d"
+	columnDynamicName = "col_%v"
 	//the maximum number of columns allowed
 	//this is a limitation for sqlite https://www.sqlite.org/limits.html
 	maxColumns = 2000
@@ -44,13 +44,14 @@ type fieldColumn struct {
 	FieldName string
 }
 
+//key is field name
 type fieldColumns map[string]fieldColumn
 
 func newResourceIndexer(ctx context.Context, logger *zap.Logger, db *gorm.DB) (resourceIndexer, error) {
 	qb := resourceIndexer{}
 	qb.logger = logger
 	qb.fieldColumns = make(fieldColumns)
-	err := qb.rebuildDataModel(ctx, db)
+	err := qb.rebuildDataModel(db)
 	return qb, err
 }
 
@@ -118,8 +119,8 @@ func (f fieldColumns) asSlice() []fieldColumn {
 
 //update a query field to map the datamodel
 //ex: "aws:ec2:fleet-id" -> "col_3"
-func (qb *resourceIndexer) toColumnName(fieldName string) string {
-	if fieldCol, ok := qb.fieldColumns[fieldName]; ok {
+func (ri *resourceIndexer) toColumnName(fieldName string) string {
+	if fieldCol, ok := ri.fieldColumns[fieldName]; ok {
 		return fieldCol.ColumnName
 	}
 	//do not do any change - rql would throw an unknown field error
@@ -127,26 +128,29 @@ func (qb *resourceIndexer) toColumnName(fieldName string) string {
 }
 
 //rebuildDataModel updates the query parser and the table schema to includes all the field names
-func (qb *resourceIndexer) rebuildDataModel(ctx context.Context, db *gorm.DB) error {
+func (ri *resourceIndexer) rebuildDataModel(db *gorm.DB) error {
 	if db == nil {
 		return fmt.Errorf("no DB provided")
 	}
-	if len(qb.fieldColumns) >= maxColumns {
+	if len(ri.fieldColumns) >= maxColumns {
 		return fmt.Errorf("maximum number of colums reached: %d", maxColumns)
 	}
 
-	if len(qb.fieldColumns) == 0 {
+	if len(ri.fieldColumns) == 0 {
 		//first call
 		var fieldColumns []fieldColumn
-		//load existing fields from the DB
-		db.Find(&fieldColumns)
-		qb.fieldColumns = newFieldColumns(fieldColumns)
+		tables, _ := db.Migrator().GetTables()
+		if slices.Contains(tables, "field_columns") {
+			//load existing fields from the DB
+			db.Find(&fieldColumns)
+		}
+		ri.fieldColumns = newFieldColumns(fieldColumns)
 		//always include these
-		qb.fieldColumns.addExplicitFields("id", "type", "region")
+		ri.fieldColumns.addExplicitFields("id", "type", "region")
 	}
 
 	builder := dynamicstruct.NewStruct()
-	for _, fieldCol := range qb.fieldColumns {
+	for _, fieldCol := range ri.fieldColumns {
 		structFieldName := cases.Title(language.AmericanEnglish).String(fieldCol.ColumnName)
 		if structFieldName == "Id" {
 			builder = builder.AddField(structFieldName, "", `gorm:"primaryKey" rql:"filter,sort"`)
@@ -156,7 +160,7 @@ func (qb *resourceIndexer) rebuildDataModel(ctx context.Context, db *gorm.DB) er
 	}
 	//update builder and parse
 	resourceIndex := builder.Build().New()
-	qb.parser = rql.MustNewParser(rql.Config{
+	ri.parser = rql.MustNewParser(rql.Config{
 		Model:         resourceIndex,
 		FieldSep:      ".",
 		DefaultLimit:  DefaultLimit,
@@ -169,18 +173,20 @@ func (qb *resourceIndexer) rebuildDataModel(ctx context.Context, db *gorm.DB) er
 	}
 
 	//save the field column names
-	//TODO we should purge this table to remove the unused fields (resources no longer exist)
-	//we can address this when we support Refresh/update resources
 	if err := db.AutoMigrate(&fieldColumn{}); err != nil {
 		return err
 	}
-	if db := db.Clauses(clause.OnConflict{DoNothing: true}).Create(qb.fieldColumns.asSlice()); db.Error != nil {
+	//update all fields columns
+	if err := db.Exec("DELETE FROM field_columns").Error; err != nil {
+		return err
+	}
+	if db := db.Create(ri.fieldColumns.asSlice()); db.Error != nil {
 		return db.Error
 	}
 	return nil
 }
 
-func (qb *resourceIndexer) updateQueryFields(jsonQuery []byte) ([]byte, error) {
+func (ri *resourceIndexer) updateQueryFields(jsonQuery []byte) ([]byte, error) {
 	var query map[string]interface{}
 	err := json.Unmarshal(jsonQuery, &query)
 	if err != nil {
@@ -189,13 +195,13 @@ func (qb *resourceIndexer) updateQueryFields(jsonQuery []byte) ([]byte, error) {
 	//update filter
 	if obj, ok := query["filter"]; ok {
 		if filter, ok := obj.(map[string]interface{}); ok {
-			query["filter"] = updateQueryFilter(filter, qb.toColumnName)
+			query["filter"] = updateQueryFilter(filter, ri.toColumnName)
 		}
 	}
 	//update sort
 	if obj, ok := query["sort"]; ok {
 		if sort, ok := obj.([]interface{}); ok {
-			query["sort"] = updateQuerySort(sort, qb.toColumnName)
+			query["sort"] = updateQuerySort(sort, ri.toColumnName)
 		}
 	}
 	jsonQuery, err = json.Marshal(query)
@@ -219,7 +225,7 @@ func updateQueryFilter(filter map[string]interface{}, f func(string) string) map
 	*/
 	result := make(map[string]interface{}, len(filter))
 	for k, v := range filter {
-		if k == "$or" {
+		if k == "$or" || k == "$and" {
 			if slice, ok := v.([]interface{}); ok {
 				for i, val := range slice {
 					if _map, ok := val.(map[string]interface{}); ok {
@@ -231,7 +237,7 @@ func updateQueryFilter(filter map[string]interface{}, f func(string) string) map
 			//update key
 			k = f(k)
 		}
-		//update the values
+		//update the result
 		result[k] = v
 	}
 	return result
@@ -258,42 +264,87 @@ func updateQuerySort(sort []interface{}, f func(string) string) []interface{} {
 	return result
 }
 
+func (ri *resourceIndexer) deleteResourceIndexes(db *gorm.DB, ids []model.ResourceId) error {
+	err := db.Table(resourceIndexTable).Where("id in ?", ids).Delete(ids).Error
+	if err != nil {
+		return fmt.Errorf("could not delete the resources indexes: %w", err)
+	}
+	return nil
+}
+
+//purgeUnusedColumns delete the unused columns so they can be used for other tag keys
+func (ri *resourceIndexer) purgeUnusedColumns(db *gorm.DB) error {
+	purged := false
+	for key, col := range ri.fieldColumns {
+		if !strings.HasPrefix(col.ColumnName, fmt.Sprintf(columnDynamicName, "")) {
+			//only remove dynamic columns
+			continue
+		}
+		//count the values defined for the current column
+		var count int64
+		err := db.Table(resourceIndexTable).Where(fmt.Sprintf("%v is not null", col.ColumnName)).Count(&count).Error
+		if err != nil {
+			return err
+		}
+		if count == 0 {
+			//this column has no value set, it can be removed
+			ri.logger.Sugar().Debugf("the column %v (tag: %v) will be removed from %v", col.ColumnName, col.FieldName, resourceIndexTable)
+			delete(ri.fieldColumns, key)
+			purged = true
+		}
+	}
+
+	if purged {
+		//only if something was changed we would rebuild the model
+		return ri.rebuildDataModel(db)
+	}
+	return nil
+}
+
 //writeResourceIndexes will insert a new resource_index row for each Resource
-func (qb *resourceIndexer) writeResourceIndexes(ctx context.Context, db *gorm.DB, resources []*model.Resource) error {
+func (ri *resourceIndexer) writeResourceIndexes(ctx context.Context, db *gorm.DB, resources []*model.Resource) error {
 
 	//get all the possible tag keys - once per batch
 	rebuildModel := false
 	for _, r := range resources {
 		for _, tag := range r.Tags {
-			if qb.fieldColumns.addDynamicFields(tag.Key) {
+			if ri.fieldColumns.addDynamicFields(tag.Key) {
 				//new tag key found - need to rebuild the model
 				rebuildModel = true
 			}
 		}
 	}
 	if rebuildModel {
-		if err := qb.rebuildDataModel(ctx, db); err != nil {
+		if err := ri.rebuildDataModel(db); err != nil {
 			return err
 		}
 	}
 
-	//write all the resource_index rows
+	//create the rows to insert in memory
 	rows := make([]map[string]interface{}, len(resources))
+	var ids []model.ResourceId
 	for i, r := range resources {
 		row := make(map[string]interface{})
+		ids = append(ids, model.ResourceId(r.Id))
 		row["id"] = r.Id
 		row["type"] = r.Type
 		row["region"] = r.Region
 		//add the tags
 		for _, tag := range r.Tags {
 			//ex: row["Col23"]="Jordan"
-			row[qb.fieldColumns[tag.Key].ColumnName] = tag.Value
+			row[ri.fieldColumns[tag.Key].ColumnName] = tag.Value
 		}
 		rows[i] = row
 	}
-	result := db.Table(resourceIndexTable).Create(rows)
-	if result.Error != nil {
-		return fmt.Errorf("could not index the resources: %w", result.Error)
+
+	//delete all previous resource_index if they exist
+	if err := ri.deleteResourceIndexes(db, ids); err != nil {
+		return err
+	}
+
+	//create the resource_index
+	if err := db.Table(resourceIndexTable).Create(rows).Error; err != nil {
+		return fmt.Errorf("could not create the resource indexes: %w", err)
 	}
 
 	return nil
@@ -343,7 +394,7 @@ func replaceWith(s string, old string, new string, sep string, i int) string {
 
 //findResourceIds finds resources using a RQL query
 //see https://github.com/a8m/rql#getting-started for the syntax
-func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQuery []byte) ([]resourceId, error) {
+func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQuery []byte) ([]model.ResourceId, error) {
 	if len(jsonQuery) == 0 {
 		//use en empty json if nothing is set - this will use the default limit
 		jsonQuery = []byte(`{}`)
@@ -353,7 +404,7 @@ func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQ
 		return nil, err
 	}
 
-	var resourceIds []resourceId
+	var resourceIds []model.ResourceId
 	result := db.Table(resourceIndexTable).
 		Select("id").
 		Where(p.FilterExp, p.FilterArgs...).

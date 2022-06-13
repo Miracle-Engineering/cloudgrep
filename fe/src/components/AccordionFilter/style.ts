@@ -17,7 +17,12 @@ const accordionHeader: CSSProperties = {
 	textOverflow: 'ellipsis',
 };
 
-export const accordionStyles = { accordionHeader };
+const details: CSSProperties = {
+	overflowY: 'auto',
+	maxHeight: '210px', // 5 elements visible before scroll and overflow
+};
+
+export const accordionStyles = { accordionHeader, details };
 
 export const labelClasses = {
 	label: 'label_label',

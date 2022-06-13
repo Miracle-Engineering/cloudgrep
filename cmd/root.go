@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/run-x/cloudgrep/pkg/cli"
 	"github.com/run-x/cloudgrep/pkg/config"
+	"github.com/run-x/cloudgrep/pkg/util"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 	"io"
@@ -26,16 +27,18 @@ func NewRootCmd(out io.Writer) *cobra.Command {
 		Short: "A web-based utility to query and manage cloud resources",
 		Long: `Cloudgrep is an app built by RunX to help devops manage the multitude of resources in
 their cloud accounts.`,
-		Run: func(cmd *cobra.Command, args []string) {
+		SilenceUsage: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
 			var cfg config.Config
 			err := viper.Unmarshal(&cfg)
 			if err != nil {
-				panic(err)
+				return err
 			}
 			err = runCmd(cmd.Context(), cfg, logger)
 			if err != nil {
-				panic(err)
+				return err
 			}
+			return nil
 		},
 	}
 
@@ -69,6 +72,7 @@ their cloud accounts.`,
 func Execute() {
 	err := NewRootCmd(os.Stdout).Execute()
 	if err != nil {
+		util.PrintStackTrace(err, os.Stderr)
 		os.Exit(1)
 	}
 }
@@ -90,6 +94,7 @@ func initConfig() {
 	var err error
 	if verbose {
 		logger, err = zap.NewDevelopment()
+		util.EnableErrorStackTrace()
 	} else {
 		logger, err = zap.NewProduction()
 	}
