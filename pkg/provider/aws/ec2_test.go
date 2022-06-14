@@ -53,3 +53,25 @@ func TestFetchEBSVolumes(t *testing.T) {
 		},
 	})
 }
+
+func TestFetchVpcs(t *testing.T) {
+	t.Parallel()
+
+	ctx := setupIntegrationTest(t)
+
+	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.VPC")
+
+	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
+		Type:   "ec2.VPC",
+		Region: defaultRegion,
+		Tags: model.Tags{
+			{
+				Key:   testingutil.TestTag,
+				Value: "vpc-default",
+			},
+		},
+		RawData: map[string]any{
+			"State": "available",
+		},
+	})
+}

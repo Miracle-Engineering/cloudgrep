@@ -1,5 +1,9 @@
 data "aws_region" "current" {}
-resource "aws_default_vpc" "default" {}
+resource "aws_default_vpc" "default" {
+  tags = {
+    "test": "vpc-default"
+  }
+}
 
 resource "aws_default_security_group" "default" {
   vpc_id = aws_default_vpc.default.id

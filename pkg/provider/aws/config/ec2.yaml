@@ -19,3 +19,13 @@ types:
       outputKey: Volumes
       id: "VolumeId"
       tags: *tags
+  - name: VPC
+    listApi:
+      call: DescribeVpcs
+      pagination: true
+      outputKey: Vpcs
+      id: VpcId
+      tags:
+        field: Tags
+        key: Key
+        value: Value
