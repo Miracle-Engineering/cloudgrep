@@ -18,6 +18,7 @@ on:
       - main
     paths:
       - "integration/aws/terraform/**"
+      - ".github/workflows/integration-setup.yml"
 
   pull_request:
     types: [opened, synchronize]
@@ -25,6 +26,7 @@ on:
       - main
     paths:
       - "integration/aws/terraform/**"
+      - ".github/workflows/integration-setup.yml"
 
 concurrency: terraform-integration
 
@@ -49,6 +51,8 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const fs = require('fs')
+
             var env
             if (context.eventName == "workflow_dispatch") {
               env = context.payload.inputs.environment
@@ -60,17 +64,14 @@ jobs:
               throw "Unknown env for push event " + context.eventName
             }
 
-            accounts = {
-              "dev": "316817240772",
-              "prod": "438881294876",
-            }
+            let accounts = JSON.parse(fs.readFileSync("integration/aws/accounts.json"))
 
             if (!accounts.hasOwnProperty(env)) {
               throw "Unknown account for env " + process.env.ENV
             }
 
             core.exportVariable('ENV', env);
-            core.exportVariable('AWS_ACCOUNT_ID', accounts[process.env.ENV]);
+            core.exportVariable('AWS_ACCOUNT_ID', accounts[env]);
             core.exportVariable('TF_DIR', 'integration/aws/terraform/' + env + '-environment')
 
       - name: Configure AWS credentials
