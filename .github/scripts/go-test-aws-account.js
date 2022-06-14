@@ -7,6 +7,7 @@ module.exports = async ({ context, core, exec, require }) => {
     if (context.eventName == "pull_request") {
         let changedFiles = []
         opts = {
+            silent: true,
             listeners: {
                 stdline: (data) => {
                     changedFiles.push(data.toString())
