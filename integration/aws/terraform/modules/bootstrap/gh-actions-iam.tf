@@ -4,6 +4,8 @@ locals {
   gh_actions_oidc_config     = jsondecode(data.http.github_actions_oidc_config.body)
 }
 
+
+
 data "http" "github_actions_oidc_config" {
   url = local.gh_actions_oidc_config_url
 }
