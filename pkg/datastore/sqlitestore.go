@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -46,7 +48,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	s.logger = zapLogger
 	//create the DB client
 	var err error
-	s.db, err = gorm.Open(sqlite.Open(cfg.Datastore.DataSourceName),
+	s.db, err = gorm.Open(sqlite.Open(s.formatDSN(cfg.Datastore.DataSourceName)),
 		&gorm.Config{Logger: gormLogger})
 	if err != nil {
 		return nil, fmt.Errorf("can't create the SQLite database: %w", err)
@@ -64,6 +66,17 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	}
 
 	return &s, nil
+}
+
+func (s *SQLiteStore) formatDSN(dsn string) string {
+	if strings.HasPrefix(dsn, "~/") {
+		dirname, err := os.UserHomeDir()
+		if err != nil {
+			panic(fmt.Errorf("could not handle searching for home directory: %w", err))
+		}
+		dsn = filepath.Join(dirname, dsn[2:])
+	}
+	return os.ExpandEnv(dsn)
 }
 
 func (s *SQLiteStore) Ping() error {
