@@ -1,4 +1,4 @@
-export default async ({ context, core, require}) => {
+module.exports = async ({ context, core, require}) => {
     const fs = require('fs')
 
     let env

@@ -1,4 +1,4 @@
-export default async ({ context, core, exec, require }) => {
+module.exports = async ({ context, core, exec, require }) => {
     const fs = require('fs')
     const accounts = JSON.parse(fs.readFileSync("integration/aws/accounts.json"))
     const tfDir = "integration/aws/terraform/"
