@@ -7,10 +7,11 @@ This application provides a single binary that contains the backend and the fron
 The project structure is inspired by https://github.com/sosedoff/pgweb
 
     .
+    ├── cmd                                  # CLI semi-generated framework (also Golang)
+    ├── hack                                 # Tools for development
     ├── pkg                                  # Backend: Golang
-    └── cmd                                  # CLI semi-generated framework (also Golang)
-    └── static                               # Frontend: Static assets
-    └── main.go                              # Executable main function
+    ├── static                               # Frontend: Static assets
+    ├── main.go                              # Executable main function
     └── Makefile                             # Defines the tasks to be executed - for local or CI run
 
 ## Start the server
@@ -44,6 +45,22 @@ make build
 All of these boxes are implemented as distinct Go packages, except for UI which is a JS app.
 
 ## Configure a new AWS resource
+1. If the resource you are adding is for a new, wholly unsupported service, add a new item in the `services` list in the `pkg/provider/aws/config.yaml` file, and then create a new file with `.yaml` appended to the service name in the same directory.
+    Use the canonical service initialism or name.
+    If the [AWS SDK for Go v2](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2) uses a different name for the service package than what is used within Cloudgrep, add that package name to the `servicePackage` field in the service configuration file (see `elb.yaml` for an example).
+2. Add a new item to the `types` list.
+    The schema for the definition, along with the documentation for each field, can be found in the `hack/awsgen/config/types.go` file (the file as a whole is the the `Service` struct).
+    You can use the existing type definitions in the other adjacent `.yaml` files as a guide.
+    Many APIs return tag data directly in the list/describe APIs (configured in the `listApi` field), but if it doesn't,
+    you must configure the `getTagsApi` field in the type.
+3. \[Optional\] If you need to customize the API call's input, you can use `inputOverrides` to hook the creation of the input struct.
+    Using `inputOverrides.fieldFuncs` you can set specific fields, but if you need more control, you can use `inputOverrides.fullFuncs`.
+4. Run `make awsgen` to generate the AWS provider resource functions.
+
+## Manually configuring a new AWS resource
+If code generation is not sufficient for a specific resource, you can also manually implement the function(s) for a resource using the following instructions.
+This method is not preferred, and instead it is preferred to improve `awsgen` as needed to support the resource:
+implementing resources manually requires more effort to maintain and improve if we change how the fetch functions work across the board.
 
 1. Implement a new AWS provider method (in pkg/provider/aws) to fetch your resources. It must have the type
    signature of a FetchFunction like so: `type FetchFunc func(context.Context, chan<- model.Resource) error`.
@@ -54,25 +71,25 @@ All of these boxes are implemented as distinct Go packages, except for UI which 
        ec2Client := ec2.NewFromConfig(p.config)
        input := &ec2.DescribeInstancesInput{}
        paginator := ec2.NewDescribeInstancesPaginator(ec2Client, input)
-   
+
        resourceConverter := p.converterFor(resourceType)
        for paginator.HasMorePages() {
            page, err := paginator.NextPage(ctx)
            if err != nil {
                return fmt.Errorf("failed to fetch EC2 Instances: %w", err)
            }
-   
+
            for _, r := range page.Reservations {
                if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, r.Instances); err != nil {
                    return err
                }
            }
        }
-   
+
        return nil
    }
    ```
-2. [Optional] Implement the method to return the tags. Unless there is already a `Tags` field, this method would need 
+2. [Optional] Implement the method to return the tags. Unless there is already a `Tags` field, this method would need
     to be implemented. It should have the type signature `type tagFunc[T any] func(context.Context, T) (model.Tags, error)`
     where T is the aws resource being ingested. Here is an example for Load Balancer:
    ```go

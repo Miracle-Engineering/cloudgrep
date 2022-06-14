@@ -1,0 +1,6 @@
+{{- define "foo" -}}
+foo
+{{- end }}
+{{- include "foo" . }}
+{{ quiet "foo" }}
+{{ tabindent 2 "bar" }}

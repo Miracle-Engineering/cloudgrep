@@ -1,0 +1,21 @@
+types:
+  - name: Instance
+    listApi:
+      call: DescribeInstances
+      inputOverrides:
+        fieldFuncs:
+          Filters: describeInstancesFilters
+      pagination: true
+      outputKey: [Reservations, Instances]
+      id: InstanceId
+      tags: &tags
+        field: Tags
+        key: Key
+        value: Value
+  - name: Volume
+    listApi:
+      call: DescribeVolumes
+      pagination: true
+      outputKey: Volumes
+      id: "VolumeId"
+      tags: *tags
