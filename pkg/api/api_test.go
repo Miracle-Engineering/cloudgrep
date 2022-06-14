@@ -107,12 +107,13 @@ func TestResourcesRoute(t *testing.T) {
 		require.NoError(t, err)
 		m.router.ServeHTTP(w, req)
 		require.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-		var body model.Resources
+		var body model.ResourcesResponse
 		err = json.Unmarshal(w.Body.Bytes(), &body)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
-		require.Equal(t, len(body), 3)
-		testingutil.AssertEqualsResources(t, body, resources)
+		require.Equal(t, len(body.Resources), 3)
+		require.Equal(t, body.Count, 3)
+		testingutil.AssertEqualsResources(t, body.Resources, resources)
 	})
 }
 
@@ -143,11 +144,12 @@ func TestResourcesPostRoute(t *testing.T) {
 		require.NoError(t, err)
 		m.router.ServeHTTP(w, req)
 		require.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-		var response model.Resources
+		var response model.ResourcesResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
-		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, response)
+		require.Equal(t, 2, response.Count)
+		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, response.Resources)
 	})
 
 	t.Run("FilterEmpty", func(t *testing.T) {
@@ -159,11 +161,11 @@ func TestResourcesPostRoute(t *testing.T) {
 		require.NoError(t, err)
 		m.router.ServeHTTP(w, req)
 		require.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-		var response model.Resources
+		var response model.ResourcesResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
-		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response)
+		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response.Resources)
 	})
 
 	t.Run("NoBody", func(t *testing.T) {
@@ -173,11 +175,11 @@ func TestResourcesPostRoute(t *testing.T) {
 		require.NoError(t, err)
 		m.router.ServeHTTP(w, req)
 		require.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-		var response model.Resources
+		var response model.ResourcesResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
-		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response)
+		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response.Resources)
 	})
 }
 

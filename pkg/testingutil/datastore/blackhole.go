@@ -26,8 +26,8 @@ func (s *Blackhole) GetResource(ctx context.Context, id string) (*model.Resource
 	return nil, nil
 }
 
-func (s *Blackhole) GetResources(ctx context.Context, query []byte) (model.Resources, error) {
-	return nil, nil
+func (s *Blackhole) GetResources(ctx context.Context, query []byte) (model.ResourcesResponse, error) {
+	return model.ResourcesResponse{}, nil
 }
 
 func (s *Blackhole) WriteResources(ctx context.Context, resources model.Resources) error {

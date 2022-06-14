@@ -18,6 +18,10 @@ type Resource struct {
 }
 
 type Resources []*Resource
+type ResourcesResponse struct {
+	Count     int       `json:"count"`
+	Resources Resources `json:"resources"`
+}
 type ResourceId string
 
 func (r Resource) MarshalLogObject(enc zapcore.ObjectEncoder) error {

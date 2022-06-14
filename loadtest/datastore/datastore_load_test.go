@@ -120,17 +120,19 @@ func TestLoad(t *testing.T) {
 
 				if tc.Resources > datastore.DefaultLimit {
 					//test limit is returned by default
-					limitedResources, err := ds.GetResources(ctx, nil)
+					limitedResources, totalCount, err := ds.GetResources(ctx, nil)
 					assert.NoError(t, err)
+					assert.True(t, len(limitedResources) < totalCount)
 					assert.Equal(t, datastore.DefaultLimit, len(limitedResources))
 				}
 
 				//test all resources added
-				allResources, err := ds.GetResources(ctx, []byte(fmt.Sprintf(`{"limit":%d}`, datastore.LimitMaxValue)))
+				allResources, totalCount, err := ds.GetResources(ctx, []byte(fmt.Sprintf(`{"limit":%d}`, datastore.LimitMaxValue)))
 				assert.NoError(t, err)
 				if tc.Resources <= datastore.LimitMaxValue {
 					assert.Equal(t, tc.Resources, len(allResources))
 				}
+				assert.Equal(t, tc.Resources, totalCount)
 				//check the tags have been set
 				assert.Equal(t, tc.TagsPerBatch, len(allResources[0].Tags))
 
@@ -163,7 +165,7 @@ func TestLoad(t *testing.T) {
 					query["filter"] = filter
 					queryJson, err := json.Marshal(query)
 					assert.NoError(t, err)
-					result, err := ds.GetResources(ctx, queryJson)
+					result, _, err := ds.GetResources(ctx, queryJson)
 					assert.NoError(t, err)
 					//since all the tags are the same for a batch - the response should include them
 					assert.Equal(t, tc.BatchSize, len(result))
