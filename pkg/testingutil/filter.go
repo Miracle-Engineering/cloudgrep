@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -45,7 +46,8 @@ func (f ResourceFilter) String() string {
 		for key, val := range f.RawData {
 			rawParts = append(rawParts, fmt.Sprintf("%s=%v", key, val))
 		}
-
+		//sorting ensures consistent output for testing
+		sort.Strings(rawParts)
 		parts = append(parts, fmt.Sprintf("RawData={%s}", strings.Join(rawParts, ", ")))
 	}
 
