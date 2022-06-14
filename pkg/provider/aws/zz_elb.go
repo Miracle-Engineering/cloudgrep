@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 
 	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
 func (p *Provider) register_elb(mapping map[string]mapper) {
@@ -19,25 +18,30 @@ func (p *Provider) register_elb(mapping map[string]mapper) {
 	}
 }
 
+func lbConverter(o *elasticloadbalancingv2.DescribeLoadBalancersOutput) []types.LoadBalancer {
+	return o.LoadBalancers
+}
+
 func (p *Provider) fetch_elb_LoadBalancer(ctx context.Context, output chan<- model.Resource) error {
 	client := elasticloadbalancingv2.NewFromConfig(p.config)
 	input := &elasticloadbalancingv2.DescribeLoadBalancersInput{}
-
-	resourceConverter := p.converterFor("elb.LoadBalancer")
 	paginator := elasticloadbalancingv2.NewDescribeLoadBalancersPaginator(client, input)
-	for paginator.HasMorePages() {
-		page, err := paginator.NextPage(ctx)
 
-		if err != nil {
-			return fmt.Errorf("failed to fetch %s: %w", "elb.LoadBalancer", err)
-		}
+	return sendPages[elasticloadbalancingv2.Options, elasticloadbalancingv2.DescribeLoadBalancersOutput](ctx, "elb.LoadBalancer", p, paginator, lbConverter, output, p.getTags_elb_LoadBalancer)
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.LoadBalancers, p.getTags_elb_LoadBalancer); err != nil {
-			return err
-		}
-	}
+	// for paginator.HasMorePages() {
+	// 	page, err := paginator.NextPage(ctx)
 
-	return nil
+	// 	if err != nil {
+	// 		return fmt.Errorf("failed to fetch %s: %w", "elb.LoadBalancer", err)
+	// 	}
+
+	// 	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.LoadBalancers, p.getTags_elb_LoadBalancer); err != nil {
+	// 		return err
+	// 	}
+	// }
+
+	// return nil
 }
 func (p *Provider) getTags_elb_LoadBalancer(ctx context.Context, resource types.LoadBalancer) (model.Tags, error) {
 	client := elasticloadbalancingv2.NewFromConfig(p.config)
