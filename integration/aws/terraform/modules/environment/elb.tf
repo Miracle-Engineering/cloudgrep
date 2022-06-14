@@ -5,6 +5,7 @@ locals {
 resource "aws_lb" "alb" {
   count = local.alb_count
 
+
   name_prefix        = "test-"
   load_balancer_type = "application"
   internal           = true
