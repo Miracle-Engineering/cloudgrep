@@ -14,6 +14,7 @@ import (
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/datastore/testdata"
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/testingutil"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 )
@@ -111,7 +112,7 @@ func TestResourcesRoute(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
 		require.Equal(t, len(body), 3)
-		model.AssertEqualsResources(t, body, resources)
+		testingutil.AssertEqualsResources(t, body, resources)
 	})
 }
 
@@ -146,7 +147,7 @@ func TestResourcesPostRoute(t *testing.T) {
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
-		model.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, response)
+		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, response)
 	})
 
 	t.Run("FilterEmpty", func(t *testing.T) {
@@ -162,7 +163,7 @@ func TestResourcesPostRoute(t *testing.T) {
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
-		model.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response)
+		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response)
 	})
 
 	t.Run("NoBody", func(t *testing.T) {
@@ -176,7 +177,7 @@ func TestResourcesPostRoute(t *testing.T) {
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
-		model.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response)
+		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response)
 	})
 }
 
@@ -242,7 +243,7 @@ func TestResourceRoute(t *testing.T) {
 		require.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 		require.Equal(t, http.StatusOK, w.Code)
 		require.NoError(t, json.Unmarshal(w.Body.Bytes(), &actualResource))
-		model.AssertEqualsResource(t, actualResource, *resources[0])
+		testingutil.AssertEqualsResource(t, actualResource, *resources[0])
 	})
 }
 

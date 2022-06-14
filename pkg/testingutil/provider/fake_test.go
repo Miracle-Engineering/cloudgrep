@@ -77,8 +77,7 @@ func TestFakeProvider_FetchFunctions_call(t *testing.T) {
 		t.Fatal("fake.Foo fetch func not found")
 	}
 
-	fetchAllFunc := testingutil.FetchAllFunc[model.Resource](fetchFoo)
-	resources, err := testingutil.FetchAll(context.Background(), t, fetchAllFunc)
+	resources, err := testingutil.FetchAll(context.Background(), t, fetchFoo)
 
 	assert.NoError(t, err)
 	assert.Len(t, resources, 1)
@@ -101,8 +100,7 @@ func TestFakeProvider_FetchFunctions_callCanceled(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	fetchAllFunc := testingutil.FetchAllFunc[model.Resource](fetchFoo)
-	resources, err := testingutil.FetchAll(ctx, t, fetchAllFunc)
+	resources, err := testingutil.FetchAll(ctx, t, fetchFoo)
 
 	assert.ErrorIs(t, err, context.Canceled)
 	assert.Empty(t, resources)
