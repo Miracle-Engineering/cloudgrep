@@ -28,3 +28,16 @@ func TestFilterFunc(t *testing.T) {
 
 	assert.Equal(t, expected, actual)
 }
+
+func TestUnique(t *testing.T) {
+	in := []int{
+		1, 0, 0, 1, 2, 0, 5, -1, -3, 2,
+	}
+
+	expected := []int{
+		1, 0, 2, 5, -1, -3,
+	}
+
+	actual := Unique(in)
+	assert.Equal(t, expected, actual)
+}

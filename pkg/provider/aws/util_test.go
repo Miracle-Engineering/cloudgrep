@@ -101,6 +101,17 @@ func setupIntegrationProvider(t testing.TB, ctx *integrationTestContext) {
 
 	providers, err := NewProviders(ctx.ctx, c, ctx.log)
 	if err != nil {
+		credErrors := []string{
+			"invalid AWS credentials",
+			"no AWS credentials found",
+		}
+
+		for _, s := range credErrors {
+			if strings.Contains(err.Error(), s) {
+				t.Skipf("no valid AWS credentials present")
+			}
+		}
+
 		t.Fatalf("unable to instantiate new providers: %v", err)
 	}
 

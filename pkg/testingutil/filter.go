@@ -19,16 +19,24 @@ type ResourceFilter struct {
 func (f ResourceFilter) String() string {
 	var parts []string
 
-	if f.Region != "" {
-		parts = append(parts, fmt.Sprintf("Region=%s", f.Region))
-	}
-
 	if f.Type != "" {
 		parts = append(parts, fmt.Sprintf("Type=%s", f.Type))
 	}
 
-	for _, tag := range f.Tags {
-		parts = append(parts, fmt.Sprintf("Tags[%s]=%s", tag.Key, tag.Value))
+	if f.Region != "" {
+		parts = append(parts, fmt.Sprintf("Region=%s", f.Region))
+	}
+
+	if f.Tags != nil && len(f.Tags) == 0 {
+		parts = append(parts, "Tags=[]")
+	} else {
+		for _, tag := range f.Tags {
+			if tag.Value == "" {
+				parts = append(parts, fmt.Sprintf("Tags[%s]", tag.Key))
+			} else {
+				parts = append(parts, fmt.Sprintf("Tags[%s]=%s", tag.Key, tag.Value))
+			}
+		}
 	}
 
 	if len(f.RawData) > 0 {
@@ -75,6 +83,10 @@ func (f ResourceFilter) Matches(resource model.Resource) bool {
 				val, has := tagMap[tag.Key]
 				if !has {
 					return false
+				}
+
+				if tag.Value == "" {
+					continue
 				}
 
 				if strings.TrimSpace(val) != strings.TrimSpace(tag.Value) {
