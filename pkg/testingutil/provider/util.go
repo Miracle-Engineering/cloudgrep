@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -17,6 +18,8 @@ func FetchResources[T types.Provider](ctx context.Context, t *testing.T, provide
 	var resourceLock sync.Mutex
 	var wg sync.WaitGroup
 
+	var foundCount int32
+
 	worker := func(p types.Provider) {
 		defer wg.Done()
 		if p == nil {
@@ -28,6 +31,8 @@ func FetchResources[T types.Provider](ctx context.Context, t *testing.T, provide
 		if !has {
 			return
 		}
+
+		atomic.AddInt32(&foundCount, 1)
 
 		funcResources, err := testingutil.FetchAll(ctx, t, f)
 		if err != nil {
@@ -50,6 +55,10 @@ func FetchResources[T types.Provider](ctx context.Context, t *testing.T, provide
 	}
 
 	wg.Wait()
+
+	if foundCount == 0 {
+		t.Fatalf("no providers found that define type %s", name)
+	}
 
 	return resources
 }

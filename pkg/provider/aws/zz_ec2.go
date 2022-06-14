@@ -21,6 +21,16 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 			Value: "Value",
 		},
 	}
+	mapping["ec2.Volume"] = mapper{
+		FetchFunc: p.fetch_ec2_Volume,
+		IdField:   "VolumeId",
+		IsGlobal:  false,
+		TagField: resourceconverter.TagField{
+			Name:  "Tags",
+			Key:   "Key",
+			Value: "Value",
+		},
+	}
 }
 
 func (p *Provider) fetch_ec2_Instance(ctx context.Context, output chan<- model.Resource) error {
@@ -41,6 +51,27 @@ func (p *Provider) fetch_ec2_Instance(ctx context.Context, output chan<- model.R
 			if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, item_0.Instances); err != nil {
 				return err
 			}
+		}
+	}
+
+	return nil
+}
+
+func (p *Provider) fetch_ec2_Volume(ctx context.Context, output chan<- model.Resource) error {
+	client := ec2.NewFromConfig(p.config)
+	input := &ec2.DescribeVolumesInput{}
+
+	resourceConverter := p.converterFor("ec2.Volume")
+	paginator := ec2.NewDescribeVolumesPaginator(client, input)
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+
+		if err != nil {
+			return fmt.Errorf("failed to fetch %s: %w", "ec2.Volume", err)
+		}
+
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.Volumes); err != nil {
+			return err
 		}
 	}
 
