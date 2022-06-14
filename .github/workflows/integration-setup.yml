@@ -21,8 +21,6 @@ on:
 
   pull_request:
     types: [opened, synchronize]
-    branches:
-      - main
     paths:
       - "integration/aws/terraform/**"
 
