@@ -27,6 +27,10 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 	e.Logger = logger
 	e.Sequencer = sequencer.AsyncSequencer{Logger: e.Logger}
 	for _, c := range cfg.Providers {
+		// Manual regions trumps any written region.
+		if len(cfg.Regions) > 0 {
+			c.Regions = cfg.Regions
+		}
 		// create a providers
 		providers, err := provider.NewProviders(ctx, c, logger)
 		if err != nil {

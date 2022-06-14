@@ -75,7 +75,7 @@ func (s *SQLiteStore) Ping() error {
 }
 
 func (s *SQLiteStore) getResourcesById(ctx context.Context, ids []model.ResourceId) ([]*model.Resource, error) {
-	var resources []*model.Resource
+	resources := make([]*model.Resource, 0)
 	if len(ids) == 0 {
 		return resources, nil
 	}
