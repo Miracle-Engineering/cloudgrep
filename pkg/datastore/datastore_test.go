@@ -67,7 +67,7 @@ func TestReadWrite(t *testing.T) {
 			assert.NoError(t, datastore.WriteResources(ctx, []*model.Resource{}))
 			resourcesRead, err := datastore.GetResources(ctx, nil)
 			assert.NoError(t, err)
-			assert.Equal(t, model.Resources{}, resourcesRead)
+			assert.Equal(t, model.ResourcesResponse{Count: 0, Resources: model.Resources{}}, resourcesRead)
 
 			//write the resources
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
