@@ -67,15 +67,16 @@ func TestReadWrite(t *testing.T) {
 			assert.NoError(t, datastore.WriteResources(ctx, []*model.Resource{}))
 			resourcesRead, err := datastore.GetResources(ctx, nil)
 			assert.NoError(t, err)
-			assert.Equal(t, model.Resources{}, resourcesRead)
+			assert.Equal(t, model.ResourcesResponse{Count: 0, Resources: model.Resources{}}, resourcesRead)
 
 			//write the resources
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
 			resourcesRead, err = datastore.GetResources(ctx, nil)
 			assert.NoError(t, err)
-			assert.Equal(t, len(resources), len(resourcesRead))
-			testingutil.AssertEqualsResources(t, resources, resourcesRead)
+			assert.Equal(t, resourcesRead.Count, len(resourcesRead.Resources))
+			assert.Equal(t, len(resources), len(resourcesRead.Resources))
+			testingutil.AssertEqualsResources(t, resources, resourcesRead.Resources)
 
 			//test getting a specific resource
 			for _, r := range resources {
@@ -102,7 +103,7 @@ func TestSearchByQuery(t *testing.T) {
 
 			assert.NoError(t, datastore.WriteResources(ctx, all_resources))
 
-			var resourcesRead []*model.Resource
+			var resourcesRead model.ResourcesResponse
 
 			//only one resource has enabled=true
 			query := `{
@@ -114,8 +115,9 @@ func TestSearchByQuery(t *testing.T) {
 			resourcesRead, err := datastore.GetResources(ctx, []byte(query))
 			//check 1 result returned
 			assert.NoError(t, err)
-			assert.Equal(t, 1, len(resourcesRead))
-			testingutil.AssertEqualsResourcePter(t, resourceInst1, resourcesRead[0])
+			assert.Equal(t, 1, len(resourcesRead.Resources))
+			assert.Equal(t, 1, resourcesRead.Count)
+			testingutil.AssertEqualsResourcePter(t, resourceInst1, resourcesRead.Resources[0])
 
 			//check 2 tags filter: both resources have both tags - 2 results
 			query = `{
@@ -126,8 +128,9 @@ func TestSearchByQuery(t *testing.T) {
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			assert.Equal(t, 2, len(resourcesRead))
-			testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, resourcesRead)
+			assert.Equal(t, 2, len(resourcesRead.Resources))
+			assert.Equal(t, 2, resourcesRead.Count)
+			testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, resourcesRead.Resources)
 
 			//check 2 tags filter on same key - 2 results
 			query = `{
@@ -144,8 +147,28 @@ func TestSearchByQuery(t *testing.T) {
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			assert.Equal(t, 2, len(resourcesRead))
-			testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, resourcesRead)
+			assert.Equal(t, 2, len(resourcesRead.Resources))
+			assert.Equal(t, 2, resourcesRead.Count)
+			testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, resourcesRead.Resources)
+
+			//check 2 tags filter on same key - 2 results
+			query = `{
+  "filter":{
+    "$or":[
+      {
+        "team":"infra"
+      },
+      {
+        "team":"dev"
+      }
+    ]
+  },
+  "limit": 1
+}`
+			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(resourcesRead.Resources))
+			assert.Equal(t, 2, resourcesRead.Count)
 
 			//test 2 filters $or - both ec2 instances have these tags team and enabled
 			//first $or returns 2 instances
@@ -170,8 +193,9 @@ func TestSearchByQuery(t *testing.T) {
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			assert.Equal(t, 1, len(resourcesRead))
-			testingutil.AssertEqualsResources(t, model.Resources{resourceInst1}, resourcesRead)
+			assert.Equal(t, 1, len(resourcesRead.Resources))
+			assert.Equal(t, 1, resourcesRead.Count)
+			testingutil.AssertEqualsResources(t, model.Resources{resourceInst1}, resourcesRead.Resources)
 
 			//test 3 filter ors
 			//1. "team":"(not null)" -> select both instances
@@ -204,8 +228,9 @@ func TestSearchByQuery(t *testing.T) {
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			assert.Equal(t, 1, len(resourcesRead))
-			testingutil.AssertEqualsResources(t, model.Resources{resourceInst1}, resourcesRead)
+			assert.Equal(t, 1, len(resourcesRead.Resources))
+			assert.Equal(t, 1, resourcesRead.Count)
+			testingutil.AssertEqualsResources(t, model.Resources{resourceInst1}, resourcesRead.Resources)
 
 			//check 2 distinct tags - but no resource has both - 0 result
 			query = `{
@@ -216,7 +241,8 @@ func TestSearchByQuery(t *testing.T) {
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			assert.Equal(t, 0, len(resourcesRead))
+			assert.Equal(t, 0, len(resourcesRead.Resources))
+			assert.Equal(t, 0, resourcesRead.Count)
 
 			//tag present - 2 results
 			query = `{
@@ -226,8 +252,9 @@ func TestSearchByQuery(t *testing.T) {
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			assert.Equal(t, 2, len(resourcesRead))
-			testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, resourcesRead)
+			assert.Equal(t, 2, len(resourcesRead.Resources))
+			assert.Equal(t, 2, resourcesRead.Count)
+			testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, resourcesRead.Resources)
 
 			//test exclude - returns the resources without the tag release
 			query = `{
@@ -237,8 +264,9 @@ func TestSearchByQuery(t *testing.T) {
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			assert.Equal(t, 2, len(resourcesRead))
-			testingutil.AssertEqualsResources(t, model.Resources{resourceInst2, resourceBucket}, resourcesRead)
+			assert.Equal(t, 2, len(resourcesRead.Resources))
+			assert.Equal(t, 2, resourcesRead.Count)
+			testingutil.AssertEqualsResources(t, model.Resources{resourceInst2, resourceBucket}, resourcesRead.Resources)
 
 			//test 2 exclusions - the s3 bucket is the only one without both tags
 			query = `{
@@ -249,7 +277,8 @@ func TestSearchByQuery(t *testing.T) {
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			testingutil.AssertEqualsResources(t, model.Resources{resourceBucket}, resourcesRead)
+			assert.Equal(t, 1, resourcesRead.Count)
+			testingutil.AssertEqualsResources(t, model.Resources{resourceBucket}, resourcesRead.Resources)
 
 			//mix include and exclude filters
 			query = `{
@@ -260,15 +289,17 @@ func TestSearchByQuery(t *testing.T) {
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			assert.Equal(t, 1, len(resourcesRead))
-			testingutil.AssertEqualsResourcePter(t, resourceInst1, resourcesRead[0])
+			assert.Equal(t, 1, len(resourcesRead.Resources))
+			assert.Equal(t, 1, resourcesRead.Count)
+			testingutil.AssertEqualsResourcePter(t, resourceInst1, resourcesRead.Resources[0])
 
 			//test on max value
 			query = fmt.Sprintf(`{"filter":{"%v":"%v"}}`, tagMaxKey, tagMaxValue)
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			assert.Equal(t, 1, len(resourcesRead))
-			testingutil.AssertEqualsResourcePter(t, resourceInst2, resourcesRead[0])
+			assert.Equal(t, 1, len(resourcesRead.Resources))
+			assert.Equal(t, 1, resourcesRead.Count)
+			testingutil.AssertEqualsResourcePter(t, resourceInst2, resourcesRead.Resources[0])
 
 			//test on a tag called region - find the tag (ignore the core field)
 			// we can probably revisit this in the future and include the group in the query field
@@ -280,8 +311,9 @@ func TestSearchByQuery(t *testing.T) {
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			assert.Equal(t, 1, len(resourcesRead))
-			testingutil.AssertEqualsResourcePter(t, resourceInst1, resourcesRead[0])
+			assert.Equal(t, 1, len(resourcesRead.Resources))
+			assert.Equal(t, 1, resourcesRead.Count)
+			testingutil.AssertEqualsResourcePter(t, resourceInst1, resourcesRead.Resources[0])
 
 		})
 	}
@@ -512,7 +544,8 @@ func TestReloadDB(t *testing.T) {
 			require.NoError(t, ds.WriteResources(ctx, resources))
 			resourcesRead, err := ds.GetResources(ctx, nil)
 			require.NoError(t, err)
-			assert.NotZero(t, len(resourcesRead))
+			assert.Equal(t, len(resourcesRead.Resources), resourcesRead.Count)
+			assert.NotZero(t, len(resourcesRead.Resources))
 			r1, _ := ds.GetResource(ctx, tagUniqueResourceId)
 			assert.NotNil(t, r1)
 			//test a query
@@ -523,8 +556,9 @@ func TestReloadDB(t *testing.T) {
 			require.NoError(t, err)
 			resourcesReadNew, err := dsNew.GetResources(ctx, nil)
 			require.NoError(t, err)
+			require.Equal(t, len(resourcesReadNew.Resources), resourcesRead.Count)
 			//the new datastore contains the same data that was previsouly stored
-			testingutil.AssertEqualsResources(t, resourcesRead, resourcesReadNew)
+			testingutil.AssertEqualsResources(t, resourcesRead.Resources, resourcesReadNew.Resources)
 			//test the same query - test index were loaded
 			testQuery(t, ctx, dsNew, tagUniqueKey, tagUniqueValue, r1)
 
@@ -559,7 +593,8 @@ func TestPurgeResources(t *testing.T) {
 			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", nil))
 			resourcesRead, err := ds.GetResources(ctx, nil)
 			require.NoError(t, err)
-			testingutil.AssertEqualsResources(t, model.Resources{r2, r3}, resourcesRead)
+			require.Equal(t, 2, resourcesRead.Count)
+			testingutil.AssertEqualsResources(t, model.Resources{r2, r3}, resourcesRead.Resources)
 			//the query doesn't return the deleted resource
 			testQueryNoResult(t, ctx, ds, "id", r1.Id)
 			testQueryUnrecognizedKey(t, ctx, ds, tagUniqueKey, tagUniqueValue)
@@ -569,7 +604,8 @@ func TestPurgeResources(t *testing.T) {
 			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", errors.New("an error happened")))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
-			testingutil.AssertEqualsResources(t, model.Resources{r2, r3}, resourcesRead)
+			require.Equal(t, 2, resourcesRead.Count)
+			testingutil.AssertEqualsResources(t, model.Resources{r2, r3}, resourcesRead.Resources)
 			testQuery(t, ctx, ds, "id", r2.Id, r2)
 
 			//4th run: add back the resource previously deleted
@@ -578,7 +614,8 @@ func TestPurgeResources(t *testing.T) {
 			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", nil))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
-			testingutil.AssertEqualsResources(t, model.Resources{r1, r2, r3}, resourcesRead)
+			require.Equal(t, 3, resourcesRead.Count)
+			testingutil.AssertEqualsResources(t, model.Resources{r1, r2, r3}, resourcesRead.Resources)
 			testQuery(t, ctx, ds, tagUniqueKey, tagUniqueValue, r1)
 
 		})
@@ -608,6 +645,6 @@ func _testQuery(t *testing.T, ctx context.Context, ds Datastore, fieldName strin
 		require.ErrorContains(t, err, "unrecognized key")
 	} else {
 		require.NoError(t, err)
-		testingutil.AssertEqualsResources(t, model.Resources(expected), resourcesRead)
+		testingutil.AssertEqualsResources(t, model.Resources(expected), resourcesRead.Resources)
 	}
 }

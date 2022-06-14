@@ -394,14 +394,14 @@ func replaceWith(s string, old string, new string, sep string, i int) string {
 
 //findResourceIds finds resources using a RQL query
 //see https://github.com/a8m/rql#getting-started for the syntax
-func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQuery []byte) ([]model.ResourceId, error) {
+func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQuery []byte) ([]model.ResourceId, int, error) {
 	if len(jsonQuery) == 0 {
 		//use en empty json if nothing is set - this will use the default limit
 		jsonQuery = []byte(`{}`)
 	}
 	p, err := ri.parse(jsonQuery)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var resourceIds []model.ResourceId
@@ -414,7 +414,17 @@ func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQ
 		Find(&resourceIds)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, 0, result.Error
 	}
-	return resourceIds, nil
+
+	var count int64
+	resultCount := db.Table(resourceIndexTable).
+		Select("id").
+		Where(p.FilterExp, p.FilterArgs...).
+		Count(&count)
+
+	if resultCount.Error != nil {
+		return nil, 0, result.Error
+	}
+	return resourceIds, int(count), nil
 }

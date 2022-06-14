@@ -290,12 +290,13 @@ func (s *SQLiteStore) GetFields(context.Context) (model.FieldGroups, error) {
 	return fieldGroups.AddNullValues(), nil
 }
 
-func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) (model.Resources, error) {
-	ids, err := s.indexer.findResourceIds(*s.db, s.logger, jsonQuery)
+func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) (model.ResourcesResponse, error) {
+	ids, totalCount, err := s.indexer.findResourceIds(*s.db, s.logger, jsonQuery)
 	if err != nil {
-		return nil, err
+		return model.ResourcesResponse{}, err
 	}
-	return s.getResourcesById(ctx, ids)
+	resources, err := s.getResourcesById(ctx, ids)
+	return model.ResourcesResponse{Count: totalCount, Resources: resources}, err
 }
 
 func (s *SQLiteStore) WriteEngineStatusStart(ctx context.Context, resource string) error {

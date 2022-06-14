@@ -45,7 +45,8 @@ func TestBlackholeEmptyFuncs(t *testing.T) {
 
 	resources, err := ds.GetResources(ctx, nil)
 	assert.NoError(t, err)
-	assert.Empty(t, resources)
+	assert.Equal(t, 0, resources.Count)
+	assert.Empty(t, resources.Resources)
 
 	fields, err := ds.GetFields(ctx)
 	assert.NoError(t, err)
