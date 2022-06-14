@@ -3,6 +3,7 @@ module github.com/run-x/cloudgrep
 go 1.18
 
 require (
+	github.com/aws/aws-sdk-go v1.44.33
 	github.com/aws/aws-sdk-go-v2 v1.16.4
 	github.com/aws/aws-sdk-go-v2/config v1.15.4
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.36.1
@@ -26,7 +27,6 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.44.33 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.1 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.12.0 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.4 // indirect
