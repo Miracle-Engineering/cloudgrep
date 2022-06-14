@@ -11,11 +11,11 @@ import (
 )
 
 func TestHomeRoute(t *testing.T) {
-	_, _, router := prepareApiUnitTest(t)
+	m := prepareApiUnitTest(t)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/", nil)
-	router.ServeHTTP(w, req)
+	m.router.ServeHTTP(w, req)
 	assert.Equal(t, "text/html; charset=utf-8", w.Header().Get("Content-Type"))
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -23,11 +23,11 @@ func TestHomeRoute(t *testing.T) {
 }
 
 func TestInfoRoute(t *testing.T) {
-	_, _, router := prepareApiUnitTest(t)
+	m := prepareApiUnitTest(t)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/info", nil)
-	router.ServeHTTP(w, req)
+	m.router.ServeHTTP(w, req)
 	assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 	var body map[string]interface{}
 	err := json.Unmarshal(w.Body.Bytes(), &body)

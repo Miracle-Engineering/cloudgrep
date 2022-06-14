@@ -17,6 +17,12 @@ import (
 	"github.com/run-x/cloudgrep/pkg/util"
 )
 
+type cli struct {
+	cfg    config.Config
+	logger *zap.Logger
+	ds     datastore.Datastore
+}
+
 func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 	if logger.Core().Enabled(zap.DebugLevel) {
 		util.StartProfiler()
@@ -26,28 +32,18 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 	util.SendEvent(ctx, logger, util.BaseEvent, nil)
 
 	//init the storage to contain cloud data
-	datastore, err := datastore.NewDatastore(ctx, cfg, logger)
+	var err error
+	cli := cli{cfg: cfg, logger: logger}
+	cli.ds, err = datastore.NewDatastore(ctx, cfg, logger)
 	if err != nil {
 		return fmt.Errorf("failed to setup datastore: %w", err)
 	}
 
 	//start the providers to collect cloud data
-	eng, err := engine.NewEngine(ctx, cfg, logger, datastore)
-	if err != nil {
-		return fmt.Errorf("failed to start engine: %w", err)
+	if err := cli.runEngine(ctx); err != nil {
+		return err
 	}
-	if err = eng.Run(ctx); err != nil {
-		stats, _ := datastore.Stats(ctx)
-		if stats.ResourcesCount > 0 {
-			//log the error but the api can still server with the datastore
-			logger.Sugar().Errorw("some error(s) when running the provider engine", "error", err)
-		} else {
-			// nothing to view - exit
-			return fmt.Errorf("can't run the provider engine: %w", err)
-		}
-	}
-
-	api.StartWebServer(ctx, cfg, logger, datastore)
+	api.StartWebServer(ctx, cfg, logger, cli.ds, cli.runEngine)
 
 	url := fmt.Sprintf("http://%v:%v/%v", cfg.Web.Host, cfg.Web.Port, cfg.Web.Prefix)
 	fmt.Println("To view Cloudgrep UI, open ", url, "in browser")
@@ -56,6 +52,26 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 		openPage(url)
 	}
 	handleSignals()
+	return nil
+}
+
+//runEngine runs the providers to collect the cloud resources
+//it returns when it's done fetching
+func (cli *cli) runEngine(ctx context.Context) error {
+	eng, err := engine.NewEngine(ctx, cli.cfg, cli.logger, cli.ds)
+	if err != nil {
+		return fmt.Errorf("failed to start engine: %w", err)
+	}
+	if err = eng.Run(ctx); err != nil {
+		stats, _ := cli.ds.Stats(ctx)
+		if stats.ResourcesCount > 0 {
+			//log the error but the api can still server with the datastore
+			cli.logger.Sugar().Errorw("some error(s) when running the provider engine", "error", err)
+		} else {
+			// nothing to view - exit
+			return fmt.Errorf("can't run the provider engine: %w", err)
+		}
+	}
 	return nil
 }
 

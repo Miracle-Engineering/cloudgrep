@@ -10,11 +10,15 @@ import (
 	"go.uber.org/zap"
 )
 
-func setupMiddlewares(group *gin.RouterGroup, cfg config.Config, logger *zap.Logger, ds datastore.Datastore) {
+func setupMiddlewares(group *gin.RouterGroup, cfg config.Config, logger *zap.Logger, ds datastore.Datastore, engineF EngineFunc) {
 	if logger.Core().Enabled(zap.DebugLevel) {
 		group.Use(logAllQueryParams(cfg, logger), logAllRequests(cfg, logger))
 	}
-	group.Use(setDatastore(ds))
+	var values = map[string]interface{}{
+		"datastore":  ds,
+		"engineFunc": engineF,
+	}
+	group.Use(setSharedObjects(values))
 	group.Use(setParams(cfg, logger))
 }
 
@@ -34,9 +38,11 @@ func logAllRequests(cfg config.Config, logger *zap.Logger) gin.HandlerFunc {
 	return ginzap.Ginzap(logger, time.RFC3339, true)
 }
 
-func setDatastore(ds datastore.Datastore) gin.HandlerFunc {
+func setSharedObjects(values map[string]interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Set("datastore", ds)
+		for k, v := range values {
+			c.Set(k, v)
+		}
 		c.Next()
 	}
 }

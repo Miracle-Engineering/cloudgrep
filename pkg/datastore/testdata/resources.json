@@ -31,6 +31,10 @@
             {
                 "key": "region",
                 "value": "us-west-2"
+            },
+            {
+                "key": "unique-tag",
+                "value": "unique-i-123"
             }
         ],
         "rawData": {

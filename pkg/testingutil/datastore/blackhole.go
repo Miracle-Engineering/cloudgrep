@@ -26,11 +26,11 @@ func (s *Blackhole) GetResource(ctx context.Context, id string) (*model.Resource
 	return nil, nil
 }
 
-func (s *Blackhole) GetResources(ctx context.Context, query []byte) ([]*model.Resource, error) {
+func (s *Blackhole) GetResources(ctx context.Context, query []byte) (model.Resources, error) {
 	return nil, nil
 }
 
-func (s *Blackhole) WriteResources(ctx context.Context, resources []*model.Resource) error {
+func (s *Blackhole) WriteResources(ctx context.Context, resources model.Resources) error {
 	s.l.Lock()
 	defer s.l.Unlock()
 	if s.writeError != nil {

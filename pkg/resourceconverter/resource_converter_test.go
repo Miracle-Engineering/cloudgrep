@@ -2,10 +2,12 @@ package resourceconverter
 
 import (
 	"context"
+	"testing"
+
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/testingutil"
 	"github.com/stretchr/testify/require"
 	"gorm.io/datatypes"
-	"testing"
 )
 
 type TestEntry struct {
@@ -46,7 +48,7 @@ func TestReflectionConverter(t *testing.T) {
 			Tags:    model.Tags{{Key: "key1", Value: "val1"}, {Key: "key2", Value: "val2"}},
 			RawData: datatypes.JSON([]byte(`{"ID":"id1","Attr1":1,"Attr2":"hi","Attr3":{"a":"b","c":2},"WeirdTags":[{"WeirdKey":"key1","WeirdValue":"val1"},{"WeirdKey":"key2","WeirdValue":"val2"}]}`)),
 		}
-		model.AssertEqualsResource(t, expectedResource, resource)
+		testingutil.AssertEqualsResource(t, expectedResource, resource)
 	})
 
 	t.Run("TagsPassedIn", func(t *testing.T) {
@@ -71,7 +73,7 @@ func TestReflectionConverter(t *testing.T) {
 			Tags:    model.Tags{{Key: "key1", Value: "val3"}, {Key: "key2", Value: "val4"}},
 			RawData: datatypes.JSON([]byte(`{"ID":"id1","Attr1":1,"Attr2":"hi","Attr3":{"a":"b","c":2},"WeirdTags":[{"WeirdKey":"key1","WeirdValue":"val1"},{"WeirdKey":"key2","WeirdValue":"val2"}]}`)),
 		}
-		model.AssertEqualsResource(t, expectedResource, resource)
+		testingutil.AssertEqualsResource(t, expectedResource, resource)
 	})
 
 	t.Run("MissingTags", func(t *testing.T) {

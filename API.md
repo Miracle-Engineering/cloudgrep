@@ -244,7 +244,7 @@ Returns the Status of the Cloudgrep run.
 
 Sample Responses:
 ```js
-// Successfully got all the resources
+// Engine completed successfully
 {
   "resource_name":"engine",
   "error_message":"",
@@ -252,7 +252,15 @@ Sample Responses:
   "fetched_at":"2022-06-07T19:53:10.570698+05:30"
 }
 
-// Failed to get resources
+// Engine is currently running
+{
+  "resource_name":"engine",
+  "error_message":"",
+  "status":"fetching",
+  "fetched_at":""
+}
+
+// Engine completed with some errors
 {
   "resource_name":"engine",
   "error_message":"Failed to get Load Balancer Resources.",
@@ -261,6 +269,29 @@ Sample Responses:
 }
 ```
 
+## Refresh the resources
+
+Trigger the engine to refresh the cloud resources.
+The response is sent when the engine is done (not async!), it can take up to 3 min.
+
+| Route                                                   | Method | Description              |  Status |
+|---------------------------------------------------------| ------------- |--------------------------| ------------- |
+| [/refresh](http://localhost:8080/api/refresh) | POST  | Refresh the cloud resources |  :white_check_mark: |
+
+Sample Responses:
+```js
+// Refresh completed successfully
+code: 200
+body: {}
+
+// There was an error
+code: 400
+{
+  "status":"400",
+  "error":"There was an engine error"
+}
+
+```
 
 ## Mocked data
 
