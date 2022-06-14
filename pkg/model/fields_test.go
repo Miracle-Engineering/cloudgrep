@@ -1,51 +1,53 @@
-package model
+package model_test
 
 import (
 	"testing"
 
+	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/testingutil"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFieldFind(t *testing.T) {
-	f1 := Field{
+	f1 := model.Field{
 		Name:   "region",
 		Values: nil,
 	}
-	f2 := Field{
+	f2 := model.Field{
 		Name:   "type",
 		Values: nil,
 	}
-	groups := FieldGroups{
+	groups := model.FieldGroups{
 		{
 			Name:   "core",
-			Fields: []Field{f1, f2},
+			Fields: []model.Field{f1, f2},
 		},
 	}
 	assert.Equal(t, "core", groups.FindGroup("core").Name)
-	AssertEqualsField(t, f2, *groups.FindField("core", "type"))
+	testingutil.AssertEqualsField(t, f2, *groups.FindField("core", "type"))
 }
 
 func TestFieldsAddNullValues(t *testing.T) {
-	groups := FieldGroups{
+	groups := model.FieldGroups{
 		{
 			Name: "core",
-			Fields: []Field{{
+			Fields: []model.Field{{
 				Name:  "region",
 				Count: 3,
-				Values: []FieldValue{
+				Values: []model.FieldValue{
 					{Value: "us-east-1", Count: 2},
 					{Value: "us-west-2", Count: 1},
 				},
 			}, {
 				Name:  "type",
 				Count: 3,
-				Values: []FieldValue{
+				Values: []model.FieldValue{
 					{Value: "ec2.instance", Count: 3},
 				},
 			}, {
 				Name:  "cluster",
 				Count: 2,
-				Values: []FieldValue{
+				Values: []model.FieldValue{
 					{Value: "dev", Count: 2},
 				},
 			},
@@ -53,13 +55,13 @@ func TestFieldsAddNullValues(t *testing.T) {
 		},
 	}
 	groupsNullable := groups.AddNullValues()
-	assert.Equal(t, FieldGroups{
+	assert.Equal(t, model.FieldGroups{
 		{
 			Name: "core",
-			Fields: []Field{{
+			Fields: []model.Field{{
 				Name:  "region",
 				Count: 3,
-				Values: []FieldValue{
+				Values: []model.FieldValue{
 					{Value: "us-east-1", Count: 2},
 					{Value: "us-west-2", Count: 1},
 					//do not show (null) if all resources have this field
@@ -67,13 +69,13 @@ func TestFieldsAddNullValues(t *testing.T) {
 			}, {
 				Name:  "type",
 				Count: 3,
-				Values: []FieldValue{
+				Values: []model.FieldValue{
 					{Value: "ec2.instance", Count: 3},
 				},
 			}, {
 				Name:  "cluster",
 				Count: 2,
-				Values: []FieldValue{
+				Values: []model.FieldValue{
 					{Value: "dev", Count: 2},
 					//(null) count is the count of resources without this field
 					{Value: "(null)", Count: 1},

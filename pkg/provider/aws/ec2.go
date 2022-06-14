@@ -3,16 +3,33 @@ package aws
 import (
 	"context"
 	"fmt"
+
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/run-x/cloudgrep/pkg/model"
 )
 
 func (p *Provider) FetchEC2Instances(ctx context.Context, output chan<- model.Resource) error {
 	resourceType := "ec2.Instance"
 	ec2Client := ec2.NewFromConfig(p.config)
-	input := &ec2.DescribeInstancesInput{}
+	input := &ec2.DescribeInstancesInput{
+		// Ignore terminated (and other) instances
+		Filters: []types.Filter{
+			{
+				Name: aws.String("instance-state-name"),
+				Values: []string{
+					"pending",
+					"running",
+					"shutting-down",
+					"stopped",
+					"stopping",
+				},
+			},
+		},
+	}
 	paginator := ec2.NewDescribeInstancesPaginator(ec2Client, input)
 
 	resourceConverter := p.converterFor(resourceType)
