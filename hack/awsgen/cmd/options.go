@@ -16,6 +16,13 @@ type Options struct {
 	ValidateOnly bool
 }
 
+func NewOptions(flags *pflag.FlagSet) *Options {
+	o := &Options{}
+	o.Default()
+	o.Bind(flags)
+	return o
+}
+
 func (o *Options) Default() {
 	o.Format = true
 }

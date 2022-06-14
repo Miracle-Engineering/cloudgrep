@@ -25,9 +25,7 @@ func Run(args []string) {
 func Do(args []string) error {
 	flags := pflag.NewFlagSet("awsgen", pflag.ContinueOnError)
 
-	opts := Options{}
-	opts.Default()
-	opts.Bind(flags)
+	opts := NewOptions(flags)
 
 	err := flags.Parse(args)
 	if errors.Is(err, pflag.ErrHelp) {
@@ -82,7 +80,7 @@ func Do(args []string) error {
 	return nil
 }
 
-func getWriter(opts Options) (writer.Writer, error) {
+func getWriter(opts *Options) (writer.Writer, error) {
 	if opts.OutputPath == "" {
 		return writer.NewStreamWriter(os.Stdout), nil
 	}
