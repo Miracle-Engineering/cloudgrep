@@ -43,14 +43,14 @@ jobs:
               opts = {
                 listeners: {
                   stdline: (data) => {
-                    diffOut += data.toString()
+                    changedFiles.push(data.toString())
                   },
                 },
               }
 
               let refspec = context.payload.pull_request.base.sha + '...HEAD'
 
-              await exec.exec('git' ['diff', '--name-only', refspec], opts)
+              await exec.exec('git', ['diff', '--name-only', refspec], opts)
 
               let hasTerraform = changedFiles.some(file => file.startsWith(tfDir))
               if (hasTerraform) {
