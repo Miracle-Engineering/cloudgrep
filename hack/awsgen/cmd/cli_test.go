@@ -6,12 +6,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDo(t *testing.T) {
 	dir := t.TempDir()
 	configPath := path.Join(dir, "config.yaml")
-	ioutil.WriteFile(configPath, []byte("services: []"), 0644)
+	writeConfig(t, configPath, "services: []")
 
 	args := []string{
 		"--config",
@@ -40,8 +41,8 @@ func TestDo_configError(t *testing.T) {
 	configPath := path.Join(dir, "config.yaml")
 	svcPath := path.Join(dir, "svc.yaml")
 
-	ioutil.WriteFile(configPath, []byte("services: [svc]"), 0644)
-	ioutil.WriteFile(svcPath, []byte("servicePackage: Foo"), 0644)
+	writeConfig(t, configPath, "services: [svc]")
+	writeConfig(t, svcPath, "servicePackage: Foo")
 
 	args := []string{
 		"--config",
@@ -56,7 +57,7 @@ func TestDo_badOutDir(t *testing.T) {
 	dir := t.TempDir()
 	outDir := path.Join(dir, "out")
 	configPath := path.Join(dir, "config.yaml")
-	ioutil.WriteFile(configPath, []byte("services: []"), 0644)
+	writeConfig(t, configPath, "services: []")
 
 	args := []string{
 		"--config",
@@ -73,7 +74,7 @@ func TestDo_outDir(t *testing.T) {
 	dir := t.TempDir()
 	outDir := t.TempDir()
 	configPath := path.Join(dir, "config.yaml")
-	ioutil.WriteFile(configPath, []byte("services: []"), 0644)
+	writeConfig(t, configPath, "services: []")
 
 	args := []string{
 		"--config",
@@ -84,4 +85,12 @@ func TestDo_outDir(t *testing.T) {
 
 	err := Do(args)
 	assert.NoError(t, err)
+}
+
+func writeConfig(t *testing.T, path, content string) {
+	t.Helper()
+
+	err := ioutil.WriteFile(path, []byte(content), 0644)
+	require.NoError(t, err)
+
 }

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"path"
 	"testing"
 
@@ -17,7 +16,7 @@ func TestOptions(t *testing.T) {
 
 	dir := t.TempDir()
 	configPath := path.Join(dir, "foo.yaml")
-	ioutil.WriteFile(configPath, []byte("services: []"), 0644)
+	writeConfig(t, configPath, "services: []")
 
 	err := flags.Parse([]string{"--config", configPath, "--format=false"})
 	assert.NoError(t, err)
