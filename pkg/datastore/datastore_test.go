@@ -65,12 +65,14 @@ func TestReadWrite(t *testing.T) {
 
 			//test write empty slice
 			assert.NoError(t, datastore.WriteResources(ctx, []*model.Resource{}))
+			resourcesRead, err := datastore.GetResources(ctx, nil)
+			assert.NoError(t, err)
+			assert.Equal(t, model.Resources{}, resourcesRead)
 
 			//write the resources
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
-			var resourcesRead []*model.Resource
-			resourcesRead, err := datastore.GetResources(ctx, nil)
+			resourcesRead, err = datastore.GetResources(ctx, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, len(resources), len(resourcesRead))
 			testingutil.AssertEqualsResources(t, resources, resourcesRead)
