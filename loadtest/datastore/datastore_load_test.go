@@ -120,21 +120,21 @@ func TestLoad(t *testing.T) {
 
 				if tc.Resources > datastore.DefaultLimit {
 					//test limit is returned by default
-					limitedResources, totalCount, err := ds.GetResources(ctx, nil)
+					limitedResources, err := ds.GetResources(ctx, nil)
 					assert.NoError(t, err)
-					assert.True(t, len(limitedResources) < totalCount)
-					assert.Equal(t, datastore.DefaultLimit, len(limitedResources))
+					assert.True(t, len(limitedResources.Resources) < limitedResources.Count)
+					assert.Equal(t, datastore.DefaultLimit, len(limitedResources.Resources))
 				}
 
 				//test all resources added
-				allResources, totalCount, err := ds.GetResources(ctx, []byte(fmt.Sprintf(`{"limit":%d}`, datastore.LimitMaxValue)))
+				allResources, err := ds.GetResources(ctx, []byte(fmt.Sprintf(`{"limit":%d}`, datastore.LimitMaxValue)))
 				assert.NoError(t, err)
 				if tc.Resources <= datastore.LimitMaxValue {
-					assert.Equal(t, tc.Resources, len(allResources))
+					assert.Equal(t, tc.Resources, len(allResources.Resources))
 				}
-				assert.Equal(t, tc.Resources, totalCount)
+				assert.Equal(t, tc.Resources, allResources.Count)
 				//check the tags have been set
-				assert.Equal(t, tc.TagsPerBatch, len(allResources[0].Tags))
+				assert.Equal(t, tc.TagsPerBatch, len(allResources.Resources[0].Tags))
 
 				//test all fields
 				fields, err := ds.GetFields(ctx)
@@ -144,7 +144,7 @@ func TestLoad(t *testing.T) {
 				//test some queries
 				for i := 0; i < tc.Queries; i = i + 1 {
 					//pick a random resource to find (to have at least 1 result)
-					randResource := randResource(allResources)
+					randResource := randResource(allResources.Resources)
 
 					//build a rql query
 					query := make(map[string]interface{})
@@ -165,10 +165,10 @@ func TestLoad(t *testing.T) {
 					query["filter"] = filter
 					queryJson, err := json.Marshal(query)
 					assert.NoError(t, err)
-					result, _, err := ds.GetResources(ctx, queryJson)
+					result, err := ds.GetResources(ctx, queryJson)
 					assert.NoError(t, err)
 					//since all the tags are the same for a batch - the response should include them
-					assert.Equal(t, tc.BatchSize, len(result))
+					assert.Equal(t, tc.BatchSize, len(result.Resources))
 				}
 			})
 
