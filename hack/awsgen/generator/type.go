@@ -38,7 +38,7 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 		Paginated      bool
 		InputOverrides config.InputOverrides
 
-		OutputKey   *util.RecursiveAppend
+		OutputKey   *util.RecursiveAppend[config.Field]
 		TagFuncName string
 	}{
 		ResourceName: resourceName(service, typ),
@@ -51,7 +51,7 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 		Paginated:      typ.ListAPI.Pagination,
 		InputOverrides: typ.ListAPI.InputOverrides,
 
-		OutputKey: &util.RecursiveAppend{
+		OutputKey: &util.RecursiveAppend[config.Field]{
 			Keys: typ.ListAPI.OutputKey,
 		},
 	}

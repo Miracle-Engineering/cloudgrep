@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func makeRa() RecursiveAppend {
-	return RecursiveAppend{
+func makeRa() RecursiveAppend[string] {
+	return RecursiveAppend[string]{
 		Keys: []string{"foo", "bar", "spam", "ham"},
 		Root: "apple",
 	}

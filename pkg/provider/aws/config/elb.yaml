@@ -5,7 +5,7 @@ types:
     listApi:
       call: DescribeLoadBalancers
       pagination: true
-      outputKey: [LoadBalancers]
+      outputKey: LoadBalancers
       id:
         name: LoadBalancerArn
         pointer: true

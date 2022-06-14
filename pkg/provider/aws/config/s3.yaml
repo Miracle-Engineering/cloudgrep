@@ -2,7 +2,7 @@ types:
   - name: Bucket
     listApi:
       call: ListBuckets
-      outputKey: [Buckets]
+      outputKey: Buckets
       id: Name
     getTagsApi:
       type: Bucket
@@ -13,6 +13,6 @@ types:
       tags:
         style: struct
         pointer: true
-        field: [TagSet]
+        field: TagSet
         key: Key
         value: Value

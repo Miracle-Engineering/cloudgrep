@@ -6,18 +6,18 @@ import (
 )
 
 // RecursiveAppend is used in templates to give a way to concisely reference nested fields.
-type RecursiveAppend struct {
+type RecursiveAppend[T any] struct {
 	Idx  int
-	Keys []string
+	Keys []T
 	Root string
 	Data map[string]any
 }
 
-func (r RecursiveAppend) IsLast() bool {
+func (r RecursiveAppend[T]) IsLast() bool {
 	return r.Idx >= len(r.Keys)-1
 }
 
-func (r RecursiveAppend) IterVar() string {
+func (r RecursiveAppend[T]) IterVar() string {
 	if r.Idx > 0 {
 		return r.varFor(r.Idx - 1)
 	}
@@ -25,19 +25,19 @@ func (r RecursiveAppend) IterVar() string {
 	return r.Root
 }
 
-func (r RecursiveAppend) Current() string {
+func (r RecursiveAppend[T]) Current() T {
 	return r.Keys[r.Idx]
 }
 
-func (r RecursiveAppend) NextIterVar() string {
+func (r RecursiveAppend[T]) NextIterVar() string {
 	return r.varFor(r.Idx)
 }
 
-func (r RecursiveAppend) varFor(i int) string {
+func (r RecursiveAppend[T]) varFor(i int) string {
 	return "item_" + strconv.Itoa(i)
 }
 
-func (r RecursiveAppend) Next() (RecursiveAppend, error) {
+func (r RecursiveAppend[T]) Next() (RecursiveAppend[T], error) {
 	if r.IsLast() {
 		return r, fmt.Errorf("end of recursive append keys")
 	}
@@ -46,12 +46,12 @@ func (r RecursiveAppend) Next() (RecursiveAppend, error) {
 	return r, nil
 }
 
-func (r RecursiveAppend) WithRoot(root string) RecursiveAppend {
+func (r RecursiveAppend[T]) WithRoot(root string) RecursiveAppend[T] {
 	r.Root = root
 	return r
 }
 
-func (r *RecursiveAppend) SetData(key string, value any) error {
+func (r *RecursiveAppend[T]) SetData(key string, value any) error {
 	if r.Data == nil {
 		r.Data = make(map[string]any)
 	}

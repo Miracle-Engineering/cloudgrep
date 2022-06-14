@@ -4,6 +4,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var _ yaml.Unmarshaler = &NestedField{}
+
 func (f NestedField) Empty() bool {
 	return len(f) == 0
 }
@@ -14,6 +16,41 @@ func (f NestedField) Last() Field {
 	}
 
 	return f[len(f)-1]
+}
+
+func (f *NestedField) UnmarshalYAML(value *yaml.Node) error {
+	if value.Kind == yaml.SequenceNode {
+		return f.decodeSequenceNode(value)
+	}
+	if value.Kind == yaml.ScalarNode {
+		return f.decodeScalarNode(value)
+	}
+
+	return &yaml.TypeError{Errors: []string{
+		"unexpected node kind",
+	}}
+}
+
+func (f *NestedField) decodeSequenceNode(value *yaml.Node) error {
+	var fields []Field
+	err := value.Decode(&fields)
+	if err != nil {
+		return err
+	}
+
+	*f = NestedField(fields)
+	return nil
+}
+
+func (f *NestedField) decodeScalarNode(value *yaml.Node) error {
+	var name string
+	err := value.Decode(&name)
+	if err != nil {
+		return err
+	}
+
+	*f = NestedField{Field{Name: name}}
+	return nil
 }
 
 func (f *Field) Zero() bool {

@@ -59,8 +59,8 @@ type ListAPI struct {
 
 	// OutputKey sets the "path" to the list of resources within the API response.
 	// Each item must be a valid Go identifier.
-	// TODO: This should be a NestedField instead of a string slice, to support pointers and non-slices.
-	OutputKey []string `yaml:"outputKey"`
+	// Pointer and SliceType are not yet supported in these fields.
+	OutputKey NestedField `yaml:"outputKey"`
 
 	// IDField points to the field within each resource struct that stores the ID of that resource
 	IDField Field `yaml:"id"`
@@ -117,9 +117,13 @@ type TagField struct {
 }
 
 // NestedField is a list of nested Fields, where each successive field is a subfield of the previous.
+// Within YAML, if there is only one field, and it only the "Name" field is being set, NestedField can be
+// specified as a single plain string.
 type NestedField []Field
 
-// Field holds a reference to a field in a struct
+// Field holds a reference to a field in a struct.
+// This type supports YAML decoding as a plain string, in which case the string's value will be used for the `Name`
+// and all other struct fields will be set to their zero value.
 type Field struct {
 	// Name is the identifier of the field. It must be a valid exported Go identifier.
 	Name string `yaml:"name"`

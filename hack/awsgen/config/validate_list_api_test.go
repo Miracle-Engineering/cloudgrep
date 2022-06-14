@@ -16,7 +16,7 @@ func TestListAPI_Validate_1(t *testing.T) {
 	}
 	expected := []string{
 		"call is not a valid Go exported identifier: foo",
-		"outputKey is empty",
+		"outputKey cannot be empty",
 		"id: name required",
 		"tags: field cannot be empty",
 		"tags: key required with style=struct",
@@ -29,10 +29,10 @@ func TestListAPI_Validate_1(t *testing.T) {
 func TestListAPI_Validate_2(t *testing.T) {
 	api := ListAPI{
 		Call: "Foo",
-		OutputKey: []string{
-			"Foo",
-			"bar",
-			"",
+		OutputKey: NestedField{
+			Field{Name: "Foo"},
+			Field{Name: "bar", SliceType: "string", Pointer: true},
+			Field{Name: ""},
 		},
 		IDField: Field{
 			Name:      "spam",
@@ -44,8 +44,10 @@ func TestListAPI_Validate_2(t *testing.T) {
 	}
 
 	expected := []string{
-		"outputKey[1] is not a valid Go exported identifier: bar",
-		"outputKey[2] is empty",
+		"outputKey[1]: name is not a valid Go exported identifier: bar",
+		"outputKey[1]: pointer not supported",
+		"outputKey[1]: sliceType not supported",
+		"outputKey[2]: name required",
 		"id: sliceType cannot be present",
 		"id: name is not a valid Go exported identifier: spam",
 		"tags: map style tags not yet supported on listApi",

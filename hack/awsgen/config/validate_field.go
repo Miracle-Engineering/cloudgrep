@@ -5,8 +5,27 @@ import (
 	"fmt"
 )
 
+type fieldValidationOpts struct {
+	slicesProhibited  bool
+	pointerProhibited bool
+}
+
 func (f Field) Validate() []error {
+	return f.validate(fieldValidationOpts{})
+}
+
+func (f Field) validate(opts fieldValidationOpts) []error {
 	var errs []error
+
+	if opts.pointerProhibited && f.Pointer {
+		errs = append(errs, errors.New("pointer not supported"))
+		f.Pointer = false
+	}
+
+	if opts.slicesProhibited && f.SliceType != "" {
+		errs = append(errs, errors.New("sliceType not supported"))
+		f.SliceType = ""
+	}
 
 	if f.SliceType != "" && f.Pointer {
 		errs = append(errs, errors.New("pointer and sliceType are mutually exclusive"))
@@ -26,6 +45,20 @@ func (f Field) Validate() []error {
 }
 
 func (nf NestedField) Validate(ctx string) []error {
+	return nf.validate(ctx, fieldValidationOpts{})
+}
+
+// ValidateSimple is like Validate, but additionally enforces that sliceType and pointer are not set
+func (nf NestedField) ValidateSimple(ctx string) []error {
+	opts := fieldValidationOpts{
+		pointerProhibited: true,
+		slicesProhibited:  true,
+	}
+
+	return nf.validate(ctx, opts)
+}
+
+func (nf NestedField) validate(ctx string, opts fieldValidationOpts) []error {
 	var errs []error
 
 	if nf.Empty() {
@@ -33,7 +66,7 @@ func (nf NestedField) Validate(ctx string) []error {
 	}
 
 	for idx, f := range nf {
-		fieldErrs := f.Validate()
+		fieldErrs := f.validate(opts)
 		ctx := fmt.Sprintf("%s[%d]", ctx, idx)
 		setErrContextExtraPrepend(ctx, fieldErrs)
 		errs = append(errs, fieldErrs...)

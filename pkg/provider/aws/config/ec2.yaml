@@ -9,13 +9,13 @@ types:
       outputKey: [Reservations, Instances]
       id: InstanceId
       tags: &tags
-        field: [Tags]
+        field: Tags
         key: Key
         value: Value
   - name: Volume
     listApi:
       call: DescribeVolumes
       pagination: true
-      outputKey: [Volumes]
+      outputKey: Volumes
       id: "VolumeId"
       tags: *tags

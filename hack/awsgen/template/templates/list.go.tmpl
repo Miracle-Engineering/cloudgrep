@@ -6,11 +6,11 @@ if err != nil {
 
 {{- define "output" }}
 {{- if .IsLast }}
-if err := resourceconverter.{{ .Data.ConvertCall }}(ctx, output, resourceConverter, {{ .IterVar }}.{{ .Current }} {{- .Data.ConvertTail }}); err != nil {
+if err := resourceconverter.{{ .Data.ConvertCall }}(ctx, output, resourceConverter, {{ .IterVar }}.{{ .Current.Name }} {{- .Data.ConvertTail }}); err != nil {
 	return err
 }
 {{- else }}
-for _, {{ .NextIterVar }} := range {{ .IterVar }}.{{ .Current }} {
+for _, {{ .NextIterVar }} := range {{ .IterVar }}.{{ .Current.Name }} {
 	{{- tabindent 1 (include "output" .Next) }}
 }
 {{- end }}

@@ -3,19 +3,16 @@ types:
     listApi:
       call: DescribeDBInstances
       pagination: true
-      outputKey: [DBInstances]
+      outputKey: DBInstances
       id: DBInstanceIdentifier
-      tags:
-        field: [TagList]
+      tags: &tags
+        field: TagList
         key: Key
         value: Value
   - name: DBCluster
     listApi:
       call: DescribeDBClusters
       pagination: true
-      outputKey: [DBClusters]
+      outputKey: DBClusters
       id: DBClusterIdentifier
-      tags:
-        field: [TagList]
-        key: Key
-        value: Value
+      tags: *tags

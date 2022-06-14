@@ -28,15 +28,17 @@ func TestField_Decoding_mapping(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func TestField_Decoding_mappingInvalid(t *testing.T) {
+	in := `{name: foo, pointer: string}`
+
+	err := yaml.Unmarshal([]byte(in), &Field{})
+	assert.ErrorContains(t, err, "cannot unmarshal !!str `string` into bool")
+}
+
 func TestField_Decoding_sequence(t *testing.T) {
-	var actual Field
 	in := "- foo\n- bar"
-	err := yaml.Unmarshal([]byte(in), &actual)
+	err := yaml.Unmarshal([]byte(in), &Field{})
 	assert.ErrorContains(t, err, "unexpected node kind")
-
-	expected := Field{}
-
-	assert.Equal(t, expected, actual)
 }
 
 func TestField_Decoding_noName(t *testing.T) {
@@ -73,6 +75,36 @@ func TestNestedField_Last(t *testing.T) {
 	nf = append(nf, Field{Name: "foo"}, Field{Name: "bar"})
 	last := nf.Last()
 	assert.Equal(t, "bar", last.Name)
+}
+
+func TestNestedField_Decoding_string(t *testing.T) {
+	in := "foo"
+	expected := NestedField{Field{Name: "foo"}}
+
+	var actual NestedField
+	err := yaml.Unmarshal([]byte(in), &actual)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, actual)
+}
+
+func TestNestedField_Decoding_map(t *testing.T) {
+	in := "name: foo"
+
+	err := yaml.Unmarshal([]byte(in), &NestedField{})
+	assert.ErrorContains(t, err, "unexpected node kind")
+}
+
+func TestNestedField_Decoding_list(t *testing.T) {
+	in := "- foo\n- name: bar\n  pointer: true"
+	expected := NestedField{
+		Field{Name: "foo"},
+		Field{Name: "bar", Pointer: true},
+	}
+
+	var actual NestedField
+	err := yaml.Unmarshal([]byte(in), &actual)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, actual)
 }
 
 func TestTagField_Zero(t *testing.T) {

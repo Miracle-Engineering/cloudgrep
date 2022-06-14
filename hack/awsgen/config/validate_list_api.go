@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"fmt"
 )
 
 func (api ListAPI) Validate() []error {
@@ -24,22 +23,7 @@ func validateListAPICall(api ListAPI) []error {
 }
 
 func validateListAPIOutputKey(api ListAPI) []error {
-	var errs []error
-
-	if len(api.OutputKey) == 0 {
-		errs = append(errs, errors.New("outputKey is empty"))
-	}
-
-	for idx, key := range api.OutputKey {
-		ref := fmt.Sprintf("outputKey[%d]", idx)
-		if len(key) == 0 {
-			errs = append(errs, fmt.Errorf("%s is empty", ref))
-		} else {
-			errs = append(errs, validateExportedIdentifier(ref, key)...)
-		}
-	}
-
-	return errs
+	return api.OutputKey.ValidateSimple("outputKey")
 }
 
 func validateListAPIIDField(api ListAPI) []error {

@@ -3,7 +3,7 @@ types:
     listApi:
       call: ListFunctions
       pagination: true
-      outputKey: [Functions]
+      outputKey: Functions
       id: FunctionArn
     getTagsApi:
       type: FunctionConfiguration
@@ -11,4 +11,4 @@ types:
       inputIDField: FunctionName
       tags:
         style: map
-        field: [Tags]
+        field: Tags

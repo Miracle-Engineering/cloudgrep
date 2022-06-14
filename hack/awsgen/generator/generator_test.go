@@ -29,7 +29,7 @@ func TestGenerator(t *testing.T) {
 								},
 							},
 							Pagination: true,
-							OutputKey:  []string{"Spam", "Ham"},
+							OutputKey:  config.NestedField{config.Field{Name: "Spam"}, config.Field{Name: "Ham"}},
 							IDField: config.Field{
 								Name:    "ID",
 								Pointer: true,
