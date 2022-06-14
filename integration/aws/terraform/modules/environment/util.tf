@@ -1,7 +1,7 @@
 data "aws_region" "current" {}
 resource "aws_default_vpc" "default" {
   tags = {
-    "test": "vpc-default"
+    "test" : "vpc-default"
   }
 }
 
