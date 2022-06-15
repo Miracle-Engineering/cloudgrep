@@ -1,4 +1,4 @@
-# development notes
+# Developing
 
 This application provides a single binary that contains the backend and the frontend.
 
@@ -10,11 +10,14 @@ The project structure is inspired by https://github.com/sosedoff/pgweb
     ├── cmd                                  # CLI semi-generated framework (also Golang)
     ├── hack                                 # Tools for development
     ├── pkg                                  # Backend: Golang
+    ├── fe                                   # Frontend: React frontend code
     ├── static                               # Frontend: Static assets
     ├── main.go                              # Executable main function
     └── Makefile                             # Defines the tasks to be executed - for local or CI run
 
-## Start the server
+## Backend
+
+### Starting the server
 
 ```shell
 # using local code
@@ -26,6 +29,15 @@ make run
 make build
 ./cloudgrep
 ```
+
+### Running Tests
+
+```shell
+make test
+```
+
+## Frontend
+Checkout the frontend development guide [here](https://github.com/run-x/cloudgrep/blob/main/fe/README.md)
 
 ### AWS Resource supported
 
@@ -43,6 +55,9 @@ make build
 ![design diagram](img/cloudgrep-design.png)
 
 All of these boxes are implemented as distinct Go packages, except for UI which is a JS app.
+
+## API
+API design is documented [here](https://github.com/run-x/cloudgrep/blob/main/API.md)
 
 ## Configure a new AWS resource
 1. If the resource you are adding is for a new, wholly unsupported service, add a new item in the `services` list in the `pkg/provider/aws/config.yaml` file, and then create a new file with `.yaml` appended to the service name in the same directory.
