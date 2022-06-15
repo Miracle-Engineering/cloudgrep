@@ -26,6 +26,8 @@ type SQLiteStore struct {
 	//fetchedAt is the last time the resources were fetched
 	fetchedAt time.Time
 	lock      sync.Mutex
+	runId     string
+	muEvent   sync.Mutex
 }
 
 func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLiteStore, error) {
@@ -55,7 +57,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	}
 
 	// Migrate the schema
-	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.EngineStatus{}); err != nil {
+	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.Event{}); err != nil {
 		return nil, fmt.Errorf("can't create the SQLite data model: %w", err)
 	}
 
@@ -431,4 +433,58 @@ func (s *SQLiteStore) GetEngineStatus(context.Context) (model.EngineStatus, erro
 		return model.EngineStatus{}, fmt.Errorf("can't fetch engine status' : %w", db.Error)
 	}
 	return status, nil
+}
+
+func (s *SQLiteStore) EngineStatus(ctx context.Context) (model.Event, error) {
+	var resourceEvents model.Events
+	result := s.db.
+		Model(&model.Event{}).
+		Find(&resourceEvents, model.Event{RunId: s.runId, Type: model.EventTypeResource})
+	if result.Error != nil {
+		return model.Event{}, fmt.Errorf("error while reading event from database %w", result.Error)
+	}
+	providerEvents := resourceEvents.AggregateResourceEvents()
+	var otherProviderEvents model.Events
+	result = s.db.
+		Model(&model.Event{}).
+		Find(&otherProviderEvents, model.Events{
+			model.Event{RunId: s.runId, Type: model.EventTypeProvider, Status: model.EventStatusFetching},
+			model.Event{RunId: s.runId, Type: model.EventTypeProvider, Status: model.EventStatusFailed}})
+	if result.Error != nil {
+		return model.Event{}, fmt.Errorf("error while reading event from database %w", result.Error)
+	}
+	providerEvents = append(providerEvents, otherProviderEvents...)
+	var engineEvent model.Event
+	result = s.db.
+		Model(&model.Event{}).
+		Find(&engineEvent, model.Event{RunId: s.runId, Type: model.EventTypeEngine})
+	engineEvent.AddChildEvents(providerEvents)
+	return engineEvent, nil
+}
+
+func (s *SQLiteStore) WriteEvent(ctx context.Context, event model.Event) error {
+	s.muEvent.Lock()
+	defer s.muEvent.Unlock()
+	if event.Type == model.EventTypeEngine && event.Status == model.EventStatusFetching {
+		s.runId = event.RunId
+	}
+	event.RunId = s.runId
+
+	var engineEvent model.Event
+	result := s.db.Model(&model.Event{}).
+		Find(&engineEvent, model.Event{
+			RunId:        s.runId,
+			Type:         event.Type,
+			ProviderName: event.ProviderName,
+			ResourceType: event.ResourceType,
+		})
+	if result.Error != nil {
+		return fmt.Errorf("error occured while fetching event from database %w", result.Error)
+	}
+	event.Id = engineEvent.Id
+	result = s.db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&event)
+	if result.Error != nil {
+		return fmt.Errorf("error occured while upserting events into database %w", result.Error)
+	}
+	return nil
 }

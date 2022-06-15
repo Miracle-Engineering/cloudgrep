@@ -2,7 +2,9 @@ package config
 
 import (
 	_ "embed"
+	"fmt"
 	"gopkg.in/yaml.v2"
+	"strings"
 )
 
 //go:embed config.yaml
@@ -19,6 +21,13 @@ type Config struct {
 type Provider struct {
 	Cloud   string   `yaml:"cloud"`
 	Regions []string `yaml:"regions"`
+}
+
+func (p *Provider) String() string {
+	if strings.Join(p.Regions, "-") == "" {
+		return p.Cloud
+	}
+	return fmt.Sprintf("%s-%s", p.Cloud, strings.Join(p.Regions, "-"))
 }
 
 type Datastore struct {
