@@ -41,10 +41,10 @@ load-test:
 
 
 run:
-	go run main.go
+	go run -race main.go
 
 version:
-	@go run main.go --version
+	@go run -race main.go --version
 
 frontend-build:
 	docker run -v "$(PWD)/fe":/usr/src/app -w /usr/src/app node:18 npm install
@@ -66,7 +66,7 @@ build: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
 build: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
 build: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
 build:
-	go build -ldflags "$(LDFLAGS)"
+	go build -race -ldflags "$(LDFLAGS)"
 	@echo "You can now execute ./cloudgrep"
 
 release: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GITHUB_SHA)
@@ -125,4 +125,4 @@ clean:
 	@rm -rf ./bin/*
 
 awsgen:
-	go run ./hack/awsgen --config pkg/provider/aws/config/config.yaml --output-dir pkg/provider/aws
+	CGO_ENABLED=1 go run -race ./hack/awsgen --config pkg/provider/aws/config/config.yaml --output-dir pkg/provider/aws
