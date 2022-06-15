@@ -68,7 +68,7 @@ See more options:
 ```
 
 # Development
-We love user contributions! Check out our [TBD - Contributing](https://github.com/run-x/opta/blob/main/CONTRIBUTING.md) and [TBD - Dev guide](https://github.com/run-x/opta/blob/main/development.md) to get started.
+We love user contributions! Check out our [Dev guide](https://github.com/run-x/cloudgrep/blob/main/DEVELOP.md) to get started.
 
 # Important Resources
 * [The Opta Team](https://www.runx.dev/about)
