@@ -9,8 +9,6 @@ const initialState: TagState = {
 	tagResource: { Tags: [], Resources: [] },
 	fields: [],
 	filterTags: [],
-	limit: 0,
-	offset: 0,
 };
 
 const tagsSlice = createSlice({

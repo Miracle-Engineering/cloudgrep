@@ -12,6 +12,8 @@ type Config struct {
 	Providers []Provider `yaml:"providers"`
 	Datastore Datastore  `yaml:"datastore"`
 	Web       Web        `yaml:"web"`
+	// Adding regions as where cli regions override will be stored
+	Regions []string
 }
 
 type Provider struct {
@@ -39,5 +41,6 @@ func GetDefault() (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
+	config.Regions = []string{}
 	return config, err
 }

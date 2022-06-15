@@ -53,6 +53,9 @@ their cloud accounts.`,
 	flags.String("bind", defaultConfig.Web.Host, "Host to bind on")
 	_ = viper.BindPFlag("web.host", flags.Lookup("bind"))
 
+	flags.StringP("regions", "r", "", "Comma separated list of regions to scan")
+	_ = viper.BindPFlag("regions", flags.Lookup("regions"))
+
 	flags.IntP("port", "p", defaultConfig.Web.Port, "Port to use")
 	_ = viper.BindPFlag("web.port", flags.Lookup("port"))
 

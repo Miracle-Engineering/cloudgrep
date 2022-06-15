@@ -8,12 +8,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/run-x/cloudgrep/pkg/engine"
 	"go.uber.org/zap"
 
 	"github.com/run-x/cloudgrep/pkg/api"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
+	"github.com/run-x/cloudgrep/pkg/engine"
 	"github.com/run-x/cloudgrep/pkg/util"
 )
 

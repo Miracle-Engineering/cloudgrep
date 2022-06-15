@@ -29,9 +29,12 @@ func TestRootCommand(t *testing.T) {
 	runCmd = dummyRunCmd
 	defaultConfig, _ := config.GetDefault()
 	newPortConfig, _ := config.GetDefault()
+	newRegionsConfig, _ := config.GetDefault()
+	newRegionsConfig.Regions = []string{"us-west-1", "us-west-2"}
 	newPortConfig.Web.Port = 8081
 	var userConfig config.Config
 	assert.NoError(t, yaml.Unmarshal(EmbedConfig, &userConfig))
+	userConfig.Regions = []string{}
 
 	testCases := []struct {
 		name    string
@@ -41,6 +44,8 @@ func TestRootCommand(t *testing.T) {
 	}{
 		{"AllGood", defaultConfig, false, []string{}},
 		{"AllGoodVerbose", defaultConfig, true, []string{"-v"}},
+		{"Regions", newRegionsConfig, false, []string{"--regions", "us-west-1,us-west-2"}},
+		{"RegionsShorthand", newRegionsConfig, false, []string{"-r", "us-west-1,us-west-2"}},
 		{"NewPort", newPortConfig, false, []string{"--port", "8081"}},
 		{"NewPortShortHand", newPortConfig, false, []string{"-p", "8081"}},
 		{"NewPortVerbose", newPortConfig, true, []string{"-v", "-p", "8081"}},

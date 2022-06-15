@@ -7,42 +7,73 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/smithy-go"
+
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
-func (p *Provider) FetchS3Buckets(ctx context.Context, output chan<- model.Resource) error {
-	resourceType := "s3.Bucket"
-	s3Client := s3.NewFromConfig(p.config)
-	input := &s3.ListBucketsInput{}
-	result, err := s3Client.ListBuckets(ctx, input)
-	if err != nil {
-		return fmt.Errorf("failed to fetch S3 buckets: %w", err)
+func (p *Provider) register_s3(mapping map[string]mapper) {
+	mapping["s3.Bucket"] = mapper{
+		FetchFunc: p.fetch_s3_Bucket,
+		IdField:   "Name",
+		IsGlobal:  true,
 	}
+}
 
-	resourceConverter := p.converterFor(resourceType)
-	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, result.Buckets, p.FetchS3BucketsTag); err != nil {
+func (p *Provider) fetch_s3_Bucket(ctx context.Context, output chan<- model.Resource) error {
+	client := s3.NewFromConfig(p.config)
+	input := &s3.ListBucketsInput{}
+
+	resourceConverter := p.converterFor("s3.Bucket")
+	results, err := client.ListBuckets(ctx, input)
+	if err != nil {
+		return fmt.Errorf("failed to fetch %s: %w", "s3.Bucket", err)
+	}
+	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, results.Buckets, p.getTags_s3_Bucket); err != nil {
 		return err
 	}
 
 	return nil
 }
-
-func (p *Provider) FetchS3BucketsTag(ctx context.Context, bucket types.Bucket) (model.Tags, error) {
-	s3Client := s3.NewFromConfig(p.config)
-	output, err := s3Client.GetBucketTagging(ctx, &s3.GetBucketTaggingInput{Bucket: bucket.Name})
+func (p *Provider) getTags_s3_Bucket(ctx context.Context, resource types.Bucket) (model.Tags, error) {
+	client := s3.NewFromConfig(p.config)
+	locationInput := &s3.GetBucketLocationInput{Bucket: resource.Name}
+	locationOutput, err := client.GetBucketLocation(ctx, locationInput)
 	if err != nil {
-		var ae smithy.APIError
-		if errors.As(err, &ae) {
-			if ae.ErrorCode() == "NoSuchTagSet" {
+		return nil, fmt.Errorf("failed to get %s location: %w", "s3.Bucket", err)
+	}
+	tempConfig := p.config.Copy()
+	switch location := locationOutput.LocationConstraint; location {
+	case "":
+		tempConfig.Region = "us-east-1"
+	default:
+		tempConfig.Region = string(location)
+	}
+	client = s3.NewFromConfig(tempConfig)
+
+	input := &s3.GetBucketTaggingInput{}
+	input.Bucket = resource.Name
+
+	output, err := client.GetBucketTagging(ctx, input)
+	if err != nil {
+		var apiErr smithy.APIError
+		if errors.As(err, &apiErr) {
+			if apiErr.ErrorCode() == "NoSuchTagSet" {
 				return nil, nil
 			}
 		}
-		return nil, fmt.Errorf("failed to fetch tags for S3 bucket %v: %w", *bucket.Name, err)
+		return nil, fmt.Errorf("failed to fetch %s tags: %w", "s3.Bucket", err)
 	}
+	tagField_0 := output.TagSet
+
 	var tags model.Tags
-	for _, t := range output.TagSet {
-		tags = append(tags, model.Tag{Key: *t.Key, Value: *t.Value})
+
+	for _, field := range tagField_0 {
+		tags = append(tags, model.Tag{
+			Key:   *field.Key,
+			Value: *field.Value,
+		})
 	}
+
 	return tags, nil
 }

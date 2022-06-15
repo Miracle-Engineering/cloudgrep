@@ -44,11 +44,11 @@ const InsightTable: FC = () => {
 				currentPage * PAGE_LENGTH,
 				PAGE_LENGTH
 			);
-			if (response?.data && response.data.length > 0) {
+			if (response?.data?.resources && response.data.resources.length > 0) {
 				setHasNext(true);
 				dispatch(
 					getFilteredResourcesNextPage({
-						resources: response.data,
+						resources: response.data.resources,
 						limit: PAGE_LENGTH,
 						offset: currentPage * PAGE_LENGTH,
 					})

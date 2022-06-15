@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/run-x/cloudgrep/pkg/config"
@@ -37,6 +39,7 @@ func prepareApiUnitTest(t *testing.T) *mockApi {
 	router := gin.Default()
 	resources := testdata.GetResources(t)
 	mockApi := mockApi{
+		ctx:       ctx,
 		router:    router,
 		ds:        ds,
 		resources: resources,
@@ -50,32 +53,51 @@ func prepareApiUnitTest(t *testing.T) *mockApi {
 }
 
 type mockApi struct {
+	ctx       context.Context
 	router    *gin.Engine
 	ds        datastore.Datastore
 	resources model.Resources
 	//if set calling the engine will return it
 	engineErr error
-	//incremented every time the engine runs
-	engineRuns int
 }
 
 //runEngine simulates running the engine by writing resources to the datastore
 func (m *mockApi) runEngine(ctx context.Context) error {
-	m.engineRuns = m.engineRuns + 1
-	if m.engineErr != nil {
-		return m.engineErr
-	}
 	//simulate running the engine
 	err := m.ds.WriteEngineStatusStart(ctx, "engine")
 	if err != nil {
 		return err
 	}
-	err = m.ds.WriteResources(ctx, m.resources)
+	if m.engineErr == nil {
+		err = m.ds.WriteResources(ctx, m.resources)
+	} else {
+		err = m.engineErr
+	}
+	//for testing async simulate a longer run by waiting
+	time.Sleep(10 * time.Millisecond)
+
+	defer func() {
+		err := m.ds.WriteEngineStatusEnd(ctx, "engine", err)
+		if err != nil {
+			log.Default().Println(err.Error())
+		}
+	}()
+
 	if err != nil {
 		return err
 	}
-	err = m.ds.WriteEngineStatusEnd(ctx, "engine", err)
-	return err
+
+	return nil
+}
+
+func (m *mockApi) waitForEngine(status string) {
+	for {
+		statusResp, _ := m.ds.GetEngineStatus(m.ctx)
+		if statusResp.Status == status {
+			break
+		}
+		time.Sleep(time.Millisecond)
+	}
 }
 
 func TestStatsRoute(t *testing.T) {
@@ -107,12 +129,13 @@ func TestResourcesRoute(t *testing.T) {
 		require.NoError(t, err)
 		m.router.ServeHTTP(w, req)
 		require.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-		var body model.Resources
+		var body model.ResourcesResponse
 		err = json.Unmarshal(w.Body.Bytes(), &body)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
-		require.Equal(t, len(body), 3)
-		testingutil.AssertEqualsResources(t, body, resources)
+		require.Equal(t, len(body.Resources), 3)
+		require.Equal(t, body.Count, 3)
+		testingutil.AssertEqualsResources(t, body.Resources, resources)
 	})
 }
 
@@ -143,11 +166,12 @@ func TestResourcesPostRoute(t *testing.T) {
 		require.NoError(t, err)
 		m.router.ServeHTTP(w, req)
 		require.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-		var response model.Resources
+		var response model.ResourcesResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
-		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, response)
+		require.Equal(t, 2, response.Count)
+		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, response.Resources)
 	})
 
 	t.Run("FilterEmpty", func(t *testing.T) {
@@ -159,11 +183,11 @@ func TestResourcesPostRoute(t *testing.T) {
 		require.NoError(t, err)
 		m.router.ServeHTTP(w, req)
 		require.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-		var response model.Resources
+		var response model.ResourcesResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
-		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response)
+		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response.Resources)
 	})
 
 	t.Run("NoBody", func(t *testing.T) {
@@ -173,11 +197,11 @@ func TestResourcesPostRoute(t *testing.T) {
 		require.NoError(t, err)
 		m.router.ServeHTTP(w, req)
 		require.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-		var response model.Resources
+		var response model.ResourcesResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, w.Code)
-		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response)
+		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2, resourceBucket}, response.Resources)
 	})
 }
 
@@ -275,7 +299,6 @@ func TestRefreshPostRoute(t *testing.T) {
 
 	t.Run("Success", func(t *testing.T) {
 		m := prepareApiUnitTest(t)
-		engineRuns := m.engineRuns
 		//trigger a refresh
 		record := httptest.NewRecorder()
 		req, err := http.NewRequest("POST", refreshPath, nil)
@@ -283,13 +306,15 @@ func TestRefreshPostRoute(t *testing.T) {
 		m.router.ServeHTTP(record, req)
 		require.Equal(t, "", record.Header().Get("Content-Type"))
 		require.Equal(t, http.StatusOK, record.Code)
-		//check that the state is in success
+		//wait for engine to complete
+		m.waitForEngine("fetching")
+		m.waitForEngine("success")
+
+		//check that the status api returns success
 		record = httptest.NewRecorder()
 		req, err = http.NewRequest("GET", engineStatusPath, nil)
 		require.NoError(t, err)
 		m.router.ServeHTTP(record, req)
-		//check engine was run
-		require.Equal(t, engineRuns+1, m.engineRuns)
 		require.Equal(t, "application/json; charset=utf-8", record.Header().Get("Content-Type"))
 		require.Equal(t, http.StatusOK, record.Code)
 		body := make(map[string]interface{})
@@ -298,23 +323,68 @@ func TestRefreshPostRoute(t *testing.T) {
 		require.Equal(t, "", body["errorMessage"])
 	})
 
-	t.Run("EngineError", func(t *testing.T) {
+	t.Run("Engine Error", func(t *testing.T) {
 		//test an error while refreshing
 		m := prepareApiUnitTest(t)
-		engineRuns := m.engineRuns
+		//configure an error in the engine
 		m.engineErr = fmt.Errorf("There was an engine error")
 		record := httptest.NewRecorder()
 		req, err := http.NewRequest("POST", refreshPath, nil)
 		require.NoError(t, err)
 		m.router.ServeHTTP(record, req)
+
 		//check engine was run
-		require.Equal(t, engineRuns+1, m.engineRuns)
+		require.Equal(t, "", record.Header().Get("Content-Type"))
+		require.Equal(t, http.StatusOK, record.Code)
+
+		//wait for engine to complete
+		m.waitForEngine("fetching")
+		m.waitForEngine("failed")
+
+		//check that the status api returns the error
+		record = httptest.NewRecorder()
+		req, err = http.NewRequest("GET", engineStatusPath, nil)
+		require.NoError(t, err)
+		m.router.ServeHTTP(record, req)
 		require.Equal(t, "application/json; charset=utf-8", record.Header().Get("Content-Type"))
-		require.Equal(t, http.StatusBadRequest, record.Code)
+		require.Equal(t, http.StatusOK, record.Code)
 		body := make(map[string]interface{})
 		require.NoError(t, json.Unmarshal(record.Body.Bytes(), &body))
-		require.Equal(t, float64(400), body["status"])
-		require.Equal(t, "There was an engine error", body["error"])
+		require.Equal(t, "failed", body["status"])
+		require.Equal(t, "There was an engine error", body["errorMessage"])
 	})
 
+	t.Run("Engine Already Running", func(t *testing.T) {
+		m := prepareApiUnitTest(t)
+		record := httptest.NewRecorder()
+		req, err := http.NewRequest("POST", refreshPath, nil)
+		require.NoError(t, err)
+		m.router.ServeHTTP(record, req)
+		require.Equal(t, http.StatusOK, record.Code)
+		//the engine is still running at this point
+		m.waitForEngine("fetching")
+
+		//refresh again - it should respond "engine already running"
+		record = httptest.NewRecorder()
+		req, err = http.NewRequest("POST", refreshPath, nil)
+		require.NoError(t, err)
+		m.router.ServeHTTP(record, req)
+		require.Equal(t, http.StatusAccepted, record.Code)
+		body := make(map[string]interface{})
+		require.NoError(t, json.Unmarshal(record.Body.Bytes(), &body))
+		require.Equal(t, float64(202), body["status"])
+		require.Equal(t, "engine is already running", body["error"])
+
+		//check that the status api returns "fetching"
+		record = httptest.NewRecorder()
+		req, err = http.NewRequest("GET", engineStatusPath, nil)
+		require.NoError(t, err)
+		m.router.ServeHTTP(record, req)
+		require.Equal(t, "application/json; charset=utf-8", record.Header().Get("Content-Type"))
+		require.Equal(t, http.StatusOK, record.Code)
+		body = make(map[string]interface{})
+		require.NoError(t, json.Unmarshal(record.Body.Bytes(), &body))
+		require.Equal(t, "fetching", body["status"])
+		require.Equal(t, "", body["errorMessage"])
+	})
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/smithy-go"
 	cfg "github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/provider/types"
@@ -79,11 +80,17 @@ func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]
 	}
 	logger.Sugar().Infof("Will look in regions %v", regions)
 	var providers []types.Provider
+	awsPartition := endpoints.AwsPartition()
+	officialRegions := awsPartition.Regions()
 	for _, region := range regions {
+		if _, ok := officialRegions[region]; !ok && region != "global" {
+			return nil, util.AddStackTrace(fmt.Errorf("invalid AWS region: %v", region))
+		}
 		newConfig := defaultConfig.Copy()
 		if region != "global" {
 			newConfig.Region = region
 		}
+		logger.Sugar().Infof("Creating provider for AWS region %v", region)
 		newProvider := Provider{isGlobal: region == "global", config: newConfig, accountId: *identity.Account}
 		providers = append(providers, newProvider)
 	}

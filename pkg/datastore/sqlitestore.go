@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -22,8 +24,8 @@ type SQLiteStore struct {
 	db      *gorm.DB
 	indexer resourceIndexer
 	//fetchedAt is the last time the resources were fetched
-	fetchedAt  time.Time
-	muResource sync.Mutex
+	fetchedAt time.Time
+	lock      sync.Mutex
 }
 
 func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLiteStore, error) {
@@ -46,7 +48,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	s.logger = zapLogger
 	//create the DB client
 	var err error
-	s.db, err = gorm.Open(sqlite.Open(cfg.Datastore.DataSourceName),
+	s.db, err = gorm.Open(sqlite.Open(s.formatDSN(cfg.Datastore.DataSourceName)),
 		&gorm.Config{Logger: gormLogger})
 	if err != nil {
 		return nil, fmt.Errorf("can't create the SQLite database: %w", err)
@@ -66,6 +68,17 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	return &s, nil
 }
 
+func (s *SQLiteStore) formatDSN(dsn string) string {
+	if strings.HasPrefix(dsn, "~/") {
+		dirname, err := os.UserHomeDir()
+		if err != nil {
+			panic(fmt.Errorf("could not handle searching for home directory: %w", err))
+		}
+		dsn = filepath.Join(dirname, dsn[2:])
+	}
+	return os.ExpandEnv(dsn)
+}
+
 func (s *SQLiteStore) Ping() error {
 	db, err := s.db.DB()
 	if err != nil {
@@ -75,7 +88,7 @@ func (s *SQLiteStore) Ping() error {
 }
 
 func (s *SQLiteStore) getResourcesById(ctx context.Context, ids []model.ResourceId) ([]*model.Resource, error) {
-	var resources []*model.Resource
+	resources := make([]*model.Resource, 0)
 	if len(ids) == 0 {
 		return resources, nil
 	}
@@ -107,8 +120,8 @@ func (s *SQLiteStore) WriteResources(ctx context.Context, resources model.Resour
 		//nothing to write
 		return nil
 	}
-	s.muResource.Lock()
-	defer s.muResource.Unlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
 	var count int64
 	err := s.db.Transaction(func(tx *gorm.DB) error {
@@ -290,15 +303,19 @@ func (s *SQLiteStore) GetFields(context.Context) (model.FieldGroups, error) {
 	return fieldGroups.AddNullValues(), nil
 }
 
-func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) (model.Resources, error) {
-	ids, err := s.indexer.findResourceIds(*s.db, s.logger, jsonQuery)
+func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) (model.ResourcesResponse, error) {
+	ids, totalCount, err := s.indexer.findResourceIds(*s.db, s.logger, jsonQuery)
 	if err != nil {
-		return nil, err
+		return model.ResourcesResponse{}, err
 	}
-	return s.getResourcesById(ctx, ids)
+	resources, err := s.getResourcesById(ctx, ids)
+	return model.ResourcesResponse{Count: totalCount, Resources: resources}, err
 }
 
 func (s *SQLiteStore) WriteEngineStatusStart(ctx context.Context, resource string) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	status := model.NewEngineStatus(model.EngineStatusFetching, resource, nil)
 	s.logger.Sugar().Infow("Writing Engine Status: ",
 		zap.Any("status", status),
@@ -317,15 +334,15 @@ func (s *SQLiteStore) WriteEngineStatusStart(ctx context.Context, resource strin
 }
 
 func (s *SQLiteStore) WriteEngineStatusEnd(ctx context.Context, resource string, err error) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	var status model.EngineStatus
 	if err != nil {
 		status = model.NewEngineStatus(model.EngineStatusFailed, resource, err)
 	} else {
 		status = model.NewEngineStatus(model.EngineStatusSuccess, resource, nil)
 	}
-	s.logger.Sugar().Infow("Writing Engine Status: ",
-		zap.Any("status", status),
-	)
 	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
 	if result.RowsAffected == 1 {
 		result = s.db.Model(&status).Updates(status)
@@ -406,6 +423,8 @@ func (s *SQLiteStore) deleteResourcesBefore(before time.Time) (int, error) {
 }
 
 func (s *SQLiteStore) GetEngineStatus(context.Context) (model.EngineStatus, error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	var status model.EngineStatus
 	db := s.db.Model(&model.EngineStatus{}).Select("*").Order("fetched_at desc").Last(&status)
 	if db.Error != nil {

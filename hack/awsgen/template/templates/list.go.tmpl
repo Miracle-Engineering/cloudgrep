@@ -1,0 +1,65 @@
+{{- define "handleErr" }}
+if err != nil {
+	return fmt.Errorf("failed to fetch %s: %w", {{ . | quote }}, err)
+}
+{{- end }}
+
+{{- define "output" }}
+{{- if .IsLast }}
+if err := resourceconverter.{{ .Data.ConvertCall }}(ctx, output, resourceConverter, {{ .IterVar }}.{{ .Current.Name }} {{- .Data.ConvertTail }}); err != nil {
+	return err
+}
+{{- else }}
+for _, {{ .NextIterVar }} := range {{ .IterVar }}.{{ .Current.Name }} {
+	{{- tabindent 1 (include "output" .Next) }}
+}
+{{- end }}
+{{- end }}
+
+func (p *{{ .ProviderName}}) {{ .FuncName }}(ctx context.Context, output chan<- model.Resource) error {
+	client := {{ .ServicePkg }}.NewFromConfig(p.config)
+	input := &{{ .ServicePkg }}.{{ .APIAction }}Input{}
+
+	{{- range $name, $funcName := .InputOverrides.FieldFuncs }}
+	input.{{ $name }} = {{ $funcName }}()
+	{{- end }}
+
+	{{- range .InputOverrides.FullFuncs }}
+	{
+		var err error {{/* make sure the func returns an error */}}
+		if err = {{ . }}(input); err != nil {
+			return fmt.Errorf("error overriding input with %s(input) for %s", {{ . | quote }}, {{ $.ResourceName | quote }})
+		}
+	}
+	{{- end }}
+
+	resourceConverter := p.converterFor({{ .ResourceName | quote }})
+
+	{{- $convertCall := "SendAllConverted" }}
+	{{- $convertTail := "" }}
+
+	{{- if .TagFuncName }}
+		{{- $convertCall = "SendAllConvertedTags" }}
+		{{- $convertTail = (cat ", p." .TagFuncName) }}
+	{{- end }}
+
+	{{- quiet (.OutputKey.SetData "ConvertCall" $convertCall) }}
+	{{- quiet (.OutputKey.SetData "ConvertTail" $convertTail) }}
+
+	{{- if .Paginated }}
+	paginator := {{ .ServicePkg }}.New{{ .APIAction }}Paginator(client, input)
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+		{{ include "handleErr" .ResourceName | tabindent 2 }}
+
+		{{ include "output" (.OutputKey.WithRoot "page") | tabindent 2 }}
+	}
+	{{- else }}
+	results, err := client.{{ .APIAction }}(ctx, input)
+	{{- include "handleErr" .ResourceName | tabindent 1 }}
+
+	{{- include "output" (.OutputKey.WithRoot "results") | tabindent 1 }}
+	{{- end }}
+
+	return nil
+}

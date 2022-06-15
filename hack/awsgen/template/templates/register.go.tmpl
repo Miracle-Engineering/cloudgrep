@@ -1,0 +1,5 @@
+func (p *{{ .ProviderName }}) registerGeneratedTypes(mapping map[string]mapper) {
+	{{- range .RegisterFuncNames }}
+	p.{{ . }}(mapping)
+	{{- end }}
+}

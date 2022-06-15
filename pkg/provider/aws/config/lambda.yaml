@@ -1,0 +1,14 @@
+types:
+  - name: Function
+    listApi:
+      call: ListFunctions
+      pagination: true
+      outputKey: Functions
+      id: FunctionArn
+    getTagsApi:
+      type: FunctionConfiguration
+      call: GetFunction
+      inputIDField: FunctionName
+      tags:
+        style: map
+        field: Tags

@@ -1,0 +1,5 @@
+services:
+- ec2
+- elb
+- lambda
+- rds
