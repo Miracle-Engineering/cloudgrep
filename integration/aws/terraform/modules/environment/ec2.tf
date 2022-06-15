@@ -11,6 +11,7 @@ resource "aws_launch_template" "amz_arm" {
 
   network_interfaces {
     associate_public_ip_address = false
+    security_groups             = [module.vpc.default_sg_id]
   }
 
   tag_specifications {
@@ -33,15 +34,16 @@ resource "aws_launch_template" "amz_arm" {
   }
 }
 
-
 resource "aws_autoscaling_group" "test" {
   count = local.ec2_instance_count
 
-  name_prefix        = "testing-${count.index}-"
-  availability_zones = ["us-east-1a"]
-  desired_capacity   = 1
-  max_size           = 1
-  min_size           = 1
+  name_prefix = "testing-${count.index}-"
+  vpc_zone_identifier = [
+    module.vpc.private_subnet_az_map["us-east-1a"]
+  ]
+  desired_capacity = 1
+  max_size         = 1
+  min_size         = 1
 
   launch_template {
     id      = aws_launch_template.amz_arm[count.index].id
