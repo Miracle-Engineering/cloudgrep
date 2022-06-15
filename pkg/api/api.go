@@ -125,6 +125,7 @@ func EngineStatus(c *gin.Context) {
 func Refresh(c *gin.Context) {
 
 	ds := c.MustGet("datastore").(datastore.Datastore)
+	logger := c.MustGet("logger").(*zap.Logger)
 	status, err := ds.GetEngineStatus(c)
 	if err != nil {
 		badRequest(c, err)
@@ -136,7 +137,10 @@ func Refresh(c *gin.Context) {
 	}
 	engineFunc := c.MustGet("engineFunc").(EngineFunc)
 	//run this process async - the UI will call EngineStatus api to check the result
-	go engineFunc(c)
+	go func() {
+		err := engineFunc(c)
+		logger.Sugar().Errorw("some error(s) when running the provider engine", "error", err)
+	}()
 	c.Status(http.StatusOK)
 
 }

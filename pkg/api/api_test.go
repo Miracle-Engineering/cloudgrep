@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -75,7 +76,13 @@ func (m *mockApi) runEngine(ctx context.Context) error {
 	//for testing async simulate a longer run by waiting
 	time.Sleep(10 * time.Millisecond)
 
-	defer m.ds.WriteEngineStatusEnd(ctx, "engine", err)
+	defer func() {
+		err := m.ds.WriteEngineStatusEnd(ctx, "engine", err)
+		if err != nil {
+			log.Default().Println(err.Error())
+		}
+	}()
+
 	if err != nil {
 		return err
 	}
