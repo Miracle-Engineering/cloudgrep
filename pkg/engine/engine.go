@@ -36,13 +36,21 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 	for _, c := range cfg.Providers {
 		// create a providers
 		providerEvent := model.NewEvent(model.EventTypeProvider, c.String(), "")
-		_ = datastore.WriteEvent(ctx, providerEvent)
+		err = datastore.WriteEvent(ctx, providerEvent)
+		if err != nil {
+			log.Default().Println(err.Error())
+			return e, err
+		}
 		providers, err := provider.NewProviders(ctx, c, logger)
 		providerEvent.UpdateError(err)
 		if err == nil {
 			e.Providers = append(e.Providers, providers...)
 		}
-		_ = datastore.WriteEvent(ctx, providerEvent)
+		err = datastore.WriteEvent(ctx, providerEvent)
+		if err != nil {
+			log.Default().Println(err.Error())
+			return e, err
+		}
 	}
 	return e, nil
 }
