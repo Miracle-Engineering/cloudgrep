@@ -65,6 +65,9 @@ their cloud accounts.`,
 	flags.Bool("skip-open", defaultConfig.Web.SkipOpen, "Skip running the open command to open default browser")
 	_ = viper.BindPFlag("web.skipOpen", flags.Lookup("skip-open"))
 
+	flags.Bool("skip-refresh", defaultConfig.Datastore.SkipRefresh, "Skip running data refresh on start up")
+	_ = viper.BindPFlag("datastore.skipRefresh", flags.Lookup("skip-refresh"))
+
 	rootCmd.AddCommand(NewVersionCommand(out))
 
 	return rootCmd

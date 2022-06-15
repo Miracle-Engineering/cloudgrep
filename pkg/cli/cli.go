@@ -40,8 +40,10 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 	}
 
 	//start the providers to collect cloud data
-	if err := cli.runEngine(ctx); err != nil {
-		return err
+	if !cfg.Datastore.SkipRefresh {
+		if err := cli.runEngine(ctx); err != nil {
+			return err
+		}
 	}
 	api.StartWebServer(ctx, cfg, logger, cli.ds, cli.runEngine)
 
