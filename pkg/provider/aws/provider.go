@@ -4,17 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/smithy-go"
+	"github.com/manifoldco/promptui"
 	cfg "github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/provider/types"
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 	"github.com/run-x/cloudgrep/pkg/util"
 	"go.uber.org/zap"
+	"os"
 )
 
 type Provider struct {
@@ -63,9 +64,21 @@ func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceC
 
 func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]types.Provider, error) {
 	logger.Info("Connecting to AWS account")
+	regions := cfg.Regions
+	nonGlobalRegions := util.Filter(regions, func(v string) bool { return v != "global" })
 	defaultConfig, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if defaultConfig.Region == "" {
+		if len(nonGlobalRegions) == 0 {
+			defaultConfig.Region = promptForRegion(ctx)
+		} else {
+			defaultConfig.Region = nonGlobalRegions[0]
+		}
+	}
+	if len(regions) == 0 {
+		regions = []string{"global", defaultConfig.Region}
 	}
 
 	identity, err := VerifyCreds(ctx, defaultConfig)
@@ -73,11 +86,6 @@ func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]
 		return nil, err
 	}
 	logger.Sugar().Infof("Using the following identity: %v", *identity.Arn)
-
-	regions := cfg.Regions
-	if len(regions) == 0 {
-		regions = []string{"global", defaultConfig.Region}
-	}
 	logger.Sugar().Infof("Will look in regions %v", regions)
 	var providers []types.Provider
 	awsPartition := endpoints.AwsPartition()
@@ -95,6 +103,35 @@ func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]
 		providers = append(providers, newProvider)
 	}
 	return providers, nil
+}
+
+func promptForRegion(ctx context.Context) string {
+	awsPartition := endpoints.AwsPartition()
+	officialRegions := awsPartition.Regions()
+	validate := func(input string) error {
+		if _, ok := officialRegions[input]; !ok && input != "global" {
+			return fmt.Errorf("invalid AWS region: %v", input)
+		}
+		return nil
+	}
+
+	for {
+		prompt := promptui.Prompt{
+			Label:    "No default aws region specified, please specify one",
+			Validate: validate,
+		}
+
+		result, err := prompt.Run()
+
+		if err != nil {
+			if err == promptui.ErrInterrupt {
+				os.Exit(1)
+			}
+			fmt.Printf("Encountered issue with input: %v\nPlease try again", err)
+		} else {
+			return result
+		}
+	}
 }
 
 func VerifyCreds(ctx context.Context, config aws.Config) (*sts.GetCallerIdentityOutput, error) {
