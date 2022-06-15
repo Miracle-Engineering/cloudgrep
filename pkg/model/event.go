@@ -10,6 +10,7 @@ const (
 	EventStatusFetching string = "fetching"
 	EventStatusFailed          = "failed"
 	EventStatusSuccess         = "success"
+	EventStatusLoaded          = "loaded"
 )
 
 const (

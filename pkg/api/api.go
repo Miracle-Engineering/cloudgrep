@@ -125,7 +125,7 @@ func EngineStatus(c *gin.Context) {
 func Refresh(c *gin.Context) {
 
 	ds := c.MustGet("datastore").(datastore.Datastore)
-	status, err := ds.GetEngineStatus(c)
+	status, err := ds.EngineStatus(c)
 	if err != nil {
 		badRequest(c, err)
 		return

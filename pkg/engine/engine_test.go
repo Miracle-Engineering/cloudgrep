@@ -4,7 +4,9 @@ import (
 	"context"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
+	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/provider"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 	"testing"
@@ -44,8 +46,12 @@ func TestNewEngine(t *testing.T) {
 		ds, err := datastore.NewDatastore(ctx, cfg, zaptest.NewLogger(t))
 		require.NoError(t, err)
 		cfg.Providers = []config.Provider{{Cloud: "badCloud"}}
-		_, err = NewEngine(ctx, cfg, logger, ds)
-		require.Error(t, err)
+		engine, err := NewEngine(ctx, cfg, logger, ds)
+		require.NoError(t, err)
+		engineEvent, err := engine.Datastore.EngineStatus(ctx)
+		assert.Equal(t, model.EventStatusFailed, engineEvent.Status)
+		assert.Equal(t, model.EventStatusFailed, engineEvent.ChildEvents[0].Status)
+		require.NoError(t, err)
 	})
 }
 

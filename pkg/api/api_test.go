@@ -65,16 +65,7 @@ func (m *mockApi) runEngine(ctx context.Context) error {
 	if m.engineErr != nil {
 		return m.engineErr
 	}
-	//simulate running the engine
-	err := m.ds.WriteEngineStatusStart(ctx, "engine")
-	if err != nil {
-		return err
-	}
-	err = m.ds.WriteResources(ctx, m.resources)
-	if err != nil {
-		return err
-	}
-	err = m.ds.WriteEngineStatusEnd(ctx, "engine", err)
+	err := m.ds.WriteResources(ctx, m.resources)
 	return err
 }
 
