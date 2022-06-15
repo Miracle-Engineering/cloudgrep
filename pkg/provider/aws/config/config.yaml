@@ -3,4 +3,3 @@ services:
 - elb
 - lambda
 - rds
-- s3
