@@ -110,14 +110,14 @@ func promptForRegion(ctx context.Context) string {
 	officialRegions := awsPartition.Regions()
 	validate := func(input string) error {
 		if _, ok := officialRegions[input]; !ok && input != "global" {
-			return fmt.Errorf("invalid AWS region: %v", input)
+			return fmt.Errorf("invalid AWS region code: %v please refer to https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions", input)
 		}
 		return nil
 	}
 
 	for {
 		prompt := promptui.Prompt{
-			Label:    "No default aws region specified, please specify one",
+			Label:    "No default AWS region found, please specify one region code",
 			Validate: validate,
 		}
 
