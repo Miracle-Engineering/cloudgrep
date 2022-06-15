@@ -126,7 +126,7 @@ func Refresh(c *gin.Context) {
 
 	ds := c.MustGet("datastore").(datastore.Datastore)
 	logger := c.MustGet("logger").(*zap.Logger)
-	status, err := ds.GetEngineStatus(c)
+	status, err := ds.EngineStatus(c)
 	if err != nil {
 		badRequest(c, err)
 		return

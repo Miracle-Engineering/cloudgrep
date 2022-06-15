@@ -3,7 +3,6 @@ package datastore
 import (
 	"context"
 	_ "embed"
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -409,73 +408,6 @@ func TestFields(t *testing.T) {
 	}
 }
 
-func TestEngineStatus(t *testing.T) {
-	engineStatuses := testdata.GetEngineStatus(t)
-	ctx := context.Background()
-	mockResourceName := "mock_resource"
-	datastores, _ := newDatastores(t, ctx)
-	for _, datastore := range datastores {
-		name := fmt.Sprintf("%T", datastore)
-		t.Run(name, func(t *testing.T) {
-			err := datastore.WriteEngineStatusStart(ctx, mockResourceName)
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-
-			status, err := datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
-			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[0], status)
-
-			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, nil)
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-
-			status, err = datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
-			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[1], status)
-
-			err = datastore.WriteEngineStatusStart(ctx, mockResourceName)
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-
-			status, err = datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
-			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[0], status)
-
-			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, errors.New(engineStatuses[2].ErrorMessage))
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-
-			status, err = datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
-			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[2], status)
-		})
-	}
-}
-
 //test that the resources can be updated: update their properties, tags
 func TestUpdateResources(t *testing.T) {
 	ctx := context.Background()
@@ -576,9 +508,9 @@ func TestPurgeResources(t *testing.T) {
 
 			//1nd run: write 3 resources
 			resources := testdata.GetResources(t)[:3]
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEvent(model.EventTypeEngine, "", "")))
 			require.NoError(t, ds.WriteResources(ctx, resources))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", nil))
+			require.NoError(t, ds.WriteEvent(ctx, model.Event{Type: model.EventTypeEngine, Status: model.EventStatusLoaded}))
 			r1, err := ds.GetResource(ctx, resources[0].Id)
 			require.NoError(t, err)
 			r2, err := ds.GetResource(ctx, resources[1].Id)
@@ -588,9 +520,9 @@ func TestPurgeResources(t *testing.T) {
 			testQuery(t, ctx, ds, tagUniqueKey, tagUniqueValue, r1)
 
 			//2nd run: one resource is removed
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEvent(model.EventTypeEngine, "", "")))
 			require.NoError(t, ds.WriteResources(ctx, model.Resources{r2, r3}.Clean()))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", nil))
+			require.NoError(t, ds.WriteEvent(ctx, model.Event{Type: model.EventTypeEngine, Status: model.EventStatusLoaded}))
 			resourcesRead, err := ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 2, resourcesRead.Count)
@@ -600,8 +532,8 @@ func TestPurgeResources(t *testing.T) {
 			testQueryUnrecognizedKey(t, ctx, ds, tagUniqueKey, tagUniqueValue)
 
 			//3rd run: an error happened - there is a built-in protection to not delete all resources
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", errors.New("an error happened")))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEvent(model.EventTypeEngine, "", "")))
+			require.NoError(t, ds.WriteEvent(ctx, model.Event{Type: model.EventTypeEngine, Status: model.EventStatusLoaded}))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 2, resourcesRead.Count)
@@ -609,9 +541,9 @@ func TestPurgeResources(t *testing.T) {
 			testQuery(t, ctx, ds, "id", r2.Id, r2)
 
 			//4th run: add back the resource previously deleted
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEvent(model.EventTypeEngine, "", "")))
 			require.NoError(t, ds.WriteResources(ctx, model.Resources{r2, r1, r3}.Clean()))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", nil))
+			require.NoError(t, ds.WriteEvent(ctx, model.Event{Type: model.EventTypeEngine, Status: model.EventStatusLoaded}))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 3, resourcesRead.Count)

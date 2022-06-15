@@ -66,5 +66,10 @@ func (e *Engine) Run(ctx context.Context) error {
 		log.Default().Println(err.Error())
 		return err
 	}
+	err = e.Datastore.WriteEvent(ctx, model.Event{Type: model.EventTypeEngine, Status: model.EventStatusLoaded})
+	if err != nil {
+		log.Default().Println(err.Error())
+		return err
+	}
 	return nil
 }
