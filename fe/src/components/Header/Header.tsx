@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import { DARK_BLUE } from 'constants/colors';
-import { PAGE_START } from 'constants/globals';
+import { PAGE_LENGTH, PAGE_START } from 'constants/globals';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -18,14 +18,14 @@ import { headerStyle, menuItems } from './style';
 function Header() {
 	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
-	const { filterTags, limit, offset } = useAppSelector(state => state.tags);
+	const { filterTags } = useAppSelector(state => state.tags);
 	const [open, setOpen] = useState(false);
 	const { resources } = useAppSelector(state => state.resources);
 
 	const handleClick = () => {
 		setOpen(true);
 		dispatch(getFields());
-		dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: limit + offset }));
+		dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
 	};
 
 	const handleClose = () => {
