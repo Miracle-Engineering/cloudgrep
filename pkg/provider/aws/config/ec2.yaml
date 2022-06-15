@@ -1,4 +1,64 @@
 types:
+  - name: Address
+    listApi:
+      call: DescribeAddresses
+      outputKey: Addresses
+      id: AllocationId
+      tags: &tags
+        field: Tags
+        key: Key
+        value: Value
+  - name: CapacityReservation
+    listApi:
+      call: DescribeCapacityReservations
+      pagination: true
+      inputOverrides:
+        fieldFuncs:
+          Filters: describeCapacityReservationsFilters
+      outputKey: CapacityReservations
+      id: CapacityReservationId
+      tags: *tags
+  - name: ClientVpnEndpoint
+    listApi:
+      call: DescribeClientVpnEndpoints
+      pagination: true
+      outputKey: ClientVpnEndpoints
+      id: ClientVpnEndpointId
+      tags: *tags
+  - name: ElasticGpu
+    listApi:
+      call: DescribeElasticGpus
+      outputKey: ElasticGpuSet
+      id: ElasticGpuId
+      tags: *tags
+  - name: Fleet
+    listApi:
+      call: DescribeFleets
+      pagination: true
+      inputOverrides:
+        fieldFuncs:
+          Filters: describeFleetsFilters
+      outputKey: Fleets
+      id: FleetId
+      tags: *tags
+  - name: FlowLogs
+    listApi:
+      call: DescribeFlowLogs
+      pagination: true
+      outputKey: FlowLogs
+      id: FlowLogId
+      tags: *tags
+  - name: Image
+    listApi:
+      call: DescribeImages
+      inputOverrides:
+        fieldFuncs:
+          Owners: describeImagesOwners
+      outputKey: Images
+      id:
+        name: ImageId
+        pointer: true
+      tags: *tags
   - name: Instance
     listApi:
       call: DescribeInstances
@@ -8,14 +68,105 @@ types:
       pagination: true
       outputKey: [Reservations, Instances]
       id: InstanceId
-      tags: &tags
-        field: Tags
+      tags: *tags
+  - name: KeyPair
+    listApi:
+      call: DescribeKeyPairs
+      outputKey: KeyPairs
+      id: KeyPairId
+      tags: *tags
+  - name: LaunchTemplate
+    listApi:
+      call: DescribeLaunchTemplates
+      pagination: true
+      outputKey: LaunchTemplates
+      id: LaunchTemplateId
+      tags: *tags
+  - name: NatGateway
+    listApi:
+      call: DescribeNatGateways
+      pagination: true
+      outputKey: NatGateways
+      id: NatGatewayId
+      tags: *tags
+  - name: NetworkAcl
+    listApi:
+      call: DescribeNetworkAcls
+      pagination: true
+      outputKey: NetworkAcls
+      id: NetworkAclId
+      tags: *tags
+  - name: NetworkInterface
+    listApi:
+      call: DescribeNetworkInterfaces
+      pagination: true
+      outputKey: NetworkInterfaces
+      id: NetworkInterfaceId
+      tags:
+        field: TagSet
         key: Key
         value: Value
+  - name: ReservedInstance
+    listApi:
+      call: DescribeReservedInstances
+      inputOverrides:
+        fieldFuncs:
+          Filters: describeReservedInstancesFilters
+      outputKey: ReservedInstances
+      id: ReservedInstancesId
+      tags: *tags
+  - name: RouteTable
+    listApi:
+      call: DescribeRouteTables
+      pagination: true
+      outputKey: RouteTables
+      id: RouteTableId
+      tags: *tags
+  - name: SecurityGroup
+    listApi:
+      call: DescribeSecurityGroups
+      pagination: true
+      outputKey: SecurityGroups
+      id: GroupId
+      tags: *tags
+  - name: Snapshot
+    listApi:
+      call: DescribeSnapshots
+      pagination: true
+      inputOverrides:
+        fieldFuncs:
+          OwnerIds: describeSnapshotsOwners
+      outputKey: Snapshots
+      id: SnapshotId
+      tags: *tags
+  - name: SpotInstanceRequest
+    listApi:
+      call: DescribeSpotInstanceRequests
+      pagination: true
+      inputOverrides:
+        fieldFuncs:
+          Filters: describeSpotInstanceRequestsFilters
+      outputKey: SpotInstanceRequests
+      id: SpotInstanceRequestId
+      tags: *tags
+  - name: Subnet
+    listApi:
+      call: DescribeSubnets
+      pagination: true
+      outputKey: Subnets
+      id: SubnetId
+      tags: *tags
   - name: Volume
     listApi:
       call: DescribeVolumes
       pagination: true
       outputKey: Volumes
-      id: "VolumeId"
+      id: VolumeId
+      tags: *tags
+  - name: Vpc
+    listApi:
+      call: DescribeVpcs
+      pagination: true
+      outputKey: Vpcs
+      id: VpcId
       tags: *tags
