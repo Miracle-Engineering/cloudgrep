@@ -446,6 +446,9 @@ func (s *SQLiteStore) EngineStatus(ctx context.Context) (model.Event, error) {
 	result = s.db.
 		Model(&model.Event{}).
 		Find(&engineEvent, model.Event{RunId: s.runId, Type: model.EventTypeEngine})
+	if result.Error != nil {
+		return model.Event{}, fmt.Errorf("error while reading event from database %w", result.Error)
+	}
 	engineEvent.AddChildEvents(providerEvents)
 	return engineEvent, nil
 }

@@ -8,15 +8,15 @@ import (
 
 const (
 	EventStatusFetching string = "fetching"
-	EventStatusFailed          = "failed"
-	EventStatusSuccess         = "success"
-	EventStatusLoaded          = "loaded"
+	EventStatusFailed   string = "failed"
+	EventStatusSuccess  string = "success"
+	EventStatusLoaded   string = "loaded"
 )
 
 const (
 	EventTypeEngine   string = "engine"
-	EventTypeProvider        = "provider"
-	EventTypeResource        = "resource"
+	EventTypeProvider string = "provider"
+	EventTypeResource string = "resource"
 )
 
 type Event struct {
@@ -41,14 +41,11 @@ func NewEvent(eventType string, providerName string, resourceType string) Event 
 	switch eventType {
 	case EventTypeEngine:
 		event.RunId = uuid.New().String()
-		break
 	case EventTypeProvider:
 		event.ProviderName = providerName
-		break
 	case EventTypeResource:
 		event.ProviderName = providerName
 		event.ResourceType = resourceType
-		break
 	}
 	return event
 }
@@ -110,7 +107,7 @@ func (es Events) getAggregatedUpdatedAt() time.Time {
 }
 
 func (es Events) AggregateResourceEvents() Events {
-	if es == nil || len(es) == 0 {
+	if len(es) == 0 {
 		return Events(nil)
 	}
 	mapEvents := make(map[string]Events)
