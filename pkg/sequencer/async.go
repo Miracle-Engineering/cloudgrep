@@ -28,6 +28,8 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 			wg.Add(1)
 			go func(fetchFunc provider.FetchFunc, provider provider.Provider, resourceType string) {
 				defer wg.Done()
+				event := model.NewEvent(model.EventTypeResource, p.String(), resourceType)
+				_ = ds.WriteEvent(ctx, event)
 				err := fetchFunc(ctx, resourceChan)
 				if err != nil {
 					// TODO: Log the error in like the future error table in db or somehow tell the user in the UI idk figure it out
@@ -36,6 +38,8 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 					errors = multierror.Append(errors, err)
 					errorLock.Unlock()
 				}
+				event.UpdateError(err)
+				_ = ds.WriteEvent(ctx, event)
 			}(fetchFunc, p, resourceType)
 		}
 	}
