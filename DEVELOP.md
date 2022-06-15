@@ -1,4 +1,4 @@
-# Developing
+# Development
 
 This application provides a single binary that contains the backend and the frontend.
 
