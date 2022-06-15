@@ -15,6 +15,7 @@ func setupMiddlewares(group *gin.RouterGroup, cfg config.Config, logger *zap.Log
 		group.Use(logAllQueryParams(cfg, logger), logAllRequests(cfg, logger))
 	}
 	var values = map[string]interface{}{
+		"logger":     logger,
 		"datastore":  ds,
 		"engineFunc": engineF,
 	}
