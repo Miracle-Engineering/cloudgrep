@@ -3,8 +3,6 @@ import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
 import SearchInput from 'components/SearchInput/SearchInput';
@@ -13,7 +11,8 @@ import { ValueType } from 'models/Field';
 import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import useHover from 'utils/hooks/useHover';
 
-import { accordionStyles, filterStyles, labelClasses, overrideSummaryClasses } from './style';
+import AccordionItem from './AccordionItem';
+import { accordionStyles, filterStyles, overrideSummaryClasses } from './style';
 import { AccordionFilterProps } from './types';
 
 const AccordionFilter: FC<AccordionFilterProps> = props => {
@@ -24,6 +23,8 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 	const [containerRef, isHovered] = useHover<HTMLDivElement>();
 	const accordionRef = useRef<HTMLElement>();
 	const [expanded, setExpanded] = useState(false);
+	const [allIncluded, setAllIncluded] = useState(false);
+	const [singleItem, setSingleItem] = useState('');
 
 	const handleExpand = () => {
 		setExpanded(!expanded);
@@ -42,6 +43,16 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 			setApplyHover(false);
 		}
 	}, [isHovered, accordionRef?.current?.clientHeight, expanded, accordionRef]);
+
+	const handleOnly = (item: ValueType) => {
+		setSingleItem(item.value);
+		setAllIncluded(false);
+	};
+
+	const handleAll = () => {
+		setAllIncluded(true);
+		setSingleItem('');
+	};
 
 	return (
 		<Box ref={accordionRef} key={id} sx={{ position: 'relative', height: boxHeight }}>
@@ -65,34 +76,20 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 									field?.values
 										.filter(item => item.value?.toLowerCase()?.includes(searchTerm?.toLowerCase()))
 										.map((item: ValueType) => (
-											<Box
+											<AccordionItem
 												key={item.value}
-												sx={{
-													display: 'flex',
-													alignItems: 'center',
-													justifyContent: 'space-between',
-													maxWidth: '100%',
-												}}>
-												<FormControlLabel
-													sx={{
-														overflow: 'hidden',
-														textOverflow: 'ellipsis',
-														whiteSpace: 'nowrap',
-													}}
-													classes={labelClasses}
-													control={
-														<Checkbox
-															size={'small'}
-															defaultChecked={checkedByDefault}
-															onChange={e => handleChange(e, field, item)}
-														/>
-													}
-													label={item.value}
-												/>
-												<Typography sx={{ fontSize: '13px', fontWeight: 600 }}>
-													{item.count}
-												</Typography>
-											</Box>
+												field={field}
+												item={item}
+												handleChange={handleChange}
+												isChecked={
+													singleItem
+														? allIncluded || item.value === singleItem
+														: checkedByDefault
+												}
+												handleOnly={handleOnly}
+												handleAll={handleAll}
+												singleItem={singleItem}
+											/>
 										))}
 							</FormGroup>
 						</Box>
