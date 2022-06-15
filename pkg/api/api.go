@@ -135,12 +135,8 @@ func Refresh(c *gin.Context) {
 		return
 	}
 	engineFunc := c.MustGet("engineFunc").(EngineFunc)
-	//TODO run this process async (and test)
-	err = engineFunc(c)
-	if err != nil {
-		badRequest(c, err)
-		return
-	}
+	//run this process async - the UI will call EngineStatus api to check the result
+	go engineFunc(c)
 	c.Status(http.StatusOK)
 
 }

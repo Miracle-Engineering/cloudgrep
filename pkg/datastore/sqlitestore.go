@@ -24,8 +24,8 @@ type SQLiteStore struct {
 	db      *gorm.DB
 	indexer resourceIndexer
 	//fetchedAt is the last time the resources were fetched
-	fetchedAt  time.Time
-	muResource sync.Mutex
+	fetchedAt time.Time
+	lock      sync.Mutex
 }
 
 func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLiteStore, error) {
@@ -120,8 +120,8 @@ func (s *SQLiteStore) WriteResources(ctx context.Context, resources model.Resour
 		//nothing to write
 		return nil
 	}
-	s.muResource.Lock()
-	defer s.muResource.Unlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
 	var count int64
 	err := s.db.Transaction(func(tx *gorm.DB) error {
@@ -313,6 +313,9 @@ func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) (model
 }
 
 func (s *SQLiteStore) WriteEngineStatusStart(ctx context.Context, resource string) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	status := model.NewEngineStatus(model.EngineStatusFetching, resource, nil)
 	s.logger.Sugar().Infow("Writing Engine Status: ",
 		zap.Any("status", status),
@@ -331,15 +334,15 @@ func (s *SQLiteStore) WriteEngineStatusStart(ctx context.Context, resource strin
 }
 
 func (s *SQLiteStore) WriteEngineStatusEnd(ctx context.Context, resource string, err error) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	var status model.EngineStatus
 	if err != nil {
 		status = model.NewEngineStatus(model.EngineStatusFailed, resource, err)
 	} else {
 		status = model.NewEngineStatus(model.EngineStatusSuccess, resource, nil)
 	}
-	s.logger.Sugar().Infow("Writing Engine Status: ",
-		zap.Any("status", status),
-	)
 	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
 	if result.RowsAffected == 1 {
 		result = s.db.Model(&status).Updates(status)
@@ -420,6 +423,8 @@ func (s *SQLiteStore) deleteResourcesBefore(before time.Time) (int, error) {
 }
 
 func (s *SQLiteStore) GetEngineStatus(context.Context) (model.EngineStatus, error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	var status model.EngineStatus
 	db := s.db.Model(&model.EngineStatus{}).Select("*").Order("fetched_at desc").Last(&status)
 	if db.Error != nil {
