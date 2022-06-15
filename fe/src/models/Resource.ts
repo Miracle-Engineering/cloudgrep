@@ -18,3 +18,8 @@ export interface MockResource {
 	Id: string;
 	Region: string;
 }
+
+export interface Resources {
+	count: number;
+	resources: Resource[];
+}

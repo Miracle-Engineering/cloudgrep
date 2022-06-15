@@ -1,17 +1,17 @@
 import { getResourcesPath } from 'constants/paths';
-import { Resource } from 'models/Resource';
+import { Resources } from 'models/Resource';
 import { Tag } from 'models/Tag';
 import ApiClient, { Response } from 'utils/apiClient/ApiClient';
 
 import { getResourcesFilters } from './helpers';
 class ResourceService {
-	static async getResources(): Promise<Response<Resource[]>> {
-		return ApiClient.get<string | undefined, Resource[]>(getResourcesPath());
+	static async getResources(): Promise<Response<Resources>> {
+		return ApiClient.get<string | undefined, Resources>(getResourcesPath());
 	}
 
-	static async getFilteredResources(data: Tag[], offset: number, limit: number): Promise<Response<Resource[]>> {
+	static async getFilteredResources(data: Tag[], offset: number, limit: number): Promise<Response<Resources>> {
 		const requestData = getResourcesFilters(data, offset, limit);
-		return ApiClient.post<string | undefined, Resource[]>(getResourcesPath(), requestData);
+		return ApiClient.post<string | undefined, Resources>(getResourcesPath(), requestData);
 	}
 }
 
