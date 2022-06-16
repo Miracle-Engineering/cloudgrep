@@ -142,12 +142,21 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
       "iam:UntagPolicy",
       "iam:UntagRole",
       "iam:UntagUser",
-      "iam:PassRole",
     ]
     resources = [
       "arn:aws:iam::*:policy/test/*",
       "arn:aws:iam::*:role/test/*",
       "arn:aws:iam::*:user/test/*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "iam:PassRole",
+    ]
+    resources = [
+      aws_iam_role.cluster_role.arn,
+      aws_iam_role.node_group.arn
     ]
   }
 
