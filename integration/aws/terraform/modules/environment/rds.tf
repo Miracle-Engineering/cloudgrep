@@ -6,11 +6,12 @@ locals {
 resource "aws_db_instance" "test" {
   count = local.rds_instance_count
 
-  identifier_prefix    = "testing-${count.index}-"
+  identifier_prefix    = "test-${count.index}-"
   allocated_storage    = 10
   engine               = "postgres"
   engine_version       = "13.4"
   instance_class       = "db.t3.micro"
+  db_subnet_group_name = aws_db_subnet_group.private.name
   username             = "postgres"
   password             = "password"
   parameter_group_name = "default.postgres13"
@@ -24,13 +25,20 @@ resource "aws_db_instance" "test" {
 resource "aws_rds_cluster" "postgresql" {
   count = local.rds_cluster_count
 
-  cluster_identifier_prefix = "testing-${count.index}-"
+  cluster_identifier_prefix = "test-${count.index}-"
   engine                    = "aurora-postgresql"
-  availability_zones        = local.vpc_azs
+  db_subnet_group_name      = aws_db_subnet_group.private.name
+  availability_zones        = module.vpc.private_subnet_azs
   master_username           = "postgres"
   master_password           = "password"
+  skip_final_snapshot       = true
 
   tags = {
     test = "rds-cluster-${count.index}"
   }
+}
+
+resource "aws_db_subnet_group" "private" {
+  name_prefix = "test-"
+  subnet_ids  = module.vpc.private_subnet_ids
 }

@@ -105,13 +105,82 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
   statement {
     actions = [
       "autoscaling:*",
+      "autoscaling:*",
+      "cloudfront:*",
       "ec2:*",
+      "ecs:*",
+      "eks:*",
+      "elasticache:*",
       "elasticloadbalancing:*",
       "iam:CreateServiceLinkedRole",
       "lambda:*",
       "rds:*",
+      "route53:*",
       "s3:*",
+      "sns:*",
+      "sqs:*",
     ]
     resources = ["*"]
   }
+
+  // Be very careful with what we grant in terms of IAM permissions:
+  //  - Only allow creating, deleting, and tagging roles/policies/users under the `test/` path.
+  //  - Don't allow anything meaningful to be done with these resources, such as adding permissions to roles,
+  //    creating credentials on users, or attaching policies to resources.
+  //  - Force permissions boundary on roles/users to ensure they are useless.
+  statement {
+    actions = [
+      "iam:CreatePolicy",
+      "iam:DeleteLoginProfile", // TF calls this unconditionally when deleting a user
+      "iam:DeletePolicy",
+      "iam:DeleteRole",
+      "iam:DeleteUser",
+      "iam:TagPolicy",
+      "iam:TagRole",
+      "iam:TagUser",
+      "iam:UntagPolicy",
+      "iam:UntagRole",
+      "iam:UntagUser",
+    ]
+    resources = [
+      "arn:aws:iam::*:policy/test/*",
+      "arn:aws:iam::*:role/test/*",
+      "arn:aws:iam::*:user/test/*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "iam:CreateRole",
+      "iam:CreateUser",
+    ]
+    resources = [
+      "arn:aws:iam::*:role/test/*",
+      "arn:aws:iam::*:user/test/*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PermissionsBoundary"
+
+      values = [
+        aws_iam_policy.gha_terraform_iam_permission_boundary.arn
+      ]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "gha_terraform_iam_permission_boundary" {
+  statement {
+    effect    = "Deny"
+    resources = ["*"]
+    actions   = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "gha_terraform_iam_permission_boundary" {
+  name        = "github-actions-terraform-permissions-boundary"
+  description = "Permissions boundary policy used for GitHub Actions Terraform"
+
+  policy = data.aws_iam_policy_document.gha_terraform_iam_permission_boundary.json
 }

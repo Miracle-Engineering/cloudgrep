@@ -23,6 +23,7 @@ type Provider struct {
 
 type Datastore struct {
 	Type           string `yaml:"type"`
+	SkipRefresh    bool   `yaml:"skipRefresh"`
 	DataSourceName string `yaml:"dataSourceName"`
 }
 

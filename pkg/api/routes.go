@@ -1,17 +1,11 @@
 package api
 
 import (
-	"fmt"
-	"log"
-	"path/filepath"
-	"strings"
-
 	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/static"
 )
 
 func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds datastore.Datastore, engineF EngineFunc) {
@@ -37,17 +31,4 @@ func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds d
 	api.GET("/fields", Fields)
 	api.GET("/enginestatus", EngineStatus)
 	api.POST("/refresh", Refresh)
-
-	mock_files, err := static.Static.ReadDir("mock")
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, f := range mock_files {
-		basename := f.Name()
-		name := strings.TrimSuffix(basename, filepath.Ext(basename))
-		relativePath := fmt.Sprintf("/mock/api/%s", name)
-		filePath := fmt.Sprintf("./static/mock/%s", basename)
-		log.Printf("[MOCK] %s -> %s", relativePath, filePath)
-		router.StaticFile(relativePath, filePath)
-	}
 }
