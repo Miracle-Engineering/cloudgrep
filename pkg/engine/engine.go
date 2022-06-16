@@ -3,7 +3,6 @@ package engine
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/run-x/cloudgrep/pkg/sequencer"
@@ -45,16 +44,6 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 
 //Run the providers: fetches data about cloud resources and save them to store
 func (e *Engine) Run(ctx context.Context) error {
-	err := e.Datastore.WriteEngineStatusStart(ctx, "engine")
-	if err != nil {
-		log.Default().Println(err.Error())
-		return err
-	}
-	err = e.Sequencer.Run(ctx, e, e.Providers)
-	err = e.Datastore.WriteEngineStatusEnd(ctx, "engine", err)
-	if err != nil {
-		log.Default().Println(err.Error())
-		return err
-	}
-	return nil
+	err := e.Sequencer.Run(ctx, e, e.Providers)
+	return err
 }
