@@ -24,7 +24,7 @@ type Provider struct {
 }
 
 func (p *Provider) String() string {
-	if strings.Join(p.Regions, "-") == "" {
+	if len(p.Regions) == 0 {
 		return p.Cloud
 	}
 	return fmt.Sprintf("%s-%s", p.Cloud, strings.Join(p.Regions, "-"))

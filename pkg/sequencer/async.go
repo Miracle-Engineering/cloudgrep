@@ -28,8 +28,7 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 			wg.Add(1)
 			go func(fetchFunc provider.FetchFunc, provider provider.Provider, resourceType string) {
 				defer wg.Done()
-				event := model.NewEvent(model.EventTypeResource, p.String(), resourceType)
-				err := ds.WriteEvent(ctx, event)
+				err := ds.WriteEvent(ctx, model.NewResourceEventStart(p.String(), resourceType))
 				if err != nil {
 					as.Logger.Sugar().Errorf("Received an error when trying to write resource event for resource  %v in provider %v: %v", resourceType, provider, err)
 					errorLock.Lock()
@@ -37,8 +36,7 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 					errorLock.Unlock()
 				}
 				err = fetchFunc(ctx, resourceChan)
-				event.UpdateError(err)
-				err = ds.WriteEvent(ctx, event)
+				err = ds.WriteEvent(ctx, model.NewResourceEventEnd(p.String(), resourceType, err))
 				if err != nil {
 					as.Logger.Sugar().Errorf("Received an error when trying to write resource event for resource  %v in provider %v: %v", resourceType, provider, err)
 					errorLock.Lock()

@@ -27,10 +27,8 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 	e.Datastore = datastore
 	e.Logger = logger
 	e.Sequencer = sequencer.AsyncSequencer{Logger: e.Logger}
-	event := model.NewEvent(model.EventTypeEngine, "", "")
-	err := e.Datastore.WriteEvent(ctx, event)
+	err := e.Datastore.WriteEvent(ctx, model.NewEngineEventStart())
 	if err != nil {
-		log.Default().Println(err.Error())
 		return e, err
 	}
 	for _, c := range cfg.Providers {
@@ -39,18 +37,16 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 			c.Regions = cfg.Regions
 		}
 		// create a providers
-		providerEvent := model.NewEvent(model.EventTypeProvider, c.String(), "")
-		err = datastore.WriteEvent(ctx, providerEvent)
+		err = datastore.WriteEvent(ctx, model.NewProviderEventStart(c.String()))
 		if err != nil {
 			log.Default().Println(err.Error())
 			return e, err
 		}
 		providers, err := provider.NewProviders(ctx, c, logger)
-		providerEvent.UpdateError(err)
 		if err == nil {
 			e.Providers = append(e.Providers, providers...)
 		}
-		err = datastore.WriteEvent(ctx, providerEvent)
+		err = datastore.WriteEvent(ctx, model.NewProviderEventEnd(c.String(), err))
 		if err != nil {
 			log.Default().Println(err.Error())
 			return e, err
@@ -66,10 +62,6 @@ func (e *Engine) Run(ctx context.Context) error {
 		log.Default().Println(err.Error())
 		return err
 	}
-	err = e.Datastore.WriteEvent(ctx, model.Event{Type: model.EventTypeEngine, Status: model.EventStatusLoaded})
-	if err != nil {
-		log.Default().Println(err.Error())
-		return err
-	}
-	return nil
+	err = e.Datastore.WriteEvent(ctx, model.NewEngineEventLoaded())
+	return err
 }

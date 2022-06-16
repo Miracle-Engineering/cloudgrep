@@ -34,33 +34,67 @@ type Event struct {
 
 type Events []Event
 
-func NewEvent(eventType string, providerName string, resourceType string) Event {
-	event := Event{}
-	event.Type = eventType
-	event.Status = EventStatusFetching
-	switch eventType {
-	case EventTypeEngine:
-		event.RunId = uuid.New().String()
-	case EventTypeProvider:
-		event.ProviderName = providerName
-	case EventTypeResource:
-		event.ProviderName = providerName
-		event.ResourceType = resourceType
+func NewEngineEventStart() Event {
+	return Event{
+		RunId:  uuid.New().String(),
+		Type:   EventTypeEngine,
+		Status: EventStatusFetching,
 	}
-	return event
 }
 
-func (e *Event) UpdateError(err error) {
+func NewEngineEventLoaded() Event {
+	return Event{
+		Type:   EventTypeEngine,
+		Status: EventStatusLoaded,
+	}
+}
+
+func NewProviderEventStart(providerName string) Event {
+	return Event{
+		Type:         EventTypeProvider,
+		Status:       EventStatusFetching,
+		ProviderName: providerName,
+	}
+}
+
+func NewProviderEventEnd(providerName string, err error) Event {
+	status := EventStatusSuccess
+	errr := ""
 	if err != nil {
-		e.Status = EventStatusFailed
-		e.Error = err.Error()
-	} else {
-		e.Status = EventStatusSuccess
+		status = EventStatusFailed
+		errr = err.Error()
+	}
+	return Event{
+		Type:         EventTypeProvider,
+		Status:       status,
+		ProviderName: providerName,
+		Error:        errr,
 	}
 }
 
-func (e *Event) HasError() bool {
-	return e.Error != ""
+func NewResourceEventStart(providerName string, resourceType string) Event {
+	return Event{
+		Type:         EventTypeResource,
+		Status:       EventStatusFetching,
+		ProviderName: providerName,
+		ResourceType: resourceType,
+	}
+}
+
+func NewResourceEventEnd(providerName string, resourceType string, err error) Event {
+	status := EventStatusSuccess
+	errr := ""
+	if err != nil {
+		status = EventStatusFailed
+		errr = err.Error()
+	}
+	return Event{
+		Type:         EventTypeResource,
+		Status:       status,
+		ProviderName: providerName,
+		ResourceType: resourceType,
+		Error:        errr,
+	}
 }
 
 func (es Events) getAggregatedStatus() string {
@@ -87,7 +121,6 @@ func (es Events) getAggregatedErrors() string {
 	for _, event := range es {
 		if event.Status == EventStatusFailed {
 			errors = append(errors, event.Error)
-			//fmt.Sprintf("%s\n%s", errors, event.Error)
 		}
 	}
 	return strings.Join(errors, "\n")

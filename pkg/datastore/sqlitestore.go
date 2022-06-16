@@ -27,7 +27,6 @@ type SQLiteStore struct {
 	fetchedAt time.Time
 	lock      sync.Mutex
 	runId     string
-	muEvent   sync.Mutex
 }
 
 func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLiteStore, error) {
@@ -454,8 +453,8 @@ func (s *SQLiteStore) EngineStatus(ctx context.Context) (model.Event, error) {
 }
 
 func (s *SQLiteStore) WriteEvent(ctx context.Context, event model.Event) error {
-	s.muEvent.Lock()
-	defer s.muEvent.Unlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	if event.Type == model.EventTypeEngine && event.Status == model.EventStatusFetching {
 		s.runId = event.RunId
 		s.fetchedAt = time.Now()

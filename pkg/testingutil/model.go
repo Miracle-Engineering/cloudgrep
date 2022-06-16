@@ -114,3 +114,32 @@ func AssertResourceFilteredCount(t testing.TB, resources []model.Resource, count
 
 	assert.Lenf(t, filtered, count, "expected %d resource(s) with filter %s", count, filter)
 }
+
+func AssertEvent(t *testing.T, ee, ae model.Event) {
+	assert.Equal(t, ee.Type, ae.Type)
+	assert.Equal(t, ee.Status, ae.Status)
+	assert.Equal(t, ee.ProviderName, ae.ProviderName)
+	assert.Equal(t, ee.ResourceType, ae.ResourceType)
+	assert.Equal(t, ee.Error, ae.Error)
+	if ee.ChildEvents != nil {
+		assert.Equal(t, len(ee.ChildEvents), len(ae.ChildEvents))
+		for _, e := range ee.ChildEvents {
+			for _, a := range ae.ChildEvents {
+				switch e.Type {
+				case model.EventTypeEngine:
+					if e.Type == a.Type {
+						AssertEvent(t, e, a)
+					}
+				case model.EventTypeProvider:
+					if e.Type == a.Type && e.ProviderName == a.ProviderName {
+						AssertEvent(t, e, a)
+					}
+				case model.EventTypeResource:
+					if e.Type == a.Type && e.ProviderName == a.ProviderName && e.ResourceType == a.ResourceType {
+						AssertEvent(t, e, a)
+					}
+				}
+			}
+		}
+	}
+}
