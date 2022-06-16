@@ -131,6 +131,7 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
   statement {
     actions = [
       "iam:CreatePolicy",
+      "iam:DeleteLoginProfile", // TF calls this unconditionally when deleting a user
       "iam:DeletePolicy",
       "iam:DeleteRole",
       "iam:DeleteUser",
