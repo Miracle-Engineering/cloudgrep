@@ -4,8 +4,8 @@
 
 The backend exposes an API at `http://localhost:8080/api`.
 
-## List resources
-
+<details open>
+<summary>List resources</summary>
 | Route | Method |  Description |  Status |
 | ------------- | ------------- | ------------- | ------------- |
 | [/resources](http://localhost:8080/api/resources)  | POST  | Return list of cloud resources |  :white_check_mark: |
@@ -144,10 +144,9 @@ Example of queries:
 }
 
 ```
-
-
-## Get a resource
-
+</details>
+<details open>
+<summary>Get a resource</summary>
 | Route | Method |  Description |  Status |
 | ------------- | ------------- | ------------- | ------------- |
 | [/resource](http://localhost:8080/api/resource)  | GET  | Return a resource |  :white_check_mark: |
@@ -233,9 +232,9 @@ Example of response:
   }
 ]
 ```
-
-## Get Engine Status
-
+</details>
+<details open>
+<summary>Get Engine Status</summary>
 Returns the Status of the Cloudgrep run.
 
 | Route                                                   | Method | Description              |  Status |
@@ -269,10 +268,14 @@ Sample Responses:
 }
 ```
 
-## Refresh the resources
+If you need to know when the engine is done running, keep pulling this endpoint until the status is no longer **fetching**.
+
+</details>
+<details open>
+<summary>Refresh the resources</summary>
 
 Trigger the engine to refresh the cloud resources.
-The response is sent when the engine is done (not async!), it can take up to 3 min.
+Calling this endpoint will returns immediately, the engine will start fetching the resources async.
 
 | Route                                                   | Method | Description              |  Status |
 |---------------------------------------------------------| ------------- |--------------------------| ------------- |
@@ -280,26 +283,24 @@ The response is sent when the engine is done (not async!), it can take up to 3 m
 
 Sample Responses:
 ```js
-// Refresh completed successfully
+// Refresh request acknowledged, the refresh has started.
 code: 200
 body: {}
+
+// The refresh has already been triggered and is in progress
+code: 202
+{
+  "status":"202",
+  "error":"engine is already running"
+}
 
 // There was an error
 code: 400
 {
   "status":"400",
-  "error":"There was an engine error"
+  "error":"can't connect to datastore"
 }
 
 ```
 
-## Mocked data
-
-There is also a mocked API at `http://localhost:8080/mock/api`.  
-The mocked api serves static data, it doesn't handle any query parameters.
-
-| Route | Method |  Description |  Status |
-| ------------- | ------------- | ------------- | ------------- |
-| [/resources](http://localhost:8080/mock/api/resources)  | GET  |  Example of "resources" reponse | :white_check_mark: |
-| [/tags](http://localhost:8080/mock/api/tags)  | GET  |  Example of "tags" ressponse |  :white_check_mark: |
-
+Once the refreshed is triggered, call **Get Engine Status** API to know if the refresh is done.
