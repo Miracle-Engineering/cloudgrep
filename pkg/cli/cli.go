@@ -62,6 +62,7 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 func (cli *cli) runEngine(ctx context.Context) error {
 	var errors *multierror.Error
 	err := cli.ds.WriteEvent(ctx, model.NewEngineEventStart())
+	errors = multierror.Append(errors, err)
 	eng, err := engine.NewEngine(ctx, cli.cfg, cli.logger, cli.ds)
 	if err != nil {
 		cli.logger.Sugar().Errorw("some error(s) when creating the provider engine", "error", err)

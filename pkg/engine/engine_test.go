@@ -2,8 +2,6 @@ package engine
 
 import (
 	"context"
-	"errors"
-	"github.com/hashicorp/go-multierror"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -37,8 +35,6 @@ func TestNewEngine(t *testing.T) {
 	})
 
 	t.Run("BadProvider", func(t *testing.T) {
-		var multipleErrors *multierror.Error
-		multipleErrors = multierror.Append(multipleErrors, errors.New("unknown provider cloud 'badCloud'"))
 		cfg, err := config.GetDefault()
 		require.NoError(t, err)
 		datastoreConfigs := config.Datastore{
@@ -50,6 +46,7 @@ func TestNewEngine(t *testing.T) {
 		ds, err := datastore.NewDatastore(ctx, cfg, zaptest.NewLogger(t))
 		require.NoError(t, err)
 		err = ds.WriteEvent(ctx, model.NewEngineEventStart())
+		require.NoError(t, err)
 		cfg.Providers = []config.Provider{{Cloud: "badCloud"}}
 		engine, err := NewEngine(ctx, cfg, logger, ds)
 		require.Error(t, err)
