@@ -113,7 +113,7 @@ resource "aws_key_pair" "test" {
   count = local.ec2_keypair_count
 
   key_name_prefix = "test-${count.index}-"
-  public_key      = tls_private_key.ec2_keypair.public_key_openssh
+  public_key      = tls_private_key.ec2_keypair[count.index].public_key_openssh
 
   tags = {
     "test" : "ec2-keypair-${count.index}"
