@@ -142,6 +142,7 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
       "iam:UntagPolicy",
       "iam:UntagRole",
       "iam:UntagUser",
+      "iam:PassRole",
     ]
     resources = [
       "arn:aws:iam::*:policy/test/*",
@@ -153,7 +154,6 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
   statement {
     actions = [
       "iam:CreateRole",
-      "iam:PassRole",
       "iam:CreateUser",
     ]
     resources = [
