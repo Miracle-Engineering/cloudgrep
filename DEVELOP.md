@@ -1,4 +1,4 @@
-# development notes
+# Development
 
 This application provides a single binary that contains the backend and the frontend.
 
@@ -10,11 +10,14 @@ The project structure is inspired by https://github.com/sosedoff/pgweb
     ├── cmd                                  # CLI semi-generated framework (also Golang)
     ├── hack                                 # Tools for development
     ├── pkg                                  # Backend: Golang
+    ├── fe                                   # Frontend: React frontend code
     ├── static                               # Frontend: Static assets
     ├── main.go                              # Executable main function
     └── Makefile                             # Defines the tasks to be executed - for local or CI run
 
-## Start the server
+## Backend
+
+### Starting the server
 
 ```shell
 # using local code
@@ -26,6 +29,15 @@ make run
 make build
 ./cloudgrep
 ```
+
+### Running Tests
+
+```shell
+make test
+```
+
+## Frontend
+Checkout the frontend development guide [here](https://github.com/run-x/cloudgrep/blob/main/fe/README.md)
 
 ### AWS Resource supported
 
@@ -43,6 +55,9 @@ make build
 ![design diagram](img/cloudgrep-design.png)
 
 All of these boxes are implemented as distinct Go packages, except for UI which is a JS app.
+
+## API
+API design is documented [here](https://github.com/run-x/cloudgrep/blob/main/API.md)
 
 ## Configure a new AWS resource
 1. If the resource you are adding is for a new, wholly unsupported service, add a new item in the `services` list in the `pkg/provider/aws/config.yaml` file, and then create a new file with `.yaml` appended to the service name in the same directory.
@@ -129,3 +144,17 @@ implementing resources manually requires more effort to maintain and improve if 
 
 These methods will be automatically called at startup.
 The mapper definition will be used to convert the returned type to some `model.Resource` objects.
+
+## Release
+
+The release process is automated when merging a Pull Request.
+
+### How to trigger a release
+
+1. Create a Pull Request.
+1. Attach a label [`bump:patch`, `bump:minor`, or `bump:major`]. Cloudgrep uses [haya14busa/action-bumpr](https://github.com/haya14busa/action-bumpr).
+1. [The release workflow](.github/workflows/release.yml) automatically tags a
+   new version depending on the label and create a new release on merging the
+   Pull Request.
+
+If you do not want to create a release for a given PR, do not attach a bump label to it.
