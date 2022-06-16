@@ -8,20 +8,20 @@ resource "aws_network_acl" "test" {
   vpc_id = aws_vpc.vpc.id
 
   egress {
-    action    = "deny"
-    rule_no   = 100
-    protocol  = "-1"
-    from_port = 0
-    to_port   = 0
+    action     = "deny"
+    rule_no    = 100
+    protocol   = "-1"
+    from_port  = 0
+    to_port    = 0
     cidr_block = "0.0.0.0/0"
   }
 
   ingress {
-    action    = "deny"
-    rule_no   = 100
-    protocol  = "-1"
-    from_port = 0
-    to_port   = 0
+    action     = "deny"
+    rule_no    = 100
+    protocol   = "-1"
+    from_port  = 0
+    to_port    = 0
     cidr_block = "0.0.0.0/0"
   }
 
