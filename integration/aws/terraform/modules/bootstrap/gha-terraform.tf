@@ -119,6 +119,7 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
       "s3:*",
       "sns:*",
       "sqs:*",
+      "logs:*",
     ]
     resources = ["*"]
   }
