@@ -313,55 +313,6 @@ func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) (model
 	return model.ResourcesResponse{Count: totalCount, Resources: resources}, err
 }
 
-func (s *SQLiteStore) WriteEngineStatusStart(ctx context.Context, resource string) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	status := model.NewEngineStatus(model.EngineStatusFetching, resource, nil)
-	s.logger.Sugar().Infow("Writing Engine Status: ",
-		zap.Any("status", status),
-	)
-	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
-	if result.RowsAffected == 1 {
-		result = s.db.Model(&status).Updates(status)
-	} else {
-		result = s.db.Create(&status)
-	}
-	if result.Error != nil {
-		return fmt.Errorf("can't write engine status to database: %w", result.Error)
-	}
-	s.fetchedAt = time.Now()
-	return nil
-}
-
-func (s *SQLiteStore) WriteEngineStatusEnd(ctx context.Context, resource string, err error) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	var status model.EngineStatus
-	if err != nil {
-		status = model.NewEngineStatus(model.EngineStatusFailed, resource, err)
-	} else {
-		status = model.NewEngineStatus(model.EngineStatusSuccess, resource, nil)
-	}
-	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
-	if result.RowsAffected == 1 {
-		result = s.db.Model(&status).Updates(status)
-	} else {
-		result = s.db.Create(&status)
-	}
-	if result.Error != nil {
-		return fmt.Errorf("can't write engine status to database: %w", result.Error)
-	}
-
-	//once engine is complete, we delete all the resources that no longer exist
-	_, err = s.deleteResourcesBefore(s.fetchedAt)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func deleteTags(db *gorm.DB, ids []model.ResourceId) error {
 	return db.Table("tags").Where("resource_id in ?", ids).Delete(ids).Error
 }
