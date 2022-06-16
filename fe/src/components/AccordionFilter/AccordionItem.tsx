@@ -13,9 +13,10 @@ import { AccordionItemProps } from './types';
 const AccordionItem: FC<AccordionItemProps> = props => {
 	const { field, handleChange, isChecked, item, handleOnly, singleItem, handleAll } = props;
 	const [containerRef, isHovered] = useHover<HTMLDivElement>();
+	const isOnlyUsed = singleItem && singleItem === item.value;
 
 	const handleClick = () => {
-		singleItem ? handleAll() : handleOnly(item);
+		isOnlyUsed ? handleAll() : handleOnly(item);
 	};
 
 	return (
@@ -47,7 +48,7 @@ const AccordionItem: FC<AccordionItemProps> = props => {
 				onClick={() => isHovered && handleClick()}>
 				{isHovered && (
 					<Typography mr={2} sx={{ fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: DARK_BLUE }}>
-						{singleItem ? 'All' : 'Only'}
+						{isOnlyUsed ? 'All' : 'Only'}
 					</Typography>
 				)}
 				<Typography sx={{ fontSize: '13px', fontWeight: 600 }}>{item.count}</Typography>
