@@ -384,16 +384,14 @@ func (s *SQLiteStore) EngineStatus(ctx context.Context) (model.Event, error) {
 	if result.Error != nil {
 		return model.Event{}, fmt.Errorf("error while reading event from database %w", result.Error)
 	}
-	providerEvents := resourceEvents.AggregateResourceEvents()
-	var otherProviderEvents model.Events
+	var providerEvents model.Events
 	result = s.db.
 		Model(&model.Event{}).
 		Where("status IN ?", []string{model.EventStatusFetching, model.EventStatusFailed}).
-		Find(&otherProviderEvents, model.Event{RunId: s.runId, Type: model.EventTypeProvider})
+		Find(&providerEvents, model.Event{RunId: s.runId, Type: model.EventTypeProvider})
 	if result.Error != nil {
 		return model.Event{}, fmt.Errorf("error while reading event from database %w", result.Error)
 	}
-	providerEvents = append(providerEvents, otherProviderEvents...)
 	var engineEvent model.Event
 	result = s.db.
 		Model(&model.Event{}).
@@ -401,7 +399,8 @@ func (s *SQLiteStore) EngineStatus(ctx context.Context) (model.Event, error) {
 	if result.Error != nil {
 		return model.Event{}, fmt.Errorf("error while reading event from database %w", result.Error)
 	}
-	engineEvent.AddChildEvents(providerEvents)
+	engineEvent.ChildEvents = append(engineEvent.ChildEvents, providerEvents...)
+	engineEvent.ChildEvents = append(engineEvent.ChildEvents, resourceEvents...)
 	return engineEvent, nil
 }
 
@@ -431,7 +430,7 @@ func (s *SQLiteStore) WriteEvent(ctx context.Context, event model.Event) error {
 		return fmt.Errorf("error occured while upserting events into database %w", result.Error)
 	}
 	//once engine is complete, we delete all the resources that no longer exist
-	if event.Type == model.EventTypeEngine && event.Status == model.EventStatusLoaded {
+	if event.Type == model.EventTypeEngine && (event.Status == model.EventStatusFailed || event.Status == model.EventStatusSuccess) {
 		_, err := s.deleteResourcesBefore(s.fetchedAt)
 		if err != nil {
 			return err

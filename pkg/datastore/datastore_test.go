@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/go-multierror"
 	"os"
 	"path"
 	"testing"
@@ -511,7 +512,7 @@ func TestPurgeResources(t *testing.T) {
 			resources := testdata.GetResources(t)[:3]
 			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
 			require.NoError(t, ds.WriteResources(ctx, resources))
-			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventLoaded()))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			r1, err := ds.GetResource(ctx, resources[0].Id)
 			require.NoError(t, err)
 			r2, err := ds.GetResource(ctx, resources[1].Id)
@@ -523,7 +524,7 @@ func TestPurgeResources(t *testing.T) {
 			//2nd run: one resource is removed
 			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
 			require.NoError(t, ds.WriteResources(ctx, model.Resources{r2, r3}.Clean()))
-			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventLoaded()))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			resourcesRead, err := ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 2, resourcesRead.Count)
@@ -534,7 +535,7 @@ func TestPurgeResources(t *testing.T) {
 
 			//3rd run: an error happened - there is a built-in protection to not delete all resources
 			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
-			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventLoaded()))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 2, resourcesRead.Count)
@@ -544,7 +545,7 @@ func TestPurgeResources(t *testing.T) {
 			//4th run: add back the resource previously deleted
 			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
 			require.NoError(t, ds.WriteResources(ctx, model.Resources{r2, r1, r3}.Clean()))
-			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventLoaded()))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 3, resourcesRead.Count)
@@ -556,6 +557,13 @@ func TestPurgeResources(t *testing.T) {
 }
 
 func TestEngineStatus(t *testing.T) {
+	//failed-provider-failed-resource-status error declaration
+	var providerErrors, resourceErrors, multipleErrors *multierror.Error
+	providerErrors = multierror.Append(providerErrors, errors.New("mp2-error"))
+	resourceErrors = multierror.Append(resourceErrors, errors.New("mp1-mr3-error"))
+	multipleErrors = multierror.Append(multipleErrors, providerErrors)
+	multipleErrors = multierror.Append(multipleErrors, resourceErrors)
+
 	type args struct {
 		events model.Events
 	}
@@ -573,7 +581,6 @@ func TestEngineStatus(t *testing.T) {
 					model.NewProviderEventStart("mp2"),
 					model.NewProviderEventEnd("mp1", nil),
 					model.NewProviderEventEnd("mp2", nil),
-					model.NewEngineEventLoaded(),
 					model.NewResourceEventStart("mp1", "mr1"),
 					model.NewResourceEventStart("mp1", "mr2"),
 					model.NewResourceEventStart("mp1", "mr3"),
@@ -586,32 +593,19 @@ func TestEngineStatus(t *testing.T) {
 					model.NewResourceEventEnd("mp2", "mr1", nil),
 					model.NewResourceEventEnd("mp2", "mr2", nil),
 					model.NewResourceEventEnd("mp2", "mr3", nil),
+					model.NewEngineEventEnd(nil),
 				},
 			},
 			expected: model.Event{
 				Type:   model.EventTypeEngine,
 				Status: model.EventStatusSuccess,
 				ChildEvents: model.Events{
-					model.Event{
-						Type:         model.EventTypeProvider,
-						Status:       model.EventStatusSuccess,
-						ProviderName: "mp1",
-						ChildEvents: model.Events{
-							model.NewResourceEventEnd("mp1", "mr1", nil),
-							model.NewResourceEventEnd("mp1", "mr2", nil),
-							model.NewResourceEventEnd("mp1", "mr3", nil),
-						},
-					},
-					model.Event{
-						Type:         model.EventTypeProvider,
-						Status:       model.EventStatusSuccess,
-						ProviderName: "mp2",
-						ChildEvents: model.Events{
-							model.NewResourceEventEnd("mp2", "mr1", nil),
-							model.NewResourceEventEnd("mp2", "mr2", nil),
-							model.NewResourceEventEnd("mp2", "mr3", nil),
-						},
-					},
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewResourceEventEnd("mp2", "mr1", nil),
+					model.NewResourceEventEnd("mp2", "mr2", nil),
+					model.NewResourceEventEnd("mp2", "mr3", nil),
 				},
 			},
 		},
@@ -624,13 +618,13 @@ func TestEngineStatus(t *testing.T) {
 					model.NewProviderEventStart("mp2"),
 					model.NewProviderEventEnd("mp1", nil),
 					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
-					model.NewEngineEventLoaded(),
 					model.NewResourceEventStart("mp1", "mr1"),
 					model.NewResourceEventStart("mp1", "mr2"),
 					model.NewResourceEventStart("mp1", "mr3"),
 					model.NewResourceEventEnd("mp1", "mr1", nil),
 					model.NewResourceEventEnd("mp1", "mr2", nil),
 					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewEngineEventEnd(errors.New("mp2-error")),
 				},
 			},
 			expected: model.Event{
@@ -638,16 +632,9 @@ func TestEngineStatus(t *testing.T) {
 				Status: model.EventStatusFailed,
 				Error:  "mp2-error",
 				ChildEvents: model.Events{
-					model.Event{
-						Type:         model.EventTypeProvider,
-						Status:       model.EventStatusSuccess,
-						ProviderName: "mp1",
-						ChildEvents: model.Events{
-							model.NewResourceEventEnd("mp1", "mr1", nil),
-							model.NewResourceEventEnd("mp1", "mr2", nil),
-							model.NewResourceEventEnd("mp1", "mr3", nil),
-						},
-					},
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
 					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
 				},
 			},
@@ -661,31 +648,23 @@ func TestEngineStatus(t *testing.T) {
 					model.NewProviderEventStart("mp2"),
 					model.NewProviderEventEnd("mp1", nil),
 					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
-					model.NewEngineEventLoaded(),
 					model.NewResourceEventStart("mp1", "mr1"),
 					model.NewResourceEventStart("mp1", "mr2"),
 					model.NewResourceEventStart("mp1", "mr3"),
 					model.NewResourceEventEnd("mp1", "mr1", nil),
 					model.NewResourceEventEnd("mp1", "mr2", nil),
 					model.NewResourceEventEnd("mp1", "mr3", errors.New("mp1-mr3-error")),
+					model.NewEngineEventEnd(multipleErrors),
 				},
 			},
 			expected: model.Event{
 				Type:   model.EventTypeEngine,
 				Status: model.EventStatusFailed,
-				Error:  "mp1-mr3-error\nmp2-error",
+				Error:  multipleErrors.Error(),
 				ChildEvents: model.Events{
-					model.Event{
-						Type:         model.EventTypeProvider,
-						Status:       model.EventStatusFailed,
-						ProviderName: "mp1",
-						Error:        "mp1-mr3-error",
-						ChildEvents: model.Events{
-							model.NewResourceEventEnd("mp1", "mr1", nil),
-							model.NewResourceEventEnd("mp1", "mr2", nil),
-							model.NewResourceEventEnd("mp1", "mr3", errors.New("mp1-mr3-error")),
-						},
-					},
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", errors.New("mp1-mr3-error")),
 					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
 				},
 			},
@@ -699,7 +678,6 @@ func TestEngineStatus(t *testing.T) {
 					model.NewProviderEventStart("mp2"),
 					model.NewProviderEventEnd("mp1", nil),
 					model.NewProviderEventEnd("mp2", nil),
-					model.NewEngineEventLoaded(),
 					model.NewResourceEventStart("mp1", "mr1"),
 					model.NewResourceEventStart("mp1", "mr2"),
 					model.NewResourceEventStart("mp1", "mr3"),
@@ -719,27 +697,13 @@ func TestEngineStatus(t *testing.T) {
 				Type:   model.EventTypeEngine,
 				Status: model.EventStatusFetching,
 				ChildEvents: model.Events{
-					model.Event{
-						Type:         model.EventTypeProvider,
-						Status:       model.EventStatusFetching,
-						ProviderName: "mp1",
-						ChildEvents: model.Events{
-							model.NewResourceEventEnd("mp1", "mr1", nil),
-							model.NewResourceEventEnd("mp1", "mr2", nil),
-							model.NewResourceEventEnd("mp1", "mr3", nil),
-							model.NewResourceEventStart("mp1", "mr4"),
-						},
-					},
-					model.Event{
-						Type:         model.EventTypeProvider,
-						Status:       model.EventStatusSuccess,
-						ProviderName: "mp2",
-						ChildEvents: model.Events{
-							model.NewResourceEventEnd("mp2", "mr1", nil),
-							model.NewResourceEventEnd("mp2", "mr2", nil),
-							model.NewResourceEventEnd("mp2", "mr3", nil),
-						},
-					},
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewResourceEventStart("mp1", "mr4"),
+					model.NewResourceEventEnd("mp2", "mr1", nil),
+					model.NewResourceEventEnd("mp2", "mr2", nil),
+					model.NewResourceEventEnd("mp2", "mr3", nil),
 				},
 			},
 		},
@@ -755,7 +719,7 @@ func TestEngineStatus(t *testing.T) {
 				}
 				es, err := ds.EngineStatus(ctx)
 				require.NoError(t, err)
-				testingutil.AssertEvent(t, es, test.expected)
+				testingutil.AssertEvent(t, test.expected, es)
 			})
 		}
 	}

@@ -36,6 +36,12 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 					errorLock.Unlock()
 				}
 				err = fetchFunc(ctx, resourceChan)
+				if err != nil {
+					as.Logger.Sugar().Errorf("Received an error when trying to write resource event for resource  %v in provider %v: %v", resourceType, provider, err)
+					errorLock.Lock()
+					errors = multierror.Append(errors, err)
+					errorLock.Unlock()
+				}
 				err = ds.WriteEvent(ctx, model.NewResourceEventEnd(p.String(), resourceType, err))
 				if err != nil {
 					as.Logger.Sugar().Errorf("Received an error when trying to write resource event for resource  %v in provider %v: %v", resourceType, provider, err)

@@ -2,12 +2,12 @@ package engine
 
 import (
 	"context"
+	"github.com/hashicorp/go-multierror"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/run-x/cloudgrep/pkg/sequencer"
-	"log"
-
 	"go.uber.org/zap"
+	"log"
 
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
@@ -27,41 +27,40 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 	e.Datastore = datastore
 	e.Logger = logger
 	e.Sequencer = sequencer.AsyncSequencer{Logger: e.Logger}
-	err := e.Datastore.WriteEvent(ctx, model.NewEngineEventStart())
-	if err != nil {
-		return e, err
-	}
+	var errors *multierror.Error
 	for _, c := range cfg.Providers {
 		// Manual regions trumps any written region.
 		if len(cfg.Regions) > 0 {
 			c.Regions = cfg.Regions
 		}
 		// create a providers
-		err = datastore.WriteEvent(ctx, model.NewProviderEventStart(c.String()))
+		err := datastore.WriteEvent(ctx, model.NewProviderEventStart(c.String()))
+		errors = multierror.Append(errors, err)
 		if err != nil {
 			log.Default().Println(err.Error())
-			return e, err
 		}
 		providers, err := provider.NewProviders(ctx, c, logger)
 		if err == nil {
 			e.Providers = append(e.Providers, providers...)
 		}
+		errors = multierror.Append(errors, err)
 		err = datastore.WriteEvent(ctx, model.NewProviderEventEnd(c.String(), err))
 		if err != nil {
 			log.Default().Println(err.Error())
-			return e, err
 		}
+		errors = multierror.Append(errors, err)
 	}
-	return e, nil
+	return e, errors.ErrorOrNil()
 }
 
 //Run the providers: fetches data about cloud resources and save them to store
 func (e *Engine) Run(ctx context.Context) error {
 	err := e.Sequencer.Run(ctx, e, e.Providers)
-	if err != nil {
-		log.Default().Println(err.Error())
-		return err
-	}
-	err = e.Datastore.WriteEvent(ctx, model.NewEngineEventLoaded())
+	//if err != nil {
+	//	log.Default().Println(err.Error())
+	//	return err
+	//}
+	//err = e.Datastore.WriteEvent(ctx, model.NewEngineEventLoaded())
+	err = e.Datastore.WriteEvent(ctx, model.NewEngineEventEnd(err))
 	return err
 }

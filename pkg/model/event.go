@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/google/uuid"
-	"strings"
 	"time"
 )
 
@@ -42,10 +41,17 @@ func NewEngineEventStart() Event {
 	}
 }
 
-func NewEngineEventLoaded() Event {
+func NewEngineEventEnd(err error) Event {
+	status := EventStatusSuccess
+	errr := ""
+	if err != nil {
+		status = EventStatusFailed
+		errr = err.Error()
+	}
 	return Event{
 		Type:   EventTypeEngine,
-		Status: EventStatusLoaded,
+		Status: status,
+		Error:  errr,
 	}
 }
 
@@ -95,77 +101,4 @@ func NewResourceEventEnd(providerName string, resourceType string, err error) Ev
 		ResourceType: resourceType,
 		Error:        errr,
 	}
-}
-
-func (es Events) getAggregatedStatus() string {
-	status := EventStatusSuccess
-	if es == nil {
-		return status
-	}
-	for _, event := range es {
-		if event.Status == EventStatusFetching {
-			status = EventStatusFetching
-		} else if event.Status == EventStatusFailed {
-			status = EventStatusFailed
-			break
-		}
-	}
-	return status
-}
-
-func (es Events) getAggregatedErrors() string {
-	var errors []string
-	if es == nil {
-		return ""
-	}
-	for _, event := range es {
-		if event.Status == EventStatusFailed {
-			errors = append(errors, event.Error)
-		}
-	}
-	return strings.Join(errors, "\n")
-}
-
-func (es Events) getAggregatedUpdatedAt() time.Time {
-	if es == nil {
-		return time.Now()
-	}
-	updatedAt := time.Time{}
-	for _, event := range es {
-		if updatedAt.Before(event.UpdatedAt) {
-			updatedAt = event.UpdatedAt
-		}
-	}
-	return updatedAt
-}
-
-func (es Events) AggregateResourceEvents() Events {
-	if len(es) == 0 {
-		return Events(nil)
-	}
-	mapEvents := make(map[string]Events)
-	for _, e := range es {
-		mapEvents[e.ProviderName] = append(mapEvents[e.ProviderName], e)
-	}
-	var pes Events
-	for providerName, events := range mapEvents {
-		pe := Event{RunId: events[0].RunId, ProviderName: providerName, Type: EventTypeProvider}
-		pe.RunId = events[0].RunId
-		pe.ChildEvents = events
-		pe.Status = pe.ChildEvents.getAggregatedStatus()
-		pe.Error = pe.ChildEvents.getAggregatedErrors()
-		pe.UpdatedAt = pe.ChildEvents.getAggregatedUpdatedAt()
-		pes = append(pes, pe)
-	}
-	return pes
-}
-
-func (e *Event) AddChildEvents(events Events) {
-	if e == nil {
-		return
-	}
-	e.ChildEvents = events
-	e.Status = e.ChildEvents.getAggregatedStatus()
-	e.Error = e.ChildEvents.getAggregatedErrors()
-	e.UpdatedAt = e.ChildEvents.getAggregatedUpdatedAt()
 }

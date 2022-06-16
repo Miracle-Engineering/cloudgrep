@@ -2,45 +2,12 @@ package model
 
 import (
 	_ "embed"
-	"encoding/json"
 	"errors"
 
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-//go:embed testdata/test_data_add_child_events.json
-var embedTestDataAddChildEvents []byte
-
-//go:embed testdata/test_data_aggregate_resource_events.json
-var embedTestDataAggregateResourceEvents []byte
-
-type TestDataAddChildEvent struct {
-	TestName      string `json:"testName"`
-	ChildEvents   Events `json:"childEvents"`
-	ExpectedEvent Event  `json:"expectedEvent"`
-}
-
-type TestDataAggregateResourceEvents struct {
-	TestName       string `json:"testName"`
-	ResourceEvents Events `json:"resourceEvents"`
-	ProviderEvents Events `json:"providerEvents"`
-}
-
-func getTestDataAddChildEvents(t *testing.T) []TestDataAddChildEvent {
-	var testData []TestDataAddChildEvent
-	err := json.Unmarshal(embedTestDataAddChildEvents, &testData)
-	assert.NoError(t, err)
-	return testData
-}
-
-func getTestDataAggregateResourceEvents(t *testing.T) []TestDataAggregateResourceEvents {
-	var testData []TestDataAggregateResourceEvents
-	err := json.Unmarshal(embedTestDataAggregateResourceEvents, &testData)
-	assert.NoError(t, err)
-	return testData
-}
 
 func assertEvent(t *testing.T, ee, ae Event) {
 	assert.Equal(t, ee.Type, ae.Type)
@@ -82,14 +49,45 @@ func TestNewEngineEventStart(t *testing.T) {
 
 }
 
-func TestNewEngineEventLoaded(t *testing.T) {
-	t.Run("NewEngineEventLoaded", func(t *testing.T) {
-		e := NewEngineEventLoaded()
-		assert.Equal(t, EventTypeEngine, e.Type)
-		assert.Equal(t, EventStatusLoaded, e.Status)
-		assert.Empty(t, e.RunId)
-	},
-	)
+func TestNewEngineEventEnd(t *testing.T) {
+	type args struct {
+		err error
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want Event
+	}{
+		{
+			name: "NewEngineEventEndNoError",
+			args: args{
+				err: nil,
+			},
+			want: Event{
+				Type:   EventTypeEngine,
+				Status: EventStatusSuccess,
+			},
+		},
+		{
+			name: "NewProviderEventEndWithError",
+			args: args{
+				err: errors.New("mock error"),
+			},
+			want: Event{
+				Type:   EventTypeEngine,
+				Status: EventStatusFailed,
+				Error:  "mock error",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := NewEngineEventEnd(tt.args.err)
+			assertEvent(t, tt.want, e)
+		},
+		)
+	}
 }
 
 func TestNewProviderEventStart(t *testing.T) {
@@ -212,36 +210,5 @@ func TestNewResourceEventEnd(t *testing.T) {
 			assertEvent(t, tt.want, e)
 		},
 		)
-	}
-}
-
-func TestAddChildEvents(t *testing.T) {
-	tests := getTestDataAddChildEvents(t)
-	for _, test := range tests {
-		t.Run(test.TestName, func(t *testing.T) {
-			var event Event
-			event.AddChildEvents(test.ChildEvents)
-			assert.Equal(t, event.Status, test.ExpectedEvent.Status)
-			assert.Equal(t, event.Error, test.ExpectedEvent.Error)
-			if len(event.ChildEvents) != 0 {
-				assert.Equal(t, event.UpdatedAt, test.ExpectedEvent.UpdatedAt)
-			}
-			assert.Equal(t, len(event.ChildEvents), len(test.ExpectedEvent.ChildEvents))
-		})
-	}
-}
-
-func TestAggregateResourceEvents(t *testing.T) {
-	tests := getTestDataAggregateResourceEvents(t)
-	for _, test := range tests {
-		t.Run(test.TestName, func(t *testing.T) {
-			providerEvents := test.ResourceEvents.AggregateResourceEvents()
-			assert.Equal(t, len(providerEvents), len(test.ProviderEvents))
-			if len(providerEvents) > 0 {
-				assertEvent(t, providerEvents[0], test.ProviderEvents[0])
-			} else {
-				assert.Nil(t, providerEvents)
-			}
-		})
 	}
 }
