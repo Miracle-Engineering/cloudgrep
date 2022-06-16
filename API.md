@@ -4,8 +4,9 @@
 
 The backend exposes an API at `http://localhost:8080/api`.
 
-<details open>
+<details>
 <summary>List resources</summary>
+
 | Route | Method |  Description |  Status |
 | ------------- | ------------- | ------------- | ------------- |
 | [/resources](http://localhost:8080/api/resources)  | POST  | Return list of cloud resources |  :white_check_mark: |
@@ -145,8 +146,9 @@ Example of queries:
 
 ```
 </details>
-<details open>
+<details>
 <summary>Get a resource</summary>
+
 | Route | Method |  Description |  Status |
 | ------------- | ------------- | ------------- | ------------- |
 | [/resource](http://localhost:8080/api/resource)  | GET  | Return a resource |  :white_check_mark: |
@@ -233,8 +235,9 @@ Example of response:
 ]
 ```
 </details>
-<details open>
+<details>
 <summary>Get Engine Status</summary>
+
 Returns the Status of the Cloudgrep run.
 
 | Route                                                   | Method | Description              |  Status |
@@ -271,7 +274,7 @@ Sample Responses:
 If you need to know when the engine is done running, keep pulling this endpoint until the status is no longer **fetching**.
 
 </details>
-<details open>
+<details>
 <summary>Refresh the resources</summary>
 
 Trigger the engine to refresh the cloud resources.
@@ -304,3 +307,4 @@ code: 400
 ```
 
 Once the refreshed is triggered, call **Get Engine Status** API to know if the refresh is done.
+</details>
