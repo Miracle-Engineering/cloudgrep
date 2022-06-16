@@ -9,6 +9,8 @@ PKG = github.com/run-x/cloudgrep
 DOCKER_RELEASE_TAG = "ghcr.io/run-x/cloudgrep:$(VERSION)"
 DOCKER_LATEST_TAG = "ghcr.io/run-x/cloudgrep:main"
 
+THIS_FILE := $(lastword $(MAKEFILE_LIST))
+
 usage:
 	@echo ""
 	@echo "Task                 : Description"
@@ -39,6 +41,10 @@ test:
 load-test:
 	go test ./loadtest/...
 
+pre-commit:
+	@$(MAKE) -f $(THIS_FILE) format
+	@$(MAKE) -f $(THIS_FILE) lint
+	@$(MAKE) -f $(THIS_FILE) test
 
 run:
 	go run -race main.go
