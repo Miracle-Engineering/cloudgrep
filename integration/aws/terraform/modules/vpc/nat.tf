@@ -4,7 +4,7 @@ resource "aws_eip" "nat" {
 
 resource "aws_nat_gateway" "main" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.private[local.subnet_az_letters[0]].id
+  subnet_id     = aws_subnet.public[local.subnet_az_letters[0]].id
 
   depends_on = [
     aws_internet_gateway.test
