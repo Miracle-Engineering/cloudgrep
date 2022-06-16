@@ -4,5 +4,6 @@ resource "aws_route_table" "private" {
     "test" : "vpc-${var.id}-route-table-private"
   }
 
+  // We don't actually want to route anything, to avoid EC2 instances from connecting to the internet
   route = []
 }
