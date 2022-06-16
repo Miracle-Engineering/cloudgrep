@@ -28,7 +28,7 @@ resource "aws_iam_role" "test" {
   count = local.iam_role_count
 
   name_prefix           = "test-${count.index}-"
-  path                  = "test/"
+  path                  = "/test/"
   assume_role_policy    = data.aws_iam_policy_document.assume_role_self.json
   permissions_boundary  = data.aws_iam_policy.permissions_boundary.arn
   force_detach_policies = true
@@ -42,7 +42,7 @@ resource "aws_iam_user" "test" {
   count = local.iam_user_count
 
   name                 = "test-${count.index}"
-  path                 = "test/"
+  path                 = "/test/"
   permissions_boundary = data.aws_iam_policy.permissions_boundary.arn
   force_destroy        = true
 
@@ -55,7 +55,7 @@ resource "aws_iam_policy" "test" {
   count = local.iam_policy_count
 
   name_prefix = "test-${count.index}-"
-  path        = "test/"
+  path        = "/test/"
   policy      = data.aws_iam_policy_document.test_policy.json
 }
 
