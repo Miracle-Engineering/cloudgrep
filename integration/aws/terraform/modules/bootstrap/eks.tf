@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "node_group" {
 
 resource "aws_iam_role" "node_group" {
   name = "eks-cluster-node-group-role"
-
+  path = "/test/"
   assume_role_policy = data.aws_iam_policy_document.node_group.json
   tags = {
     test = "eks-cluster-default-nodegroup-iam-role"
@@ -49,6 +49,7 @@ data "aws_iam_policy_document" "trust_policy" {
 
 resource "aws_iam_role" "cluster_role" {
   name               = "eks-cluster-default-role"
+  path = "/test/"
   assume_role_policy = data.aws_iam_policy_document.trust_policy.json
   tags = {
     test = "eks-cluster-default-iam-role"

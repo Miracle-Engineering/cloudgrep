@@ -153,6 +153,7 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
   statement {
     actions = [
       "iam:CreateRole",
+      "iam:PassRole",
       "iam:CreateUser",
     ]
     resources = [
