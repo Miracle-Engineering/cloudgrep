@@ -37,13 +37,11 @@ export const filterHeader = {
 };
 
 export const filterHover = {
-	width: '400px',
+	width: '500px',
 	position: 'absolute',
 	left: '0px ',
 	zIndex: '10',
-	backgroundColor: 'white',
 	overflow: 'visible',
-	top: '4px',
 };
 
 export const filterStyles = { filterHeader, filterHover };

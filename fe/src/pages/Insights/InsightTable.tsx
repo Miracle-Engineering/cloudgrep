@@ -7,6 +7,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 import { PAGE_LENGTH, TOTAL_RECORDS } from 'constants/globals';
 import { Resource } from 'models/Resource';
 import React, { FC, useEffect, useState } from 'react';
@@ -21,7 +22,7 @@ import { isScrolledForInfiniteScroll } from 'utils/uiHelper';
 import { tableStyles } from './style';
 
 const InsightTable: FC = () => {
-	const { resources } = useAppSelector(state => state.resources);
+	const { resources, count } = useAppSelector(state => state.resources);
 	const { filterTags } = useAppSelector(state => state.tags);
 	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
@@ -34,11 +35,6 @@ const InsightTable: FC = () => {
 			setIsInfiniteScroll(false);
 		}
 	}, [resources]);
-
-	const handleClick = (resource: Resource) => {
-		dispatch(setCurrentResource(resource));
-		dispatch(toggleMenuVisible());
-	};
 
 	const handleInfiniteScroll = async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 		if (isScrolledForInfiniteScroll(e) && hasNext) {
@@ -64,27 +60,29 @@ const InsightTable: FC = () => {
 		}
 	};
 
+	const handleClick = (resource: Resource) => {
+		dispatch(setCurrentResource(resource));
+		dispatch(toggleMenuVisible());
+	};
+
 	return (
 		<Box
 			sx={{
 				width: '80%',
-				height: '100%',
 				backgroundColor: '#F9F7F6',
 				paddingLeft: '28px',
 				paddingRight: '44px',
 			}}>
+			<Typography sx={{ display: 'flex', margin: '4px' }}>{`${count} ${t('COUNT_RESOURCES')}`}</Typography>
 			<TableContainer
+				sx={{ maxHeight: '200vH' }}
 				component={Paper}
-				sx={{ height: '100%' }}
 				onScroll={async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 					if (!isInfiniteScroll) {
 						await handleInfiniteScroll(e);
 					}
 				}}>
-				<Table
-					sx={{ minWidth: 650, maxHeight: '100%', overflowY: 'scroll' }}
-					size="small"
-					aria-label="a dense table">
+				<Table sx={{ minWidth: 650, overflowY: 'scroll' }} size="small" aria-label="a dense table">
 					<TableHead>
 						<TableRow>
 							<TableCell sx={tableStyles.headerStyle}>{t('TYPE')} </TableCell>

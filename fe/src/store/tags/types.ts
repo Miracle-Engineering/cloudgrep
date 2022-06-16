@@ -12,8 +12,3 @@ export interface ErrorType {
 	response?: { status: string };
 	message: string;
 }
-
-export interface Paging {
-	limit: number;
-	offset: number;
-}
