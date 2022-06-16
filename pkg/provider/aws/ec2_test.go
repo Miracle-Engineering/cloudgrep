@@ -86,7 +86,7 @@ func TestFetchImages(t *testing.T) {
 			},
 		},
 		RawData: map[string]any{
-			"Architecture": "x86_84",
+			"Architecture": "x86_64",
 		},
 	})
 }
