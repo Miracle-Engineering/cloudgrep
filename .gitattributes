@@ -1,0 +1,7 @@
+# Improve diff appearance for go files
+*.go -text diff=golang
+
+# Don't count generated files in stats, and hide their diffs
+zz_*.go linguist-generated
+/static linguist-generated
+go.sum linguist-generated
