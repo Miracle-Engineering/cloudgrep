@@ -142,6 +142,7 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
       "iam:UntagPolicy",
       "iam:UntagRole",
       "iam:UntagUser",
+      "iam:CreateOpenIDConnectProvider",
     ]
     resources = [
       "arn:aws:iam::*:policy/test/*",
