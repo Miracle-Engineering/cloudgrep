@@ -1,8 +1,8 @@
 locals {
   vpc_size = tonumber(split("/", var.vpc_cidr)[1])
   cidr_ids = concat(
-    [for s in local.subnet_az_letters: "private-${s}"],
-    [for s in local.subnet_az_letters: "public-${s}"],
+    [for s in local.subnet_az_letters : "private-${s}"],
+    [for s in local.subnet_az_letters : "public-${s}"],
   )
 }
 
