@@ -1,4 +1,18 @@
 data "aws_region" "current" {}
+data "aws_iam_role" "node_group" {
+  name = var.node_group_role
+}
+data "aws_iam_role" "cluster_role" {
+  name = var.cluster_role
+}
+
+variable "cluster_role" {
+  type = string
+}
+
+variable "node_group_role" {
+  type = string
+}
 
 variable "id" {
   description = "ID used in naming and tagging resources"

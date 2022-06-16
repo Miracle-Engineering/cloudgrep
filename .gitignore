@@ -33,6 +33,7 @@ __debug_bin
 **/.terraform/*
 *.tfstate
 *.tfstate.*
+tf.plan
 crash.log
 crash.*.log
 *.tfvars

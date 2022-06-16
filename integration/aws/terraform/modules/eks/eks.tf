@@ -28,7 +28,7 @@ resource "aws_security_group" "eks" {
 
 resource "aws_eks_cluster" "cluster" {
   name     = var.id
-  role_arn = aws_iam_role.cluster_role.arn
+  role_arn = data.aws_iam_role.cluster_role.arn
   version  = var.k8s_version
 
   # To be fixed, although early opta users need this - Cluster allows access from a public CIDR: 0.0.0.0/0
@@ -47,7 +47,6 @@ resource "aws_eks_cluster" "cluster" {
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
   # Otherwise, EKS will not be able to properly delete EKS managed EC2 infrastructure such as Security Groups.
   depends_on = [
-    aws_iam_role_policy_attachment.cluster_AmazonEKSClusterPolicy,
     aws_cloudwatch_log_group.cluster_logs,
   ]
 
