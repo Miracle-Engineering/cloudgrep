@@ -83,6 +83,7 @@ resource "aws_ami_copy" "test" {
   count = local.ami_count
 
   name              = "test-ami-copy-${count.index}"
+  description       = "Test AMI ${count.index}"
   source_ami_id     = "ami-0cff7528ff583bf9a" // Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type, 64-bit x86
   source_ami_region = "us-east-1"
 
