@@ -7,8 +7,9 @@ import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
 import SearchInput from 'components/SearchInput/SearchInput';
 import { SEARCH_ELEMENTS_NUMBER } from 'constants/globals';
-import { ValueType } from 'models/Field';
-import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
+import { Field, ValueType } from 'models/Field';
+import { Tag } from 'models/Tag';
+import React, { ChangeEvent, FC, useEffect, useMemo, useRef, useState } from 'react';
 import useHover from 'utils/hooks/useHover';
 
 import AccordionItem from './AccordionItem';
@@ -16,15 +17,22 @@ import { accordionStyles, filterStyles, overrideSummaryClasses } from './style';
 import { AccordionFilterProps } from './types';
 
 const AccordionFilter: FC<AccordionFilterProps> = props => {
-	const { label, hasSearch, id, field, handleChange, checkedByDefault } = props;
+	const { label, hasSearch, id, field } = props;
 	const [searchTerm, setSearchTerm] = useState('');
 	const [applyHover, setApplyHover] = useState(false);
 	const [boxHeight, setBoxHeight] = useState('unset');
 	const [containerRef, isHovered] = useHover<HTMLDivElement>();
 	const accordionRef = useRef<HTMLElement>();
 	const [expanded, setExpanded] = useState(false);
-	const [allIncluded, setAllIncluded] = useState(false);
 	const [singleItem, setSingleItem] = useState('');
+	const initialTags = useMemo(
+		() =>
+			field?.values?.map((item: ValueType) => {
+				return { key: field.name, value: item.value };
+			}),
+		[field]
+	);
+	const [filterTags, setFilterTags] = useState<Tag[]>(initialTags);
 
 	const handleExpand = () => {
 		setExpanded(!expanded);
@@ -42,16 +50,30 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 			setBoxHeight('unset');
 			setApplyHover(false);
 		}
-	}, [isHovered, accordionRef?.current?.clientHeight, expanded, accordionRef]);
+	}, [isHovered, expanded, accordionRef]);
 
 	const handleOnly = (item: ValueType) => {
+		setFilterTags([{ key: field.name, value: item.value }]);
 		setSingleItem(item.value);
-		setAllIncluded(false);
 	};
 
 	const handleAll = () => {
-		setAllIncluded(true);
+		setFilterTags(initialTags);
 		setSingleItem('');
+	};
+
+	const handleChange = (event: React.ChangeEvent<HTMLInputElement>, field: Field, item: ValueType) => {
+		const tag = { key: field.name, value: item.value };
+		const existingTag = filterTags?.some(filterTag => filterTag.key === tag.key && filterTag.value === tag.value);
+
+		if (event.target.checked && !existingTag) {
+			setFilterTags([...filterTags, tag]);
+		} else if (!event.target.checked && existingTag && filterTags?.length > 0) {
+			const newFilters = filterTags.filter(
+				filterTag => !(filterTag.key === tag.key && filterTag.value === tag.value)
+			);
+			setFilterTags(newFilters);
+		}
 	};
 
 	return (
@@ -81,11 +103,9 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 												field={field}
 												item={item}
 												handleChange={handleChange}
-												isChecked={
-													singleItem
-														? allIncluded || item.value === singleItem
-														: checkedByDefault
-												}
+												isChecked={filterTags.some(
+													tag => tag.key === field.name && tag.value === item.value
+												)}
 												handleOnly={handleOnly}
 												handleAll={handleAll}
 												singleItem={singleItem}

@@ -1,12 +1,11 @@
 import { Field, ValueType } from 'models/Field';
+import { Tag } from 'models/Tag';
 
 export interface AccordionFilterProps {
 	id: string;
 	label: string;
 	field: Field;
 	hasSearch: boolean;
-	handleChange: (event: React.ChangeEvent<HTMLInputElement>, field: Field, item: ValueType) => void;
-	checkedByDefault: boolean;
 }
 export interface AccordionItemProps {
 	field: Field;
