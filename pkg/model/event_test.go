@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
-	"github.com/run-x/cloudgrep/pkg/testingutil"
+
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -40,6 +40,35 @@ func getTestDataAggregateResourceEvents(t *testing.T) []TestDataAggregateResourc
 	err := json.Unmarshal(embedTestDataAggregateResourceEvents, &testData)
 	assert.NoError(t, err)
 	return testData
+}
+
+func assertEvent(t *testing.T, ee, ae Event) {
+	assert.Equal(t, ee.Type, ae.Type)
+	assert.Equal(t, ee.Status, ae.Status)
+	assert.Equal(t, ee.ProviderName, ae.ProviderName)
+	assert.Equal(t, ee.ResourceType, ae.ResourceType)
+	assert.Equal(t, ee.Error, ae.Error)
+	if ee.ChildEvents != nil {
+		assert.Equal(t, len(ee.ChildEvents), len(ae.ChildEvents))
+		for _, e := range ee.ChildEvents {
+			for _, a := range ae.ChildEvents {
+				switch e.Type {
+				case EventTypeEngine:
+					if e.Type == a.Type {
+						assertEvent(t, e, a)
+					}
+				case EventTypeProvider:
+					if e.Type == a.Type && e.ProviderName == a.ProviderName {
+						assertEvent(t, e, a)
+					}
+				case EventTypeResource:
+					if e.Type == a.Type && e.ProviderName == a.ProviderName && e.ResourceType == a.ResourceType {
+						assertEvent(t, e, a)
+					}
+				}
+			}
+		}
+	}
 }
 
 func TestNewEngineEventStart(t *testing.T) {
@@ -115,7 +144,7 @@ func TestNewProviderEventEnd(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := NewProviderEventEnd(tt.args.providerName, tt.args.err)
-			testingutil.AssertEvent(t, tt.want, e)
+			assertEvent(t, tt.want, e)
 		},
 		)
 	}
@@ -180,7 +209,7 @@ func TestNewResourceEventEnd(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := NewResourceEventEnd(tt.args.providerName, tt.args.resourceType, tt.args.err)
-			testingutil.AssertEvent(t, tt.want, e)
+			assertEvent(t, tt.want, e)
 		},
 		)
 	}
@@ -209,7 +238,7 @@ func TestAggregateResourceEvents(t *testing.T) {
 			providerEvents := test.ResourceEvents.AggregateResourceEvents()
 			assert.Equal(t, len(providerEvents), len(test.ProviderEvents))
 			if len(providerEvents) > 0 {
-				testingutil.AssertEvent(t, providerEvents[0], test.ProviderEvents[0])
+				assertEvent(t, providerEvents[0], test.ProviderEvents[0])
 			} else {
 				assert.Nil(t, providerEvents)
 			}

@@ -80,12 +80,6 @@ func AssertEqualsField(t *testing.T, a, b model.Field) {
 	assert.ElementsMatch(t, a.Values, b.Values)
 }
 
-func AssertEqualsEngineStatus(t *testing.T, expectedEngineStatus, actualEngineStatus model.EngineStatus) {
-	assert.Equal(t, expectedEngineStatus.ResourceType, actualEngineStatus.ResourceType)
-	assert.Equal(t, expectedEngineStatus.Status, actualEngineStatus.Status)
-	assert.Equal(t, expectedEngineStatus.ErrorMessage, actualEngineStatus.ErrorMessage)
-}
-
 func AssertEqualsTag(t *testing.T, a, b *model.Tag) {
 	if a == nil {
 		assert.Nil(t, b)
