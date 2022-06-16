@@ -2,9 +2,11 @@ package engine
 
 import (
 	"context"
+	"fmt"
+	"log"
+
 	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/run-x/cloudgrep/pkg/sequencer"
-	"log"
 
 	"go.uber.org/zap"
 
@@ -34,7 +36,7 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 		// create a providers
 		providers, err := provider.NewProviders(ctx, c, logger)
 		if err != nil {
-			return Engine{}, err
+			return Engine{}, fmt.Errorf("failed to start engine: %w", err)
 		}
 		e.Providers = append(e.Providers, providers...)
 	}

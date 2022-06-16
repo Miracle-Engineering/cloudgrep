@@ -60,20 +60,21 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 //runEngine runs the providers to collect the cloud resources
 //it returns when it's done fetching
 func (cli *cli) runEngine(ctx context.Context) error {
+	//TODO send engine start event
 	eng, err := engine.NewEngine(ctx, cli.cfg, cli.logger, cli.ds)
-	if err != nil {
-		return fmt.Errorf("failed to start engine: %w", err)
-	}
-	if err = eng.Run(ctx); err != nil {
-		stats, _ := cli.ds.Stats(ctx)
-		if stats.ResourcesCount > 0 {
-			//log the error but the api can still server with the datastore
-			cli.logger.Sugar().Errorw("some error(s) when running the provider engine", "error", err)
-		} else {
-			// nothing to view - exit
-			return fmt.Errorf("can't run the provider engine: %w", err)
+	if err == nil {
+		if err = eng.Run(ctx); err != nil {
+			stats, _ := cli.ds.Stats(ctx)
+			if stats.ResourcesCount > 0 {
+				//log the error but the api can still server with the datastore
+				cli.logger.Sugar().Errorw("some error(s) when running the provider engine", "error", err)
+			} else {
+				// nothing to view - exit
+				return fmt.Errorf("can't run the provider engine: %w", err)
+			}
 		}
 	}
+	//TODO send engine end event using err as param
 	return nil
 }
 
