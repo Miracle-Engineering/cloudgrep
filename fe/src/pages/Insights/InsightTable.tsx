@@ -7,6 +7,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 import { PAGE_LENGTH, TOTAL_RECORDS } from 'constants/globals';
 import { Resource } from 'models/Resource';
 import React, { FC, useEffect, useState } from 'react';
@@ -21,7 +22,7 @@ import { isScrolledForInfiniteScroll } from 'utils/uiHelper';
 import { tableStyles } from './style';
 
 const InsightTable: FC = () => {
-	const { resources } = useAppSelector(state => state.resources);
+	const { resources, count } = useAppSelector(state => state.resources);
 	const { filterTags } = useAppSelector(state => state.tags);
 	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
@@ -72,6 +73,7 @@ const InsightTable: FC = () => {
 				paddingLeft: '28px',
 				paddingRight: '44px',
 			}}>
+			<Typography sx={{ display: 'flex', margin: '4px' }}>{`${count} ${t('COUNT_RESOURCES')}`}</Typography>
 			<TableContainer
 				sx={{ maxHeight: '200vH' }}
 				component={Paper}
