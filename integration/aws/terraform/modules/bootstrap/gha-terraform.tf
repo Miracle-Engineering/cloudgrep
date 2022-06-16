@@ -119,6 +119,7 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
       "s3:*",
       "sns:*",
       "sqs:*",
+      "logs:*",
     ]
     resources = ["*"]
   }
@@ -141,11 +142,23 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
       "iam:UntagPolicy",
       "iam:UntagRole",
       "iam:UntagUser",
+      "iam:CreateOpenIDConnectProvider",
     ]
     resources = [
       "arn:aws:iam::*:policy/test/*",
       "arn:aws:iam::*:role/test/*",
       "arn:aws:iam::*:user/test/*",
+      "arn:aws:iam::*:oidc-provider/*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "iam:PassRole",
+    ]
+    resources = [
+      aws_iam_role.cluster_role.arn,
+      aws_iam_role.node_group.arn
     ]
   }
 

@@ -10,7 +10,7 @@ resource "aws_subnet" "private" {
 
   vpc_id                  = aws_vpc.vpc.id
   availability_zone       = each.value
-  cidr_block              = local.subnet_cidrs[each.key]
+  cidr_block              = local.subnet_cidrs["private-${each.key}"]
   map_public_ip_on_launch = false
 
   tags = {
@@ -23,4 +23,24 @@ resource "aws_route_table_association" "private" {
 
   subnet_id      = aws_subnet.private[each.key].id
   route_table_id = aws_route_table.private.id
+}
+
+resource "aws_subnet" "public" {
+  for_each = local.subnet_az_map
+
+  vpc_id                  = aws_vpc.vpc.id
+  availability_zone       = each.value
+  cidr_block              = local.subnet_cidrs["public-${each.key}"]
+  map_public_ip_on_launch = true
+
+  tags = {
+    "test" : "vpc-${var.id}-public-subnet-${each.key}"
+  }
+}
+
+resource "aws_route_table_association" "public" {
+  for_each = local.subnet_az_map
+
+  subnet_id      = aws_subnet.public[each.key].id
+  route_table_id = aws_route_table.public.id
 }
