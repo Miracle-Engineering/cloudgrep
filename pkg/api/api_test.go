@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -63,6 +64,10 @@ type mockApi struct {
 //runEngine simulates running the engine by writing resources to the datastore
 func (m *mockApi) runEngine(ctx context.Context) error {
 	var err error
+	err = m.ds.WriteEvent(ctx, model.NewEngineEventStart())
+	if err != nil {
+		return err
+	}
 	if m.engineErr == nil {
 		err = m.ds.WriteResources(ctx, m.resources)
 	} else {
@@ -70,6 +75,13 @@ func (m *mockApi) runEngine(ctx context.Context) error {
 	}
 	//for testing async simulate a longer run by waiting
 	time.Sleep(10 * time.Millisecond)
+
+	defer func() {
+		err := m.ds.WriteEvent(ctx, model.NewEngineEventLoaded())
+		if err != nil {
+			log.Default().Println(err.Error())
+		}
+	}()
 
 	if err != nil {
 		return err

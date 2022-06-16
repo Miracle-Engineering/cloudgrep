@@ -375,6 +375,8 @@ func (s *SQLiteStore) deleteResourcesBefore(before time.Time) (int, error) {
 }
 
 func (s *SQLiteStore) EngineStatus(ctx context.Context) (model.Event, error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	var resourceEvents model.Events
 	result := s.db.
 		Model(&model.Event{}).
