@@ -131,10 +131,10 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
   //  - Force permissions boundary on roles/users to ensure they are useless.
   statement {
     actions = [
+      "iam:AddRoleToInstanceProfile",
       "iam:CreateInstanceProfile",
       "iam:CreateOpenIDConnectProvider",
       "iam:CreatePolicy",
-      "iam:CreateVirtualMFADevice",
       "iam:CreateVirtualMFADevice",
       "iam:DeleteInstanceProfile",
       "iam:DeleteLoginProfile", // TF calls this unconditionally when deleting a user
@@ -142,6 +142,9 @@ data "aws_iam_policy_document" "gha_terraform_resources" {
       "iam:DeletePolicy",
       "iam:DeleteRole",
       "iam:DeleteUser",
+      "iam:DeleteVirtualMFADevice",
+      "iam:PassRole",
+      "iam:RemoveRoleFromInstanceProfile",
       "iam:TagInstanceProfile",
       "iam:TagMFADevice",
       "iam:TagOpenIDConnectProvider",
