@@ -1,0 +1,18 @@
+types:
+  - name: CacheCluster
+    listApi:
+      call: DescribeCacheClusters
+      outputKey: CacheClusters
+      id: ARN
+      pagination: true
+    getTagsApi:
+      type: CacheCluster
+      call: ListTagsForResource
+      inputIDField:
+        name: ResourceName
+      tags:
+        style: struct
+        field: "TagList"
+        pointer: true
+        key: Key
+        value: Value

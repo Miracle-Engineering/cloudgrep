@@ -3,3 +3,4 @@ services:
 - elb
 - lambda
 - rds
+- elasticache
