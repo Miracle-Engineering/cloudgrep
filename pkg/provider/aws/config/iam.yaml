@@ -1,0 +1,86 @@
+global: true
+
+types:
+  - name: InstanceProfile
+    listApi:
+      call: ListInstanceProfiles
+      pagination: true
+      outputKey: InstanceProfiles
+      id: InstanceProfileName
+    getTagsApi:
+      call: ListInstanceProfileTags
+      type: InstanceProfile
+      inputIDField: InstanceProfileName
+      tags: &tags
+        style: struct
+        pointer: true
+        field: Tags
+        key: Key
+        value: Value
+  - name: OpenIDConnectProvider
+    listApi:
+      call: ListOpenIDConnectProviders
+      outputKey: OpenIDConnectProviderList
+      id: Arn
+    getTagsApi:
+      call: ListOpenIDConnectProviderTags
+      type: OpenIDConnectProviderListEntry
+      inputIDField: OpenIDConnectProviderArn
+      tags: *tags
+  - name: Policy
+    listApi:
+      call: ListPolicies
+      pagination: true
+      inputOverrides:
+        fieldFuncs:
+          Scope: listPoliciesScope
+      outputKey: Policies
+      id: Arn
+    getTagsApi:
+      type: Policy
+      call: ListPolicyTags
+      inputIDField: PolicyArn
+      tags: *tags
+  - name: Role
+    listApi:
+      call: ListRoles
+      pagination: true
+      outputKey: Roles
+      id: RoleName
+    getTagsApi:
+      type: Role
+      call: ListRoleTags
+      inputIDField: RoleName
+      tags: *tags
+  - name: SAMLProvider
+    listApi:
+      call: ListSAMLProviders
+      outputKey: SAMLProviderList
+      id: Arn
+    getTagsApi:
+      call: ListSAMLProviderTags
+      type: SAMLProviderListEntry
+      inputIDField: SAMLProviderArn
+      tags: *tags
+  - name: User
+    listApi:
+      call: ListUsers
+      pagination: true
+      outputKey: Users
+      id: UserName
+    getTagsApi:
+      type: User
+      call: ListUserTags
+      inputIDField: UserName
+      tags: *tags
+  - name: VirtualMFADevice
+    listApi:
+      call: ListVirtualMFADevices
+      pagination: true
+      outputKey: VirtualMFADevices
+      id: SerialNumber
+    getTagsApi:
+      type: VirtualMFADevice
+      call: ListMFADeviceTags
+      inputIDField: SerialNumber
+      tags: *tags
