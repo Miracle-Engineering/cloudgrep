@@ -28,6 +28,7 @@ __debug_bin
 
 # local config
 .config/
+local
 
 # Terraform; source https://github.com/github/gitignore/blob/main/Terraform.gitignore
 **/.terraform/*
