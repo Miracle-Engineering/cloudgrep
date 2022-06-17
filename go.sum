@@ -77,6 +77,8 @@ github.com/aws/aws-sdk-go-v2/internal/ini v1.3.11 h1:6cZRymlLEIlDTEB0+5+An6Zj1CK
 github.com/aws/aws-sdk-go-v2/internal/ini v1.3.11/go.mod h1:0MR+sS1b/yxsfAPvAESrw8NfwUoxMinDyw6EYR9BS2U=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.1 h1:C21IDZCm9Yu5xqjb3fKmxDoYvJXtw1DNlOmLZEIlY1M=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.1/go.mod h1:l/BbcfqDCT3hePawhy4ZRtewjtdkl6GWtd9/U+1penQ=
+github.com/aws/aws-sdk-go-v2/service/cloudfront v1.18.2 h1:uhpcmaxRKPt/VHGmzJ4aam8sL0DYr7qJejiQzp/dBV8=
+github.com/aws/aws-sdk-go-v2/service/cloudfront v1.18.2/go.mod h1:TRXCqcApTM1LhOJcLNolqFEDr3InJoYBieb1qqPcCko=
 github.com/aws/aws-sdk-go-v2/service/ec2 v1.36.1 h1:FS8Ja6LuLDVHcX+rmoNpOXqYb52N2A5DwQy7Dgduq4Q=
 github.com/aws/aws-sdk-go-v2/service/ec2 v1.36.1/go.mod h1:KOy1O7Fc2+GRgsbn/Kjr15vYDVXMEQALBaPRia3twSY=
 github.com/aws/aws-sdk-go-v2/service/eks v1.21.2 h1:USHbPmNuYU4TWK/4aReqwdEdeXea76EUnNbLztzyGMQ=
