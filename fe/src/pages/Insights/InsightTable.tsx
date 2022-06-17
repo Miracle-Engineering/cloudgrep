@@ -8,7 +8,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { PAGE_LENGTH, TOTAL_RECORDS } from 'constants/globals';
+import { DEBOUNCE_PERIOD, PAGE_LENGTH } from 'constants/globals';
+import debounce from 'debounce';
 import { Resource } from 'models/Resource';
 import React, { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,18 +29,18 @@ const InsightTable: FC = () => {
 	const dispatch = useAppDispatch();
 	const [isInfiniteScroll, setIsInfiniteScroll] = useState<boolean>(false);
 	const [hasNext, setHasNext] = useState<boolean>(true);
-	const { currentPage, next } = usePagination(PAGE_LENGTH, TOTAL_RECORDS);
+	const { currentPage, next } = usePagination(PAGE_LENGTH, count);
 
 	useEffect(() => {
-		if (resources) {
+		if (resources && isInfiniteScroll) {
 			setIsInfiniteScroll(false);
+			next();
 		}
 	}, [resources]);
 
 	const handleInfiniteScroll = async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
-		if (isScrolledForInfiniteScroll(e) && hasNext) {
+		if (isScrolledForInfiniteScroll(e)) {
 			setIsInfiniteScroll(true);
-			next();
 			const response = await ResourceService.getFilteredResources(
 				filterTags,
 				currentPage * PAGE_LENGTH,
@@ -60,10 +61,19 @@ const InsightTable: FC = () => {
 		}
 	};
 
+	const onContainerScroll = async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
+		if (!isInfiniteScroll && hasNext) {
+			await handleInfiniteScroll(e);
+			e.persist();
+		}
+	};
+
 	const handleClick = (resource: Resource) => {
 		dispatch(setCurrentResource(resource));
 		dispatch(toggleMenuVisible());
 	};
+
+	const debouncedContainerScroll = debounce(onContainerScroll, DEBOUNCE_PERIOD);
 
 	return (
 		<Box
@@ -79,7 +89,7 @@ const InsightTable: FC = () => {
 				component={Paper}
 				onScroll={async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 					if (!isInfiniteScroll) {
-						await handleInfiniteScroll(e);
+						await debouncedContainerScroll(e);
 					}
 				}}>
 				<Table sx={{ minWidth: 650, overflowY: 'scroll' }} size="small" aria-label="a dense table">
