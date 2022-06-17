@@ -1,0 +1,21 @@
+[
+  "ec2.Address",
+  "ec2.Image",
+  "ec2.Instance",
+  "ec2.KeyPair",
+  "ec2.LaunchTemplate",
+  "ec2.NatGateway",
+  "ec2.NetworkAcl",
+  "ec2.NetworkInterface",
+  "ec2.RouteTable",
+  "ec2.SecurityGroup",
+  "ec2.Snapshot",
+  "ec2.Subnet",
+  "ec2.Volume",
+  "ec2.Vpc",
+  "elb.LoadBalancer",
+  "lambda.Function",
+  "rds.DBCluster",
+  "rds.DBInstance",
+  "s3.Bucket"
+]
