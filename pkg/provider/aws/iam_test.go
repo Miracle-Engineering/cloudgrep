@@ -10,6 +10,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestFetchInstanceProfiles(t *testing.T) {
+	t.Parallel()
+
+	ctx := setupIntegrationTest(t)
+
+	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.InstanceProfile")
+
+	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
+		Type:   "iam.InstanceProfile",
+		Region: globalRegion,
+		Tags: model.Tags{
+			{
+				Key:   testingutil.TestTag,
+				Value: "iam-instance-profile-0",
+			},
+		},
+		RawData: map[string]any{
+			"Path": "/test/",
+		},
+	})
+}
+
 func TestFetchOpenIDConnectProviders(t *testing.T) {
 	t.Parallel()
 
@@ -95,6 +117,28 @@ func TestFetchUsers(t *testing.T) {
 			{
 				Key:   testingutil.TestTag,
 				Value: "iam-user-0",
+			},
+		},
+		RawData: map[string]any{
+			"Path": "/test/",
+		},
+	})
+}
+
+func TestFetchVirtualMFADevices(t *testing.T) {
+	t.Parallel()
+
+	ctx := setupIntegrationTest(t)
+
+	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.VirtualMFADevice")
+
+	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
+		Type:   "iam.VirtualMFADevice",
+		Region: globalRegion,
+		Tags: model.Tags{
+			{
+				Key:   testingutil.TestTag,
+				Value: "iam-virtual-mfa-0",
 			},
 		},
 		RawData: map[string]any{
