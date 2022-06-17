@@ -141,8 +141,5 @@ func TestFetchVirtualMFADevices(t *testing.T) {
 				Value: "iam-virtual-mfa-0",
 			},
 		},
-		RawData: map[string]any{
-			"Path": "/test/",
-		},
 	})
 }

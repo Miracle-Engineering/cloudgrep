@@ -79,4 +79,8 @@ types:
       pagination: true
       outputKey: VirtualMFADevices
       id: SerialNumber
+    getTagsApi:
+      type: VirtualMFADevice
+      call: ListMFADeviceTags
+      inputIDField: SerialNumber
       tags: *tags

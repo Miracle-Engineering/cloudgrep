@@ -46,11 +46,6 @@ func (p *Provider) register_iam(mapping map[string]mapper) {
 		FetchFunc: p.fetch_iam_VirtualMFADevice,
 		IdField:   "SerialNumber",
 		IsGlobal:  true,
-		TagField: resourceconverter.TagField{
-			Name:  "Tags",
-			Key:   "Key",
-			Value: "Value",
-		},
 	}
 }
 
@@ -322,10 +317,33 @@ func (p *Provider) fetch_iam_VirtualMFADevice(ctx context.Context, output chan<-
 			return fmt.Errorf("failed to fetch %s: %w", "iam.VirtualMFADevice", err)
 		}
 
-		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.VirtualMFADevices); err != nil {
+		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.VirtualMFADevices, p.getTags_iam_VirtualMFADevice); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+func (p *Provider) getTags_iam_VirtualMFADevice(ctx context.Context, resource types.VirtualMFADevice) (model.Tags, error) {
+	client := iam.NewFromConfig(p.config)
+	input := &iam.ListMFADeviceTagsInput{}
+
+	input.SerialNumber = resource.SerialNumber
+
+	output, err := client.ListMFADeviceTags(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch %s tags: %w", "iam.VirtualMFADevice", err)
+	}
+	tagField_0 := output.Tags
+
+	var tags model.Tags
+
+	for _, field := range tagField_0 {
+		tags = append(tags, model.Tag{
+			Key:   *field.Key,
+			Value: *field.Value,
+		})
+	}
+
+	return tags, nil
 }

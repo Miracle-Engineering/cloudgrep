@@ -96,6 +96,6 @@ resource "aws_iam_virtual_mfa_device" "test" {
   path                    = "/test/"
 
   tags = {
-    "test": "iam-virtual-mfa-${count.index}"
+    "test" : "iam-virtual-mfa-${count.index}"
   }
 }
