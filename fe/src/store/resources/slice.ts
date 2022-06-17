@@ -20,7 +20,6 @@ const resourcesSlice = createSlice({
 		},
 		addResources: (state, action: PayloadAction<Resource[]>) => {
 			state.resources = state.resources.concat(action.payload);
-			state.count = state.count + action.payload.length;
 		},
 		setCurrentResource: (state, action: PayloadAction<Resource>) => {
 			state.currentResource = action.payload;
