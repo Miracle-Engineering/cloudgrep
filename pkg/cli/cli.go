@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"go.uber.org/zap"
@@ -48,6 +49,7 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 	api.StartWebServer(ctx, cfg, logger, cli.ds, cli.runEngine)
 
 	url := fmt.Sprintf("http://%v:%v/%v", cfg.Web.Host, cfg.Web.Port, cfg.Web.Prefix)
+	url = strings.Trim(url, "/")
 	fmt.Println("To view Cloudgrep UI, open ", url, "in browser")
 
 	if !cfg.Web.SkipOpen {
