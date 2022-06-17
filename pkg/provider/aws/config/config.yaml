@@ -4,3 +4,4 @@ services:
 - iam
 - lambda
 - rds
+- elasticache

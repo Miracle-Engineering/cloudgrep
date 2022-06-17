@@ -6,7 +6,7 @@ export const sideMenuStyle: CSSProperties = {
 	overflow: 'scroll',
 	width: '50%',
 	border: '1px solid black',
-	position: 'absolute',
+	position: 'fixed',
 	right: '0px',
 	top: '0px',
 	backgroundColor: 'white',
