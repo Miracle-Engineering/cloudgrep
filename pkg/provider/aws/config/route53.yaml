@@ -1,0 +1,41 @@
+global: true
+
+types:
+  - name: HealthCheck
+    listApi:
+      call: ListHealthChecks
+      pagination: true
+      outputKey: HealthChecks
+      id:
+        name: Id
+        pointer: true
+    getTagsApi:
+      call: ListTagsForResources
+      type: HealthCheck
+      inputIDField:
+        name: ResourceIds
+        sliceType: string
+      tags: &tags
+        style: struct
+        field:
+          - ResourceTagSets
+          - name: Tags
+            sliceType: types.Tag
+        key: Key
+        value: Value
+        pointer: true
+  - name: HostedZone
+    listApi:
+      call: ListHostedZones
+      pagination: true
+      outputKey: HostedZones
+      id:
+        name: Id
+        pointer: true
+    getTagsApi:
+      call: ListTagsForResources
+      type: HostedZone
+      inputIDField:
+        name: ResourceIds
+        sliceType: string
+      tags: *tags
