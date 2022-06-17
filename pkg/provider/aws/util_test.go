@@ -21,6 +21,7 @@ import (
 // Default region to run tests against if AWS_REGION is not set.
 // Always runs integration tests for the "global" region.
 const defaultRegion = "us-east-1"
+const globalRegion = "global"
 
 const (
 	accountIntegrationDev  = "316817240772"
