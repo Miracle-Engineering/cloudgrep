@@ -1,5 +1,5 @@
 locals {
-  redis_cluster_count  = 1
+  redis_cluster_count = 1
 }
 
 resource "random_password" "redis_auth" {
@@ -31,7 +31,7 @@ resource "aws_security_group" "elasticache" {
 }
 
 resource "aws_elasticache_replication_group" "redis_cluster" {
-  count = local.redis_cluster_count
+  count                         = local.redis_cluster_count
   automatic_failover_enabled    = true
   auto_minor_version_upgrade    = true
   security_group_ids            = [aws_security_group.elasticache.id]
