@@ -54,17 +54,81 @@ If you'd like to try it out or have any questions - feel free to join our [TBD -
 - [Precompiled binaries](https://github.com/run-x/cloudgrep/releases) for supported 
 operating systems are available.
 
-# Usage
+# CLI Usage
 
-Start cloudgrep locally:
+Cloudgrep runs as a cli binary executed in your local machine. You can find our latest release 
+[here](https://github.com/run-x/cloudgrep/releases) on our release page -- simply download the zip named for your
+OS/spec (or let us know if you can't find yours). 
 
-```
+Once downloaded, (and assuming you have AWS credentials properly configured in your CLI) you can start using cloudgrep
+immediately by executing the binary (no args needed)
+
+```bash
 cloudgrep
 ```
 
-See more options:
-```
+Cloudgrep will then run with the default behavior which does the following:
+
+1. Create an in-memory SQLite database to store the data in.
+2. Use your current AWS credentials to scan your current cloud account for resources in either the us-east-1 region or
+   those deemed global (like S3 buckets).
+3. Store said found resources in the datastore.
+4. Launch the cloudgrep webapp.
+
+Assuming your `open` bash command is working properly (if not go to the localhost url printed out), cloudgrep will now
+open your default web browser to the homepage of the cloudgrep webapp!
+
+Again, this is just cloudgrep's *default* behavior -- cloudgrep's behavior can be configured via a user-inputted config
+yaml and/or cli argument. Configs are then resolved at runtime by considering said cli arguments, the user-passed config
+yaml, and the defaults in that order of precedence.
+
+## CLI Arguments
+The cli arguments are all fully documented under the cli's `help` option thanks to [cobra](https://github.com/spf13/cobra).
+To view documentation for them, simply add the `--help` flag like so:
+
+```bash
 ./cloudgrep --help
+```
+
+## Config YAML
+The config yaml can be passed in by using the `-c` or `--config` flag as follows:
+
+```bash
+cloudgrep -c my_config.yaml
+```
+The path is relative to the current working directory. Cloudgrep expects the follow possible values in the yaml
+(you do not need to markdown all if passing the file as it will alwys try to default to the original behavior):
+
+```yaml
+# Config represents all the user-configurable settings for cloudgrep. One such structure is loaded at runtime and
+# is populated through the cli arguments, user-provider config file, or a preset default, with values resolved
+# in that order of precedence. To see the default, please refer to
+# https://github.com/run-x/cloudgrep/blob/main/pkg/config/config.yaml
+
+# web represents the specs cloudgrep uses for creating the webapp server
+web:
+  # host is the host the server is running as
+  host: localhost
+  # port is the port the server is running in
+  port: 8080
+  # prefix is the url prefix the server uses  
+  prefix: "/"
+  # skipOpen determines whether to automatically open the webui on startup
+  skipOpen: false
+
+# datastore represents the specs cloudgrep uses for creating and/or connecting to the datastore/database used.
+datastore:
+  # type is the kind of datastore to be used by cloudgrep (currently only supports SQLite)
+  type: sqlite
+  #  skipRefresh determines whether to refresh the data (i.e. scan the cloud) on startup.
+  skipRefresh: false
+  # dataSourceName is the Type-specific data source name or uri for connecting to the desired data source
+  dataSourceName: "~/blah.db"
+
+# providers represents the cloud providers cloudgrep will scan w/ the current credentials
+providers:
+  - cloud: aws # cloud is the type of the cloud provider (currently only AWS is supported)
+    regions: [us-east-1, global] # regions is the list of different regions within the cloud provider to scan
 ```
 
 # Development
