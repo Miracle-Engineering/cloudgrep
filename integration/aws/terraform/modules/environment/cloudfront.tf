@@ -11,7 +11,7 @@ resource "aws_cloudfront_distribution" "distribution" {
   enabled         = true
   is_ipv6_enabled = true
   price_class     = "PriceClass_200"
-  aliases         =  []
+  aliases         = []
 
   restrictions {
     geo_restriction {
@@ -20,7 +20,7 @@ resource "aws_cloudfront_distribution" "distribution" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate =  true
+    cloudfront_default_certificate = true
     ssl_support_method             = "sni-only"
   }
 
