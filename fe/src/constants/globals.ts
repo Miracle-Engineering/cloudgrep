@@ -8,4 +8,4 @@ export const AND_OPERATOR = '$and';
 export const PAGE_LENGTH = 30;
 export const PAGE_START = 0;
 export const INFINITE_SCROLL_VALUE = 0.75; // If 75% of table is scrolled then fetch next page of results
-export const TOTAL_RECORDS = 10000; // todo update with real value from API response when available
+export const DEBOUNCE_PERIOD = 300; // debounce period for scroll, search, etc.
