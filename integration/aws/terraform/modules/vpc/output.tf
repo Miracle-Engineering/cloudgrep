@@ -10,6 +10,10 @@ output "private_subnet_azs" {
   value = values(local.subnet_az_map)
 }
 
+output "vpc_cidr" {
+  value = var.vpc_cidr
+}
+
 output "private_subnet_az_map" {
   value = { for letter, az in local.subnet_az_map : az => aws_subnet.private[letter].id }
 }
