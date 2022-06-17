@@ -22,6 +22,8 @@ type Service struct {
 	// Defaults to Name.
 	ServicePackage string `yaml:"servicePackage"`
 
+	EndpointID string `yaml:"endpointId"`
+
 	// Global controls whether or not all types in this service default to global, but can be overriden on a per-type basis.
 	// A global service is one where resources are not defined in a specific region.
 	Global bool `yaml:"global"`

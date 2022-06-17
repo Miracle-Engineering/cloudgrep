@@ -1,4 +1,4 @@
-package testingutil
+package util
 
 import (
 	"testing"

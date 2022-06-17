@@ -45,6 +45,7 @@ func loadService(dir string, name string) (Service, error) {
 	c := Service{
 		Name:           name,
 		ServicePackage: name,
+		EndpointID:     name,
 	}
 
 	configPath := path.Join(dir, name+".yaml")

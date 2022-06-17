@@ -1,4 +1,4 @@
-package testingutil
+package util
 
 // FilterFunc filters a slice based on the predicate function
 func FilterFunc[T any](in []T, predicate func(T) bool) []T {

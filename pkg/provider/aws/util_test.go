@@ -15,7 +15,8 @@ import (
 	"go.uber.org/zap/zaptest"
 
 	cfg "github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/testingutil"
+	"github.com/run-x/cloudgrep/pkg/provider/aws/regions"
+	"github.com/run-x/cloudgrep/pkg/util"
 )
 
 // Default region to run tests against if AWS_REGION is not set.
@@ -99,6 +100,7 @@ func setupIntegrationProvider(t testing.TB, ctx *integrationTestContext) {
 	c := cfg.Provider{}
 	c.Cloud = "aws"
 	c.Regions = regionsToTest()
+	c.Regions = []string{regions.All}
 
 	providers, err := NewProviders(ctx.ctx, c, ctx.log)
 	if err != nil {
@@ -195,5 +197,5 @@ func regionsToTest() []string {
 	// Always run tests on the global region
 	regions = append(regions, "global")
 
-	return testingutil.Unique(regions)
+	return util.Unique(regions)
 }

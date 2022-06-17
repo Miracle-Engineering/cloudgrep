@@ -6,10 +6,11 @@ import (
 )
 
 type mapper struct {
-	IdField   string
-	TagField  resourceconverter.TagField
-	FetchFunc types.FetchFunc
-	IsGlobal  bool
+	IdField           string
+	TagField          resourceconverter.TagField
+	FetchFunc         types.FetchFunc
+	IsGlobal          bool
+	ServiceEndpointID string
 }
 
 func (p *Provider) getTypeMapping() map[string]mapper {

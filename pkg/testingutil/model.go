@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +25,7 @@ func AssertResourceCount(t testing.TB, resources []model.Resource, tagValue stri
 
 // ResourceFilterTagKey filters a slice of model.Resources based on a given tag key being present on that resource.
 func ResourceFilterTagKey(in []model.Resource, key string) []model.Resource {
-	return FilterFunc(in, func(r model.Resource) bool {
+	return util.FilterFunc(in, func(r model.Resource) bool {
 		for _, tag := range r.Tags {
 			if tag.Key == key {
 				return true
@@ -37,7 +38,7 @@ func ResourceFilterTagKey(in []model.Resource, key string) []model.Resource {
 
 // ResourceFilterTagKey filters a slice of model.Resources based on a given tag key/value pair being present on that resource.
 func ResourceFilterTagKeyValue(in []model.Resource, key, value string) []model.Resource {
-	return FilterFunc(in, func(r model.Resource) bool {
+	return util.FilterFunc(in, func(r model.Resource) bool {
 		for _, tag := range r.Tags {
 			if tag.Key == key && tag.Value == value {
 				return true
