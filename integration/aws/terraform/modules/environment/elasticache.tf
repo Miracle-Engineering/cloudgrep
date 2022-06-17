@@ -30,12 +30,17 @@ resource "aws_security_group" "elasticache" {
 
 }
 
+resource "aws_elasticache_subnet_group" "main" {
+  name       = "test-elasticache"
+  subnet_ids = module.vpc.private_subnet_ids
+}
+
 resource "aws_elasticache_replication_group" "redis_cluster" {
   count                         = local.redis_cluster_count
   automatic_failover_enabled    = true
   auto_minor_version_upgrade    = true
   security_group_ids            = [aws_security_group.elasticache.id]
-  subnet_group_name             = "test-${count.index}"
+  subnet_group_name             = aws_elasticache_subnet_group.main.id
   replication_group_id          = "test-${count.index}-${random_string.redis_name_hash.result}"
   replication_group_description = "Elasticache test test-${count.index}-${random_string.redis_name_hash.result}"
   node_type                     = "cache.m4.large"
