@@ -54,14 +54,14 @@ If you'd like to try it out or have any questions - feel free to join our [TBD -
 - [Precompiled binaries](https://github.com/run-x/cloudgrep/releases) for supported 
 operating systems are available.
 
-# CLI Usage
+# Basic Usage
 
-Cloudgrep runs as a cli binary executed in your local machine. You can find our latest release 
+Cloudgrep is a web-based cloud resource browser executed in your local machine. You can find our latest release 
 [here](https://github.com/run-x/cloudgrep/releases) on our release page -- simply download the zip named for your
 OS/spec (or let us know if you can't find yours). 
 
 Once downloaded, (and assuming you have AWS credentials properly configured in your CLI) you can start using cloudgrep
-immediately by executing the binary (no args needed)
+immediately by executing the binary (no args needed) on your cli:
 
 ```bash
 cloudgrep
@@ -69,35 +69,29 @@ cloudgrep
 
 Cloudgrep will then run with the default behavior which does the following:
 
-1. Create an in-memory SQLite database to store the data in.
-2. Use your current AWS credentials to scan your current cloud account for resources in either the us-east-1 region or
-   those deemed global (like S3 buckets).
-3. Store said found resources in the datastore.
-4. Launch the cloudgrep webapp.
+1. Scan your current cloud account for global resources and resources on your currently configured AWS region 
+2. Launch the webapp
 
-Assuming your `open` bash command is working properly (if not go to the localhost url printed out), cloudgrep will now
-open your default web browser to the homepage of the cloudgrep webapp!
-
-Again, this is just cloudgrep's *default* behavior -- cloudgrep's behavior can be configured via a user-inputted config
-yaml and/or cli argument. Configs are then resolved at runtime by considering said cli arguments, the user-passed config
-yaml, and the defaults in that order of precedence.
-
-## CLI Arguments
-The cli arguments are all fully documented under the cli's `help` option thanks to [cobra](https://github.com/spf13/cobra).
-To view documentation for them, simply add the `--help` flag like so:
+## Arguments
+You can easily pass cli arguments to cloudgrep for customized behavior, such as multiple/different regions to scan,
+what port to serve the webapp on, etc... The cli arguments are all fully documented under the cli's `help` option thanks 
+to [cobra](https://github.com/spf13/cobra). To view documentation for them, simply add the `--help` flag like so:
 
 ```bash
 ./cloudgrep --help
 ```
 
-## Config YAML
+## Advanced Usage
+Cloudgrep's behavior can further be configured via a user-inputted config yaml. Configs are then resolved at runtime by 
+considering the cli arguments, the user-passed config  yaml, and the defaults in that order of precedence.
+
 The config yaml can be passed in by using the `-c` or `--config` flag as follows:
 
 ```bash
 cloudgrep -c my_config.yaml
 ```
 The path is relative to the current working directory. Cloudgrep expects the follow possible values in the yaml
-(you do not need to markdown all if passing the file as it will alwys try to default to the original behavior):
+(you do not need to markdown all if passing the file as it will always try to default to the original behavior):
 
 ```yaml
 # Config represents all the user-configurable settings for cloudgrep. One such structure is loaded at runtime and
@@ -135,5 +129,5 @@ providers:
 We love user contributions! Check out our [Dev guide](https://github.com/run-x/cloudgrep/blob/main/DEVELOP.md) to get started.
 
 # Important Resources
-* [The Opta Team](https://www.runx.dev/about)
+* [The Cloudgrep Team](https://www.runx.dev/about)
 * [Check Out The Blog](https://blog.runx.dev/)
