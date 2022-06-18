@@ -58,7 +58,15 @@ operating systems are available.
 
 Cloudgrep is a web-based cloud resource browser executed in your local machine. You can find our latest release 
 [here](https://github.com/run-x/cloudgrep/releases) on our release page -- simply download the zip named for your
-OS/spec (or let us know if you can't find yours). 
+OS/spec (or let us know if you can't find yours).
+
+Cloudgrep works by using the cloud provider credentials (e.g. AWS) found in your cli to scan your cloud for data about
+your existing resources. For it to work, make sure you set such credentials properly (see 
+[here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html) for AWS). These, and a stable
+internet connection, are its only prerequisites. 
+
+**NOTE: Cloudgrep only ever needs ReadOnly credentials-- it creates nothing, it modifies nothing. Moreover, it will
+do a best effort scan based on its permission, so the user does not need to have read access to all resources.**
 
 Once downloaded, (and assuming you have AWS credentials properly configured in your CLI) you can start using cloudgrep
 immediately by executing the binary (no args needed) on your cli:
