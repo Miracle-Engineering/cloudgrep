@@ -21,7 +21,7 @@ resource "aws_route53_health_check" "test" {
 resource "aws_route53_zone" "test" {
   count = local.r53_hosted_zone_count
 
-  name          = "${count.index}.example.com"
+  name          = "${count.index}.example.runx.dev"
   force_destroy = true
 
   tags = {
