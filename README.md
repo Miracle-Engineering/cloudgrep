@@ -74,8 +74,8 @@ Cloudgrep will then run with the default behavior which does the following:
 
 ## Arguments
 You can easily pass cli arguments to cloudgrep for customized behavior, such as multiple/different regions to scan,
-what port to serve the webapp on, etc... The cli arguments are all fully documented under the cli's `help` option thanks 
-to [cobra](https://github.com/spf13/cobra). To view documentation for them, simply add the `--help` flag like so:
+what port to serve the webapp on, etc... The cli arguments are all fully documented under the cli's `help` option. 
+To view documentation for them, simply add the `--help` flag like so:
 
 ```bash
 ./cloudgrep --help
