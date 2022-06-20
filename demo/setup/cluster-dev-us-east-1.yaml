@@ -1,0 +1,28 @@
+
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: dev-cluster
+  region: us-east-1
+  tags:
+    env: dev
+    team: marketplace
+    market: North America
+    cluster: dev-cluster
+
+privateCluster:
+  enabled: true
+
+nodeGroups:
+  - name: ng-1
+    instanceType: t2.small
+    desiredCapacity: 2
+    privateNetworking: true
+    tags:
+      env: dev
+      team: marketplace
+      market: North America
+      cluster: dev-cluster
+
+

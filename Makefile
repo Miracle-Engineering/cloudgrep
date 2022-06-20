@@ -23,6 +23,7 @@ usage:
 	@echo "make release         : Generate binaries for Linux, Windows"
 	@echo "make release-darwin  : Generate binaries for macOS"
 	@echo "make run           	: Run using local code"
+	@echo "make run-demo       	: Run the demo"
 	@echo "make setup           : Install all necessary dependencies"
 	@echo "make test            : Execute test suite"
 	@echo "make load-test       : Execute load test suite"
@@ -48,6 +49,9 @@ pre-commit:
 
 run:
 	go run -race main.go
+
+run-demo:
+	go run -race main.go  --config demo/demo.yaml
 
 version:
 	@go run -race main.go --version
