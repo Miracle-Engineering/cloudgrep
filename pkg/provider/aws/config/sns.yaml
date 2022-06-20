@@ -1,0 +1,18 @@
+types:
+  - name: SNS
+    listApi:
+      call: ListTopics
+      outputKey: Topics
+      id: TopicArn
+      pagination: true
+    getTagsApi:
+      type: Topic
+      call: ListTagsForResource
+      inputIDField:
+        name: ResourceArn
+      tags:
+        style: struct
+        field: "Tags"
+        pointer: true
+        key: Key
+        value: Value
