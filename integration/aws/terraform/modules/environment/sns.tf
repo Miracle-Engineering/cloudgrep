@@ -43,7 +43,8 @@ EOF
 
 ## SNS topic policy
 resource "aws_sns_topic_policy" "default" {
-  arn = aws_sns_topic.topic.arn
+  count = local.sns_count
+  arn   = aws_sns_topic.topic[count.index].arn
 
   policy = data.aws_iam_policy_document.sns_topic_policy.json
 }
