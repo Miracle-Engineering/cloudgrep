@@ -2,7 +2,7 @@ locals {
   sns_count = 2
 }
 
-resource random_string "sns_topic_name" {
+resource "random_string" "sns_topic_name" {
   count = local.sns_count
 
   length  = 8
@@ -11,8 +11,9 @@ resource random_string "sns_topic_name" {
 }
 
 resource "aws_sns_topic" "topic" {
-  name = "testing--${count.index}-${random_string.sns_topic_name[count.index].result}"
-  delivery_policy             = <<EOF
+  count           = local.sns_count
+  name            = "testing--${count.index}-${random_string.sns_topic_name[count.index].result}"
+  delivery_policy = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -36,7 +37,7 @@ EOF
   }
   tags = {
     test : "sns-topic-${count.index}"
-    IntegrationTest: "true"
+    IntegrationTest : "true"
   }
 }
 
