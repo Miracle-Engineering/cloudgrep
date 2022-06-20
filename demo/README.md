@@ -1,6 +1,6 @@
 # Demo
 
-The demo shows some sample data for a medium-sized AWS account.
+The demo shows some sample data for a medium-sized AWS account (a few hundred cloud resources).
 
 ## How can cloudgrep help my organization?
 
