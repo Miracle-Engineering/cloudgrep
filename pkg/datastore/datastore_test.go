@@ -600,6 +600,8 @@ func TestEngineStatus(t *testing.T) {
 				Type:   model.EventTypeEngine,
 				Status: model.EventStatusSuccess,
 				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", nil),
 					model.NewResourceEventEnd("mp1", "mr1", nil),
 					model.NewResourceEventEnd("mp1", "mr2", nil),
 					model.NewResourceEventEnd("mp1", "mr3", nil),
@@ -632,10 +634,11 @@ func TestEngineStatus(t *testing.T) {
 				Status: model.EventStatusFailed,
 				Error:  "mp2-error",
 				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
 					model.NewResourceEventEnd("mp1", "mr1", nil),
 					model.NewResourceEventEnd("mp1", "mr2", nil),
 					model.NewResourceEventEnd("mp1", "mr3", nil),
-					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
 				},
 			},
 		},
@@ -662,6 +665,7 @@ func TestEngineStatus(t *testing.T) {
 				Status: model.EventStatusFailed,
 				Error:  multipleErrors.Error(),
 				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
 					model.NewResourceEventEnd("mp1", "mr1", nil),
 					model.NewResourceEventEnd("mp1", "mr2", nil),
 					model.NewResourceEventEnd("mp1", "mr3", errors.New("mp1-mr3-error")),
@@ -697,6 +701,8 @@ func TestEngineStatus(t *testing.T) {
 				Type:   model.EventTypeEngine,
 				Status: model.EventStatusFetching,
 				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", nil),
 					model.NewResourceEventEnd("mp1", "mr1", nil),
 					model.NewResourceEventEnd("mp1", "mr2", nil),
 					model.NewResourceEventEnd("mp1", "mr3", nil),
@@ -705,6 +711,35 @@ func TestEngineStatus(t *testing.T) {
 					model.NewResourceEventEnd("mp2", "mr2", nil),
 					model.NewResourceEventEnd("mp2", "mr3", nil),
 				},
+			},
+		},
+		{
+			name: "success-status-no-provider",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewEngineEventEnd(nil),
+				},
+			},
+			expected: model.Event{
+				Type:        model.EventTypeEngine,
+				Status:      model.EventStatusSuccess,
+				ChildEvents: model.Events{},
+			},
+		},
+		{
+			name: "success-error-no-provider",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewEngineEventEnd(errors.New("engine-error")),
+				},
+			},
+			expected: model.Event{
+				Type:        model.EventTypeEngine,
+				Status:      model.EventStatusFailed,
+				ChildEvents: model.Events{},
+				Error:       "engine-error",
 			},
 		},
 	}

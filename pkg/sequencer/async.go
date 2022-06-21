@@ -27,26 +27,22 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 		for resourceType, fetchFunc := range newFetchFuncs {
 			wg.Add(1)
 			go func(fetchFunc provider.FetchFunc, provider provider.Provider, resourceType string) {
+				var fetchErrors *multierror.Error
 				defer wg.Done()
-				err := ds.WriteEvent(ctx, model.NewResourceEventStart(provider.String(), resourceType))
-				if err != nil {
-					as.Logger.Sugar().Errorf("Received an error when trying to write resource event for resource  %v in provider %v: %v", resourceType, provider, err)
-					errorLock.Lock()
-					errors = multierror.Append(errors, err)
-					errorLock.Unlock()
+				if err := ds.WriteEvent(ctx, model.NewResourceEventStart(provider.String(), resourceType)); err != nil {
+					fetchErrors = multierror.Append(fetchErrors, err)
 				}
-				err = fetchFunc(ctx, resourceChan)
+				err := fetchFunc(ctx, resourceChan)
 				if err != nil {
-					as.Logger.Sugar().Errorf("Received an error when trying to write resource event for resource  %v in provider %v: %v", resourceType, provider, err)
-					errorLock.Lock()
-					errors = multierror.Append(errors, err)
-					errorLock.Unlock()
+					fetchErrors = multierror.Append(fetchErrors, err)
 				}
-				err = ds.WriteEvent(ctx, model.NewResourceEventEnd(provider.String(), resourceType, err))
-				if err != nil {
-					as.Logger.Sugar().Errorf("Received an error when trying to write resource event for resource  %v in provider %v: %v", resourceType, provider, err)
+				if err = ds.WriteEvent(ctx, model.NewResourceEventEnd(provider.String(), resourceType, err)); err != nil {
+					fetchErrors = multierror.Append(fetchErrors, err)
+				}
+				if fetchErrors.ErrorOrNil() != nil {
+					as.Logger.Sugar().Errorf("Received an error when trying to fetch resource  %v in provider %v: %v", resourceType, provider, fetchErrors)
 					errorLock.Lock()
-					errors = multierror.Append(errors, err)
+					errors = multierror.Append(errors, fetchErrors)
 					errorLock.Unlock()
 				}
 			}(fetchFunc, p, resourceType)

@@ -246,10 +246,38 @@ Sample Responses:
 ```js
 // Engine completed successfully
 {
-  "resource_name":"engine",
-  "error_message":"",
-  "status":"success",
-  "fetched_at":"2022-06-07T19:53:10.570698+05:30"
+    "runId": "6fd67489-d852-4962-95bc-eea01159993f",
+    "eventType": "engine",
+    "status": "success",
+    "providerName": "",
+    "resourceType": "",
+    "error": "",
+    "createdAt": "2022-06-22T02:54:12.727066+05:30",
+    "updatedAt": "2022-06-22T02:54:25.458235+05:30",
+    "childEvents": [
+        {
+            "runId": "6fd67489-d852-4962-95bc-eea01159993f",
+            "eventType": "provider",
+            "status": "success",
+            "providerName": "aws",
+            "resourceType": "",
+            "error": "",
+            "createdAt": "2022-06-22T02:54:12.727395+05:30",
+            "updatedAt": "2022-06-22T02:54:13.979699+05:30",
+            "childEvents": null
+        },
+        {
+            "runId": "6fd67489-d852-4962-95bc-eea01159993f",
+            "eventType": "resource",
+            "status": "success",
+            "providerName": "AWS Provider for account 693658092572, region us-east-2",
+            "resourceType": "ec2.Volume",
+            "error": "",
+            "createdAt": "2022-06-22T02:54:13.980207+05:30",
+            "updatedAt": "2022-06-22T02:54:16.658743+05:30",
+            "childEvents": null
+        }
+    ]
 }
 
 // Engine is currently running

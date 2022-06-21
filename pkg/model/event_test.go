@@ -39,14 +39,10 @@ func assertEvent(t *testing.T, ee, ae Event) {
 }
 
 func TestNewEngineEventStart(t *testing.T) {
-	t.Run("NewEngineEventStart", func(t *testing.T) {
-		e := NewEngineEventStart()
-		assert.Equal(t, EventTypeEngine, e.Type)
-		assert.Equal(t, EventStatusFetching, e.Status)
-		assert.NotEmpty(t, e.RunId)
-	},
-	)
-
+	e := NewEngineEventStart()
+	assert.Equal(t, EventTypeEngine, e.Type)
+	assert.Equal(t, EventStatusFetching, e.Status)
+	assert.NotEmpty(t, e.RunId)
 }
 
 func TestNewEngineEventEnd(t *testing.T) {

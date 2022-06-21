@@ -320,7 +320,7 @@ func TestRefreshPostRoute(t *testing.T) {
 		body := make(map[string]interface{})
 		require.NoError(t, json.Unmarshal(record.Body.Bytes(), &body))
 		require.Equal(t, "success", body["status"])
-		//require.Equal(t, "", body["errorMessage"])
+		require.Equal(t, "", body["error"])
 	})
 
 	t.Run("Engine Error", func(t *testing.T) {
@@ -351,7 +351,7 @@ func TestRefreshPostRoute(t *testing.T) {
 		body := make(map[string]interface{})
 		require.NoError(t, json.Unmarshal(record.Body.Bytes(), &body))
 		require.Equal(t, "failed", body["status"])
-		//require.Equal(t, "There was an engine error", body["errorMessage"])
+		require.Equal(t, "There was an engine error", body["error"])
 	})
 
 	t.Run("Engine Already Running", func(t *testing.T) {
@@ -385,6 +385,6 @@ func TestRefreshPostRoute(t *testing.T) {
 		body = make(map[string]interface{})
 		require.NoError(t, json.Unmarshal(record.Body.Bytes(), &body))
 		require.Equal(t, "fetching", body["status"])
-		//require.Equal(t, "", body["errorMessage"])
+		require.Equal(t, "", body["error"])
 	})
 }

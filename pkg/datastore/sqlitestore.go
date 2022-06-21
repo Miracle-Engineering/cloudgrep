@@ -380,27 +380,17 @@ func (s *SQLiteStore) EngineStatus(ctx context.Context) (model.Event, error) {
 	var resourceEvents model.Events
 	result := s.db.
 		Model(&model.Event{}).
-		Find(&resourceEvents, model.Event{RunId: s.runId, Type: model.EventTypeResource})
+		Order("created_at").
+		Find(&resourceEvents, model.Event{RunId: s.runId})
 	if result.Error != nil {
 		return model.Event{}, fmt.Errorf("error while reading event from database %w", result.Error)
 	}
-	var providerEvents model.Events
-	result = s.db.
-		Model(&model.Event{}).
-		Where("status IN ?", []string{model.EventStatusFetching, model.EventStatusFailed}).
-		Find(&providerEvents, model.Event{RunId: s.runId, Type: model.EventTypeProvider})
-	if result.Error != nil {
-		return model.Event{}, fmt.Errorf("error while reading event from database %w", result.Error)
+	if len(resourceEvents) == 0 {
+		//no event found
+		return model.Event{}, nil
 	}
-	var engineEvent model.Event
-	result = s.db.
-		Model(&model.Event{}).
-		Find(&engineEvent, model.Event{RunId: s.runId, Type: model.EventTypeEngine})
-	if result.Error != nil {
-		return model.Event{}, fmt.Errorf("error while reading event from database %w", result.Error)
-	}
-	engineEvent.ChildEvents = append(engineEvent.ChildEvents, providerEvents...)
-	engineEvent.ChildEvents = append(engineEvent.ChildEvents, resourceEvents...)
+	engineEvent := resourceEvents[0]
+	engineEvent.ChildEvents = resourceEvents[1:]
 	return engineEvent, nil
 }
 

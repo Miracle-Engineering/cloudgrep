@@ -3,12 +3,13 @@ package cli
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/go-multierror"
-	"github.com/run-x/cloudgrep/pkg/model"
 	"os"
 	"os/exec"
 	"os/signal"
 	"syscall"
+
+	"github.com/hashicorp/go-multierror"
+	"github.com/run-x/cloudgrep/pkg/model"
 
 	"go.uber.org/zap"
 
@@ -60,21 +61,27 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 //runEngine runs the providers to collect the cloud resources
 //it returns when it's done fetching
 func (cli *cli) runEngine(ctx context.Context) error {
-	var errors *multierror.Error
-	err := cli.ds.WriteEvent(ctx, model.NewEngineEventStart())
-	errors = multierror.Append(errors, err)
-	eng, err := engine.NewEngine(ctx, cli.cfg, cli.logger, cli.ds)
-	if err != nil {
-		cli.logger.Sugar().Errorw("some error(s) when creating the provider engine", "error", err)
+	if err := cli.ds.WriteEvent(ctx, model.NewEngineEventStart()); err != nil {
+		return err
 	}
-	errors = multierror.Append(errors, err)
-	err = eng.Run(ctx)
-	if err != nil {
-		cli.logger.Sugar().Errorw("some error(s) when runninig the provider engine", "error", err)
+	eng, errors := engine.NewEngine(ctx, cli.cfg, cli.logger, cli.ds)
+	if errors == nil {
+		err := eng.Run(ctx)
+		if err != nil {
+			stats, _ := cli.ds.Stats(ctx)
+			if stats.ResourcesCount > 0 {
+				//log the error but the api can still server with the datastore
+				cli.logger.Sugar().Errorw("some error(s) when running the provider engine", "error", err)
+			} else {
+				// nothing to view - exit
+				errors = multierror.Append(errors, fmt.Errorf("can't run the provider engine: %w", errors))
+			}
+		}
 	}
-	errors = multierror.Append(errors, err)
-	err = cli.ds.WriteEvent(ctx, model.NewEngineEventEnd(errors))
-	return err
+	if err := cli.ds.WriteEvent(ctx, model.NewEngineEventEnd(errors)); err != nil {
+		errors = multierror.Append(errors, err)
+	}
+	return errors
 }
 
 func handleSignals() {

@@ -3,14 +3,12 @@ package engine
 import (
 	"context"
 	"github.com/hashicorp/go-multierror"
+	"github.com/run-x/cloudgrep/pkg/config"
+	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/run-x/cloudgrep/pkg/sequencer"
 	"go.uber.org/zap"
-	"log"
-
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/datastore"
 )
 
 //Engine configures and starts the providers
@@ -34,21 +32,18 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 			c.Regions = cfg.Regions
 		}
 		// create a providers
-		err := datastore.WriteEvent(ctx, model.NewProviderEventStart(c.String()))
-		errors = multierror.Append(errors, err)
-		if err != nil {
-			log.Default().Println(err.Error())
+		if err := datastore.WriteEvent(ctx, model.NewProviderEventStart(c.String())); err != nil {
+			errors = multierror.Append(errors, err)
 		}
 		providers, err := provider.NewProviders(ctx, c, logger)
 		if err == nil {
 			e.Providers = append(e.Providers, providers...)
+		} else {
+			errors = multierror.Append(errors, err)
 		}
-		errors = multierror.Append(errors, err)
-		err = datastore.WriteEvent(ctx, model.NewProviderEventEnd(c.String(), err))
-		if err != nil {
-			log.Default().Println(err.Error())
+		if err = datastore.WriteEvent(ctx, model.NewProviderEventEnd(c.String(), err)); err != nil {
+			errors = multierror.Append(errors, err)
 		}
-		errors = multierror.Append(errors, err)
 	}
 	return e, errors.ErrorOrNil()
 }
@@ -57,11 +52,11 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 func (e *Engine) Run(ctx context.Context) error {
 	var multipleErrors *multierror.Error
 	err := e.Sequencer.Run(ctx, e, e.Providers)
-	multipleErrors = multierror.Append(multipleErrors, err)
 	if err != nil {
-		log.Default().Println(err.Error())
+		multipleErrors = multierror.Append(multipleErrors, err)
 	}
-	err = e.Datastore.WriteEvent(ctx, model.NewEngineEventEnd(err))
-	multipleErrors = multierror.Append(multipleErrors, err)
+	if err = e.Datastore.WriteEvent(ctx, model.NewEngineEventEnd(err)); err != nil {
+		multipleErrors = multierror.Append(multipleErrors, err)
+	}
 	return multipleErrors.ErrorOrNil()
 }
