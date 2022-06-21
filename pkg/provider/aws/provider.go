@@ -72,7 +72,7 @@ func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]
 		return nil, fmt.Errorf("cannot select regions for AWS provider: %w", err)
 	}
 
-	regionutil.ConfigureConfigRegion(&defaultConfig, regions)
+	regionutil.SetConfigRegion(&defaultConfig, regions)
 
 	identity, err := VerifyCreds(ctx, defaultConfig)
 	if err != nil {

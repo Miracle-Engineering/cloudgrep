@@ -118,16 +118,3 @@ func allRegions(ctx context.Context, cfg aws.Config) ([]Region, error) {
 
 	return regions, nil
 }
-
-// func allRegions() []Region {
-// 	regions := make([]Region, 0, len(officialRegions)+1)
-
-// 	regions = append(regions, Region{})
-
-// 	for _, officialRegion := range officialRegions {
-// 		region := officialRegion
-// 		regions = append(regions, Region{region: &region})
-// 	}
-
-// 	return regions
-// }

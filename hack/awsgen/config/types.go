@@ -22,6 +22,9 @@ type Service struct {
 	// Defaults to Name.
 	ServicePackage string `yaml:"servicePackage"`
 
+	// EndpointID is the identifier for the service in the endpoints file located at https://github.com/aws/aws-sdk-go/blob/v1.44.33/aws/endpoints/defaults.go.
+	// For example, for the `elb` service, the EndpointID is `elasticloadbalancing`.
+	// Defaults to Name if not specified.
 	EndpointID string `yaml:"endpointId"`
 
 	// Global controls whether or not all types in this service default to global, but can be overriden on a per-type basis.
