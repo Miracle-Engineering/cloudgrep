@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -13,7 +14,7 @@ func (p *Provider) register_cloudfront(mapping map[string]mapper) {
 	mapping["cloudfront.Distribution"] = mapper{
 		FetchFunc: p.fetch_cloudfront_Distribution,
 		IdField:   "Id",
-		IsGlobal:  false,
+		IsGlobal:  true,
 	}
 }
 
