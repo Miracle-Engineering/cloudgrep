@@ -41,16 +41,6 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 			Value: "Value",
 		},
 	}
-	mapping["ec2.ElasticGpu"] = mapper{
-		FetchFunc: p.fetch_ec2_ElasticGpu,
-		IdField:   "ElasticGpuId",
-		IsGlobal:  false,
-		TagField: resourceconverter.TagField{
-			Name:  "Tags",
-			Key:   "Key",
-			Value: "Value",
-		},
-	}
 	mapping["ec2.Fleet"] = mapper{
 		FetchFunc: p.fetch_ec2_Fleet,
 		IdField:   "FleetId",
@@ -277,22 +267,6 @@ func (p *Provider) fetch_ec2_ClientVpnEndpoint(ctx context.Context, output chan<
 		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.ClientVpnEndpoints); err != nil {
 			return err
 		}
-	}
-
-	return nil
-}
-
-func (p *Provider) fetch_ec2_ElasticGpu(ctx context.Context, output chan<- model.Resource) error {
-	client := ec2.NewFromConfig(p.config)
-	input := &ec2.DescribeElasticGpusInput{}
-
-	resourceConverter := p.converterFor("ec2.ElasticGpu")
-	results, err := client.DescribeElasticGpus(ctx, input)
-	if err != nil {
-		return fmt.Errorf("failed to fetch %s: %w", "ec2.ElasticGpu", err)
-	}
-	if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, results.ElasticGpuSet); err != nil {
-		return err
 	}
 
 	return nil
