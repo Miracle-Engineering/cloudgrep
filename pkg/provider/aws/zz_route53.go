@@ -49,6 +49,12 @@ func (p *Provider) getTags_route53_HealthCheck(ctx context.Context, resource typ
 	input := &route53.ListTagsForResourcesInput{}
 
 	input.ResourceIds = []string{*resource.Id}
+	{
+		var err error
+		if err = listHealthCheckTagsInput(input); err != nil {
+			return nil, fmt.Errorf("error overriding input with %s(input) for %s", "listHealthCheckTagsInput", "route53.HealthCheck")
+		}
+	}
 
 	output, err := client.ListTagsForResources(ctx, input)
 	if err != nil {
@@ -97,6 +103,12 @@ func (p *Provider) getTags_route53_HostedZone(ctx context.Context, resource type
 	input := &route53.ListTagsForResourcesInput{}
 
 	input.ResourceIds = []string{*resource.Id}
+	{
+		var err error
+		if err = listHostedZoneTagsInput(input); err != nil {
+			return nil, fmt.Errorf("error overriding input with %s(input) for %s", "listHostedZoneTagsInput", "route53.HostedZone")
+		}
+	}
 
 	output, err := client.ListTagsForResources(ctx, input)
 	if err != nil {

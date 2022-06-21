@@ -15,6 +15,9 @@ types:
       inputIDField:
         name: ResourceIds
         sliceType: string
+      inputOverrides:
+        fullFuncs:
+          - listHealthCheckTagsInput
       tags: &tags
         style: struct
         field:
@@ -38,4 +41,7 @@ types:
       inputIDField:
         name: ResourceIds
         sliceType: string
+      inputOverrides:
+        fullFuncs:
+          - listHostedZoneTagsInput
       tags: *tags

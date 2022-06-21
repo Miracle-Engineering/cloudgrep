@@ -44,7 +44,7 @@ func TestFetchHostedZones(t *testing.T) {
 			},
 		},
 		RawData: map[string]any{
-			"Name": "0.example.runx.dev",
+			"Name": "0.example.runx.dev.",
 		},
 	})
 }
