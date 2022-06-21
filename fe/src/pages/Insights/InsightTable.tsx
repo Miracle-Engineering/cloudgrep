@@ -88,7 +88,7 @@ const InsightTable: FC = () => {
 				'COUNT_RESOURCES'
 			)}`}</Typography>
 			<TableContainer
-				sx={{ maxHeight: '200vH' }}
+				sx={{ maxHeight: '150vH' }}
 				component={Paper}
 				onScroll={async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 					if (!isInfiniteScroll) {
