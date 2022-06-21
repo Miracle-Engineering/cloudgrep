@@ -25,12 +25,6 @@ types:
       outputKey: ClientVpnEndpoints
       id: ClientVpnEndpointId
       tags: *tags
-  - name: ElasticGpu
-    listApi:
-      call: DescribeElasticGpus
-      outputKey: ElasticGpuSet
-      id: ElasticGpuId
-      tags: *tags
   - name: Fleet
     listApi:
       call: DescribeFleets
