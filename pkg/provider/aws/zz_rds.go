@@ -12,9 +12,10 @@ import (
 
 func (p *Provider) register_rds(mapping map[string]mapper) {
 	mapping["rds.DBCluster"] = mapper{
-		FetchFunc: p.fetch_rds_DBCluster,
-		IdField:   "DBClusterIdentifier",
-		IsGlobal:  false,
+		ServiceEndpointID: "rds",
+		FetchFunc:         p.fetch_rds_DBCluster,
+		IdField:           "DBClusterIdentifier",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "TagList",
 			Key:   "Key",
@@ -22,9 +23,10 @@ func (p *Provider) register_rds(mapping map[string]mapper) {
 		},
 	}
 	mapping["rds.DBInstance"] = mapper{
-		FetchFunc: p.fetch_rds_DBInstance,
-		IdField:   "DBInstanceIdentifier",
-		IsGlobal:  false,
+		ServiceEndpointID: "rds",
+		FetchFunc:         p.fetch_rds_DBInstance,
+		IdField:           "DBInstanceIdentifier",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "TagList",
 			Key:   "Key",

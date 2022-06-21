@@ -13,9 +13,10 @@ import (
 
 func (p *Provider) register_lambda(mapping map[string]mapper) {
 	mapping["lambda.Function"] = mapper{
-		FetchFunc: p.fetch_lambda_Function,
-		IdField:   "FunctionArn",
-		IsGlobal:  false,
+		ServiceEndpointID: "lambda",
+		FetchFunc:         p.fetch_lambda_Function,
+		IdField:           "FunctionArn",
+		IsGlobal:          false,
 	}
 }
 

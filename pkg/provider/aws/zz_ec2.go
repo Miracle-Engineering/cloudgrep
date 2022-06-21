@@ -12,9 +12,10 @@ import (
 
 func (p *Provider) register_ec2(mapping map[string]mapper) {
 	mapping["ec2.Address"] = mapper{
-		FetchFunc: p.fetch_ec2_Address,
-		IdField:   "AllocationId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_Address,
+		IdField:           "AllocationId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -22,9 +23,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.CapacityReservation"] = mapper{
-		FetchFunc: p.fetch_ec2_CapacityReservation,
-		IdField:   "CapacityReservationId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_CapacityReservation,
+		IdField:           "CapacityReservationId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -32,9 +34,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.ClientVpnEndpoint"] = mapper{
-		FetchFunc: p.fetch_ec2_ClientVpnEndpoint,
-		IdField:   "ClientVpnEndpointId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_ClientVpnEndpoint,
+		IdField:           "ClientVpnEndpointId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -42,9 +45,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.Fleet"] = mapper{
-		FetchFunc: p.fetch_ec2_Fleet,
-		IdField:   "FleetId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_Fleet,
+		IdField:           "FleetId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -52,9 +56,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.FlowLogs"] = mapper{
-		FetchFunc: p.fetch_ec2_FlowLogs,
-		IdField:   "FlowLogId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_FlowLogs,
+		IdField:           "FlowLogId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -62,9 +67,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.Image"] = mapper{
-		FetchFunc: p.fetch_ec2_Image,
-		IdField:   "ImageId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_Image,
+		IdField:           "ImageId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -72,9 +78,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.Instance"] = mapper{
-		FetchFunc: p.fetch_ec2_Instance,
-		IdField:   "InstanceId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_Instance,
+		IdField:           "InstanceId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -82,9 +89,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.KeyPair"] = mapper{
-		FetchFunc: p.fetch_ec2_KeyPair,
-		IdField:   "KeyPairId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_KeyPair,
+		IdField:           "KeyPairId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -92,9 +100,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.LaunchTemplate"] = mapper{
-		FetchFunc: p.fetch_ec2_LaunchTemplate,
-		IdField:   "LaunchTemplateId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_LaunchTemplate,
+		IdField:           "LaunchTemplateId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -102,9 +111,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.NatGateway"] = mapper{
-		FetchFunc: p.fetch_ec2_NatGateway,
-		IdField:   "NatGatewayId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_NatGateway,
+		IdField:           "NatGatewayId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -112,9 +122,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.NetworkAcl"] = mapper{
-		FetchFunc: p.fetch_ec2_NetworkAcl,
-		IdField:   "NetworkAclId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_NetworkAcl,
+		IdField:           "NetworkAclId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -122,9 +133,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.NetworkInterface"] = mapper{
-		FetchFunc: p.fetch_ec2_NetworkInterface,
-		IdField:   "NetworkInterfaceId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_NetworkInterface,
+		IdField:           "NetworkInterfaceId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "TagSet",
 			Key:   "Key",
@@ -132,9 +144,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.ReservedInstance"] = mapper{
-		FetchFunc: p.fetch_ec2_ReservedInstance,
-		IdField:   "ReservedInstancesId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_ReservedInstance,
+		IdField:           "ReservedInstancesId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -142,9 +155,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.RouteTable"] = mapper{
-		FetchFunc: p.fetch_ec2_RouteTable,
-		IdField:   "RouteTableId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_RouteTable,
+		IdField:           "RouteTableId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -152,9 +166,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.SecurityGroup"] = mapper{
-		FetchFunc: p.fetch_ec2_SecurityGroup,
-		IdField:   "GroupId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_SecurityGroup,
+		IdField:           "GroupId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -162,9 +177,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.Snapshot"] = mapper{
-		FetchFunc: p.fetch_ec2_Snapshot,
-		IdField:   "SnapshotId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_Snapshot,
+		IdField:           "SnapshotId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -172,9 +188,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.SpotInstanceRequest"] = mapper{
-		FetchFunc: p.fetch_ec2_SpotInstanceRequest,
-		IdField:   "SpotInstanceRequestId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_SpotInstanceRequest,
+		IdField:           "SpotInstanceRequestId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -182,9 +199,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.Subnet"] = mapper{
-		FetchFunc: p.fetch_ec2_Subnet,
-		IdField:   "SubnetId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_Subnet,
+		IdField:           "SubnetId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -192,9 +210,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.Volume"] = mapper{
-		FetchFunc: p.fetch_ec2_Volume,
-		IdField:   "VolumeId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_Volume,
+		IdField:           "VolumeId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
@@ -202,9 +221,10 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 		},
 	}
 	mapping["ec2.Vpc"] = mapper{
-		FetchFunc: p.fetch_ec2_Vpc,
-		IdField:   "VpcId",
-		IsGlobal:  false,
+		ServiceEndpointID: "ec2",
+		FetchFunc:         p.fetch_ec2_Vpc,
+		IdField:           "VpcId",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",

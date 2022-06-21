@@ -13,39 +13,46 @@ import (
 
 func (p *Provider) register_iam(mapping map[string]mapper) {
 	mapping["iam.InstanceProfile"] = mapper{
-		FetchFunc: p.fetch_iam_InstanceProfile,
-		IdField:   "InstanceProfileName",
-		IsGlobal:  true,
+		ServiceEndpointID: "iam",
+		FetchFunc:         p.fetch_iam_InstanceProfile,
+		IdField:           "InstanceProfileName",
+		IsGlobal:          true,
 	}
 	mapping["iam.OpenIDConnectProvider"] = mapper{
-		FetchFunc: p.fetch_iam_OpenIDConnectProvider,
-		IdField:   "Arn",
-		IsGlobal:  true,
+		ServiceEndpointID: "iam",
+		FetchFunc:         p.fetch_iam_OpenIDConnectProvider,
+		IdField:           "Arn",
+		IsGlobal:          true,
 	}
 	mapping["iam.Policy"] = mapper{
-		FetchFunc: p.fetch_iam_Policy,
-		IdField:   "Arn",
-		IsGlobal:  true,
+		ServiceEndpointID: "iam",
+		FetchFunc:         p.fetch_iam_Policy,
+		IdField:           "Arn",
+		IsGlobal:          true,
 	}
 	mapping["iam.Role"] = mapper{
-		FetchFunc: p.fetch_iam_Role,
-		IdField:   "RoleName",
-		IsGlobal:  true,
+		ServiceEndpointID: "iam",
+		FetchFunc:         p.fetch_iam_Role,
+		IdField:           "RoleName",
+		IsGlobal:          true,
 	}
 	mapping["iam.SAMLProvider"] = mapper{
-		FetchFunc: p.fetch_iam_SAMLProvider,
-		IdField:   "Arn",
-		IsGlobal:  true,
+		ServiceEndpointID: "iam",
+		FetchFunc:         p.fetch_iam_SAMLProvider,
+		IdField:           "Arn",
+		IsGlobal:          true,
 	}
 	mapping["iam.User"] = mapper{
-		FetchFunc: p.fetch_iam_User,
-		IdField:   "UserName",
-		IsGlobal:  true,
+		ServiceEndpointID: "iam",
+		FetchFunc:         p.fetch_iam_User,
+		IdField:           "UserName",
+		IsGlobal:          true,
 	}
 	mapping["iam.VirtualMFADevice"] = mapper{
-		FetchFunc: p.fetch_iam_VirtualMFADevice,
-		IdField:   "SerialNumber",
-		IsGlobal:  true,
+		ServiceEndpointID: "iam",
+		FetchFunc:         p.fetch_iam_VirtualMFADevice,
+		IdField:           "SerialNumber",
+		IsGlobal:          true,
 	}
 }
 
