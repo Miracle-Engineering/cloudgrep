@@ -9,4 +9,5 @@ func (p *Provider) registerGeneratedTypes(mapping map[string]mapper) {
 	p.register_iam(mapping)
 	p.register_lambda(mapping)
 	p.register_rds(mapping)
+	p.register_route53(mapping)
 }

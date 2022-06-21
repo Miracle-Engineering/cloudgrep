@@ -5,3 +5,4 @@ services:
 - lambda
 - rds
 - elasticache
+- route53
