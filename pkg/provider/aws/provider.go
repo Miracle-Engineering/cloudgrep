@@ -8,35 +8,37 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/smithy-go"
 	cfg "github.com/run-x/cloudgrep/pkg/config"
+	regionutil "github.com/run-x/cloudgrep/pkg/provider/aws/regions"
 	"github.com/run-x/cloudgrep/pkg/provider/types"
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 	"github.com/run-x/cloudgrep/pkg/util"
+	_ "github.com/run-x/cloudgrep/pkg/util/rlimit"
 	"go.uber.org/zap"
 )
 
 type Provider struct {
 	config    aws.Config
-	isGlobal  bool
 	accountId string
+	region    regionutil.Region
 }
 
 func (p Provider) String() string {
-	realRegion := p.config.Region
-	if p.isGlobal {
-		realRegion = "Global"
-	}
-	return fmt.Sprintf("AWS Provider for account %v, region %v", p.accountId, realRegion)
+	return fmt.Sprintf("AWS Provider for account %v, region %v", p.accountId, p.region.ID())
 }
 
 func (p Provider) FetchFunctions() map[string]types.FetchFunc {
 	funcMap := make(map[string]types.FetchFunc)
 	for resourceType, mapping := range p.getTypeMapping() {
-		if p.isGlobal != mapping.IsGlobal {
+		if p.region.IsGlobal() != mapping.IsGlobal {
 			continue
 		}
+
+		if mapping.ServiceEndpointID != "" && !p.region.IsServiceSupported(mapping.ServiceEndpointID) {
+			continue
+		}
+
 		funcMap[resourceType] = mapping.FetchFunc
 	}
 	return funcMap
@@ -48,10 +50,7 @@ func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceC
 		panic(fmt.Sprintf("Could not find mapping for resource type %v", resourceType))
 	}
 
-	region := p.config.Region
-	if p.isGlobal {
-		region = "global"
-	}
+	region := p.region.ID()
 
 	return &resourceconverter.ReflectionConverter{
 		Region:       region,
@@ -63,35 +62,38 @@ func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceC
 
 func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]types.Provider, error) {
 	logger.Info("Connecting to AWS account")
-	defaultConfig, err := config.LoadDefaultConfig(ctx)
+	defaultConfig, err := config.LoadDefaultConfig(ctx, config.WithDefaultsMode(aws.DefaultsModeCrossRegion))
 	if err != nil {
 		return nil, err
 	}
+
+	regions, err := regionutil.SelectRegions(ctx, cfg.Regions, defaultConfig)
+	if err != nil {
+		return nil, fmt.Errorf("cannot select regions for AWS provider: %w", err)
+	}
+
+	regionutil.SetConfigRegion(&defaultConfig, regions)
 
 	identity, err := VerifyCreds(ctx, defaultConfig)
 	if err != nil {
 		return nil, err
 	}
 	logger.Sugar().Infof("Using the following identity: %v", *identity.Arn)
-
-	regions := cfg.Regions
-	if len(regions) == 0 {
-		regions = []string{"global", defaultConfig.Region}
-	}
 	logger.Sugar().Infof("Will look in regions %v", regions)
 	var providers []types.Provider
-	awsPartition := endpoints.AwsPartition()
-	officialRegions := awsPartition.Regions()
+
 	for _, region := range regions {
-		if _, ok := officialRegions[region]; !ok && region != "global" {
-			return nil, util.AddStackTrace(fmt.Errorf("invalid AWS region: %v", region))
-		}
 		newConfig := defaultConfig.Copy()
-		if region != "global" {
-			newConfig.Region = region
+		if !region.IsGlobal() {
+			newConfig.Region = region.ID()
 		}
+
 		logger.Sugar().Infof("Creating provider for AWS region %v", region)
-		newProvider := Provider{isGlobal: region == "global", config: newConfig, accountId: *identity.Account}
+		newProvider := Provider{
+			config:    newConfig,
+			accountId: *identity.Account,
+			region:    region,
+		}
 		providers = append(providers, newProvider)
 	}
 	return providers, nil

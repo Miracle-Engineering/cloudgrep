@@ -15,12 +15,14 @@ import (
 	"go.uber.org/zap/zaptest"
 
 	cfg "github.com/run-x/cloudgrep/pkg/config"
+	regionutil "github.com/run-x/cloudgrep/pkg/provider/aws/regions"
 	"github.com/run-x/cloudgrep/pkg/testingutil"
 )
 
 // Default region to run tests against if AWS_REGION is not set.
 // Always runs integration tests for the "global" region.
 const defaultRegion = "us-east-1"
+const globalRegion = "global"
 
 const (
 	accountIntegrationDev  = "316817240772"
@@ -192,7 +194,7 @@ func regionsToTest() []string {
 	}
 
 	// Always run tests on the global region
-	regions = append(regions, "global")
+	regions = append(regions, regionutil.Global)
 
 	return testingutil.Unique(regions)
 }

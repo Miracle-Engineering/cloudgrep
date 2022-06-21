@@ -28,3 +28,12 @@ func Unique[T comparable](in []T) []T {
 
 	return out
 }
+
+func SliceConvertFunc[In any, Out any, T ~[]In](in T, f func(In) Out) []Out {
+	out := make([]Out, len(in))
+	for idx, val := range in {
+		out[idx] = f(val)
+	}
+
+	return out
+}

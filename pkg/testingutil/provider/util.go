@@ -36,7 +36,7 @@ func FetchResources[T types.Provider](ctx context.Context, t *testing.T, provide
 
 		funcResources, err := testingutil.FetchAll(ctx, t, f)
 		if err != nil {
-			t.Errorf("failed to fetch %s on provider %s", name, p.String())
+			t.Errorf("failed to fetch %s on provider %s: %v", name, p.String(), err)
 			return
 		}
 

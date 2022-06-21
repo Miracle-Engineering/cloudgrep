@@ -1,4 +1,5 @@
 servicePackage: elasticloadbalancingv2
+endpointId: elasticloadbalancing
 
 types:
   - name: LoadBalancer

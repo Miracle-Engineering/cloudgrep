@@ -7,7 +7,9 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { PAGE_LENGTH, TOTAL_RECORDS } from 'constants/globals';
+import Typography from '@mui/material/Typography';
+import { DEBOUNCE_PERIOD, PAGE_LENGTH } from 'constants/globals';
+import debounce from 'debounce';
 import { Resource } from 'models/Resource';
 import React, { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,39 +23,34 @@ import { isScrolledForInfiniteScroll } from 'utils/uiHelper';
 import { tableStyles } from './style';
 
 const InsightTable: FC = () => {
-	const { resources } = useAppSelector(state => state.resources);
+	const { resources, count } = useAppSelector(state => state.resources);
 	const { filterTags } = useAppSelector(state => state.tags);
 	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
 	const [isInfiniteScroll, setIsInfiniteScroll] = useState<boolean>(false);
 	const [hasNext, setHasNext] = useState<boolean>(true);
-	const { currentPage, next } = usePagination(PAGE_LENGTH, TOTAL_RECORDS);
+	const { currentPage, next } = usePagination(PAGE_LENGTH, count);
 
 	useEffect(() => {
-		if (resources) {
+		if (resources && isInfiniteScroll) {
 			setIsInfiniteScroll(false);
+			next();
 		}
 	}, [resources]);
 
-	const handleClick = (resource: Resource) => {
-		dispatch(setCurrentResource(resource));
-		dispatch(toggleMenuVisible());
-	};
-
 	const handleInfiniteScroll = async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
-		if (isScrolledForInfiniteScroll(e) && hasNext) {
+		if (isScrolledForInfiniteScroll(e)) {
 			setIsInfiniteScroll(true);
-			next();
 			const response = await ResourceService.getFilteredResources(
 				filterTags,
 				currentPage * PAGE_LENGTH,
 				PAGE_LENGTH
 			);
-			if (response?.data && response.data.length > 0) {
+			if (response?.data?.resources && response.data.resources.length > 0) {
 				setHasNext(true);
 				dispatch(
 					getFilteredResourcesNextPage({
-						resources: response.data,
+						resources: response.data.resources,
 						limit: PAGE_LENGTH,
 						offset: currentPage * PAGE_LENGTH,
 					})
@@ -64,27 +61,38 @@ const InsightTable: FC = () => {
 		}
 	};
 
+	const onContainerScroll = async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
+		if (!isInfiniteScroll && hasNext) {
+			await handleInfiniteScroll(e);
+			e.persist();
+		}
+	};
+
+	const handleClick = (resource: Resource) => {
+		dispatch(setCurrentResource(resource));
+		dispatch(toggleMenuVisible());
+	};
+
+	const debouncedContainerScroll = debounce(onContainerScroll, DEBOUNCE_PERIOD);
+
 	return (
 		<Box
 			sx={{
 				width: '80%',
-				height: '100%',
 				backgroundColor: '#F9F7F6',
 				paddingLeft: '28px',
 				paddingRight: '44px',
 			}}>
+			<Typography sx={{ display: 'flex', margin: '4px' }}>{`${count} ${t('COUNT_RESOURCES')}`}</Typography>
 			<TableContainer
+				sx={{ maxHeight: '200vH' }}
 				component={Paper}
-				sx={{ height: '100%' }}
 				onScroll={async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 					if (!isInfiniteScroll) {
-						await handleInfiniteScroll(e);
+						await debouncedContainerScroll(e);
 					}
 				}}>
-				<Table
-					sx={{ minWidth: 650, maxHeight: '100%', overflowY: 'scroll' }}
-					size="small"
-					aria-label="a dense table">
+				<Table sx={{ minWidth: 650, overflowY: 'scroll' }} size="small" aria-label="a dense table">
 					<TableHead>
 						<TableRow>
 							<TableCell sx={tableStyles.headerStyle}>{t('TYPE')} </TableCell>

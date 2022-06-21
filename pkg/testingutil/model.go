@@ -101,12 +101,13 @@ func AssertEqualsTags(t *testing.T, a, b model.Tags) {
 	}
 }
 
-func AssertResourceFilteredCount(t testing.TB, resources []model.Resource, count int, filter ResourceFilter) {
+func AssertResourceFilteredCount(t testing.TB, resources []model.Resource, count int, filter ResourceFilter) []model.Resource {
 	t.Helper()
 
 	filtered := filter.Filter(resources)
 
 	assert.Lenf(t, filtered, count, "expected %d resource(s) with filter %s", count, filter)
+	return filtered
 }
 
 func AssertEvent(t *testing.T, ee, ae model.Event) {

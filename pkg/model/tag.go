@@ -45,6 +45,7 @@ func (t Tags) Clean() Tags {
 func (t Tags) Empty() bool {
 	return len(t) == 0
 }
+
 func (t Tags) Find(key string) *Tag {
 	for _, tag := range t {
 		if tag.Key == key {
@@ -63,4 +64,8 @@ func (t Tags) Delete(key string) Tags {
 		}
 	}
 	return result
+}
+
+func (t Tags) Add(key string, value string) Tags {
+	return append(t, Tag{Key: key, Value: value})
 }

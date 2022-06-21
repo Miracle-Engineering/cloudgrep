@@ -1,0 +1,12 @@
+# use the demo DB - no cloud required
+
+datastore:
+  skipRefresh: true
+  type: sqlite
+  dataSourceName: ./demo/demo.db
+
+providers:
+  - cloud: aws
+    regions:
+      - us-east-1
+      - eu-west-3

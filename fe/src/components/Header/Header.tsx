@@ -4,32 +4,47 @@ import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
+import Alert from 'components/Alert/Alert';
 import { DARK_BLUE } from 'constants/colors';
-import { PAGE_START } from 'constants/globals';
+import { PAGE_LENGTH, PAGE_START } from 'constants/globals';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import RefreshService from 'services/RefreshService';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getFilteredResources } from 'store/resources/thunks';
 import { getFields } from 'store/tags/thunks';
 
 import { headerStyle, menuItems } from './style';
 
-function Header() {
+const Header = () => {
 	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
-	const { filterTags, limit, offset } = useAppSelector(state => state.tags);
+	const { filterTags } = useAppSelector(state => state.tags);
 	const [open, setOpen] = useState(false);
 	const { resources } = useAppSelector(state => state.resources);
+	const [errorMessage, setErrorMessage] = useState('');
 
-	const handleClick = () => {
+	const handleClick = async () => {
 		setOpen(true);
+		try {
+			// throw { error: 'test error message for Demo purposes' };
+			await RefreshService.refresh();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (err: any) {
+			setErrorMessage(err.error);
+		}
 		dispatch(getFields());
-		dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: limit + offset }));
+		dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
 	};
 
-	const handleClose = () => {
-		setOpen(false);
+	const handleCloseBanner = (_event: React.SyntheticEvent | Event, reason?: string) => {
+		if (reason === 'clickaway') {
+			return;
+		}
+
+		setErrorMessage('');
 	};
 
 	useEffect(() => {
@@ -66,14 +81,16 @@ function Header() {
 					{t('REFRESH')}
 				</Button>
 			</Box>
-			<Backdrop
-				sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
-				open={open}
-				onClick={handleClose}>
+			<Backdrop sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }} open={open}>
 				<CircularProgress color="inherit" />
 			</Backdrop>
+			<Snackbar open={!!errorMessage} autoHideDuration={6000} onClose={handleCloseBanner}>
+				<Alert onClose={handleCloseBanner} severity="error" sx={{ width: '100%' }}>
+					{errorMessage}
+				</Alert>
+			</Snackbar>
 		</Box>
 	);
-}
+};
 
 export default Header;

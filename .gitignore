@@ -23,16 +23,15 @@ __debug_bin
 .vscode
 .idea
 
-# local databases
-*.db
-
 # local config
 .config/
+local
 
 # Terraform; source https://github.com/github/gitignore/blob/main/Terraform.gitignore
 **/.terraform/*
 *.tfstate
 *.tfstate.*
+tf.plan
 crash.log
 crash.*.log
 *.tfvars
@@ -44,3 +43,9 @@ override.tf.json
 *tfplan*
 .terraformrc
 terraform.rc
+
+# ignore sqlite db files
+*.db
+# except for the demo DB which is committed
+!demo/demo.db
+!demo/setup/original-dump.db

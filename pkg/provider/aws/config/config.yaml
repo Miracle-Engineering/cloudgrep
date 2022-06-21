@@ -1,6 +1,9 @@
 services:
 - ec2
 - elb
+- iam
 - lambda
 - rds
-- s3
+- elasticache
+- sns
+- route53
