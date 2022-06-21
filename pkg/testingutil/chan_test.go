@@ -55,7 +55,10 @@ func TestFetchAllCanceled(t *testing.T) {
 	actual, err := FetchAll(ctx, t, fetchFunc)
 
 	assert.ErrorIs(t, err, context.Canceled)
-	assert.Empty(t, actual)
+
+	// Because of the undeterministic nature of select,
+	// it's possible for an element to sometimes slip through
+	assert.LessOrEqual(t, len(actual), 1)
 }
 
 func TestMustFetchAllCanceled(t *testing.T) {

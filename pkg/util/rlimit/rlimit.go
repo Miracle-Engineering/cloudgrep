@@ -27,6 +27,6 @@ func init() {
 	if err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &lim); err == nil && lim.Cur != lim.Max {
 		lim.Cur = lim.Max
 		adjustFileLimit(&lim)
-		syscall.Setrlimit(syscall.RLIMIT_NOFILE, &lim)
+		_ = syscall.Setrlimit(syscall.RLIMIT_NOFILE, &lim)
 	}
 }
