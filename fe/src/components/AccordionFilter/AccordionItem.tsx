@@ -3,11 +3,10 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { DARK_BLUE } from 'constants/colors';
 import React, { FC } from 'react';
 import useHover from 'utils/hooks/useHover';
 
-import { labelClasses } from './style';
+import { accordionItem, labelClasses, onlyAndAll } from './style';
 import { AccordionItemProps } from './types';
 
 const AccordionItem: FC<AccordionItemProps> = props => {
@@ -47,11 +46,11 @@ const AccordionItem: FC<AccordionItemProps> = props => {
 				sx={{ display: 'flex', cursor: isHovered ? 'pointer' : 'unset' }}
 				onClick={() => isHovered && handleClick()}>
 				{isHovered && (
-					<Typography mr={2} sx={{ fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: DARK_BLUE }}>
+					<Typography mr={2} sx={onlyAndAll}>
 						{isOnlyUsed ? 'All' : 'Only'}
 					</Typography>
 				)}
-				<Typography sx={{ fontSize: '13px', fontWeight: 600 }}>{item.count}</Typography>
+				<Typography sx={accordionItem}>{item.count}</Typography>
 			</Box>
 		</Box>
 	);

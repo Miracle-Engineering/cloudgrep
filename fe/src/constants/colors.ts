@@ -1,5 +1,9 @@
-export const BACKGROUND_COLOR = '#F9F7F6';
-export const DARK_BLUE = '#1E3F6D';
+export const BACKGROUND_COLOR = '#F7F9FD';
+export const DARK_BLUE = '#2B3A67';
+export const GREY = '#6B7595';
+export const GREY_ONLY_ITEM = '#959DB3';
 export const TEXT_COLOR = '#1c2b34';
 export const BLACK = '#000000';
+export const BLACK_ROW = '#112138';
 export const WHITE = '#FFFFFF';
+export const BORDER_COLOR = '#EAEBF0';

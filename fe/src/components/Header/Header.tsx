@@ -1,5 +1,6 @@
 import 'utils/localisation/index';
 
+import RefreshIcon from '@mui/icons-material/Refresh';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -7,7 +8,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
 import Alert from 'components/Alert/Alert';
-import { DARK_BLUE } from 'constants/colors';
+import { BORDER_COLOR, DARK_BLUE } from 'constants/colors';
 import { AUTO_HIDE_DURATION, ENGINE_STATUS_INTERVAL, PAGE_LENGTH, PAGE_START } from 'constants/globals';
 import { EngineStatus, EngineStatusEnum } from 'models/EngineStatus';
 import React, { useEffect, useState } from 'react';
@@ -78,29 +79,37 @@ const Header = () => {
 
 	return (
 		<Box sx={headerStyle}>
-			<Box>
-				<img
-					style={{ marginLeft: '24px', height: '40px', cursor: 'pointer' }}
-					src={`${process.env.REACT_APP_PATH_PREFIX}/logo.png`}
-				/>
-			</Box>
 			<Box sx={{ display: 'flex' }}>
-				<Typography sx={{ ...menuItems, color: DARK_BLUE }}>{t('HOME')}</Typography>
-				<Typography ml={4} sx={menuItems}>
-					{t('SLACK')}
-				</Typography>
-				<Typography ml={4} sx={menuItems}>
-					{t('GITHUB')}
-				</Typography>
-				<Typography ml={4} sx={menuItems}>
-					{t('CONTACT')}
-				</Typography>
+				<Box>
+					<img
+						style={{ marginLeft: '24px', height: '28px', cursor: 'pointer' }}
+						src={`${process.env.REACT_APP_PATH_PREFIX}/logo.png`}
+					/>
+				</Box>
+				<Box sx={{ display: 'flex', marginLeft: '103.25px', alignItems: 'center' }}>
+					<Typography sx={{ ...menuItems, color: DARK_BLUE }}>{t('HOME')}</Typography>
+					<Typography ml={4} sx={menuItems}>
+						{t('SLACK')}
+					</Typography>
+					<Typography ml={4} sx={menuItems}>
+						{t('GITHUB')}
+					</Typography>
+					<Typography ml={4} sx={menuItems}>
+						{t('CONTACT')}
+					</Typography>
+				</Box>
 			</Box>
-			<Box>
-				<Button
-					onClick={handleClick}
-					sx={{ color: '#697391', borderColor: '#677290', marginRight: '44px' }}
-					variant="outlined">
+			<Box
+				onClick={handleClick}
+				sx={{
+					height: '100%',
+					display: 'flex',
+					borderLeft: `1px solid ${BORDER_COLOR}`,
+					width: '163px',
+					justifyContent: 'center',
+					cursor: 'pointer',
+				}}>
+				<Button sx={{ color: DARK_BLUE, textTransform: 'none' }} startIcon={<RefreshIcon />}>
 					{t('REFRESH')}
 				</Button>
 			</Box>

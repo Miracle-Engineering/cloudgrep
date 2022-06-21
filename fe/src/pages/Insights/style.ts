@@ -1,14 +1,17 @@
-import { DARK_BLUE } from 'constants/colors';
+import { BACKGROUND_COLOR, BLACK_ROW, DARK_BLUE, WHITE } from 'constants/colors';
 import { CSSProperties } from 'react';
 
 const headerStyle: CSSProperties = {
-	backgroundColor: DARK_BLUE,
-	color: 'white',
-	height: 46,
+	backgroundColor: WHITE,
+	color: DARK_BLUE,
+	height: '46px',
 	fontFamily: 'Montserrat',
-	fontSize: 18,
+	fontSize: '12px',
 	paddingTop: 0,
 	paddingBottom: 0,
+	fontStyle: 'normal',
+	fontWeight: '600',
+	lineHeight: '130%',
 };
 
 const hoverStyle: CSSProperties = {
@@ -16,7 +19,16 @@ const hoverStyle: CSSProperties = {
 	backgroundColor: '#8FCAF9',
 };
 
-export const tableStyles = { hoverStyle, headerStyle };
+const bodyRow: CSSProperties = {
+	fontFamily: 'Montserrat',
+	fontStyle: 'normal',
+	fontWeight: 500,
+	fontSize: '14px',
+	lineHeight: '18px',
+	color: BLACK_ROW,
+}
+
+export const tableStyles = { hoverStyle, headerStyle, bodyRow };
 
 export const overrideSummaryClasses = {
 	content: 'summary_content',
@@ -24,14 +36,15 @@ export const overrideSummaryClasses = {
 };
 
 const accordionHeader: CSSProperties = {
-	fontWeight: '400',
-	fontSize: '18px',
-	lineHeight: '18px',
+	fontWeight: '600',
+	fontSize: '14px',
+	lineHeight: '120%',
 	marginBottom: '4px',
 	fontFamily: 'Montserrat',
 	overflow: 'hidden',
 	whiteSpace: 'nowrap',
 	textOverflow: 'ellipsis',
+	color: DARK_BLUE,
 };
 
 const accordionDetails: CSSProperties = {
@@ -45,8 +58,8 @@ export const labelClasses = {
 };
 
 export const filterHeader = {
-	backgroundColor: `${DARK_BLUE}`,
-	color: '#FFFFFF',
+	backgroundColor: BACKGROUND_COLOR,
+	color: DARK_BLUE,
 	borderRadius: '4px',
 	minHeight: '42px !important',
 };

@@ -5,6 +5,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AccordionFilter from 'components/AccordionFilter';
+import { DARK_BLUE } from 'constants/colors';
 import { CHECKED_BY_DEFAULT, PAGE_LENGTH, PAGE_START } from 'constants/globals';
 import { Field, FieldGroup, ValueType } from 'models/Field';
 import { Tag } from 'models/Tag';
@@ -13,6 +14,7 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getFilteredResources, getResources } from 'store/resources/thunks';
 
 import { accordionStyles, filterStyles, overrideSummaryClasses } from '../style';
+import { capitalize } from './helper';
 
 const InsightFilter: FC = () => {
 	const { fields } = useAppSelector(state => state.tags);
@@ -52,12 +54,12 @@ const InsightFilter: FC = () => {
 					<Accordion key={field.name}>
 						<AccordionSummary
 							sx={filterStyles.filterHeader}
-							expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+							expandIcon={<ExpandMoreIcon sx={{ color: DARK_BLUE }} />}
 							aria-controls={`${field.name}-content`}
 							id={`${field.name}-header`}
 							key={field.name}
 							classes={overrideSummaryClasses}>
-							<Typography sx={accordionStyles.accordionHeader}>{field.name.toUpperCase()}</Typography>
+							<Typography sx={accordionStyles.accordionHeader}>{capitalize(field.name)}</Typography>
 						</AccordionSummary>
 						<AccordionDetails sx={{ padding: '0px' }}>
 							{field.fields.map((fieldItem: Field, index: number) => (

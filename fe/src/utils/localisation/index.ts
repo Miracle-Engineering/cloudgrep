@@ -37,9 +37,9 @@ i18n.use(initReactI18next).init({
 				PROPERTIES: 'Properties',
 
 				// Resources
-				TYPE: 'TYPE',
+				TYPE: 'Type',
 				ID: 'ID',
-				REGION: 'REGION',
+				REGION: 'Region',
 				REGIONS: 'Regions',
 				TYPES: 'Types',
 				COUNT_RESOURCES: 'resource(s) found',

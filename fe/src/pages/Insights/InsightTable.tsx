@@ -8,6 +8,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import { BORDER_COLOR } from 'constants/colors';
 import { DEBOUNCE_PERIOD, PAGE_LENGTH } from 'constants/globals';
 import debounce from 'debounce';
 import { Resource } from 'models/Resource';
@@ -83,7 +84,9 @@ const InsightTable: FC = () => {
 				paddingLeft: '28px',
 				paddingRight: '44px',
 			}}>
-			<Typography sx={{ display: 'flex', margin: '4px' }}>{`${count} ${t('COUNT_RESOURCES')}`}</Typography>
+			<Typography sx={{ ...tableStyles.bodyRow, display: 'flex', margin: '8px' }}>{`${count} ${t(
+				'COUNT_RESOURCES'
+			)}`}</Typography>
 			<TableContainer
 				sx={{ maxHeight: '200vH' }}
 				component={Paper}
@@ -94,7 +97,7 @@ const InsightTable: FC = () => {
 				}}>
 				<Table sx={{ minWidth: 650, overflowY: 'scroll' }} size="small" aria-label="a dense table">
 					<TableHead>
-						<TableRow>
+						<TableRow sx={{ height: '46px', borderBottom: `1px solid ${BORDER_COLOR}` }}>
 							<TableCell sx={tableStyles.headerStyle}>{t('TYPE')} </TableCell>
 							<TableCell align="left" sx={tableStyles.headerStyle}>
 								{t('ID')}
@@ -110,15 +113,19 @@ const InsightTable: FC = () => {
 								onClick={() => handleClick(row)}
 								key={row.id + row.type + index}
 								sx={{
-									height: '77px',
+									height: '66px',
 									'&:last-child td, &:last-child th': { border: 0 },
 									'&:hover': tableStyles.hoverStyle,
 								}}>
-								<TableCell component="th" scope="row">
+								<TableCell sx={tableStyles.bodyRow} component="th" scope="row">
 									{row.type}
 								</TableCell>
-								<TableCell align="left">{row.id}</TableCell>
-								<TableCell align="left">{row.region}</TableCell>
+								<TableCell sx={tableStyles.bodyRow} align="left">
+									{row.id}
+								</TableCell>
+								<TableCell sx={tableStyles.bodyRow} align="left">
+									{row.region}
+								</TableCell>
 							</TableRow>
 						))}
 					</TableBody>
