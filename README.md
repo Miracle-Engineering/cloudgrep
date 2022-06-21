@@ -125,7 +125,7 @@ datastore:
   #  skipRefresh determines whether to refresh the data (i.e. scan the cloud) on startup.
   skipRefresh: false
   # dataSourceName is the Type-specific data source name or uri for connecting to the desired data source
-  dataSourceName: "~/blah.db"
+  dataSourceName: "~/cloudgrep_data.db"
 
 # providers represents the cloud providers cloudgrep will scan w/ the current credentials
 providers:
