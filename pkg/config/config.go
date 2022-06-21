@@ -33,7 +33,6 @@ type Provider struct {
 	Regions []string `yaml:"regions"`
 }
 
-
 func (p *Provider) String() string {
 	if len(p.Regions) == 0 {
 		return p.Cloud
