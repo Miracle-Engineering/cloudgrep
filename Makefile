@@ -136,3 +136,4 @@ clean:
 
 awsgen:
 	CGO_ENABLED=1 go run -race ./hack/awsgen --config pkg/provider/aws/config/config.yaml --output-dir pkg/provider/aws
+
