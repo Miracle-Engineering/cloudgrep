@@ -53,7 +53,14 @@ func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceC
 	if p.isGlobal {
 		region = "global"
 	}
-
+	if mapping.UseMapConverter {
+		return &resourceconverter.MapConverter{
+			Region:       region,
+			ResourceType: resourceType,
+			TagField:     mapping.TagField,
+			IdField:      mapping.IdField,
+		}
+	}
 	return &resourceconverter.ReflectionConverter{
 		Region:       region,
 		ResourceType: resourceType,
