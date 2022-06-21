@@ -7,6 +7,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.33
 	github.com/aws/aws-sdk-go-v2 v1.16.5
 	github.com/aws/aws-sdk-go-v2/config v1.15.4
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.23.3
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.18.2
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.36.1
 	github.com/aws/aws-sdk-go-v2/service/eks v1.21.2

@@ -1,0 +1,13 @@
+types:
+  - name: AutoScalingGroup
+    listApi:
+      call: DescribeAutoScalingGroups
+      pagination: true
+      outputKey: AutoScalingGroups
+      id:
+        name: AutoScalingGroupName
+        pointer: true
+      tags:
+        field: Tags
+        key: Key
+        value: Value
