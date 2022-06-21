@@ -15,6 +15,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.23.1
 	github.com/aws/aws-sdk-go-v2/service/rds v1.21.2
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.21.1
+	github.com/aws/aws-sdk-go-v2/service/sns v1.17.7
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.4
 	github.com/aws/smithy-go v1.11.3
 	github.com/gin-contrib/zap v0.0.2
