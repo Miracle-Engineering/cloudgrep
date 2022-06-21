@@ -8,8 +8,7 @@ types:
     getTagsApi:
       type: Topic
       call: ListTagsForResource
-      inputIDField:
-        name: ResourceArn
+      inputIDField: ResourceArn
       tags:
         style: struct
         field: "Tags"

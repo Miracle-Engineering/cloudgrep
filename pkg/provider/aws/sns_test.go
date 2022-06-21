@@ -24,10 +24,6 @@ func TestFetchSnsTopic(t *testing.T) {
 				Key:   testingutil.TestTag,
 				Value: "sns-topic-0",
 			},
-			{
-				Key:   "IntegrationTest",
-				Value: "true",
-			},
 		},
 	})
 }
