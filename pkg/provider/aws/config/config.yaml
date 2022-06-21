@@ -1,6 +1,7 @@
 services:
 - ec2
 - elb
+- iam
 - lambda
 - rds
 - elasticache
