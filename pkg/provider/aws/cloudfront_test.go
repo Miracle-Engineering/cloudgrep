@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -17,11 +16,9 @@ func TestFetchCloudfrontDistributions(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "cloudfront.Distribution")
 
 	testingutil.AssertResourceCount(t, resources, "", 1)
-	fmt.Println(resources[0])
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type: "cloudfront.Distribution" +
-			"",
-		Region: defaultRegion,
+		Type:   "cloudfront.Distribution",
+		Region: globalRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

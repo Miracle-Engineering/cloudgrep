@@ -6,3 +6,4 @@ services:
 - rds
 - elasticache
 - sns
+- route53
