@@ -57,7 +57,7 @@ export const sideMenuHeader = {
 	fontWeight: 500,
 	fontSize: '24px',
 	lineHeight: '32px',
-}
+};
 
 export const tabStyle = {
 	fontFamily: 'Montserrat',
@@ -67,4 +67,4 @@ export const tabStyle = {
 	lineHeight: '24px',
 	color: GREY_TAB_ITEM,
 	textTransform: 'none',
-}
+};
