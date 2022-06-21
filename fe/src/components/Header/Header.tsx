@@ -108,7 +108,7 @@ const Header = () => {
 				<CircularProgress color="inherit" />
 			</Backdrop>
 			<Snackbar
-				sx={{ marginRight: '16px' }}
+				sx={{ marginRight: '24px' }}
 				open={!!errorMessage}
 				autoHideDuration={AUTO_HIDE_DURATION}
 				onClose={handleCloseBanner}>
@@ -117,7 +117,7 @@ const Header = () => {
 				</Alert>
 			</Snackbar>
 			<Snackbar
-				sx={{ marginRight: '16px' }}
+				sx={{ marginRight: '24px' }}
 				open={!!engineStatus}
 				autoHideDuration={AUTO_HIDE_DURATION}
 				onClose={handleCloseBanner}>
