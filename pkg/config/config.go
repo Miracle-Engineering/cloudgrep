@@ -50,7 +50,7 @@ type Web struct {
 	// Prefix is the url prefix the server uses
 	Prefix string `yaml:"prefix"`
 	// SkipOpen determines whether to automatically open the webui on startup
-	SkipOpen bool `yaml:"skip_open"`
+	SkipOpen bool `yaml:"skipOpen"`
 }
 
 func GetDefault() (Config, error) {
