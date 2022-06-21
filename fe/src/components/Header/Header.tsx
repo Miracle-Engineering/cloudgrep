@@ -107,12 +107,20 @@ const Header = () => {
 			<Backdrop sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }} open={open}>
 				<CircularProgress color="inherit" />
 			</Backdrop>
-			<Snackbar mr={2} open={!!errorMessage} autoHideDuration={AUTO_HIDE_DURATION} onClose={handleCloseBanner}>
+			<Snackbar
+				sx={{ marginRight: '16px' }}
+				open={!!errorMessage}
+				autoHideDuration={AUTO_HIDE_DURATION}
+				onClose={handleCloseBanner}>
 				<Alert onClose={handleCloseBanner} severity="error" sx={{ width: '100%' }}>
 					{errorMessage}
 				</Alert>
 			</Snackbar>
-			<Snackbar mr={2} open={!!engineStatus} autoHideDuration={AUTO_HIDE_DURATION} onClose={handleCloseBanner}>
+			<Snackbar
+				sx={{ marginRight: '16px' }}
+				open={!!engineStatus}
+				autoHideDuration={AUTO_HIDE_DURATION}
+				onClose={handleCloseBanner}>
 				<Alert onClose={handleCloseBanner} severity="success" sx={{ width: '100%' }}>
 					{t('REFRESH_SUCCESS')}
 				</Alert>
