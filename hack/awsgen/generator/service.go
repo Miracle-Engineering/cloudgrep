@@ -34,11 +34,13 @@ func (g Generator) generateServiceRegister(service config.Service) (string, util
 	data := struct {
 		ProviderName string
 		ServiceName  string
+		EndpointID   string
 		FuncName     string
 
 		Types []typeRegisterInfo
 	}{
 		ProviderName: ProviderStructName,
+		EndpointID:   service.EndpointID,
 		ServiceName:  service.Name,
 		FuncName:     registerFuncName(service),
 	}

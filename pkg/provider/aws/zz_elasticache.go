@@ -13,9 +13,10 @@ import (
 
 func (p *Provider) register_elasticache(mapping map[string]mapper) {
 	mapping["elasticache.CacheCluster"] = mapper{
-		FetchFunc: p.fetch_elasticache_CacheCluster,
-		IdField:   "ARN",
-		IsGlobal:  false,
+		ServiceEndpointID: "elasticache",
+		FetchFunc:         p.fetch_elasticache_CacheCluster,
+		IdField:           "ARN",
+		IsGlobal:          false,
 	}
 }
 

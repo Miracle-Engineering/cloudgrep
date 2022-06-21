@@ -13,9 +13,10 @@ import (
 
 func (p *Provider) register_elb(mapping map[string]mapper) {
 	mapping["elb.LoadBalancer"] = mapper{
-		FetchFunc: p.fetch_elb_LoadBalancer,
-		IdField:   "LoadBalancerArn",
-		IsGlobal:  false,
+		ServiceEndpointID: "elb",
+		FetchFunc:         p.fetch_elb_LoadBalancer,
+		IdField:           "LoadBalancerArn",
+		IsGlobal:          false,
 	}
 }
 

@@ -13,14 +13,16 @@ import (
 
 func (p *Provider) register_route53(mapping map[string]mapper) {
 	mapping["route53.HealthCheck"] = mapper{
-		FetchFunc: p.fetch_route53_HealthCheck,
-		IdField:   "Id",
-		IsGlobal:  true,
+		ServiceEndpointID: "route53",
+		FetchFunc:         p.fetch_route53_HealthCheck,
+		IdField:           "Id",
+		IsGlobal:          true,
 	}
 	mapping["route53.HostedZone"] = mapper{
-		FetchFunc: p.fetch_route53_HostedZone,
-		IdField:   "Id",
-		IsGlobal:  true,
+		ServiceEndpointID: "route53",
+		FetchFunc:         p.fetch_route53_HostedZone,
+		IdField:           "Id",
+		IsGlobal:          true,
 	}
 }
 
