@@ -12,9 +12,10 @@ import (
 
 func (p *Provider) register_autoscaling(mapping map[string]mapper) {
 	mapping["autoscaling.AutoScalingGroup"] = mapper{
-		FetchFunc: p.fetch_autoscaling_AutoScalingGroup,
-		IdField:   "AutoScalingGroupName",
-		IsGlobal:  false,
+		ServiceEndpointID: "autoscaling",
+		FetchFunc:         p.fetch_autoscaling_AutoScalingGroup,
+		IdField:           "AutoScalingGroupName",
+		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "Tags",
 			Key:   "Key",
