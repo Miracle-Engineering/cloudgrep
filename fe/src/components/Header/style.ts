@@ -1,3 +1,4 @@
+import { GREY, WHITE } from 'constants/colors';
 import { CSSProperties } from 'react';
 
 export const headerStyle: CSSProperties = {
@@ -6,14 +7,16 @@ export const headerStyle: CSSProperties = {
 	display: 'flex',
 	alignItems: 'center',
 	border: '1px solid #EAEBF0',
-	backgroundColor: '#F9F7F6',
+	backgroundColor: WHITE,
 	justifyContent: 'space-between',
 };
 
 export const menuItems: CSSProperties = {
-	color: '#697391',
+	color: GREY,
+	lineHeight: '18px',
+	letterSpacing: '0em',
 	cursor: 'pointer',
-	fontSize: '15px',
+	fontSize: '14px',
 	fontWeight: '600',
 	fontFamily: 'Montserrat',
 };

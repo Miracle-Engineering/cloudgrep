@@ -25,6 +25,7 @@ i18n.use(initReactI18next).init({
 				SEARCH: 'Search',
 				SEARCH_TERM: 'Search term',
 				REFRESH: 'Refresh',
+				DETAILS: 'Details',
 
 				// HEADER:
 				HOME: 'Home',
@@ -37,12 +38,13 @@ i18n.use(initReactI18next).init({
 				PROPERTIES: 'Properties',
 
 				// Resources
-				TYPE: 'TYPE',
+				TYPE: 'Type',
 				ID: 'ID',
-				REGION: 'REGION',
+				REGION: 'Region',
 				REGIONS: 'Regions',
 				TYPES: 'Types',
 				COUNT_RESOURCES: 'resource(s) found',
+				REFRESH_SUCCESS: 'Refresh completed successfully',
 			},
 		},
 	},

@@ -30,7 +30,7 @@ const Insights: FC = () => {
 				p={2}>
 				<SearchInput
 					width={'400px'}
-					height={'32px'} // todo if visible substract from page height below
+					height={32} // todo if visible substract from page height below
 					onChange={handleChange}
 					rest={{ flexDirection: 'row-reverse' }}
 				/>
