@@ -13,9 +13,10 @@ import (
 
 func (p *Provider) register_sns(mapping map[string]mapper) {
 	mapping["sns.SNS"] = mapper{
-		FetchFunc: p.fetch_sns_SNS,
-		IdField:   "TopicArn",
-		IsGlobal:  false,
+		ServiceEndpointID: "sns",
+		FetchFunc:         p.fetch_sns_SNS,
+		IdField:           "TopicArn",
+		IsGlobal:          false,
 	}
 }
 
