@@ -43,6 +43,7 @@ i18n.use(initReactI18next).init({
 				REGIONS: 'Regions',
 				TYPES: 'Types',
 				COUNT_RESOURCES: 'resource(s) found',
+				REFRESH_SUCCESS: 'Refresh completed successfully',
 			},
 		},
 	},
