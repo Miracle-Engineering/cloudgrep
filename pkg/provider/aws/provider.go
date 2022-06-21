@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
@@ -14,8 +16,8 @@ import (
 	"github.com/run-x/cloudgrep/pkg/provider/types"
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 	"github.com/run-x/cloudgrep/pkg/util"
+	_ "github.com/run-x/cloudgrep/pkg/util/rlimit"
 	"go.uber.org/zap"
-	"os"
 )
 
 type Provider struct {
