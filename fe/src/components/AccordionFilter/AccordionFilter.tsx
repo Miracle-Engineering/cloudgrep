@@ -114,7 +114,7 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 					</AccordionSummary>
 					<AccordionDetails ref={containerRef} sx={accordionStyles.details}>
 						{hasSearch && field?.values?.length > SEARCH_ELEMENTS_NUMBER && (
-							<SearchInput onChange={handleSearchTerm} />
+							<SearchInput onChange={handleSearchTerm} height={32} />
 						)}
 						<Box>
 							<FormGroup>

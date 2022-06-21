@@ -3,6 +3,7 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { DARK_BLUE } from 'constants/colors';
 import React, { FC } from 'react';
 import useHover from 'utils/hooks/useHover';
 
@@ -37,7 +38,17 @@ const AccordionItem: FC<AccordionItemProps> = props => {
 					}}
 					classes={labelClasses}
 					control={
-						<Checkbox size={'small'} checked={isChecked} onChange={e => handleChange(e, field, item)} />
+						<Checkbox
+							sx={{
+								color: DARK_BLUE,
+								'&.Mui-checked': {
+									color: DARK_BLUE,
+								},
+							}}
+							size={'small'}
+							checked={isChecked}
+							onChange={e => handleChange(e, field, item)}
+						/>
 					}
 					label={item.value}
 				/>

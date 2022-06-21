@@ -2,10 +2,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
-import { BACKGROUND_COLOR } from 'constants/colors';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { searchStyle, searchText } from './style';
 import { SearchProps } from './types';
 
 const SearchInput: FC<SearchProps> = props => {
@@ -16,31 +16,25 @@ const SearchInput: FC<SearchProps> = props => {
 		<Paper
 			component="form"
 			sx={{
-				p: '2px 4px',
-				display: 'flex',
-				alignItems: 'center',
+				...searchStyle,
 				width: width,
 				height: height || 24,
 				maxWidth: width,
-				border: '1px solid #CECDCD',
-				borderRadius: '0px',
-				boxShadow: 'none',
-				backgroundColor: BACKGROUND_COLOR,
 				...rest,
 			}}>
+			<IconButton type="submit" sx={{ p: '6px', paddingLeft: '16px' }} aria-label={t('SEARCH')}>
+				<SearchIcon width="20px" height="20px" fontSize="small" />
+			</IconButton>
 			<InputBase
 				sx={{
+					...searchText,
 					ml: 1,
 					flex: 1,
-					fontSize: 12,
 				}}
 				placeholder={t('SEARCH')}
 				inputProps={{ 'aria-label': t('SEARCH_TERM') }}
 				onChange={onChange}
 			/>
-			<IconButton type="submit" sx={{ p: '10px' }} aria-label={t('SEARCH')}>
-				<SearchIcon fontSize="small" />
-			</IconButton>
 		</Paper>
 	);
 };
