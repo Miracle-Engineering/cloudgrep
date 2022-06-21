@@ -1,0 +1,11 @@
+# contains the original DB dump
+
+datastore:
+  type: sqlite
+  dataSourceName: ./demo/setup/original-dump.db
+
+providers:
+  - cloud: aws
+    regions:
+      - us-east-1
+      - eu-west-3

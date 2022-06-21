@@ -23,9 +23,6 @@ __debug_bin
 .vscode
 .idea
 
-# local databases
-*.db
-
 # local config
 .config/
 local
@@ -46,3 +43,9 @@ override.tf.json
 *tfplan*
 .terraformrc
 terraform.rc
+
+# ignore sqlite db files
+*.db
+# except for the demo DB which is committed
+!demo/demo.db
+!demo/setup/original-dump.db

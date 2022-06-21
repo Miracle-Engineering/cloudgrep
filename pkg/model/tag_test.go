@@ -36,3 +36,16 @@ func TestTagsDelete(t *testing.T) {
 	testingutil.AssertEqualsTags(t, model.Tags{t1}, tags.Delete("env"))
 	testingutil.AssertEqualsTags(t, model.Tags{t1, t2}, tags.Delete("unknown"))
 }
+
+func TestTagsAdd(t *testing.T) {
+	t1 := model.Tag{
+		Key:   "cluster",
+		Value: "dev-cluster",
+	}
+	t2 := model.Tag{
+		Key:   "env",
+		Value: "dev",
+	}
+	tags := model.Tags{t1}
+	testingutil.AssertEqualsTags(t, model.Tags{t1, t2}, tags.Add(t2.Key, t2.Value))
+}
