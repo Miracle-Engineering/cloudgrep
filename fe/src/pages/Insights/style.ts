@@ -26,7 +26,7 @@ const bodyRow: CSSProperties = {
 	fontSize: '14px',
 	lineHeight: '18px',
 	color: BLACK_ROW,
-}
+};
 
 export const tableStyles = { hoverStyle, headerStyle, bodyRow };
 
