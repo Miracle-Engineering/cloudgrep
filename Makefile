@@ -4,7 +4,7 @@ VERSION ?= dev
 GITHUB_SHA ?= $(shell git rev-parse HEAD)
 BUILD_TIME = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n')
 GO_VERSION = $(shell go version | awk {'print $$3'})
-LDFLAGS = -s -w
+LDFLAGS = -s -w -linkmode=external
 PKG = github.com/run-x/cloudgrep
 
 DOCKER_RELEASE_TAG = "ghcr.io/run-x/cloudgrep:$(VERSION)"
@@ -119,11 +119,11 @@ release-darwin: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
 release-darwin:
 	@echo "Building Darwin ARM64 binary"
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=arm64 GOOS=darwin \
-		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_arm64"
+		go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_darwin_arm64"
 
 	@echo "Building Darwin AMD64 binary..."
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin \
-		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_amd64"
+		go build -ldflags "$(LDFLAGS)"  -o "./bin/cloudgrep_darwin_amd64"
 
 	@echo "Signing Darwin ARM64 binary..."
 	gon gon_arm64.hcl
