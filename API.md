@@ -38,7 +38,7 @@ The response contains:
   "count": 25,
   //the fields available for filtering the resources, their count is updated based on the input query
   //a field can be: a resource type, a region, a tag key
-  "fieldGroups": 0,
+  "fieldGroups": [],
   //the resources matching the input query (paginated)
   "resources": []
 }
@@ -181,7 +181,9 @@ Example of queries:
 
 ```js
 {
+  //the query has 2 results - if pagination is used this number would be unchanged - it's the total number of results
   "count":2,
+  //the updated list of fields matching the current query
   "fieldGroups":[
     {
       "name":"core",
@@ -195,6 +197,7 @@ Example of queries:
             },
             {
               "value":"eu-west-3",
+              // "-" means that this value is not relevant for current query - filtering on it would have no effect
               "count":"-"
             }
           ],
@@ -250,6 +253,7 @@ Example of queries:
       ]
     }
   ],
+  //list the resources - if pagination is used only one page would be returned at time
   "resources":[
     {
       "id":"i-05a8cc7c8b7bc4f2d",
