@@ -12,11 +12,11 @@ func TestFetchSqsQueue(t *testing.T) {
 
 	ctx := setupIntegrationTest(t)
 
-	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "sqs.SQS")
+	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "sqs.Queue")
 
 	testingutil.AssertResourceCount(t, resources, "", 1)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "sqs.SQS",
+		Type:   "sqs.Queue",
 		Region: defaultRegion,
 		Tags: model.Tags{
 			{
