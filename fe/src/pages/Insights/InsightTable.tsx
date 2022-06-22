@@ -88,14 +88,14 @@ const InsightTable: FC = () => {
 				'COUNT_RESOURCES'
 			)}`}</Typography>
 			<TableContainer
-				sx={{ maxHeight: '150vH' }}
+				sx={{ maxHeight: '100vH' }}
 				component={Paper}
 				onScroll={async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 					if (!isInfiniteScroll) {
 						await debouncedContainerScroll(e);
 					}
 				}}>
-				<Table sx={{ minWidth: 650, overflowY: 'scroll' }} size="small" aria-label="a dense table">
+				<Table stickyHeader sx={{ minWidth: 650, overflowY: 'scroll' }} size="small" aria-label="a dense table">
 					<TableHead>
 						<TableRow sx={{ height: '46px', borderBottom: `1px solid ${BORDER_COLOR}` }}>
 							<TableCell sx={tableStyles.headerStyle}>{t('TYPE')} </TableCell>
