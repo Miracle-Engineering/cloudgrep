@@ -7,3 +7,4 @@ services:
 - elasticache
 - sns
 - route53
+- autoscaling

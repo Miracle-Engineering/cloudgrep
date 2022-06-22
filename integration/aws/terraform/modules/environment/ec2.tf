@@ -68,6 +68,16 @@ resource "aws_autoscaling_group" "test" {
     }
     triggers = ["tag"]
   }
+  tag {
+    key                 = "test"
+    propagate_at_launch = false
+    value               = "autoscaling-group-${count.index}"
+  }
+  tag {
+    key                 = "IntegrationTest"
+    propagate_at_launch = false
+    value               = "true"
+  }
 }
 
 resource "aws_eip" "test" {

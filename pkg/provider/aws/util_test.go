@@ -15,6 +15,7 @@ import (
 	"go.uber.org/zap/zaptest"
 
 	cfg "github.com/run-x/cloudgrep/pkg/config"
+	regionutil "github.com/run-x/cloudgrep/pkg/provider/aws/regions"
 	"github.com/run-x/cloudgrep/pkg/testingutil"
 )
 
@@ -193,7 +194,7 @@ func regionsToTest() []string {
 	}
 
 	// Always run tests on the global region
-	regions = append(regions, "global")
+	regions = append(regions, regionutil.Global)
 
 	return testingutil.Unique(regions)
 }

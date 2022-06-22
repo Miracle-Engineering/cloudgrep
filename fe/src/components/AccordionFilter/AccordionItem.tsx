@@ -7,7 +7,7 @@ import { DARK_BLUE } from 'constants/colors';
 import React, { FC } from 'react';
 import useHover from 'utils/hooks/useHover';
 
-import { labelClasses } from './style';
+import { accordionItem, labelClasses, onlyAndAll } from './style';
 import { AccordionItemProps } from './types';
 
 const AccordionItem: FC<AccordionItemProps> = props => {
@@ -38,7 +38,17 @@ const AccordionItem: FC<AccordionItemProps> = props => {
 					}}
 					classes={labelClasses}
 					control={
-						<Checkbox size={'small'} checked={isChecked} onChange={e => handleChange(e, field, item)} />
+						<Checkbox
+							sx={{
+								color: DARK_BLUE,
+								'&.Mui-checked': {
+									color: DARK_BLUE,
+								},
+							}}
+							size={'small'}
+							checked={isChecked}
+							onChange={e => handleChange(e, field, item)}
+						/>
 					}
 					label={item.value}
 				/>
@@ -47,11 +57,11 @@ const AccordionItem: FC<AccordionItemProps> = props => {
 				sx={{ display: 'flex', cursor: isHovered ? 'pointer' : 'unset' }}
 				onClick={() => isHovered && handleClick()}>
 				{isHovered && (
-					<Typography mr={2} sx={{ fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: DARK_BLUE }}>
+					<Typography mr={2} sx={onlyAndAll}>
 						{isOnlyUsed ? 'All' : 'Only'}
 					</Typography>
 				)}
-				<Typography sx={{ fontSize: '13px', fontWeight: 600 }}>{item.count}</Typography>
+				<Typography sx={accordionItem}>{item.count}</Typography>
 			</Box>
 		</Box>
 	);

@@ -1,11 +1,12 @@
 import 'utils/localisation/index';
 
 import CloseIcon from '@mui/icons-material/Close';
+import DataObjectIcon from '@mui/icons-material/DataObject';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
-import { Property } from 'models/Resource';
+import { BACKGROUND_COLOR } from 'constants/colors';
 import { Tag } from 'models/Tag';
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +14,16 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { toggleMenuVisible } from 'store/resources/slice';
 
 import PropertyItem from './PropertyItem/';
-import { boxFirstLine, boxSecondLine, boxStyle, sideMenuLeftText, sideMenuRightText, sideMenuStyle } from './style';
+import {
+	boxFirstLine,
+	boxSecondLine,
+	boxStyle,
+	sideMenuHeader,
+	sideMenuLeftText,
+	sideMenuRightText,
+	sideMenuStyle,
+	tabStyle,
+} from './style';
 import TabPanel from './TabPanel';
 
 const SideMenu = () => {
@@ -58,28 +68,67 @@ const SideMenu = () => {
 		<>
 			{currentResource ? (
 				<Box ref={menuRef} sx={sideMenuStyle}>
-					<Box sx={{ display: 'flex', justifyContent: 'end' }}>
-						<CloseIcon onClick={handleClose} sx={{ margin: '20px', cursor: 'pointer' }} />
+					<Box
+						sx={{
+							display: 'flex',
+							justifyContent: 'space-between',
+							height: '72px',
+							backgroundColor: BACKGROUND_COLOR,
+						}}
+						mb={3}>
+						<Box ml={'16px'} sx={{ display: 'flex', alignItems: 'center' }}>
+							<DataObjectIcon sx={{ margin: '10px', color: '#AAB0C2' }} />
+							<Typography sx={sideMenuHeader}>{t('DETAILS')}</Typography>
+						</Box>
+						<CloseIcon onClick={handleClose} sx={{ margin: '20px', cursor: 'pointer', color: '#AAB0C2' }} />
 					</Box>
 					<Box sx={{ display: 'flex', flexDirection: 'row' }}>
-						<Box ml={2} p={1} sx={boxStyle}>
+						<Box ml={2} p={'12px'} sx={boxStyle}>
 							<Typography {...boxFirstLine}>{`${t('ID')}`.toUpperCase()}</Typography>
 							<Typography {...boxSecondLine}> {`${currentResource.id}`} </Typography>
 						</Box>
 						<Box ml={2} p={1} sx={boxStyle}>
-							<Typography {...boxFirstLine}> {`${t('REGION')}`.toUpperCase()} </Typography>
+							<Typography {...boxFirstLine}> {`${t('REGION')}`} </Typography>
 							<Typography {...boxSecondLine}> {`${currentResource.region}`} </Typography>
 						</Box>
 						<Box ml={2} p={1} sx={boxStyle}>
-							<Typography {...boxFirstLine}> {`${t('TYPE')}`.toUpperCase()} </Typography>
+							<Typography {...boxFirstLine}> {`${t('TYPE')}`} </Typography>
 							<Typography {...boxSecondLine}> {`${currentResource.type}`} </Typography>
 						</Box>
 					</Box>
 					<Box sx={{ width: '100%' }} mt={2}>
 						<Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-							<Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-								<Tab label={t('TAGS')} {...commonTabProps(0)} />
-								<Tab label={t('PROPERTIES')} {...commonTabProps(1)} />
+							<Tabs
+								sx={{
+									color: '#959DB3 !important',
+									'&.Mui-selected': {
+										color: '#2B3A67 !important',
+									},
+									textTransform: 'none',
+								}}
+								value={value}
+								onChange={handleChange}
+								aria-label="basic tabs example">
+								<Tab
+									sx={{
+										...tabStyle,
+										'&.Mui-selected': {
+											color: '#2B3A67 !important',
+										},
+									}}
+									label={t('TAGS')}
+									{...commonTabProps(0)}
+								/>
+								<Tab
+									sx={{
+										...tabStyle,
+										'&.Mui-selected': {
+											color: '#2B3A67 !important',
+										},
+									}}
+									label={t('PROPERTIES')}
+									{...commonTabProps(1)}
+								/>
 							</Tabs>
 						</Box>
 						<TabPanel value={value} index={0}>

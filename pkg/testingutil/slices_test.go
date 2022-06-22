@@ -1,6 +1,7 @@
 package testingutil
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -39,5 +40,18 @@ func TestUnique(t *testing.T) {
 	}
 
 	actual := Unique(in)
+	assert.Equal(t, expected, actual)
+}
+
+func TestSliceConvertFunc(t *testing.T) {
+	in := []int{
+		0, 1, 3, -1,
+	}
+
+	expected := []string{
+		"0", "1", "3", "-1",
+	}
+
+	actual := SliceConvertFunc(in, strconv.Itoa)
 	assert.Equal(t, expected, actual)
 }

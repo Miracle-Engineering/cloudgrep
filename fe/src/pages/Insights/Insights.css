@@ -17,9 +17,10 @@
 }
 
 .label_label {
-    font-weight: 400;
-    font-size: 13px !important;
-    color: rgba(28, 43, 52, 0.98);
+    font-weight: 500 !important;
+    font-size: 12px !important;
+    line-height: 140% !important;
+    color: #112138;
     font-family: "Montserrat" !important;
     text-overflow: ellipsis;
     white-space: nowrap;

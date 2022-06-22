@@ -1,4 +1,4 @@
-import { BLACK, WHITE } from 'constants/colors';
+import { BLACK, BLACK_ROW, DARK_BLUE, GREY_ONLY_ITEM, WHITE } from 'constants/colors';
 import { CSSProperties } from 'react';
 
 export const overrideSummaryClasses = {
@@ -7,14 +7,16 @@ export const overrideSummaryClasses = {
 };
 
 const accordionHeader: CSSProperties = {
+	fontStyle: 'normal',
 	fontWeight: '400',
-	fontSize: '18px',
-	lineHeight: '18px',
+	fontSize: '13px',
+	lineHeight: '140%',
 	marginBottom: '4px',
 	fontFamily: 'Montserrat',
 	overflow: 'hidden',
 	whiteSpace: 'nowrap',
 	textOverflow: 'ellipsis',
+	color: DARK_BLUE,
 };
 
 const details: CSSProperties = {
@@ -45,3 +47,22 @@ export const filterHover = {
 };
 
 export const filterStyles = { filterHeader, filterHover };
+
+export const accordionItem: CSSProperties = {
+	fontFamily: 'Montserrat',
+	fontStyle: 'normal',
+	fontWeight: 500,
+	fontSize: '12px',
+	lineHeight: '140%',
+	color: BLACK_ROW,
+};
+
+export const onlyAndAll: CSSProperties = {
+	fontFamily: 'Montserrat',
+	fontStyle: 'normal',
+	fontWeight: 500,
+	fontSize: '12px',
+	lineHeight: '140%',
+	color: GREY_ONLY_ITEM,
+	cursor: 'pointer',
+};
