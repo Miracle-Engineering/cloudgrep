@@ -7,6 +7,7 @@ func (p *Provider) buildTypeMapping() map[string]mapper {
 	p.register_s3(mapping)
 	p.register_eks(mapping)
 	p.register_cloudfront(mapping)
+	p.register_sqs(mapping)
 
 	return mapping
 }
