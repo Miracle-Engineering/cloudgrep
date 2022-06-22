@@ -114,10 +114,6 @@ jobs:
           make setup
           VERSION=${{ steps.tag.outputs.value }} make release-windows
 
-      - name: Sanity Check Step
-        run: |
-          ./bin/cloudgrep_linux_amd64 version
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:

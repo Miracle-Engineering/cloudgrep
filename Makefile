@@ -119,11 +119,11 @@ release-darwin: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
 release-darwin:
 	@echo "Building Darwin ARM64 binary"
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=arm64 GOOS=darwin \
-		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_arm64"
+		go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_darwin_arm64"
 
 	@echo "Building Darwin AMD64 binary..."
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin \
-		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_amd64"
+		go build -ldflags "$(LDFLAGS)"  -o "./bin/cloudgrep_darwin_amd64"
 
 	@echo "Signing Darwin ARM64 binary..."
 	gon gon_arm64.hcl
