@@ -40,7 +40,7 @@ test:
 	go test -race ./hack/... ./pkg/... ./cmd/... -coverprofile=coverage.out -covermode=atomic
 
 load-test:
-	go test ./loadtest/...
+	go clean -testcache && go test ./loadtest/...
 
 pre-commit:
 	@$(MAKE) -f $(THIS_FILE) format
