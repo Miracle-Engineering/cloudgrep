@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/go-multierror"
 	"os"
 	"path"
 	"testing"
@@ -409,73 +410,6 @@ func TestFields(t *testing.T) {
 	}
 }
 
-func TestEngineStatus(t *testing.T) {
-	engineStatuses := testdata.GetEngineStatus(t)
-	ctx := context.Background()
-	mockResourceName := "mock_resource"
-	datastores, _ := newDatastores(t, ctx)
-	for _, datastore := range datastores {
-		name := fmt.Sprintf("%T", datastore)
-		t.Run(name, func(t *testing.T) {
-			err := datastore.WriteEngineStatusStart(ctx, mockResourceName)
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-
-			status, err := datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
-			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[0], status)
-
-			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, nil)
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-
-			status, err = datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
-			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[1], status)
-
-			err = datastore.WriteEngineStatusStart(ctx, mockResourceName)
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-
-			status, err = datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
-			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[0], status)
-
-			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, errors.New(engineStatuses[2].ErrorMessage))
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-
-			status, err = datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
-			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[2], status)
-		})
-	}
-}
-
 //test that the resources can be updated: update their properties, tags
 func TestUpdateResources(t *testing.T) {
 	ctx := context.Background()
@@ -576,9 +510,9 @@ func TestPurgeResources(t *testing.T) {
 
 			//1nd run: write 3 resources
 			resources := testdata.GetResources(t)[:3]
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
 			require.NoError(t, ds.WriteResources(ctx, resources))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", nil))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			r1, err := ds.GetResource(ctx, resources[0].Id)
 			require.NoError(t, err)
 			r2, err := ds.GetResource(ctx, resources[1].Id)
@@ -588,9 +522,9 @@ func TestPurgeResources(t *testing.T) {
 			testQuery(t, ctx, ds, tagUniqueKey, tagUniqueValue, r1)
 
 			//2nd run: one resource is removed
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
 			require.NoError(t, ds.WriteResources(ctx, model.Resources{r2, r3}.Clean()))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", nil))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			resourcesRead, err := ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 2, resourcesRead.Count)
@@ -600,8 +534,8 @@ func TestPurgeResources(t *testing.T) {
 			testQueryUnrecognizedKey(t, ctx, ds, tagUniqueKey, tagUniqueValue)
 
 			//3rd run: an error happened - there is a built-in protection to not delete all resources
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", errors.New("an error happened")))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 2, resourcesRead.Count)
@@ -609,9 +543,9 @@ func TestPurgeResources(t *testing.T) {
 			testQuery(t, ctx, ds, "id", r2.Id, r2)
 
 			//4th run: add back the resource previously deleted
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
 			require.NoError(t, ds.WriteResources(ctx, model.Resources{r2, r1, r3}.Clean()))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", nil))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 3, resourcesRead.Count)
@@ -619,6 +553,210 @@ func TestPurgeResources(t *testing.T) {
 			testQuery(t, ctx, ds, tagUniqueKey, tagUniqueValue, r1)
 
 		})
+	}
+}
+
+func TestEngineStatus(t *testing.T) {
+	//failed-provider-failed-resource-status error declaration
+	var providerErrors, resourceErrors, multipleErrors *multierror.Error
+	providerErrors = multierror.Append(providerErrors, errors.New("mp2-error"))
+	resourceErrors = multierror.Append(resourceErrors, errors.New("mp1-mr3-error"))
+	multipleErrors = multierror.Append(multipleErrors, providerErrors)
+	multipleErrors = multierror.Append(multipleErrors, resourceErrors)
+
+	type args struct {
+		events model.Events
+	}
+	tests := []struct {
+		name     string
+		args     args
+		expected model.Event
+	}{
+		{
+			name: "success-status",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewProviderEventStart("mp1"),
+					model.NewProviderEventStart("mp2"),
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", nil),
+					model.NewResourceEventStart("mp1", "mr1"),
+					model.NewResourceEventStart("mp1", "mr2"),
+					model.NewResourceEventStart("mp1", "mr3"),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewResourceEventStart("mp2", "mr1"),
+					model.NewResourceEventStart("mp2", "mr2"),
+					model.NewResourceEventStart("mp2", "mr3"),
+					model.NewResourceEventEnd("mp2", "mr1", nil),
+					model.NewResourceEventEnd("mp2", "mr2", nil),
+					model.NewResourceEventEnd("mp2", "mr3", nil),
+					model.NewEngineEventEnd(nil),
+				},
+			},
+			expected: model.Event{
+				Type:   model.EventTypeEngine,
+				Status: model.EventStatusSuccess,
+				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", nil),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewResourceEventEnd("mp2", "mr1", nil),
+					model.NewResourceEventEnd("mp2", "mr2", nil),
+					model.NewResourceEventEnd("mp2", "mr3", nil),
+				},
+			},
+		},
+		{
+			name: "failed-provider-status",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewProviderEventStart("mp1"),
+					model.NewProviderEventStart("mp2"),
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
+					model.NewResourceEventStart("mp1", "mr1"),
+					model.NewResourceEventStart("mp1", "mr2"),
+					model.NewResourceEventStart("mp1", "mr3"),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewEngineEventEnd(errors.New("mp2-error")),
+				},
+			},
+			expected: model.Event{
+				Type:   model.EventTypeEngine,
+				Status: model.EventStatusFailed,
+				Error:  "mp2-error",
+				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+				},
+			},
+		},
+		{
+			name: "failed-provider-failed-resource-status",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewProviderEventStart("mp1"),
+					model.NewProviderEventStart("mp2"),
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
+					model.NewResourceEventStart("mp1", "mr1"),
+					model.NewResourceEventStart("mp1", "mr2"),
+					model.NewResourceEventStart("mp1", "mr3"),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", errors.New("mp1-mr3-error")),
+					model.NewEngineEventEnd(multipleErrors),
+				},
+			},
+			expected: model.Event{
+				Type:   model.EventTypeEngine,
+				Status: model.EventStatusFailed,
+				Error:  multipleErrors.Error(),
+				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", errors.New("mp1-mr3-error")),
+					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
+				},
+			},
+		},
+		{
+			name: "fetching-status",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewProviderEventStart("mp1"),
+					model.NewProviderEventStart("mp2"),
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", nil),
+					model.NewResourceEventStart("mp1", "mr1"),
+					model.NewResourceEventStart("mp1", "mr2"),
+					model.NewResourceEventStart("mp1", "mr3"),
+					model.NewResourceEventStart("mp1", "mr4"),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewResourceEventStart("mp2", "mr1"),
+					model.NewResourceEventStart("mp2", "mr2"),
+					model.NewResourceEventStart("mp2", "mr3"),
+					model.NewResourceEventEnd("mp2", "mr1", nil),
+					model.NewResourceEventEnd("mp2", "mr2", nil),
+					model.NewResourceEventEnd("mp2", "mr3", nil),
+				},
+			},
+			expected: model.Event{
+				Type:   model.EventTypeEngine,
+				Status: model.EventStatusFetching,
+				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", nil),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewResourceEventStart("mp1", "mr4"),
+					model.NewResourceEventEnd("mp2", "mr1", nil),
+					model.NewResourceEventEnd("mp2", "mr2", nil),
+					model.NewResourceEventEnd("mp2", "mr3", nil),
+				},
+			},
+		},
+		{
+			name: "success-status-no-provider",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewEngineEventEnd(nil),
+				},
+			},
+			expected: model.Event{
+				Type:        model.EventTypeEngine,
+				Status:      model.EventStatusSuccess,
+				ChildEvents: model.Events{},
+			},
+		},
+		{
+			name: "success-error-no-provider",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewEngineEventEnd(errors.New("engine-error")),
+				},
+			},
+			expected: model.Event{
+				Type:        model.EventTypeEngine,
+				Status:      model.EventStatusFailed,
+				ChildEvents: model.Events{},
+				Error:       "engine-error",
+			},
+		},
+	}
+	ctx := context.Background()
+	datastores, _ := newDatastores(t, ctx)
+	for _, ds := range datastores {
+		for _, test := range tests {
+			name := fmt.Sprintf("%T-%s", ds, test.name)
+			t.Run(name, func(t *testing.T) {
+				for _, event := range test.args.events {
+					require.NoError(t, ds.WriteEvent(ctx, event))
+				}
+				es, err := ds.EngineStatus(ctx)
+				require.NoError(t, err)
+				testingutil.AssertEvent(t, test.expected, es)
+			})
+		}
 	}
 }
 

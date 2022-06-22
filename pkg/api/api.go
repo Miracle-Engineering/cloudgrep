@@ -113,7 +113,7 @@ func Fields(c *gin.Context) {
 //EngineStatus returns the status of the engine
 func EngineStatus(c *gin.Context) {
 	ds := c.MustGet("datastore").(datastore.Datastore)
-	status, err := ds.GetEngineStatus(c)
+	status, err := ds.EngineStatus(c)
 	if err != nil {
 		badRequest(c, err)
 		return
@@ -126,12 +126,12 @@ func Refresh(c *gin.Context) {
 
 	ds := c.MustGet("datastore").(datastore.Datastore)
 	logger := c.MustGet("logger").(*zap.Logger)
-	status, err := ds.GetEngineStatus(c)
+	status, err := ds.EngineStatus(c)
 	if err != nil {
 		badRequest(c, err)
 		return
 	}
-	if status.Status == model.EngineStatusFetching {
+	if status.Status == model.EventStatusFetching {
 		errorResponse(c, http.StatusAccepted, fmt.Errorf("engine is already running"))
 		return
 	}

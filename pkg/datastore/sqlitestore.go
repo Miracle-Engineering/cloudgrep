@@ -26,6 +26,7 @@ type SQLiteStore struct {
 	//fetchedAt is the last time the resources were fetched
 	fetchedAt time.Time
 	lock      sync.Mutex
+	runId     string
 }
 
 func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLiteStore, error) {
@@ -55,7 +56,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	}
 
 	// Migrate the schema
-	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.EngineStatus{}); err != nil {
+	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.Event{}); err != nil {
 		return nil, fmt.Errorf("can't create the SQLite data model: %w", err)
 	}
 
@@ -312,55 +313,6 @@ func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) (model
 	return model.ResourcesResponse{Count: totalCount, Resources: resources}, err
 }
 
-func (s *SQLiteStore) WriteEngineStatusStart(ctx context.Context, resource string) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	status := model.NewEngineStatus(model.EngineStatusFetching, resource, nil)
-	s.logger.Sugar().Infow("Writing Engine Status: ",
-		zap.Any("status", status),
-	)
-	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
-	if result.RowsAffected == 1 {
-		result = s.db.Model(&status).Updates(status)
-	} else {
-		result = s.db.Create(&status)
-	}
-	if result.Error != nil {
-		return fmt.Errorf("can't write engine status to database: %w", result.Error)
-	}
-	s.fetchedAt = time.Now()
-	return nil
-}
-
-func (s *SQLiteStore) WriteEngineStatusEnd(ctx context.Context, resource string, err error) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	var status model.EngineStatus
-	if err != nil {
-		status = model.NewEngineStatus(model.EngineStatusFailed, resource, err)
-	} else {
-		status = model.NewEngineStatus(model.EngineStatusSuccess, resource, nil)
-	}
-	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
-	if result.RowsAffected == 1 {
-		result = s.db.Model(&status).Updates(status)
-	} else {
-		result = s.db.Create(&status)
-	}
-	if result.Error != nil {
-		return fmt.Errorf("can't write engine status to database: %w", result.Error)
-	}
-
-	//once engine is complete, we delete all the resources that no longer exist
-	_, err = s.deleteResourcesBefore(s.fetchedAt)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func deleteTags(db *gorm.DB, ids []model.ResourceId) error {
 	return db.Table("tags").Where("resource_id in ?", ids).Delete(ids).Error
 }
@@ -422,13 +374,57 @@ func (s *SQLiteStore) deleteResourcesBefore(before time.Time) (int, error) {
 	return int(rowsAffected), nil
 }
 
-func (s *SQLiteStore) GetEngineStatus(context.Context) (model.EngineStatus, error) {
+func (s *SQLiteStore) EngineStatus(ctx context.Context) (model.Event, error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
-	var status model.EngineStatus
-	db := s.db.Model(&model.EngineStatus{}).Select("*").Order("fetched_at desc").Last(&status)
-	if db.Error != nil {
-		return model.EngineStatus{}, fmt.Errorf("can't fetch engine status' : %w", db.Error)
+	var resourceEvents model.Events
+	result := s.db.
+		Model(&model.Event{}).
+		Order("created_at").
+		Find(&resourceEvents, model.Event{RunId: s.runId})
+	if result.Error != nil {
+		return model.Event{}, fmt.Errorf("error while reading event from database %w", result.Error)
 	}
-	return status, nil
+	if len(resourceEvents) == 0 {
+		//no event found
+		return model.Event{}, nil
+	}
+	engineEvent := resourceEvents[0]
+	engineEvent.ChildEvents = resourceEvents[1:]
+	return engineEvent, nil
+}
+
+func (s *SQLiteStore) WriteEvent(ctx context.Context, event model.Event) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	if event.Type == model.EventTypeEngine && event.Status == model.EventStatusFetching {
+		s.runId = event.RunId
+		s.fetchedAt = time.Now()
+	}
+	event.RunId = s.runId
+
+	var existingEvent model.Event
+	result := s.db.Model(&model.Event{}).
+		Find(&existingEvent, model.Event{
+			RunId:        s.runId,
+			Type:         event.Type,
+			ProviderName: event.ProviderName,
+			ResourceType: event.ResourceType,
+		})
+	if result.Error != nil {
+		return fmt.Errorf("error occured while fetching event from database %w", result.Error)
+	}
+	event.Id = existingEvent.Id
+	result = s.db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&event)
+	if result.Error != nil {
+		return fmt.Errorf("error occured while upserting events into database %w", result.Error)
+	}
+	//once engine is complete, we delete all the resources that no longer exist
+	if event.Type == model.EventTypeEngine && (event.Status == model.EventStatusFailed || event.Status == model.EventStatusSuccess) {
+		_, err := s.deleteResourcesBefore(s.fetchedAt)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

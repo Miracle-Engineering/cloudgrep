@@ -2,7 +2,9 @@ package config
 
 import (
 	_ "embed"
+	"fmt"
 	"gopkg.in/yaml.v2"
+	"strings"
 )
 
 //go:embed config.yaml
@@ -29,6 +31,13 @@ type Provider struct {
 	Cloud string `yaml:"cloud"`
 	// Regions is the list of different regions within the cloud provider to scan
 	Regions []string `yaml:"regions"`
+}
+
+func (p *Provider) String() string {
+	if len(p.Regions) == 0 {
+		return p.Cloud
+	}
+	return fmt.Sprintf("%s-%s", p.Cloud, strings.Join(p.Regions, "-"))
 }
 
 // Datastore represents the specs cloudgrep uses for creating and/or connecting to the datastore/database used.
