@@ -24,8 +24,8 @@ type Event struct {
 	RunId        string    `json:"runId"`
 	Type         string    `json:"eventType"`
 	Status       string    `json:"status"`
-	ProviderName string    `json:"providerName"`
-	ResourceType string    `json:"resourceType"`
+	ProviderName string    `json:"providerName,omitempty"`
+	ResourceType string    `json:"resourceType,omitempty"`
 	Error        string    `json:"error"`
 	CreatedAt    time.Time `json:"createdAt"`
 	UpdatedAt    time.Time `json:"updatedAt"`

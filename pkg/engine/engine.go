@@ -25,7 +25,7 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 	e.Datastore = datastore
 	e.Logger = logger
 	e.Sequencer = sequencer.AsyncSequencer{Logger: e.Logger}
-	var errors *multierror.Error
+	var errors error
 	for _, c := range cfg.Providers {
 		// Manual regions trumps any written region.
 		if len(cfg.Regions) > 0 {
@@ -45,18 +45,18 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 			errors = multierror.Append(errors, err)
 		}
 	}
-	return e, errors.ErrorOrNil()
+	return e, errors
 }
 
 //Run the providers: fetches data about cloud resources and save them to store
 func (e *Engine) Run(ctx context.Context) error {
-	var multipleErrors *multierror.Error
+	var errors error
 	err := e.Sequencer.Run(ctx, e, e.Providers)
 	if err != nil {
-		multipleErrors = multierror.Append(multipleErrors, err)
+		errors = multierror.Append(errors, err)
 	}
 	if err = e.Datastore.WriteEvent(ctx, model.NewEngineEventEnd(err)); err != nil {
-		multipleErrors = multierror.Append(multipleErrors, err)
+		errors = multierror.Append(errors, err)
 	}
-	return multipleErrors.ErrorOrNil()
+	return errors
 }

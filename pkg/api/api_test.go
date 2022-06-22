@@ -63,8 +63,7 @@ type mockApi struct {
 
 //runEngine simulates running the engine by writing resources to the datastore
 func (m *mockApi) runEngine(ctx context.Context) error {
-	var err error
-	err = m.ds.WriteEvent(ctx, model.NewEngineEventStart())
+	err := m.ds.WriteEvent(ctx, model.NewEngineEventStart())
 	if err != nil {
 		return err
 	}
