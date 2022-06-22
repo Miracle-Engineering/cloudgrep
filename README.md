@@ -134,6 +134,7 @@ providers:
 ```
 
 # Development
+
 We love user contributions! Check out our [Dev guide](https://github.com/run-x/cloudgrep/blob/main/DEVELOP.md) to get started.
 
 # Important Resources
