@@ -12,5 +12,6 @@ test('renders cloud grep react link', () => {
 		</Provider>
 	);
 
-	expect(getByText(/Contact/i)).toBeInTheDocument();
+	expect(getByText(/Slack/i)).toBeInTheDocument();
+	expect(getByText(/Github/i)).toBeInTheDocument();
 });
