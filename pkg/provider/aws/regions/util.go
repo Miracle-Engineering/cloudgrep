@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/manifoldco/promptui"
 )
@@ -71,4 +73,48 @@ func validateRegions(regions []string) error {
 	}
 
 	return fmt.Errorf("invalid AWS %s: %s", plural, strings.Join(badRegions, ", "))
+}
+
+func listAvailableRegions(ctx context.Context, cfg aws.Config) ([]string, error) {
+	cfg = cfg.Copy()
+
+	if cfg.Region == "" {
+		cfg.Region = "us-east-1"
+	}
+
+	client := ec2.NewFromConfig(cfg)
+	input := &ec2.DescribeRegionsInput{}
+
+	output, err := client.DescribeRegions(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("unable to call ec2:DescribeRegions: %w", err)
+	}
+
+	var regions []string
+	for _, region := range output.Regions {
+		regions = append(regions, *region.RegionName)
+	}
+
+	return regions, nil
+}
+
+func allRegions(ctx context.Context, cfg aws.Config) ([]Region, error) {
+	availableRegions, err := listAvailableRegions(ctx, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get all regions: %w", err)
+	}
+
+	regions := make([]Region, 0, len(officialRegions)+1)
+	regions = append(regions, Region{})
+
+	for _, regionName := range availableRegions {
+		region, has := officialRegions[regionName]
+		if !has {
+			continue
+		}
+
+		regions = append(regions, Region{region: &region})
+	}
+
+	return regions, nil
 }
