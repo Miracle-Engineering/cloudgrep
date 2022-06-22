@@ -394,7 +394,7 @@ func replaceWith(s string, old string, new string, sep string, i int) string {
 
 //findResourceIds finds resources using a RQL query
 //see https://github.com/a8m/rql#getting-started for the syntax
-func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQuery []byte) ([]model.ResourceId, int, error) {
+func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQuery []byte, paginated bool) ([]model.ResourceId, int, error) {
 	if len(jsonQuery) == 0 {
 		//use en empty json if nothing is set - this will use the default limit
 		jsonQuery = []byte(`{}`)
@@ -405,13 +405,22 @@ func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQ
 	}
 
 	var resourceIds []model.ResourceId
-	result := db.Table(resourceIndexTable).
-		Select("id").
-		Where(p.FilterExp, p.FilterArgs...).
-		Offset(p.Offset).
-		Limit(p.Limit).
-		Order(p.Sort).
-		Find(&resourceIds)
+	var result *gorm.DB
+	if paginated {
+		result = db.Table(resourceIndexTable).
+			Select("id").
+			Where(p.FilterExp, p.FilterArgs...).
+			Offset(p.Offset).
+			Limit(p.Limit).
+			Order(p.Sort).
+			Find(&resourceIds)
+	} else {
+		result = db.Table(resourceIndexTable).
+			Select("id").
+			Where(p.FilterExp, p.FilterArgs...).
+			Order(p.Sort).
+			Find(&resourceIds)
+	}
 
 	if result.Error != nil {
 		return nil, 0, result.Error

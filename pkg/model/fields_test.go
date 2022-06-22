@@ -20,7 +20,7 @@ func TestFieldFind(t *testing.T) {
 	groups := model.FieldGroups{
 		{
 			Name:   "core",
-			Fields: []model.Field{f1, f2},
+			Fields: []*model.Field{&f1, &f2},
 		},
 	}
 	assert.Equal(t, "core", groups.FindGroup("core").Name)
@@ -31,24 +31,24 @@ func TestFieldsAddNullValues(t *testing.T) {
 	groups := model.FieldGroups{
 		{
 			Name: "core",
-			Fields: []model.Field{{
+			Fields: []*model.Field{{
 				Name:  "region",
 				Count: 3,
-				Values: []model.FieldValue{
-					{Value: "us-east-1", Count: 2},
-					{Value: "us-west-2", Count: 1},
+				Values: []*model.FieldValue{
+					{Value: "us-east-1", Count: "2"},
+					{Value: "us-west-2", Count: "1"},
 				},
 			}, {
 				Name:  "type",
 				Count: 3,
-				Values: []model.FieldValue{
-					{Value: "ec2.instance", Count: 3},
+				Values: []*model.FieldValue{
+					{Value: "ec2.instance", Count: "3"},
 				},
 			}, {
 				Name:  "cluster",
 				Count: 2,
-				Values: []model.FieldValue{
-					{Value: "dev", Count: 2},
+				Values: []*model.FieldValue{
+					{Value: "dev", Count: "2"},
 				},
 			},
 			},
@@ -58,32 +58,30 @@ func TestFieldsAddNullValues(t *testing.T) {
 	assert.Equal(t, model.FieldGroups{
 		{
 			Name: "core",
-			Fields: []model.Field{{
+			Fields: []*model.Field{{
 				Name:  "region",
 				Count: 3,
-				Values: []model.FieldValue{
-					{Value: "us-east-1", Count: 2},
-					{Value: "us-west-2", Count: 1},
+				Values: []*model.FieldValue{
+					{Value: "us-east-1", Count: "2"},
+					{Value: "us-west-2", Count: "1"},
 					//do not show (null) if all resources have this field
 				},
 			}, {
 				Name:  "type",
 				Count: 3,
-				Values: []model.FieldValue{
-					{Value: "ec2.instance", Count: 3},
+				Values: []*model.FieldValue{
+					{Value: "ec2.instance", Count: "3"},
 				},
 			}, {
 				Name:  "cluster",
 				Count: 2,
-				Values: []model.FieldValue{
-					{Value: "dev", Count: 2},
+				Values: []*model.FieldValue{
+					{Value: "dev", Count: "2"},
 					//(null) count is the count of resources without this field
-					{Value: "(null)", Count: 1},
+					{Value: "(null)", Count: "1"},
 				},
 			},
 			},
 		},
 	}, groupsNullable)
-
-	// groups.
 }

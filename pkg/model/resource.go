@@ -19,8 +19,9 @@ type Resource struct {
 
 type Resources []*Resource
 type ResourcesResponse struct {
-	Count     int       `json:"count"`
-	Resources Resources `json:"resources"`
+	Count       int         `json:"count"`
+	FieldGroups FieldGroups `json:"fieldGroups"`
+	Resources   Resources   `json:"resources"`
 }
 type ResourceId string
 

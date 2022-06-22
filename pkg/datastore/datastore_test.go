@@ -5,11 +5,12 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/go-multierror"
 	"os"
 	"path"
 	"testing"
 	"time"
+
+	"github.com/hashicorp/go-multierror"
 
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore/testdata"
@@ -68,7 +69,7 @@ func TestReadWrite(t *testing.T) {
 			assert.NoError(t, datastore.WriteResources(ctx, []*model.Resource{}))
 			resourcesRead, err := datastore.GetResources(ctx, nil)
 			assert.NoError(t, err)
-			assert.Equal(t, model.ResourcesResponse{Count: 0, Resources: model.Resources{}}, resourcesRead)
+			assert.Equal(t, 0, resourcesRead.Count)
 
 			//write the resources
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
@@ -348,8 +349,9 @@ func TestFields(t *testing.T) {
 			resources := testdata.GetResources(t)
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
-			fields, err := datastore.GetFields(ctx)
-			//check fields
+			resourceResp, err := datastore.GetResources(ctx, nil)
+			assert.NoError(t, err)
+			fields := resourceResp.FieldGroups
 			assert.NoError(t, err)
 			//check number of groups
 			assert.Equal(t, 2, len(fields))
@@ -362,7 +364,7 @@ func TestFields(t *testing.T) {
 				Name:  "region",
 				Count: 3,
 				Values: model.FieldValues{
-					model.FieldValue{Value: "us-east-1", Count: 3},
+					&model.FieldValue{Value: "us-east-1", Count: "3"},
 				}}, *fields.FindField("core", "region"))
 
 			typeField := *fields.FindField("core", "type")
@@ -370,22 +372,22 @@ func TestFields(t *testing.T) {
 				Name:  "type",
 				Count: 3,
 				Values: model.FieldValues{
-					model.FieldValue{Value: "s3.Bucket", Count: 1},
-					model.FieldValue{Value: "test.Instance", Count: 2},
+					&model.FieldValue{Value: "s3.Bucket", Count: "1"},
+					&model.FieldValue{Value: "test.Instance", Count: "2"},
 				},
 			}, typeField)
 
 			//check that values are sorted by count desc
-			assert.Equal(t, typeField.Values[0].Count, 2)
-			assert.Equal(t, typeField.Values[1].Count, 1)
+			assert.Equal(t, typeField.Values[0].Count, "2")
+			assert.Equal(t, typeField.Values[1].Count, "1")
 
 			testingutil.AssertEqualsField(t, model.Field{
 				Name:  "team",
 				Count: 2,
 				Values: model.FieldValues{
-					model.FieldValue{Value: "infra", Count: 1},
-					model.FieldValue{Value: "dev", Count: 1},
-					model.FieldValue{Value: "(null)", Count: 1},
+					&model.FieldValue{Value: "infra", Count: "1"},
+					&model.FieldValue{Value: "dev", Count: "1"},
+					&model.FieldValue{Value: "(null)", Count: "1"},
 				}}, *fields.FindField("tags", "team"))
 
 			//test long field
@@ -393,8 +395,8 @@ func TestFields(t *testing.T) {
 				Name:  tagMaxKey,
 				Count: 1,
 				Values: model.FieldValues{
-					model.FieldValue{Value: tagMaxValue, Count: 1},
-					model.FieldValue{Value: "(null)", Count: 2},
+					&model.FieldValue{Value: tagMaxValue, Count: "1"},
+					&model.FieldValue{Value: "(null)", Count: "2"},
 				}}, *fields.FindField("tags", tagMaxKey))
 
 			//test the tag field called "region"
@@ -402,9 +404,59 @@ func TestFields(t *testing.T) {
 				Name:  "region",
 				Count: 1,
 				Values: model.FieldValues{
-					model.FieldValue{Value: "us-west-2", Count: 1},
-					model.FieldValue{Value: "(null)", Count: 2},
+					&model.FieldValue{Value: "us-west-2", Count: "1"},
+					&model.FieldValue{Value: "(null)", Count: "2"},
 				}}, *fields.FindField("tags", "region"))
+
+			//test that the fields count are updated when sending a filter
+			//only one resource has enabled=false
+			query := `{
+  "filter":{
+    "enabled": "false"
+  }
+}`
+
+			resourceResp, err = datastore.GetResources(ctx, []byte(query))
+			assert.NoError(t, err)
+			fields = resourceResp.FieldGroups
+
+			//check all groups and tags are returned
+			assert.Equal(t, 2, len(fields))
+			assert.Equal(t, 2, len(fields.FindGroup("core").Fields))
+			assert.Equal(t, 10, len(fields.FindGroup("tags").Fields))
+
+			//check the values were updated
+			testingutil.AssertEqualsField(t, model.Field{
+				Name:  "region",
+				Count: 1,
+				Values: model.FieldValues{
+					&model.FieldValue{Value: "us-east-1", Count: "1"},
+				}}, *fields.FindField("core", "region"))
+
+			//check the count are correct and if a value is excluded it shows as "-"
+			testingutil.AssertEqualsField(t, model.Field{
+				Name:  "team",
+				Count: 1,
+				Values: model.FieldValues{
+					&model.FieldValue{Value: "infra", Count: "-"},
+					&model.FieldValue{Value: "dev", Count: "1"},
+				}}, *fields.FindField("tags", "team"))
+			testingutil.AssertEqualsField(t, model.Field{
+				Name:  "enabled",
+				Count: 1,
+				Values: model.FieldValues{
+					&model.FieldValue{Value: "true", Count: "-"},
+					&model.FieldValue{Value: "false", Count: "1"},
+				}}, *fields.FindField("tags", "enabled"))
+
+			//check a tag that is not relevant is still showing with a 0 count, and a (null) value
+			testingutil.AssertEqualsField(t, model.Field{
+				Name:  "unique-tag",
+				Count: 0,
+				Values: model.FieldValues{
+					&model.FieldValue{Value: "unique-i-123", Count: "-"},
+					&model.FieldValue{Value: "(null)", Count: "1"},
+				}}, *fields.FindField("tags", "unique-tag"))
 
 		})
 	}
