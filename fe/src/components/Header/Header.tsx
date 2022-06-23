@@ -43,7 +43,6 @@ const Header = () => {
 	const handleClick = async () => {
 		setOpen(true);
 		try {
-			// throw { error: 'test error message for Demo purposes' };
 			await RefreshService.refresh();
 			await handleStatus();
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
