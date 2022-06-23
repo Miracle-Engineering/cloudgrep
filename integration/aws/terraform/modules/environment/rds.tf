@@ -46,6 +46,8 @@ resource "aws_db_subnet_group" "private" {
 }
 
 resource "random_string" "db_snapshot_suffix" {
+  count = local.rds_snapshot_count
+
   length  = 8
   special = false
   upper   = false
@@ -64,6 +66,8 @@ resource "aws_db_snapshot" "test" {
 
 
 resource "random_string" "db_cluster_snapshot_suffix" {
+  count = local.rds_cluster_snapshot_count
+
   length  = 8
   special = false
   upper   = false
