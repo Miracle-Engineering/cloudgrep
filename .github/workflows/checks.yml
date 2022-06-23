@@ -40,6 +40,8 @@ jobs:
         id: build
         run: |
           VERSION=dev make release-windows
+        env:
+          CGO_ENABLED: 1
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3

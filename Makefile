@@ -87,12 +87,12 @@ release-windows: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
 release-windows:
 	@echo "Building binary for 386."
 	@CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ CC_FOR_TARGET=i686-w64-mingw32-gcc GOOS=windows GOARCH=386 go build \
-		-ldflags "$(LDFLAGS) -extld=$CC" \
+		-ldflags "$(LDFLAGS) -extld=i686-w64-mingw32-gcc" \
 		-o "./bin/cloudgrep_windows_386"
 
 	@echo "Building binary for amd64."
 	@CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CC_FOR_TARGET=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 go build \
-		-ldflags "$(LDFLAGS) -extld=$CC" \
+		-ldflags "$(LDFLAGS) -extld=x86_64-w64-mingw32-gcc" \
 		-o "./bin/cloudgrep_windows_amd64"
 
 	@echo "\nPackaging binaries...\n"
