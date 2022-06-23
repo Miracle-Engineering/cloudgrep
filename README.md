@@ -14,7 +14,7 @@ Cloud Tags Explorer</p>
   </a>
 
   <img src="https://img.shields.io/github/commit-activity/w/run-x/cloudgrep.svg?style=plastic" alt="Commit Activity" />
-  
+
 </p>
 <p align="center">
 <a href="https://slack.opta.dev">
@@ -39,7 +39,7 @@ If you'd like to try it out or have any questions - feel free to join our [TBD -
   <a href="https://www.youtube.com/watch?v=nja_EfpGexE"><img width="480" src="https://user-images.githubusercontent.com/855699/149367998-9f00a9f4-abaa-4abf-949c-5b470e7d410c.png"></a>
   </br>
   <span><i>TBD: Demo video</i></span>
-  
+
 </p>
 
 # Features
@@ -51,19 +51,19 @@ If you'd like to try it out or have any questions - feel free to join our [TBD -
 
 # Installation
 
-- [Precompiled binaries](https://github.com/run-x/cloudgrep/releases) for supported 
+- [Precompiled binaries](https://github.com/run-x/cloudgrep/releases) for supported
 operating systems are available.
 
 # Basic Usage
 
-Cloudgrep is a web-based cloud resource browser executed in your local machine. You can find our latest release 
+Cloudgrep is a web-based cloud resource browser executed in your local machine. You can find our latest release
 [here](https://github.com/run-x/cloudgrep/releases) on our release page -- simply download the zip named for your
 OS/spec (or let us know if you can't find yours).
 
 Cloudgrep works by using the cloud provider credentials (e.g. AWS) found in your cli to scan your cloud for data about
-your existing resources. For it to work, make sure you set such credentials properly (see 
+your existing resources. For it to work, make sure you set such credentials properly (see
 [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html) for AWS). These, and a stable
-internet connection, are its only prerequisites. 
+internet connection, are its only prerequisites.
 
 **NOTE: Cloudgrep only ever needs ReadOnly credentials-- it creates nothing, it modifies nothing. Moreover, it will
 do a best effort scan based on its permission, so the user does not need to have read access to all resources.**
@@ -77,12 +77,12 @@ cloudgrep
 
 Cloudgrep will then run with the default behavior which does the following:
 
-1. Scan your current cloud account for global resources and resources on your currently configured AWS region 
+1. Scan your current cloud account for global resources and resources on your currently configured AWS region
 2. Launch the webapp
 
 ## Arguments
 You can easily pass cli arguments to cloudgrep for customized behavior, such as multiple/different regions to scan,
-what port to serve the webapp on, etc... The cli arguments are all fully documented under the cli's `help` option. 
+what port to serve the webapp on, etc... The cli arguments are all fully documented under the cli's `help` option.
 To view documentation for them, simply add the `--help` flag like so:
 
 ```bash
@@ -90,7 +90,7 @@ To view documentation for them, simply add the `--help` flag like so:
 ```
 
 ## Advanced Usage
-Cloudgrep's behavior can further be configured via a user-inputted config yaml. Configs are then resolved at runtime by 
+Cloudgrep's behavior can further be configured via a user-inputted config yaml. Configs are then resolved at runtime by
 considering the cli arguments, the user-passed config  yaml, and the defaults in that order of precedence.
 
 The config yaml can be passed in by using the `-c` or `--config` flag as follows:
@@ -113,7 +113,7 @@ web:
   host: localhost
   # port is the port the server is running in
   port: 8080
-  # prefix is the url prefix the server uses  
+  # prefix is the url prefix the server uses
   prefix: "/"
   # skipOpen determines whether to automatically open the webui on startup
   skipOpen: false
@@ -130,7 +130,9 @@ datastore:
 # providers represents the cloud providers cloudgrep will scan w/ the current credentials
 providers:
   - cloud: aws # cloud is the type of the cloud provider (currently only AWS is supported)
-    regions: [us-east-1, global] # regions is the list of different regions within the cloud provider to scan
+    # regions is the list of different regions within the cloud provider to scan
+    # The special "all" region can be specified by itself to scan all available regions
+    regions: [us-east-1, global]
 ```
 
 # Development

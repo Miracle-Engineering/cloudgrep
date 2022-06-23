@@ -3,13 +3,14 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"os"
+
 	"github.com/run-x/cloudgrep/pkg/cli"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/util"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
-	"io"
-	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -53,7 +54,7 @@ their cloud accounts.`,
 	flags.String("bind", defaultConfig.Web.Host, "Host to bind on")
 	_ = viper.BindPFlag("web.host", flags.Lookup("bind"))
 
-	flags.StringP("regions", "r", "", "Comma separated list of regions to scan")
+	flags.StringP("regions", "r", "", "Comma separated list of regions to scan, or \"all\"")
 	_ = viper.BindPFlag("regions", flags.Lookup("regions"))
 
 	flags.IntP("port", "p", defaultConfig.Web.Port, "Port to use")

@@ -5,13 +5,24 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"golang.org/x/exp/slices"
 )
 
 const Global = "global"
+const All = "all"
 
 // SelectRegions returns the regions the user has selected, from either the cloudgrep config, AWS config, or prompting.
+// The special value "all" can be present by itself in configuredRegions to automatically select all enabled regions in the account.
 func SelectRegions(ctx context.Context, configuredRegions []string, awsConfig aws.Config) ([]Region, error) {
 	var err error
+
+	if len(configuredRegions) == 1 && configuredRegions[0] == All {
+		return allRegions(ctx, awsConfig)
+	}
+
+	if slices.Contains(configuredRegions, All) {
+		return nil, fmt.Errorf("can only use '%s' as a region if it is the only configured region", All)
+	}
 
 	if len(configuredRegions) > 0 {
 		// If regions were configured, use those
@@ -40,6 +51,10 @@ func SelectRegions(ctx context.Context, configuredRegions []string, awsConfig aw
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	if region == All {
+		return allRegions(ctx, awsConfig)
 	}
 
 	// Always include global region without explicit configuration excluding it

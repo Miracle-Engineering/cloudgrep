@@ -16,7 +16,6 @@ import (
 
 	cfg "github.com/run-x/cloudgrep/pkg/config"
 	regionutil "github.com/run-x/cloudgrep/pkg/provider/aws/regions"
-	"github.com/run-x/cloudgrep/pkg/testingutil"
 )
 
 // Default region to run tests against if AWS_REGION is not set.
@@ -99,7 +98,7 @@ func setupIntegrationProvider(t testing.TB, ctx *integrationTestContext) {
 
 	c := cfg.Provider{}
 	c.Cloud = "aws"
-	c.Regions = regionsToTest()
+	c.Regions = []string{regionutil.All}
 
 	providers, err := NewProviders(ctx.ctx, c, ctx.log)
 	if err != nil {
@@ -177,24 +176,4 @@ func (c *credChecker) HasAWSCreds(t testing.TB, cfg aws.Config) bool {
 	}
 
 	return false
-}
-
-func regionsToTest() []string {
-	var regions []string
-
-	regionEnvVarVal := os.Getenv("AWS_REGION")
-	if len(regionEnvVarVal) > 0 {
-		regions = []string{
-			regionEnvVarVal,
-		}
-	} else {
-		regions = []string{
-			defaultRegion,
-		}
-	}
-
-	// Always run tests on the global region
-	regions = append(regions, regionutil.Global)
-
-	return testingutil.Unique(regions)
 }

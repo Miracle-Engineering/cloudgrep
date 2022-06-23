@@ -2,18 +2,15 @@ package aws
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/aws/smithy-go"
 	cfg "github.com/run-x/cloudgrep/pkg/config"
 	regionutil "github.com/run-x/cloudgrep/pkg/provider/aws/regions"
+	awsutil "github.com/run-x/cloudgrep/pkg/provider/aws/util"
 	"github.com/run-x/cloudgrep/pkg/provider/types"
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
-	"github.com/run-x/cloudgrep/pkg/util"
 	_ "github.com/run-x/cloudgrep/pkg/util/rlimit"
 	"go.uber.org/zap"
 )
@@ -74,7 +71,7 @@ func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]
 
 	regionutil.SetConfigRegion(&defaultConfig, regions)
 
-	identity, err := VerifyCreds(ctx, defaultConfig)
+	identity, err := awsutil.VerifyCreds(ctx, defaultConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -97,24 +94,4 @@ func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]
 		providers = append(providers, newProvider)
 	}
 	return providers, nil
-}
-
-func VerifyCreds(ctx context.Context, config aws.Config) (*sts.GetCallerIdentityOutput, error) {
-	stsClient := sts.NewFromConfig(config)
-	input := &sts.GetCallerIdentityInput{}
-	creds, err := config.Credentials.Retrieve(ctx)
-	if err != nil || !creds.HasKeys() {
-		return nil, util.AddStackTrace(fmt.Errorf("no AWS credentials found"))
-	}
-	result, err := stsClient.GetCallerIdentity(ctx, input)
-	if err != nil {
-		var apiErr smithy.APIError
-		if errors.As(err, &apiErr) {
-			return nil, util.AddStackTrace(fmt.Errorf(
-				"invalid AWS credentials (try running aws sts get-caller-identity). Error code: %v", apiErr.ErrorCode()))
-		} else {
-			return nil, util.AddStackTrace(err)
-		}
-	}
-	return result, nil
 }
