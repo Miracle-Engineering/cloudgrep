@@ -1,5 +1,4 @@
 LINUX_TARGETS = linux/amd64 linux/386
-WINDOWS_TARGETS = windows/amd64 windows/386
 VERSION ?= dev
 GITHUB_SHA ?= $(shell git rev-parse HEAD)
 BUILD_TIME = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n')
@@ -86,10 +85,16 @@ release-windows: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
 release-windows: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
 release-windows: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
 release-windows:
-	@echo "Building binaries..."
-	@CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ gox \
-		-osarch "$(WINDOWS_TARGETS)" \
-		-ldflags "$(LDFLAGS)" \
+	@echo "Building binary for 386."
+	@CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ CC_FOR_TARGET=i686-w64-mingw32-gcc gox \
+		-osarch "windows/386" \
+		-ldflags "$(LDFLAGS) -extld=$CC" \
+		-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
+
+	@echo "Building binary for amd64."
+	@CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CC_FOR_TARGET=x86_64-w64-mingw32-gcc gox \
+		-osarch "windows/amd64" \
+		-ldflags "$(LDFLAGS) -extld=$CC" \
 		-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
 
 	@echo "\nPackaging binaries...\n"
