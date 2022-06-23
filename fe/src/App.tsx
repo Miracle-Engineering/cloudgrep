@@ -6,7 +6,7 @@ import React, { FC, useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Routes from 'routes/Routes';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { getFields } from 'store/tags/thunks';
+import { getResources } from 'store/resources/thunks';
 
 import Header from './components/Header';
 
@@ -16,7 +16,7 @@ const App: FC = () => {
 
 	useEffect(() => {
 		if (!fields?.length) {
-			dispatch(getFields());
+			dispatch(getResources());
 		}
 	}, [dispatch, fields?.length]);
 

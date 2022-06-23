@@ -43,15 +43,12 @@ const Header = () => {
 	const handleClick = async () => {
 		setOpen(true);
 		try {
-			// throw { error: 'test error message for Demo purposes' };
 			await RefreshService.refresh();
 			await handleStatus();
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err: any) {
 			setErrorMessage(err.error);
 		}
-		dispatch(getFields());
-		dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
 	};
 
 	const handleCloseBanner = (_event: React.SyntheticEvent | Event, reason?: string) => {
@@ -71,9 +68,8 @@ const Header = () => {
 
 	useEffect(() => {
 		if (engineStatus?.status === EngineStatusEnum.SUCCESS) {
-			dispatch(getFields());
 			dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
-			setEngineStatus(undefined);
+			setTimeout(() => setEngineStatus(undefined), AUTO_HIDE_DURATION);
 		}
 	}, [engineStatus, filterTags, dispatch]);
 

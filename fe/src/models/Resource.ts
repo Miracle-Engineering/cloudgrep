@@ -1,3 +1,4 @@
+import { FieldGroup } from './Field';
 import { Tag } from './Tag';
 
 export interface Property {
@@ -22,4 +23,5 @@ export interface MockResource {
 export interface Resources {
 	count: number;
 	resources: Resource[];
+	fieldGroups: FieldGroup[];
 }
