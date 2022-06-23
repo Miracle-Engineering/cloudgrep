@@ -135,14 +135,25 @@ func TestSelectRegions_allMultiple(t *testing.T) {
 //go:embed testdata/describe_regions_resp.xml
 var describeRegionsResponse []byte
 
+//go:embed testdata/get_caller_identity_resp.xml
+var getCallerIdentityResponse []byte
+
 func TestSelectRegions_all(t *testing.T) {
 	ctx := context.Background()
 	cfg := aws.Config{}
 	configured := []string{"all"}
 
-	httpClient := mockedHttpClient{
-		contentType: "text/xml;charset=UTF-8",
-		body:        describeRegionsResponse,
+	httpClient := sequencedHttpClient{
+		clients: []aws.HTTPClient{
+			&mockedHttpClient{
+				contentType: "text/xml;charset=UTF-8",
+				body:        getCallerIdentityResponse,
+			},
+			&mockedHttpClient{
+				contentType: "text/xml;charset=UTF-8",
+				body:        describeRegionsResponse,
+			},
+		},
 	}
 
 	cfg.HTTPClient = &httpClient

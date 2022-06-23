@@ -5,6 +5,7 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"sync"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -22,6 +23,27 @@ func regionIds(regions []Region) []string {
 	return testingutil.SliceConvertFunc(regions, func(region Region) string {
 		return region.ID()
 	})
+}
+
+type sequencedHttpClient struct {
+	clients []aws.HTTPClient
+	mu      sync.Mutex
+}
+
+var _ aws.HTTPClient = &sequencedHttpClient{}
+
+func (c *sequencedHttpClient) Do(req *http.Request) (*http.Response, error) {
+	c.mu.Lock()
+	if len(c.clients) == 0 {
+		c.mu.Unlock()
+		panic("no more clients")
+	}
+
+	client := c.clients[0]
+	c.clients = c.clients[1:]
+	c.mu.Unlock()
+
+	return client.Do(req)
 }
 
 type mockedHttpClient struct {
