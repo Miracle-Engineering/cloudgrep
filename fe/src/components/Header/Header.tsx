@@ -68,7 +68,6 @@ const Header = () => {
 
 	useEffect(() => {
 		if (engineStatus?.status === EngineStatusEnum.SUCCESS) {
-			dispatch(getFields());
 			dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
 			setTimeout(() => setEngineStatus(undefined), AUTO_HIDE_DURATION);
 		}
