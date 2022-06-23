@@ -111,8 +111,9 @@ jobs:
       - name: Build Release Artifacts for Windows
         id: build
         run: |
-          make setup
-          VERSION=${{ steps.tag.outputs.value }} make release-windows
+          make release-windows
+        env:
+          CGO_ENABLED: 1
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3

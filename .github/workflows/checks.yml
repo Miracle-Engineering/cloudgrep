@@ -17,37 +17,6 @@ permissions:
   id-token: write
 
 jobs:
-  build-windows:
-    name: Build Windows
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.18
-
-      - name: Install windows dependencies
-        id: windows-cc
-        run: |
-          sudo apt update &&\
-          sudo apt install \
-          make mingw-w64 bash --yes
-
-      - name: Build Release Artifacts for Windows
-        id: build
-        run: |
-          VERSION=dev make release-windows
-        env:
-          CGO_ENABLED: 1
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: cloudgrep_windows
-          path: ./bin/*.zip
   go-test:
     name: go test
     runs-on: ubuntu-latest
