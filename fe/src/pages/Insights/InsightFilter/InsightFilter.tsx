@@ -24,12 +24,12 @@ const InsightFilter: FC = () => {
 	const isFirstRun = useRef(true);
 
 	useEffect(() => {
-		if (isFirstRun.current) {
-			isFirstRun.current = false;
-			return;
-		}
-
 		if (filterTags?.length) {
+			if (isFirstRun.current) {
+				isFirstRun.current = false;
+				return;
+			}
+
 			dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
 		}
 	}, [dispatch, filterTags]);
