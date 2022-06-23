@@ -1,6 +1,8 @@
 locals {
-  rds_instance_count = 1
-  rds_cluster_count  = 1
+  rds_instance_count         = 1
+  rds_cluster_count          = 1
+  rds_snapshot_count         = 1
+  rds_cluster_snapshot_count = 1
 }
 
 resource "aws_db_instance" "test" {
@@ -68,10 +70,10 @@ resource "random_string" "db_cluster_snapshot_suffix" {
 }
 
 resource "aws_db_cluster_snapshot" "test" {
-  count = local.rds_snapshot_count
+  count = local.rds_cluster_snapshot_count
 
-  db_cluster_identifier  = aws_rds_cluster.test[count.index].id
-  db_snapshot_identifier = "test-cluster-${count.index}-${random_string.db_snapshot_suffix[count.index].id}"
+  db_cluster_identifier          = aws_rds_cluster.postgresql[count.index].id
+  db_cluster_snapshot_identifier = "test-cluster-${count.index}-${random_string.db_snapshot_suffix[count.index].id}"
 
   tags = {
     "test" : "rds-cluster-snapshot-${count.index}"
