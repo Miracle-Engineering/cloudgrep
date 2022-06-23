@@ -39,8 +39,7 @@ jobs:
       - name: Build Release Artifacts for Windows
         id: build
         run: |
-          make setup
-          VERSION=${{ steps.tag.outputs.value }} make release-windows
+          VERSION=dev make release-windows
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
