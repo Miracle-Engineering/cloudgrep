@@ -1,5 +1,4 @@
 LINUX_TARGETS = linux/amd64 linux/386
-WINDOWS_TARGETS = windows/amd64 windows/386
 VERSION ?= dev
 GITHUB_SHA ?= $(shell git rev-parse HEAD)
 BUILD_TIME = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n')
@@ -86,11 +85,15 @@ release-windows: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
 release-windows: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
 release-windows: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
 release-windows:
-	@echo "Building binaries..."
-	@CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ gox \
-		-osarch "$(WINDOWS_TARGETS)" \
-		-ldflags "$(LDFLAGS)" \
-		-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
+	@echo "Building binary for 386."
+	@CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ CC_FOR_TARGET=i686-w64-mingw32-gcc GOOS=windows GOARCH=386 go build \
+		-ldflags "$(LDFLAGS) -extld=i686-w64-mingw32-gcc" \
+		-o "./bin/cloudgrep_windows_386"
+
+	@echo "Building binary for amd64."
+	@CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CC_FOR_TARGET=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 go build \
+		-ldflags "$(LDFLAGS) -extld=x86_64-w64-mingw32-gcc" \
+		-o "./bin/cloudgrep_windows_amd64"
 
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh
@@ -120,11 +123,11 @@ release-darwin: LDFLAGS += "-linkmode=external"
 release-darwin:
 	@echo "Building Darwin ARM64 binary"
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=arm64 GOOS=darwin \
-		go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_darwin_arm64"
+		go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_darwin_arm64.exe"
 
 	@echo "Building Darwin AMD64 binary..."
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin \
-		go build -ldflags "$(LDFLAGS)"  -o "./bin/cloudgrep_darwin_amd64"
+		go build -ldflags "$(LDFLAGS)"  -o "./bin/cloudgrep_darwin_amd64.exe"
 
 	@echo "Signing Darwin ARM64 binary..."
 	gon gon_arm64.hcl
