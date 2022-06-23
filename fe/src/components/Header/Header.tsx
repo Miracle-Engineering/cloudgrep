@@ -5,11 +5,11 @@ import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
-import Typography from '@mui/material/Typography';
 import Alert from 'components/Alert/Alert';
 import { BORDER_COLOR, DARK_BLUE } from 'constants/colors';
-import { AUTO_HIDE_DURATION, ENGINE_STATUS_INTERVAL, PAGE_LENGTH, PAGE_START } from 'constants/globals';
+import { AUTO_HIDE_DURATION, ENGINE_STATUS_INTERVAL, GITHUB, PAGE_LENGTH, PAGE_START, SLACK } from 'constants/globals';
 import { EngineStatus, EngineStatusEnum } from 'models/EngineStatus';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -86,17 +86,13 @@ const Header = () => {
 						src={`${process.env.REACT_APP_PATH_PREFIX}/logo.png`}
 					/>
 				</Box>
-				<Box sx={{ display: 'flex', marginLeft: '103.25px', alignItems: 'center' }}>
-					<Typography sx={{ ...menuItems, color: DARK_BLUE }}>{t('HOME')}</Typography>
-					<Typography ml={4} sx={menuItems}>
+				<Box sx={{ display: 'flex', marginLeft: '203.25px', alignItems: 'center' }}>
+					<Link ml={4} sx={menuItems} href={SLACK} underline="none" target="_blank" rel="noopener">
 						{t('SLACK')}
-					</Typography>
-					<Typography ml={4} sx={menuItems}>
+					</Link>
+					<Link ml={4} sx={menuItems} href={GITHUB} underline="none" target="_blank" rel="noopener">
 						{t('GITHUB')}
-					</Typography>
-					<Typography ml={4} sx={menuItems}>
-						{t('CONTACT')}
-					</Typography>
+					</Link>
 				</Box>
 			</Box>
 			<Box
