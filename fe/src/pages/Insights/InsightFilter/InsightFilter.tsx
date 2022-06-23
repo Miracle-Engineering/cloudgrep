@@ -13,13 +13,14 @@ import { Tag } from 'models/Tag';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getFilteredResources } from 'store/resources/thunks';
+import { setFilterTags } from 'store/tags/slice';
 
 import { accordionStyles, filterStyles, overrideSummaryClasses } from '../style';
 import { capitalize } from './helper';
 
 const InsightFilter: FC = () => {
 	const { fields } = useAppSelector(state => state.tags);
-	const [filterTags, setFilterTags] = useState<Tag[]>([]);
+	const [filterTags, setTags] = useState<Tag[]>([]);
 	const dispatch = useAppDispatch();
 	const isFirstRun = useRef(true);
 
@@ -43,9 +44,10 @@ const InsightFilter: FC = () => {
 					})
 				)
 			);
-			setFilterTags(tags);
+			setTags(tags);
+			dispatch(setFilterTags(tags));
 		}
-	}, [fields, filterTags?.length]);
+	}, [fields, filterTags?.length, dispatch]);
 
 	return (
 		<Box
