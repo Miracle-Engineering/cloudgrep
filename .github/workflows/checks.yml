@@ -24,14 +24,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Get tag name
-        id: tag
-        uses: haya14busa/action-cond@v1
-        with:
-          cond: "${{ startsWith(github.ref, 'refs/tags/') }}"
-          if_true: ${{ github.ref }}
-          if_false: ${{ needs.bumpr.outputs.next_version }}
-
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
