@@ -42,3 +42,38 @@ resource "aws_db_subnet_group" "private" {
   name_prefix = "test-"
   subnet_ids  = module.vpc.private_subnet_ids
 }
+
+resource "random_string" "db_snapshot_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+}
+
+resource "aws_db_snapshot" "test" {
+  count = local.rds_snapshot_count
+
+  db_instance_identifier = aws_db_instance.test[count.index].id
+  db_snapshot_identifier = "test-${count.index}-${random_string.db_snapshot_suffix[count.index].id}"
+
+  tags = {
+    "test" : "rds-snapshot-${count.index}"
+  }
+}
+
+
+resource "random_string" "db_cluster_snapshot_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+}
+
+resource "aws_db_cluster_snapshot" "test" {
+  count = local.rds_snapshot_count
+
+  db_cluster_identifier  = aws_rds_cluster.test[count.index].id
+  db_snapshot_identifier = "test-cluster-${count.index}-${random_string.db_snapshot_suffix[count.index].id}"
+
+  tags = {
+    "test" : "rds-cluster-snapshot-${count.index}"
+  }
+}

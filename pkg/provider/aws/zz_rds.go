@@ -22,10 +22,32 @@ func (p *Provider) register_rds(mapping map[string]mapper) {
 			Value: "Value",
 		},
 	}
+	mapping["rds.DBClusterSnapshot"] = mapper{
+		ServiceEndpointID: "rds",
+		FetchFunc:         p.fetch_rds_DBClusterSnapshot,
+		IdField:           "DBClusterSnapshotIdentifier",
+		IsGlobal:          false,
+		TagField: resourceconverter.TagField{
+			Name:  "TagList",
+			Key:   "Key",
+			Value: "Value",
+		},
+	}
 	mapping["rds.DBInstance"] = mapper{
 		ServiceEndpointID: "rds",
 		FetchFunc:         p.fetch_rds_DBInstance,
 		IdField:           "DBInstanceIdentifier",
+		IsGlobal:          false,
+		TagField: resourceconverter.TagField{
+			Name:  "TagList",
+			Key:   "Key",
+			Value: "Value",
+		},
+	}
+	mapping["rds.DBSnapshot"] = mapper{
+		ServiceEndpointID: "rds",
+		FetchFunc:         p.fetch_rds_DBSnapshot,
+		IdField:           "DBSnapshotIdentifier",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
 			Name:  "TagList",
@@ -56,6 +78,27 @@ func (p *Provider) fetch_rds_DBCluster(ctx context.Context, output chan<- model.
 	return nil
 }
 
+func (p *Provider) fetch_rds_DBClusterSnapshot(ctx context.Context, output chan<- model.Resource) error {
+	client := rds.NewFromConfig(p.config)
+	input := &rds.DescribeDBClusterSnapshotsInput{}
+
+	resourceConverter := p.converterFor("rds.DBClusterSnapshot")
+	paginator := rds.NewDescribeDBClusterSnapshotsPaginator(client, input)
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+
+		if err != nil {
+			return fmt.Errorf("failed to fetch %s: %w", "rds.DBClusterSnapshot", err)
+		}
+
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBClusterSnapshots); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (p *Provider) fetch_rds_DBInstance(ctx context.Context, output chan<- model.Resource) error {
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBInstancesInput{}
@@ -70,6 +113,27 @@ func (p *Provider) fetch_rds_DBInstance(ctx context.Context, output chan<- model
 		}
 
 		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBInstances); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (p *Provider) fetch_rds_DBSnapshot(ctx context.Context, output chan<- model.Resource) error {
+	client := rds.NewFromConfig(p.config)
+	input := &rds.DescribeDBSnapshotsInput{}
+
+	resourceConverter := p.converterFor("rds.DBSnapshot")
+	paginator := rds.NewDescribeDBSnapshotsPaginator(client, input)
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+
+		if err != nil {
+			return fmt.Errorf("failed to fetch %s: %w", "rds.DBSnapshot", err)
+		}
+
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBSnapshots); err != nil {
 			return err
 		}
 	}
