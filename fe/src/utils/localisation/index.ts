@@ -45,6 +45,7 @@ i18n.use(initReactI18next).init({
 				TYPES: 'Types',
 				COUNT_RESOURCES: 'resource(s) found',
 				REFRESH_SUCCESS: 'Refresh completed successfully',
+				NO_MORE_RESULTS: 'No more resources found',
 			},
 		},
 	},
