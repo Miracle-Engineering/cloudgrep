@@ -50,8 +50,6 @@ const Header = () => {
 		} catch (err: any) {
 			setErrorMessage(err.error);
 		}
-		dispatch(getFields());
-		dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
 	};
 
 	const handleCloseBanner = (_event: React.SyntheticEvent | Event, reason?: string) => {
@@ -73,7 +71,7 @@ const Header = () => {
 		if (engineStatus?.status === EngineStatusEnum.SUCCESS) {
 			dispatch(getFields());
 			dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
-			setEngineStatus(undefined);
+			setTimeout(() => setEngineStatus(undefined), AUTO_HIDE_DURATION);
 		}
 	}, [engineStatus, filterTags, dispatch]);
 
