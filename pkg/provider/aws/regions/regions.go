@@ -53,6 +53,10 @@ func SelectRegions(ctx context.Context, configuredRegions []string, awsConfig aw
 		}
 	}
 
+	if region == All {
+		return allRegions(ctx, awsConfig)
+	}
+
 	// Always include global region without explicit configuration excluding it
 	regions := []string{Global, region}
 
