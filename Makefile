@@ -88,12 +88,12 @@ release-windows:
 	@echo "Building binary for 386."
 	@CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ CC_FOR_TARGET=i686-w64-mingw32-gcc GOOS=windows GOARCH=386 go build \
 		-ldflags "$(LDFLAGS) -extld=i686-w64-mingw32-gcc" \
-		-o "./bin/cloudgrep_windows_386"
+		-o "./bin/cloudgrep_windows_386.exe"
 
 	@echo "Building binary for amd64."
 	@CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CC_FOR_TARGET=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 go build \
 		-ldflags "$(LDFLAGS) -extld=x86_64-w64-mingw32-gcc" \
-		-o "./bin/cloudgrep_windows_amd64"
+		-o "./bin/cloudgrep_windows_amd64.exe"
 
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh
@@ -123,11 +123,11 @@ release-darwin: LDFLAGS += "-linkmode=external"
 release-darwin:
 	@echo "Building Darwin ARM64 binary"
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=arm64 GOOS=darwin \
-		go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_darwin_arm64.exe"
+		go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_darwin_arm64"
 
 	@echo "Building Darwin AMD64 binary..."
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin \
-		go build -ldflags "$(LDFLAGS)"  -o "./bin/cloudgrep_darwin_amd64.exe"
+		go build -ldflags "$(LDFLAGS)"  -o "./bin/cloudgrep_darwin_amd64"
 
 	@echo "Signing Darwin ARM64 binary..."
 	gon gon_arm64.hcl
