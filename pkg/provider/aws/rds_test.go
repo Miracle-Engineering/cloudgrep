@@ -52,3 +52,41 @@ func TestFetchRDSClusters(t *testing.T) {
 		},
 	})
 }
+
+func TestFetchRDSClusterSnapshots(t *testing.T) {
+	t.Parallel()
+
+	ctx := setupIntegrationTest(t)
+
+	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "rds.DBClusterSnapshot")
+
+	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
+		Type:   "rds.DBClusterSnapshot",
+		Region: defaultRegion,
+		Tags: model.Tags{
+			{
+				Key:   testingutil.TestTag,
+				Value: "rds-cluster-snapshot-0",
+			},
+		},
+	})
+}
+
+func TestFetchRDSSnapshots(t *testing.T) {
+	t.Parallel()
+
+	ctx := setupIntegrationTest(t)
+
+	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "rds.DBSnapshot")
+
+	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
+		Type:   "rds.DBSnapshot",
+		Region: defaultRegion,
+		Tags: model.Tags{
+			{
+				Key:   testingutil.TestTag,
+				Value: "rds-snapshot-0",
+			},
+		},
+	})
+}
