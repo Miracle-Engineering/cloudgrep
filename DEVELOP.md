@@ -131,7 +131,9 @@ implementing resources manually requires more effort to maintain and improve if 
    * `IdField`: Name of id field in ingested aws resource struct
    * `TagField`: A struct of the TagField type used to dictate where. Leave this empty if passing the tagfields separately like with the load balancer
    * `FetchFunc`: The fetch function created in step 1
-   * `IsGlobal`: Set to true if this is a global resource (like a Hosted Zone). Otherwise leave empty.
+   * `IsGlobal`: Set to true if this is a global resource (like a Hosted Zone). Otherwise, leave empty.
+   * `UseMapConverter`: Set to true when attributes are coming as `map[string]any`, instead of a Struct. Otherwise, leave empty.
+   
    Example:
    ```go
    "ec2.Instance": {
