@@ -261,7 +261,7 @@ func TestSearchByQuery(t *testing.T) {
 			//test exclude - returns the resources without the tag release
 			query = `{
   "filter":{
-    "release": "(null)"
+    "release": "(missing)"
   }
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
@@ -273,8 +273,8 @@ func TestSearchByQuery(t *testing.T) {
 			//test 2 exclusions - the s3 bucket is the only one without both tags
 			query = `{
   "filter":{
-    "release": "(null)",
-    "debug:info": "(null)"
+    "release": "(missing)",
+    "debug:info": "(missing)"
   }
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
@@ -387,7 +387,7 @@ func TestFields(t *testing.T) {
 				Values: model.FieldValues{
 					&model.FieldValue{Value: "infra", Count: "1"},
 					&model.FieldValue{Value: "dev", Count: "1"},
-					&model.FieldValue{Value: "(null)", Count: "1"},
+					&model.FieldValue{Value: "(missing)", Count: "1"},
 				}}, *fields.FindField("tags", "team"))
 
 			//test long field
@@ -396,7 +396,7 @@ func TestFields(t *testing.T) {
 				Count: 1,
 				Values: model.FieldValues{
 					&model.FieldValue{Value: tagMaxValue, Count: "1"},
-					&model.FieldValue{Value: "(null)", Count: "2"},
+					&model.FieldValue{Value: "(missing)", Count: "2"},
 				}}, *fields.FindField("tags", tagMaxKey))
 
 			//test the tag field called "region"
@@ -405,7 +405,7 @@ func TestFields(t *testing.T) {
 				Count: 1,
 				Values: model.FieldValues{
 					&model.FieldValue{Value: "us-west-2", Count: "1"},
-					&model.FieldValue{Value: "(null)", Count: "2"},
+					&model.FieldValue{Value: "(missing)", Count: "2"},
 				}}, *fields.FindField("tags", "region"))
 
 			//test that the fields count are updated when sending a filter
@@ -449,13 +449,13 @@ func TestFields(t *testing.T) {
 					&model.FieldValue{Value: "false", Count: "1"},
 				}}, *fields.FindField("tags", "enabled"))
 
-			//check a tag that is not relevant is still showing with a 0 count, and a (null) value
+			//check a tag that is not relevant is still showing with a 0 count, and a (missing) value
 			testingutil.AssertEqualsField(t, model.Field{
 				Name:  "unique-tag",
 				Count: 0,
 				Values: model.FieldValues{
 					&model.FieldValue{Value: "unique-i-123", Count: "-"},
-					&model.FieldValue{Value: "(null)", Count: "1"},
+					&model.FieldValue{Value: "(missing)", Count: "1"},
 				}}, *fields.FindField("tags", "unique-tag"))
 
 		})

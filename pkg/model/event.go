@@ -6,19 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const (
-	EventStatusFetching string = "fetching"
-	EventStatusFailed   string = "failed"
-	EventStatusSuccess  string = "success"
-	EventStatusLoaded   string = "loaded"
-)
-
-const (
-	EventTypeEngine   string = "engine"
-	EventTypeProvider string = "provider"
-	EventTypeResource string = "resource"
-)
-
 type Event struct {
 	Id           int64     `json:"-" gorm:"primaryKey;autoIncrement"`
 	RunId        string    `json:"runId"`

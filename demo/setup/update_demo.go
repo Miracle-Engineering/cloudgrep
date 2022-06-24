@@ -75,7 +75,7 @@ func main() {
 	//assign 95% of the ec2.NetworkInterface, ec2.SecurityGroup, ec2.Subnet without tags to infra team
 	//leave some aside for default vpc and such
 	for _, _type := range []string{"ec2.NetworkInterface", "ec2.SecurityGroup", "ec2.Subnet"} {
-		toUpdate := output.getResources(map[string]string{"type": _type, "team": "(null)"})
+		toUpdate := output.getResources(map[string]string{"type": _type, "team": "(missing)"})
 		fnResource := func(r model.Resource) model.Resource {
 			r.Tags = model.Tags{model.Tag{Key: "team", Value: "infra"}}
 			return r
@@ -103,7 +103,7 @@ func main() {
 		"managed-by", "cloudformation",
 	)
 	// for the rest - 80% is terraform - leave some unassigned for demo
-	toUpdate := output.getResources(map[string]string{"managed-by": "(null)"})
+	toUpdate := output.getResources(map[string]string{"managed-by": "(missing)"})
 	fnResource := func(r model.Resource) model.Resource {
 		r.Tags = model.Tags{model.Tag{Key: "managed-by", Value: "terraform"}}
 		return r
@@ -198,7 +198,7 @@ func (d *demo) updateTag(filter map[string]string, key string, val string) {
 		t := r.Tags.Find(key)
 		if t != nil {
 			r.Tags = r.Tags.Delete(key)
-			if val != "(null)" {
+			if val != "(missing)" {
 				r.Tags = r.Tags.Add(key, val)
 			}
 		} else {

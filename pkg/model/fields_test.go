@@ -64,7 +64,7 @@ func TestFieldsAddNullValues(t *testing.T) {
 				Values: []*model.FieldValue{
 					{Value: "us-east-1", Count: "2"},
 					{Value: "us-west-2", Count: "1"},
-					//do not show (null) if all resources have this field
+					//do not show (missing) if all resources have this field
 				},
 			}, {
 				Name:  "type",
@@ -77,8 +77,8 @@ func TestFieldsAddNullValues(t *testing.T) {
 				Count: 2,
 				Values: []*model.FieldValue{
 					{Value: "dev", Count: "2"},
-					//(null) count is the count of resources without this field
-					{Value: "(null)", Count: "1"},
+					//(missing) count is the count of resources without this field
+					{Value: "(missing)", Count: "1"},
 				},
 			},
 			},

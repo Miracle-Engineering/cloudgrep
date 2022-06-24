@@ -17,9 +17,6 @@ import (
 )
 
 const (
-	//limit number of resource returned
-	DefaultLimit       = 25
-	LimitMaxValue      = 2000
 	resourceIndexTable = "resource_index"
 	//the name the dynamic columns
 	columnDynamicName = "col_%v"
@@ -373,11 +370,11 @@ func (ri *resourceIndexer) parse(jsonQuery []byte) (*rql.Params, error) {
 func replaceNullValues(p *rql.Params) *rql.Params {
 	for i, arg := range p.FilterArgs {
 		if s, ok := arg.(string); ok {
-			if s == model.NullValue {
+			if s == model.FieldMissing {
 				p.FilterExp = replaceWith(p.FilterExp, "=", "is", "?", i)
 				p.FilterArgs[i] = nil
 			}
-			if s == model.NotNullValue {
+			if s == model.FieldPresent {
 				p.FilterExp = replaceWith(p.FilterExp, "=", "is not", "?", i)
 				p.FilterArgs[i] = nil
 			}
