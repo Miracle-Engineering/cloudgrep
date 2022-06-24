@@ -99,7 +99,7 @@ func (fgs FieldGroups) AddNullValues() FieldGroups {
 	var result []FieldGroup
 	totalCount := fgs.count()
 	for _, group := range fgs {
-		var fields Fields
+		fields := make([]*Field, 0)
 		for _, field := range group.Fields {
 
 			nullCount := totalCount - field.Count
