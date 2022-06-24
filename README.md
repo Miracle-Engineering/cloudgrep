@@ -24,8 +24,11 @@ Cloud Asset Explorer</p>
 
 # What is Cloudgrep?
 Cloudgrep is an asset explorer for cloud resources. It shows you everything you're running on your cloud account(s) and enables you to slice and dice these based on tags and properties. It is a UI tool built on open source technologies and runs completely client side (so no data leaves your machine).
+<p align="center">
+<img width="820" alt="Screenshot" src="https://user-images.githubusercontent.com/855699/175440360-d6e759d0-ecd6-4a36-889c-b329563979db.png">
+</p>
 
-TBD - screenshot
+
 
 ### Why use Cloudgrep?
 Cloudgrep's goal is to help your team ensure every resource follows consistent tagging schema. It helps identify missing tags, misspellings and unowned resources. Consistent tagging leads to better cost attribution and faster incident resolution.
@@ -36,9 +39,10 @@ If you'd like to try it out or have any questions - feel free to join our [Slack
 
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=nja_EfpGexE"><img width="480" src="https://user-images.githubusercontent.com/855699/149367998-9f00a9f4-abaa-4abf-949c-5b470e7d410c.png"></a>
+  <a href="https://www.youtube.com/watch?v=Ip-lY9x7bh4"><img width="478" alt="Group 2" src="https://user-images.githubusercontent.com/855699/175441143-5834e9f2-8e23-471a-95be-7b3388d1f455.png"></a>
   </br>
-  <span><i>TBD: Demo video</i></span>
+  <span><i>
+Demo video</i></span>
 
 </p>
 
