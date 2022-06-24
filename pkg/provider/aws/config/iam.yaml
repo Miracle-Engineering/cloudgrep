@@ -10,7 +10,7 @@ types:
     getTagsApi:
       call: ListInstanceProfileTags
       type: InstanceProfile
-      inputIDField: InstanceProfileName
+      inputIDField: InstanceProfileId
       tags: &tags
         style: struct
         pointer: true
@@ -46,7 +46,7 @@ types:
       call: ListRoles
       pagination: true
       outputKey: Roles
-      id: RoleName
+      id: RoleId
     getTagsApi:
       type: Role
       call: ListRoleTags
@@ -67,7 +67,7 @@ types:
       call: ListUsers
       pagination: true
       outputKey: Users
-      id: UserName
+      id: UserId
     getTagsApi:
       type: User
       call: ListUserTags

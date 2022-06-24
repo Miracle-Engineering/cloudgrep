@@ -15,7 +15,7 @@ func (p *Provider) register_iam(mapping map[string]mapper) {
 	mapping["iam.InstanceProfile"] = mapper{
 		ServiceEndpointID: "iam",
 		FetchFunc:         p.fetch_iam_InstanceProfile,
-		IdField:           "InstanceProfileName",
+		IdField:           "InstanceProfileId",
 		IsGlobal:          true,
 	}
 	mapping["iam.OpenIDConnectProvider"] = mapper{
@@ -33,7 +33,7 @@ func (p *Provider) register_iam(mapping map[string]mapper) {
 	mapping["iam.Role"] = mapper{
 		ServiceEndpointID: "iam",
 		FetchFunc:         p.fetch_iam_Role,
-		IdField:           "RoleName",
+		IdField:           "RoleId",
 		IsGlobal:          true,
 	}
 	mapping["iam.SAMLProvider"] = mapper{
@@ -45,7 +45,7 @@ func (p *Provider) register_iam(mapping map[string]mapper) {
 	mapping["iam.User"] = mapper{
 		ServiceEndpointID: "iam",
 		FetchFunc:         p.fetch_iam_User,
-		IdField:           "UserName",
+		IdField:           "UserId",
 		IsGlobal:          true,
 	}
 	mapping["iam.VirtualMFADevice"] = mapper{
