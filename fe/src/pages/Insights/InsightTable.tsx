@@ -131,7 +131,7 @@ const InsightTable: FC = () => {
 						))}
 					</TableBody>
 				</Table>
-				{(!resources?.length || (isInfiniteScroll && hasNext)) && (
+				{(!resources || (isInfiniteScroll && hasNext)) && (
 					<Box
 						sx={{ display: 'flex', justifyContent: 'center', height: '100px', alignItems: 'center' }}
 						mt={1}>

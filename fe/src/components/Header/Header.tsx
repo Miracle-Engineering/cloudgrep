@@ -16,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import RefreshService from 'services/RefreshService';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getFilteredResources } from 'store/resources/thunks';
-import { getFields } from 'store/tags/thunks';
 
 import { headerStyle, menuItems } from './style';
 
@@ -44,10 +43,12 @@ const Header = () => {
 		setOpen(true);
 		try {
 			await RefreshService.refresh();
+			setOpen(false);
 			await handleStatus();
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err: any) {
 			setErrorMessage(err.error);
+			setOpen(false);
 		}
 	};
 
@@ -82,7 +83,7 @@ const Header = () => {
 						src={`${process.env.REACT_APP_PATH_PREFIX}/logo.png`}
 					/>
 				</Box>
-				<Box sx={{ display: 'flex', marginLeft: '203.25px', alignItems: 'center' }}>
+				<Box sx={{ display: 'flex', position: 'absolute', left: '20%', alignItems: 'center' }}>
 					<Link ml={4} sx={menuItems} href={SLACK} underline="none" target="_blank" rel="noopener">
 						{t('SLACK')}
 					</Link>
