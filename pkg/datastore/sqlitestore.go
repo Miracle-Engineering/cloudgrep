@@ -378,10 +378,6 @@ func (s *SQLiteStore) getFields(ctx context.Context, ids []model.ResourceId) (mo
 	if err != nil {
 		return nil, err
 	}
-	// tagFields, err := s.getTagFields(ids)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	tagsGroup := model.FieldGroup{
 		Name:   model.FieldGroupTags,
 		Fields: tagFields,
