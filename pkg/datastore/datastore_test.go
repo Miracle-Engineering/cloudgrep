@@ -512,6 +512,13 @@ func TestUpdateResources(t *testing.T) {
 			//searching on deleting tag returns nothing
 			testQueryNoResult(t, ctx, ds, deletedTag.Key, deletedTag.Value)
 
+			//send 2 resources with same id
+			r1DuplicateId, err := ds.GetResource(ctx, resources[1].Id)
+			require.NoError(t, err)
+			r1DuplicateId.Id = r1.Id
+			//only 1 resource would be written without throwing an error
+			require.NoError(t, ds.WriteResources(ctx, model.Resources{r1, r1DuplicateId}))
+
 		})
 	}
 }
