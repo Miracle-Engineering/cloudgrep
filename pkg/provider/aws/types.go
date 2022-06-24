@@ -6,11 +6,11 @@ import (
 )
 
 type mapper struct {
-	IdField   string
-	TagField  resourceconverter.TagField
-	FetchFunc types.FetchFunc
-	IsGlobal  bool
-
+	IdField         string
+	TagField        resourceconverter.TagField
+	FetchFunc       types.FetchFunc
+	IsGlobal        bool
+	UseMapConverter bool
 	// ServiceEndpointID is the identifier for the service in the endpoints file located at https://github.com/aws/aws-sdk-go/blob/v1.44.33/aws/endpoints/defaults.go.
 	// For example, for the `elb` service, the EndpointID is `elasticloadbalancing`.
 	// Used to detect regions that don't support specific services.
