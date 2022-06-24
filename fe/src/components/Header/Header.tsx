@@ -5,18 +5,18 @@ import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import Link from '@mui/material/Link';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
 import Alert from 'components/Alert/Alert';
-import { BORDER_COLOR, DARK_BLUE } from 'constants/colors';
-import { AUTO_HIDE_DURATION, ENGINE_STATUS_INTERVAL, PAGE_LENGTH, PAGE_START } from 'constants/globals';
+import { BORDER_COLOR, DARK_BLUE, TEXT_COLOR } from 'constants/colors';
+import { AUTO_HIDE_DURATION, ENGINE_STATUS_INTERVAL, GITHUB, PAGE_LENGTH, PAGE_START, SLACK } from 'constants/globals';
 import { EngineStatus, EngineStatusEnum } from 'models/EngineStatus';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RefreshService from 'services/RefreshService';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getFilteredResources } from 'store/resources/thunks';
-import { getFields } from 'store/tags/thunks';
 
 import { headerStyle, menuItems } from './style';
 
@@ -25,6 +25,7 @@ const Header = () => {
 	const dispatch = useAppDispatch();
 	const { filterTags } = useAppSelector(state => state.tags);
 	const [open, setOpen] = useState(false);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 	const { resources } = useAppSelector(state => state.resources);
 	const [errorMessage, setErrorMessage] = useState('');
 	const [engineStatus, setEngineStatus] = useState<EngineStatus | undefined>();
@@ -42,16 +43,17 @@ const Header = () => {
 
 	const handleClick = async () => {
 		setOpen(true);
+		setIsRefreshing(true);
 		try {
-			// throw { error: 'test error message for Demo purposes' };
 			await RefreshService.refresh();
+			setOpen(false);
 			await handleStatus();
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err: any) {
 			setErrorMessage(err.error);
+			setOpen(false);
+			setIsRefreshing(false);
 		}
-		dispatch(getFields());
-		dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
 	};
 
 	const handleCloseBanner = (_event: React.SyntheticEvent | Event, reason?: string) => {
@@ -66,14 +68,14 @@ const Header = () => {
 	useEffect(() => {
 		if (resources) {
 			setOpen(false);
+			setIsRefreshing(false);
 		}
 	}, [resources]);
 
 	useEffect(() => {
 		if (engineStatus?.status === EngineStatusEnum.SUCCESS) {
-			dispatch(getFields());
 			dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
-			setEngineStatus(undefined);
+			setTimeout(() => setEngineStatus(undefined), AUTO_HIDE_DURATION);
 		}
 	}, [engineStatus, filterTags, dispatch]);
 
@@ -86,17 +88,21 @@ const Header = () => {
 						src={`${process.env.REACT_APP_PATH_PREFIX}/logo.png`}
 					/>
 				</Box>
-				<Box sx={{ display: 'flex', marginLeft: '103.25px', alignItems: 'center' }}>
-					<Typography sx={{ ...menuItems, color: DARK_BLUE }}>{t('HOME')}</Typography>
-					<Typography ml={4} sx={menuItems}>
+				<Box
+					sx={{
+						display: 'flex',
+						position: 'absolute',
+						left: '20%',
+						top: '0%',
+						height: '66px',
+						alignItems: 'center',
+					}}>
+					<Link ml={4} sx={menuItems} href={SLACK} underline="none" target="_blank" rel="noopener">
 						{t('SLACK')}
-					</Typography>
-					<Typography ml={4} sx={menuItems}>
+					</Link>
+					<Link ml={4} sx={menuItems} href={GITHUB} underline="none" target="_blank" rel="noopener">
 						{t('GITHUB')}
-					</Typography>
-					<Typography ml={4} sx={menuItems}>
-						{t('CONTACT')}
-					</Typography>
+					</Link>
 				</Box>
 			</Box>
 			<Box
@@ -109,9 +115,18 @@ const Header = () => {
 					justifyContent: 'center',
 					cursor: 'pointer',
 				}}>
-				<Button sx={{ color: DARK_BLUE, textTransform: 'none' }} startIcon={<RefreshIcon />}>
-					{t('REFRESH')}
-				</Button>
+				{isRefreshing ? (
+					<Box sx={{ display: 'flex', alignItems: 'center' }}>
+						<CircularProgress size="1.5rem" color="primary" />
+						<Typography ml={1} color={TEXT_COLOR} sx={{ fontSize: '14px' }}>
+							{t('REFRESHING')}
+						</Typography>
+					</Box>
+				) : (
+					<Button sx={{ color: DARK_BLUE, textTransform: 'none' }} startIcon={<RefreshIcon />}>
+						{t('REFRESH')}
+					</Button>
+				)}
 			</Box>
 			<Backdrop sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }} open={open}>
 				<CircularProgress color="inherit" />

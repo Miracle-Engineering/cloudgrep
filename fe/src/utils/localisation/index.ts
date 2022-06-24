@@ -25,6 +25,7 @@ i18n.use(initReactI18next).init({
 				SEARCH: 'Search',
 				SEARCH_TERM: 'Search term',
 				REFRESH: 'Refresh',
+				REFRESHING: 'Refreshing',
 				DETAILS: 'Details',
 
 				// HEADER:
@@ -45,6 +46,7 @@ i18n.use(initReactI18next).init({
 				TYPES: 'Types',
 				COUNT_RESOURCES: 'resource(s) found',
 				REFRESH_SUCCESS: 'Refresh completed successfully',
+				NO_MORE_RESULTS: 'No more resources found',
 			},
 		},
 	},

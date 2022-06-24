@@ -137,9 +137,9 @@ func TestLoad(t *testing.T) {
 				assert.Equal(t, tc.TagsPerBatch, len(allResources.Resources[0].Tags))
 
 				//test all fields
-				fields, err := ds.GetFields(ctx)
+				resourceResp, err := ds.GetResources(ctx, nil)
 				assert.NoError(t, err)
-				assert.Equal(t, tc.Tags, len(fields.FindGroup("tags").Fields))
+				assert.Equal(t, tc.Tags, len(resourceResp.FieldGroups.FindGroup("tags").Fields))
 
 				//test some queries
 				for i := 0; i < tc.Queries; i = i + 1 {

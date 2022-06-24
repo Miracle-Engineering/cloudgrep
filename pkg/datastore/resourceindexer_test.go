@@ -158,25 +158,25 @@ func TestReplaceNullValues(t *testing.T) {
 	}{
 		{
 			"col_17 = ? AND region = ? AND type = ?",
-			[]interface{}{model.NullValue, "us-east-1", "ec2.instance"},
+			[]interface{}{model.FieldMissing, "us-east-1", "ec2.instance"},
 			"col_17 is ? AND region = ? AND type = ?",
 			[]interface{}{nil, "us-east-1", "ec2.instance"},
 		},
 		{
 			"col_17 = ? AND region = ? AND type = ?",
-			[]interface{}{model.NullValue, "us-east-1", model.NullValue},
+			[]interface{}{model.FieldMissing, "us-east-1", model.FieldMissing},
 			"col_17 is ? AND region = ? AND type is ?",
 			[]interface{}{nil, "us-east-1", nil},
 		},
 		{
 			"(col_17 = ? OR col_17 = ?) AND type = ?",
-			[]interface{}{model.NullValue, model.NullValue, model.NullValue},
+			[]interface{}{model.FieldMissing, model.FieldMissing, model.FieldMissing},
 			"(col_17 is ? OR col_17 is ?) AND type is ?",
 			[]interface{}{nil, nil, nil},
 		},
 		{
 			"(col_17 = ? OR col_17 = ?) AND type = ?",
-			[]interface{}{model.NullValue, model.NotNullValue, model.NullValue},
+			[]interface{}{model.FieldMissing, model.FieldPresent, model.FieldMissing},
 			"(col_17 is ? OR col_17 is not ?) AND type is ?",
 			[]interface{}{nil, nil, nil},
 		},

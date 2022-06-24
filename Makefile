@@ -1,4 +1,4 @@
-TARGETS = linux/amd64 linux/386 windows/amd64 windows/386
+LINUX_TARGETS = linux/amd64 linux/386
 VERSION ?= dev
 GITHUB_SHA ?= $(shell git rev-parse HEAD)
 BUILD_TIME = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n')
@@ -20,7 +20,8 @@ usage:
 	@echo "make format      	: Format code"
 	@echo "make frontend-build  : Build the frontend assets"
 	@echo "make frontend-deploy : Deploy the frontend assets"
-	@echo "make release         : Generate binaries for Linux, Windows"
+	@echo "make release-linux   : Generate binaries for Linux"
+	@echo "make release-windows : Generate binaries for Windows"
 	@echo "make release-darwin  : Generate binaries for macOS"
 	@echo "make run           	: Run using local code"
 	@echo "make run-demo       	: Run the demo"
@@ -40,7 +41,7 @@ test:
 	go test -race ./hack/... ./pkg/... ./cmd/... -coverprofile=coverage.out -covermode=atomic
 
 load-test:
-	go test ./loadtest/...
+	go clean -testcache && go test ./loadtest/...
 
 pre-commit:
 	@$(MAKE) -f $(THIS_FILE) format
@@ -79,14 +80,32 @@ build:
 	go build -race -ldflags "$(LDFLAGS)"
 	@echo "You can now execute ./cloudgrep"
 
-release: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GITHUB_SHA)
-release: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
-release: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
-release: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
-release:
+release-windows: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GITHUB_SHA)
+release-windows: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
+release-windows: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
+release-windows: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
+release-windows:
+	@echo "Building binary for 386."
+	@CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ CC_FOR_TARGET=i686-w64-mingw32-gcc GOOS=windows GOARCH=386 go build \
+		-ldflags "$(LDFLAGS) -extld=i686-w64-mingw32-gcc" \
+		-o "./bin/cloudgrep_windows_386.exe"
+
+	@echo "Building binary for amd64."
+	@CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CC_FOR_TARGET=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 go build \
+		-ldflags "$(LDFLAGS) -extld=x86_64-w64-mingw32-gcc" \
+		-o "./bin/cloudgrep_windows_amd64.exe"
+
+	@echo "\nPackaging binaries...\n"
+	@./script/package.sh
+
+release-linux: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GITHUB_SHA)
+release-linux: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
+release-linux: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
+release-linux: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
+release-linux:
 	@echo "Building binaries..."
 	@CGO_ENABLED=1 gox \
-		-osarch "$(TARGETS)" \
+		-osarch "$(LINUX_TARGETS)" \
 		-ldflags "$(LDFLAGS)" \
 		-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
 
@@ -96,26 +115,25 @@ release:
 	@echo "\nPackaging binaries...\n"
 	@./script/package.sh
 
+release-darwin: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GITHUB_SHA)
+release-darwin: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
+release-darwin: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
+release-darwin: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
+release-darwin: LDFLAGS += "-linkmode=external"
 release-darwin:
-	@echo "Building Darwin ARM64 binaries..."
+	@echo "Building Darwin ARM64 binary"
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=arm64 GOOS=darwin \
-		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_arm64"
+		go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_darwin_arm64"
 
-	@echo "Building Darwin AMD64 binaries (require Mac OS)..."
+	@echo "Building Darwin AMD64 binary..."
 	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin \
-		go build -ldflags "-s -w -linkmode=external"  -o "./bin/cloudgrep_darwin_amd64"
+		go build -ldflags "$(LDFLAGS)"  -o "./bin/cloudgrep_darwin_amd64"
 
-	@echo "\nPackaging binaries...\n"
-	@./script/package.sh
+	@echo "Signing Darwin ARM64 binary..."
+	gon gon_arm64.hcl
 
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GIT_COMMIT)
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
-release-linux-amd64: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
-release-linux-amd64:
-	@echo "Building Linux binaries..."
-	GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_amd64"
-
+	@echo "Signing Darwin AMD64 binary..."
+	gon gon_amd64.hcl
 
 docker-build:
 	docker build --no-cache -t $(DOCKER_RELEASE_TAG) .

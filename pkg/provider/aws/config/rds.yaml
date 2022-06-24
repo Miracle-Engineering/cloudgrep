@@ -1,18 +1,33 @@
 types:
-  - name: DBInstance
-    listApi:
-      call: DescribeDBInstances
-      pagination: true
-      outputKey: DBInstances
-      id: DBInstanceIdentifier
-      tags: &tags
-        field: TagList
-        key: Key
-        value: Value
+
   - name: DBCluster
     listApi:
       call: DescribeDBClusters
       pagination: true
       outputKey: DBClusters
       id: DBClusterIdentifier
+      tags: &tags
+        field: TagList
+        key: Key
+        value: Value
+  - name: DBClusterSnapshot
+    listApi:
+      call: DescribeDBClusterSnapshots
+      pagination: true
+      outputKey: DBClusterSnapshots
+      id: DBClusterSnapshotIdentifier
+      tags: *tags
+  - name: DBInstance
+    listApi:
+      call: DescribeDBInstances
+      pagination: true
+      outputKey: DBInstances
+      id: DBInstanceIdentifier
+      tags: *tags
+  - name: DBSnapshot
+    listApi:
+      call: DescribeDBSnapshots
+      pagination: true
+      outputKey: DBSnapshots
+      id: DBSnapshotIdentifier
       tags: *tags

@@ -58,6 +58,7 @@ const InsightTable: FC = () => {
 				);
 			} else {
 				setHasNext(false);
+				setIsInfiniteScroll(false);
 			}
 		}
 	};
@@ -88,14 +89,14 @@ const InsightTable: FC = () => {
 				'COUNT_RESOURCES'
 			)}`}</Typography>
 			<TableContainer
-				sx={{ maxHeight: '150vH' }}
+				sx={{ maxHeight: 'calc(100vH - 34px)' }}
 				component={Paper}
 				onScroll={async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 					if (!isInfiniteScroll) {
 						await debouncedContainerScroll(e);
 					}
 				}}>
-				<Table sx={{ minWidth: 650, overflowY: 'scroll' }} size="small" aria-label="a dense table">
+				<Table stickyHeader sx={{ minWidth: 650, overflowY: 'scroll' }} size="small" aria-label="a dense table">
 					<TableHead>
 						<TableRow sx={{ height: '46px', borderBottom: `1px solid ${BORDER_COLOR}` }}>
 							<TableCell sx={tableStyles.headerStyle}>{t('TYPE')} </TableCell>
@@ -114,7 +115,7 @@ const InsightTable: FC = () => {
 								key={row.id + row.type + index}
 								sx={{
 									height: '66px',
-									'&:last-child td, &:last-child th': { border: 0 },
+									// '&:last-child td, &:last-child th': { border: 0 },
 									'&:hover': tableStyles.hoverStyle,
 								}}>
 								<TableCell sx={tableStyles.bodyRow} component="th" scope="row">
@@ -130,9 +131,16 @@ const InsightTable: FC = () => {
 						))}
 					</TableBody>
 				</Table>
-				{isInfiniteScroll && hasNext && (
-					<Box sx={{ display: 'flex', justifyContent: 'center' }} mt={1}>
-						{<CircularProgress />}
+				{(!resources || (isInfiniteScroll && hasNext)) && (
+					<Box
+						sx={{ display: 'flex', justifyContent: 'center', height: '100px', alignItems: 'center' }}
+						mt={1}>
+						{<CircularProgress color="primary" />}
+					</Box>
+				)}
+				{!isInfiniteScroll && !hasNext && (
+					<Box sx={{ ...tableStyles.bodyRow, display: 'flex', justifyContent: 'center' }} my={1}>
+						{t('NO_MORE_RESULTS')}
 					</Box>
 				)}
 			</TableContainer>

@@ -17,9 +17,6 @@ import (
 )
 
 const (
-	//limit number of resource returned
-	DefaultLimit       = 25
-	LimitMaxValue      = 2000
 	resourceIndexTable = "resource_index"
 	//the name the dynamic columns
 	columnDynamicName = "col_%v"
@@ -321,10 +318,21 @@ func (ri *resourceIndexer) writeResourceIndexes(ctx context.Context, db *gorm.DB
 	}
 
 	//create the rows to insert in memory
-	rows := make([]map[string]interface{}, len(resources))
+	var rows []map[string]interface{}
+	uniqueIds := make(map[model.ResourceId]*model.Resource)
 	var ids []model.ResourceId
-	for i, r := range resources {
+	for _, r := range resources {
 		row := make(map[string]interface{})
+		id := model.ResourceId(r.Id)
+		if rExist, found := uniqueIds[id]; found {
+			ri.logger.Warn("Found duplicate key",
+				zap.String("key", string(id)),
+				zap.Object("resource 1", rExist),
+				zap.Object("resource 2", r),
+			)
+			continue
+		}
+		uniqueIds[id] = r
 		ids = append(ids, model.ResourceId(r.Id))
 		row["id"] = r.Id
 		row["type"] = r.Type
@@ -334,7 +342,7 @@ func (ri *resourceIndexer) writeResourceIndexes(ctx context.Context, db *gorm.DB
 			//ex: row["Col23"]="Jordan"
 			row[ri.fieldColumns[tag.Key].ColumnName] = tag.Value
 		}
-		rows[i] = row
+		rows = append(rows, row)
 	}
 
 	//delete all previous resource_index if they exist
@@ -373,11 +381,11 @@ func (ri *resourceIndexer) parse(jsonQuery []byte) (*rql.Params, error) {
 func replaceNullValues(p *rql.Params) *rql.Params {
 	for i, arg := range p.FilterArgs {
 		if s, ok := arg.(string); ok {
-			if s == model.NullValue {
+			if s == model.FieldMissing {
 				p.FilterExp = replaceWith(p.FilterExp, "=", "is", "?", i)
 				p.FilterArgs[i] = nil
 			}
-			if s == model.NotNullValue {
+			if s == model.FieldPresent {
 				p.FilterExp = replaceWith(p.FilterExp, "=", "is not", "?", i)
 				p.FilterArgs[i] = nil
 			}
@@ -394,7 +402,7 @@ func replaceWith(s string, old string, new string, sep string, i int) string {
 
 //findResourceIds finds resources using a RQL query
 //see https://github.com/a8m/rql#getting-started for the syntax
-func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQuery []byte) ([]model.ResourceId, int, error) {
+func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQuery []byte, paginated bool) ([]model.ResourceId, int, error) {
 	if len(jsonQuery) == 0 {
 		//use en empty json if nothing is set - this will use the default limit
 		jsonQuery = []byte(`{}`)
@@ -405,13 +413,22 @@ func (ri *resourceIndexer) findResourceIds(db gorm.DB, logger *zap.Logger, jsonQ
 	}
 
 	var resourceIds []model.ResourceId
-	result := db.Table(resourceIndexTable).
-		Select("id").
-		Where(p.FilterExp, p.FilterArgs...).
-		Offset(p.Offset).
-		Limit(p.Limit).
-		Order(p.Sort).
-		Find(&resourceIds)
+	var result *gorm.DB
+	if paginated {
+		result = db.Table(resourceIndexTable).
+			Select("id").
+			Where(p.FilterExp, p.FilterArgs...).
+			Offset(p.Offset).
+			Limit(p.Limit).
+			Order(p.Sort).
+			Find(&resourceIds)
+	} else {
+		result = db.Table(resourceIndexTable).
+			Select("id").
+			Where(p.FilterExp, p.FilterArgs...).
+			Order(p.Sort).
+			Find(&resourceIds)
+	}
 
 	if result.Error != nil {
 		return nil, 0, result.Error

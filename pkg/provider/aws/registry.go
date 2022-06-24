@@ -8,6 +8,6 @@ func (p *Provider) buildTypeMapping() map[string]mapper {
 	p.register_eks(mapping)
 	p.register_cloudfront(mapping)
 	p.register_sqs(mapping)
-
+	p.register_iam_manual(mapping)
 	return mapping
 }

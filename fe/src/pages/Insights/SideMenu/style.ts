@@ -11,6 +11,7 @@ export const sideMenuStyle: CSSProperties = {
 	right: '0px',
 	top: '0px',
 	backgroundColor: 'white',
+	zIndex: 2,
 };
 
 export const sideMenuLeftText = {

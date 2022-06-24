@@ -11,9 +11,40 @@ The backend exposes an API at `http://localhost:8080/api`.
 | ------------- | ------------- | ------------- | ------------- |
 | [/resources](http://localhost:8080/api/resources)  | POST  | Return list of cloud resources |  :white_check_mark: |
 
-To filter the resources, send a body containing a query.
-The name of the fields used in `filter` and `sort` is the `field.name` returned in the `/fields/` API.
 
+To filter the resources, send a body containing a query.
+
+```js
+{
+  // set a limit, default is 25, max is 2000 
+  "limit": 25,
+  //specifies the number of rows to skip before any rows are retrieved
+  "offset": 0,
+  //filter the resources
+  "filter": {
+    "type": "ec2.Instance"
+    "env": "prod"
+  }
+  //optional sort
+  "sort": ["type"]
+}
+```
+
+The response contains:
+
+```js
+{
+  //the total number of resources matching the filter
+  "count": 25,
+  //the fields available for filtering the resources, their count is updated based on the input query
+  //a field can be: a resource type, a region, a tag key
+  "fieldGroups": [],
+  //the resources matching the input query (paginated)
+  "resources": []
+}
+```
+
+- Examples of requests:
 ```js
 {
   // set a limit, default is 25, max is 100 
@@ -63,7 +94,7 @@ Example of queries:
 //return resources missing the tag "team"
 {
   "filter":{
-	  "team": "(null)"
+	  "team": "(missing)"
   }
 }
 
@@ -76,7 +107,7 @@ Example of queries:
       { "team": "marketplace" },
       { "team": "shipping" }
     ]
-  }
+  } 
 }
 
 //Using multiple OR sections
@@ -145,6 +176,157 @@ Example of queries:
 }
 
 ```
+
+- Examples of response:
+
+```js
+{
+  //the query has 2 results - if pagination is used this number would be unchanged - it's the total number of results
+  "count":2,
+  //the updated list of fields matching the current query
+  "fieldGroups":[
+    {
+      "name":"core",
+      "fields":[
+        {
+          "name":"region",
+          "values":[
+            {
+              "value":"us-east-1",
+              "count":"2"
+            },
+            {
+              "value":"eu-west-3",
+              // "-" means that this value is not relevant for current query - filtering on it would have no effect
+              "count":"-"
+            }
+          ],
+          "count":2
+        },
+        {
+          "name":"type",
+          "values":[
+            {
+              "value":"ec2.Instance",
+              "count":"2"
+            },
+            {
+              "value":"ec2.Volume",
+              "count":"-"
+            }
+          ],
+          "count":2
+        }
+      ]
+    },
+    {
+      "name":"tags",
+      "fields":[
+        {
+          "name":"managed-by",
+          "values":[
+            {
+              "value":"cloudformation",
+              "count":"2"
+            },
+            {
+              "value":"terraform",
+              "count":"-"
+            }
+          ],
+          "count":2
+        },
+        {
+          "name":"env",
+          "values":[
+            {
+              "value":"prod",
+              "count":"1"
+            },
+            {
+              "value":"dev",
+              "count":"1"
+            }
+          ],
+          "count":2
+        }
+      ]
+    }
+  ],
+  //list the resources - if pagination is used only one page would be returned at time
+  "resources":[
+    {
+      "id":"i-05a8cc7c8b7bc4f2d",
+      "region":"us-east-1",
+      "type":"ec2.Instance",
+      "tags":[
+        {
+          "key":"env",
+          "value":"dev"
+        },
+        {
+          "key":"managed-by",
+          "value":"cloudformation"
+        }
+      ],
+      "rawData":{
+        "AmiLaunchIndex":0,
+        "Architecture":"x86_64",
+        "BlockDeviceMappings":[
+          {
+            "DeviceName":"/dev/xvda",
+            "Ebs":{
+              "AttachTime":"2022-06-16T23:25:00Z",
+              "DeleteOnTermination":true,
+              "Status":"attached",
+              "VolumeId":"vol-0d125183ed4159484"
+            }
+          }
+        ],
+        "BootMode":"",
+        "ImageId":"ami-032930428bf1abbff",
+        "InstanceId":"i-05a8cc7c8b7bc4f2d"
+      }
+    },
+    {
+      "id":"i-0695984d3a9256cea",
+      "region":"us-east-1",
+      "type":"ec2.Instance",
+      "tags":[
+        {
+          "key":"env",
+          "value":"dev"
+        },
+        {
+          "key":"managed-by",
+          "value":"cloudformation"
+        }
+      ],
+      "rawData":{
+        "AmiLaunchIndex":0,
+        "Architecture":"x86_64",
+        "BlockDeviceMappings":[
+          {
+            "DeviceName":"/dev/xvda",
+            "Ebs":{
+              "AttachTime":"2022-06-16T23:25:00Z",
+              "DeleteOnTermination":true,
+              "Status":"attached",
+              "VolumeId":"vol-0f6ee55f46d5b5f65"
+            }
+          }
+        ],
+        "BootMode":"",
+        "ImageId":"ami-032930428bf1abbff",
+        "InstanceId":"i-0695984d3a9256cea"
+      },
+      "updatedAt":"2022-06-20T14:10:44.679424-07:00"
+    }
+  ]
+}
+```
+
+
 </details>
 <details>
 <summary>Get a resource</summary>
@@ -157,7 +339,11 @@ Example of queries:
 | ------------- | ------------- | ------------- |
 | id  | the resource id  | `id=i-024c4971f7f510c8f` return resource with the id `i-024c4971f7f510c8f`
 
-## List fields
+</details>
+<details>
+<summary>[Deprecated] List fields</summary>
+
+Deprecated: use "List resources" to get the fields.
 
 Return the list of fields available for filtering the resources.
 
@@ -248,27 +434,76 @@ Sample Responses:
 ```js
 // Engine completed successfully
 {
-  "resource_name":"engine",
-  "error_message":"",
-  "status":"success",
-  "fetched_at":"2022-06-07T19:53:10.570698+05:30"
+    "runId": "6fd67489-d852-4962-95bc-eea01159993f",
+    "eventType": "engine",
+    "status": "success",
+    "providerName": "",
+    "resourceType": "",
+    "error": "",
+    "createdAt": "2022-06-22T02:54:12.727066+05:30",
+    "updatedAt": "2022-06-22T02:54:25.458235+05:30",
+    "childEvents": [
+        {
+            "runId": "6fd67489-d852-4962-95bc-eea01159993f",
+            "eventType": "provider",
+            "status": "success",
+            "providerName": "aws",
+            "resourceType": "",
+            "error": "",
+            "createdAt": "2022-06-22T02:54:12.727395+05:30",
+            "updatedAt": "2022-06-22T02:54:13.979699+05:30",
+            "childEvents": null
+        },
+        {
+            "runId": "6fd67489-d852-4962-95bc-eea01159993f",
+            "eventType": "resource",
+            "status": "success",
+            "providerName": "AWS Provider for account 693658092572, region us-east-2",
+            "resourceType": "ec2.Volume",
+            "error": "",
+            "createdAt": "2022-06-22T02:54:13.980207+05:30",
+            "updatedAt": "2022-06-22T02:54:16.658743+05:30",
+            "childEvents": null
+        }
+    ]
 }
 
 // Engine is currently running
 {
-  "resource_name":"engine",
-  "error_message":"",
-  "status":"fetching",
-  "fetched_at":""
+    "runId": "6fd67489-d852-4962-95bc-eea01159993f",
+    "eventType": "engine",
+    "status": "failed",
+    "providerName": "",
+    "resourceType": "",
+    "error": "1 error message\n error message",
+    "createdAt": "2022-06-22T02:54:12.727066+05:30",
+    "updatedAt": "2022-06-22T02:54:25.458235+05:30",
+    "childEvents": [
+    {
+        "runId": "6fd67489-d852-4962-95bc-eea01159993f",
+        "eventType": "provider",
+        "status": "success",
+        "providerName": "aws",
+        "resourceType": "",
+        "error": "",
+        "createdAt": "2022-06-22T02:54:12.727395+05:30",
+        "updatedAt": "2022-06-22T02:54:13.979699+05:30",
+        "childEvents": null
+    },
+    {
+        "runId": "6fd67489-d852-4962-95bc-eea01159993f",
+        "eventType": "resource",
+        "status": "failed",
+        "providerName": "AWS Provider for account 693658092572, region us-east-2",
+        "resourceType": "ec2.Volume",
+        "error": "error message",
+        "createdAt": "2022-06-22T02:54:13.980207+05:30",
+        "updatedAt": "2022-06-22T02:54:16.658743+05:30",
+        "childEvents": null
+    }
+]
 }
 
-// Engine completed with some errors
-{
-  "resource_name":"engine",
-  "error_message":"Failed to get Load Balancer Resources.",
-  "status":"failed",
-  "fetched_at":"2022-06-07T19:53:10.570698+05:30"
-}
 ```
 
 If you need to know when the engine is done running, keep pulling this endpoint until the status is no longer **fetching**.

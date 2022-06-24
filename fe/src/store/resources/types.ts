@@ -2,7 +2,7 @@ import { Resource } from 'models/Resource';
 import { Tag } from 'models/Tag';
 
 export interface ResourceState {
-	resources: Resource[];
+	resources?: Resource[];
 	currentResource?: Resource;
 	sideMenuVisible: boolean;
 	count: number;

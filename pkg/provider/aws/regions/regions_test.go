@@ -2,6 +2,7 @@ package regions
 
 import (
 	"context"
+	_ "embed"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -119,4 +120,49 @@ func TestSelectRegions_promptCanceled(t *testing.T) {
 	regions, err := SelectRegions(ctx, nil, cfg)
 	assert.ErrorIs(t, err, context.Canceled)
 	assert.Empty(t, regions)
+}
+
+func TestSelectRegions_allMultiple(t *testing.T) {
+	ctx := context.Background()
+	cfg := aws.Config{}
+	configured := []string{"us-east-1", "all"}
+
+	regions, err := SelectRegions(ctx, configured, cfg)
+	assert.ErrorContains(t, err, "can only use 'all' as a region if it is the only configured region")
+	assert.Empty(t, regions)
+}
+
+//go:embed testdata/describe_regions_resp.xml
+var describeRegionsResponse []byte
+
+//go:embed testdata/get_caller_identity_resp.xml
+var getCallerIdentityResponse []byte
+
+func TestSelectRegions_all(t *testing.T) {
+	ctx := context.Background()
+	cfg := aws.Config{}
+	configured := []string{"all"}
+
+	httpClient := sequencedHttpClient{
+		clients: []aws.HTTPClient{
+			&mockedHttpClient{
+				contentType: "text/xml;charset=UTF-8",
+				body:        getCallerIdentityResponse,
+			},
+			&mockedHttpClient{
+				contentType: "text/xml;charset=UTF-8",
+				body:        describeRegionsResponse,
+			},
+		},
+	}
+
+	cfg.HTTPClient = &httpClient
+	cfg.Credentials = mockedCredentialsProvider{}
+
+	expected := []string{"us-east-1", "eu-west-1", "global"}
+
+	regions, err := SelectRegions(ctx, configured, cfg)
+	assert.NoError(t, err)
+	ids := regionIds(regions)
+	assert.ElementsMatch(t, expected, ids)
 }

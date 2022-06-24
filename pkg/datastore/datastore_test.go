@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hashicorp/go-multierror"
+
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore/testdata"
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -67,7 +69,7 @@ func TestReadWrite(t *testing.T) {
 			assert.NoError(t, datastore.WriteResources(ctx, []*model.Resource{}))
 			resourcesRead, err := datastore.GetResources(ctx, nil)
 			assert.NoError(t, err)
-			assert.Equal(t, model.ResourcesResponse{Count: 0, Resources: model.Resources{}}, resourcesRead)
+			assert.Equal(t, 0, resourcesRead.Count)
 
 			//write the resources
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
@@ -259,7 +261,7 @@ func TestSearchByQuery(t *testing.T) {
 			//test exclude - returns the resources without the tag release
 			query = `{
   "filter":{
-    "release": "(null)"
+    "release": "(missing)"
   }
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
@@ -271,8 +273,8 @@ func TestSearchByQuery(t *testing.T) {
 			//test 2 exclusions - the s3 bucket is the only one without both tags
 			query = `{
   "filter":{
-    "release": "(null)",
-    "debug:info": "(null)"
+    "release": "(missing)",
+    "debug:info": "(missing)"
   }
 }`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
@@ -347,8 +349,9 @@ func TestFields(t *testing.T) {
 			resources := testdata.GetResources(t)
 			assert.NoError(t, datastore.WriteResources(ctx, resources))
 
-			fields, err := datastore.GetFields(ctx)
-			//check fields
+			resourceResp, err := datastore.GetResources(ctx, nil)
+			assert.NoError(t, err)
+			fields := resourceResp.FieldGroups
 			assert.NoError(t, err)
 			//check number of groups
 			assert.Equal(t, 2, len(fields))
@@ -361,7 +364,7 @@ func TestFields(t *testing.T) {
 				Name:  "region",
 				Count: 3,
 				Values: model.FieldValues{
-					model.FieldValue{Value: "us-east-1", Count: 3},
+					&model.FieldValue{Value: "us-east-1", Count: "3"},
 				}}, *fields.FindField("core", "region"))
 
 			typeField := *fields.FindField("core", "type")
@@ -369,22 +372,22 @@ func TestFields(t *testing.T) {
 				Name:  "type",
 				Count: 3,
 				Values: model.FieldValues{
-					model.FieldValue{Value: "s3.Bucket", Count: 1},
-					model.FieldValue{Value: "test.Instance", Count: 2},
+					&model.FieldValue{Value: "s3.Bucket", Count: "1"},
+					&model.FieldValue{Value: "test.Instance", Count: "2"},
 				},
 			}, typeField)
 
 			//check that values are sorted by count desc
-			assert.Equal(t, typeField.Values[0].Count, 2)
-			assert.Equal(t, typeField.Values[1].Count, 1)
+			assert.Equal(t, typeField.Values[0].Count, "2")
+			assert.Equal(t, typeField.Values[1].Count, "1")
 
 			testingutil.AssertEqualsField(t, model.Field{
 				Name:  "team",
 				Count: 2,
 				Values: model.FieldValues{
-					model.FieldValue{Value: "infra", Count: 1},
-					model.FieldValue{Value: "dev", Count: 1},
-					model.FieldValue{Value: "(null)", Count: 1},
+					&model.FieldValue{Value: "infra", Count: "1"},
+					&model.FieldValue{Value: "dev", Count: "1"},
+					&model.FieldValue{Value: "(missing)", Count: "1"},
 				}}, *fields.FindField("tags", "team"))
 
 			//test long field
@@ -392,8 +395,8 @@ func TestFields(t *testing.T) {
 				Name:  tagMaxKey,
 				Count: 1,
 				Values: model.FieldValues{
-					model.FieldValue{Value: tagMaxValue, Count: 1},
-					model.FieldValue{Value: "(null)", Count: 2},
+					&model.FieldValue{Value: tagMaxValue, Count: "1"},
+					&model.FieldValue{Value: "(missing)", Count: "2"},
 				}}, *fields.FindField("tags", tagMaxKey))
 
 			//test the tag field called "region"
@@ -401,77 +404,60 @@ func TestFields(t *testing.T) {
 				Name:  "region",
 				Count: 1,
 				Values: model.FieldValues{
-					model.FieldValue{Value: "us-west-2", Count: 1},
-					model.FieldValue{Value: "(null)", Count: 2},
+					&model.FieldValue{Value: "us-west-2", Count: "1"},
+					&model.FieldValue{Value: "(missing)", Count: "2"},
 				}}, *fields.FindField("tags", "region"))
 
-		})
-	}
-}
+			//test that the fields count are updated when sending a filter
+			//only one resource has enabled=false
+			query := `{
+  "filter":{
+    "enabled": "false"
+  }
+}`
 
-func TestEngineStatus(t *testing.T) {
-	engineStatuses := testdata.GetEngineStatus(t)
-	ctx := context.Background()
-	mockResourceName := "mock_resource"
-	datastores, _ := newDatastores(t, ctx)
-	for _, datastore := range datastores {
-		name := fmt.Sprintf("%T", datastore)
-		t.Run(name, func(t *testing.T) {
-			err := datastore.WriteEngineStatusStart(ctx, mockResourceName)
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-
-			status, err := datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
+			resourceResp, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[0], status)
+			fields = resourceResp.FieldGroups
 
-			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, nil)
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
+			//check all groups and tags are returned
+			assert.Equal(t, 2, len(fields))
+			assert.Equal(t, 2, len(fields.FindGroup("core").Fields))
+			assert.Equal(t, 10, len(fields.FindGroup("tags").Fields))
 
-			status, err = datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
-			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[1], status)
+			//check the values were updated
+			testingutil.AssertEqualsField(t, model.Field{
+				Name:  "region",
+				Count: 1,
+				Values: model.FieldValues{
+					&model.FieldValue{Value: "us-east-1", Count: "1"},
+				}}, *fields.FindField("core", "region"))
 
-			err = datastore.WriteEngineStatusStart(ctx, mockResourceName)
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
+			//check the count are correct and if a value is excluded it shows as "-"
+			testingutil.AssertEqualsField(t, model.Field{
+				Name:  "team",
+				Count: 1,
+				Values: model.FieldValues{
+					&model.FieldValue{Value: "infra", Count: "-"},
+					&model.FieldValue{Value: "dev", Count: "1"},
+				}}, *fields.FindField("tags", "team"))
+			testingutil.AssertEqualsField(t, model.Field{
+				Name:  "enabled",
+				Count: 1,
+				Values: model.FieldValues{
+					&model.FieldValue{Value: "true", Count: "-"},
+					&model.FieldValue{Value: "false", Count: "1"},
+				}}, *fields.FindField("tags", "enabled"))
 
-			status, err = datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
-			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[0], status)
+			//check a tag that is not relevant is still showing with a 0 count, and a (missing) value
+			testingutil.AssertEqualsField(t, model.Field{
+				Name:  "unique-tag",
+				Count: 0,
+				Values: model.FieldValues{
+					&model.FieldValue{Value: "unique-i-123", Count: "-"},
+					&model.FieldValue{Value: "(missing)", Count: "1"},
+				}}, *fields.FindField("tags", "unique-tag"))
 
-			err = datastore.WriteEngineStatusEnd(ctx, mockResourceName, errors.New(engineStatuses[2].ErrorMessage))
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-
-			status, err = datastore.GetEngineStatus(ctx)
-			//do not test result if not implemented
-			if err != nil && err.Error() == "not implemented" {
-				return
-			}
-			//check stats
-			assert.NoError(t, err)
-			testingutil.AssertEqualsEngineStatus(t, engineStatuses[2], status)
 		})
 	}
 }
@@ -526,6 +512,13 @@ func TestUpdateResources(t *testing.T) {
 			//searching on deleting tag returns nothing
 			testQueryNoResult(t, ctx, ds, deletedTag.Key, deletedTag.Value)
 
+			//send 2 resources with same id
+			r1DuplicateId, err := ds.GetResource(ctx, resources[1].Id)
+			require.NoError(t, err)
+			r1DuplicateId.Id = r1.Id
+			//only 1 resource would be written without throwing an error
+			require.NoError(t, ds.WriteResources(ctx, model.Resources{r1, r1DuplicateId}))
+
 		})
 	}
 }
@@ -576,9 +569,9 @@ func TestPurgeResources(t *testing.T) {
 
 			//1nd run: write 3 resources
 			resources := testdata.GetResources(t)[:3]
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
 			require.NoError(t, ds.WriteResources(ctx, resources))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", nil))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			r1, err := ds.GetResource(ctx, resources[0].Id)
 			require.NoError(t, err)
 			r2, err := ds.GetResource(ctx, resources[1].Id)
@@ -588,9 +581,9 @@ func TestPurgeResources(t *testing.T) {
 			testQuery(t, ctx, ds, tagUniqueKey, tagUniqueValue, r1)
 
 			//2nd run: one resource is removed
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
 			require.NoError(t, ds.WriteResources(ctx, model.Resources{r2, r3}.Clean()))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", nil))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			resourcesRead, err := ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 2, resourcesRead.Count)
@@ -600,8 +593,8 @@ func TestPurgeResources(t *testing.T) {
 			testQueryUnrecognizedKey(t, ctx, ds, tagUniqueKey, tagUniqueValue)
 
 			//3rd run: an error happened - there is a built-in protection to not delete all resources
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", errors.New("an error happened")))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 2, resourcesRead.Count)
@@ -609,9 +602,9 @@ func TestPurgeResources(t *testing.T) {
 			testQuery(t, ctx, ds, "id", r2.Id, r2)
 
 			//4th run: add back the resource previously deleted
-			require.NoError(t, ds.WriteEngineStatusStart(ctx, "engine"))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventStart()))
 			require.NoError(t, ds.WriteResources(ctx, model.Resources{r2, r1, r3}.Clean()))
-			require.NoError(t, ds.WriteEngineStatusEnd(ctx, "engine", nil))
+			require.NoError(t, ds.WriteEvent(ctx, model.NewEngineEventEnd(nil)))
 			resourcesRead, err = ds.GetResources(ctx, nil)
 			require.NoError(t, err)
 			require.Equal(t, 3, resourcesRead.Count)
@@ -619,6 +612,210 @@ func TestPurgeResources(t *testing.T) {
 			testQuery(t, ctx, ds, tagUniqueKey, tagUniqueValue, r1)
 
 		})
+	}
+}
+
+func TestEngineStatus(t *testing.T) {
+	//failed-provider-failed-resource-status error declaration
+	var providerErrors, resourceErrors, multipleErrors *multierror.Error
+	providerErrors = multierror.Append(providerErrors, errors.New("mp2-error"))
+	resourceErrors = multierror.Append(resourceErrors, errors.New("mp1-mr3-error"))
+	multipleErrors = multierror.Append(multipleErrors, providerErrors)
+	multipleErrors = multierror.Append(multipleErrors, resourceErrors)
+
+	type args struct {
+		events model.Events
+	}
+	tests := []struct {
+		name     string
+		args     args
+		expected model.Event
+	}{
+		{
+			name: "success-status",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewProviderEventStart("mp1"),
+					model.NewProviderEventStart("mp2"),
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", nil),
+					model.NewResourceEventStart("mp1", "mr1"),
+					model.NewResourceEventStart("mp1", "mr2"),
+					model.NewResourceEventStart("mp1", "mr3"),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewResourceEventStart("mp2", "mr1"),
+					model.NewResourceEventStart("mp2", "mr2"),
+					model.NewResourceEventStart("mp2", "mr3"),
+					model.NewResourceEventEnd("mp2", "mr1", nil),
+					model.NewResourceEventEnd("mp2", "mr2", nil),
+					model.NewResourceEventEnd("mp2", "mr3", nil),
+					model.NewEngineEventEnd(nil),
+				},
+			},
+			expected: model.Event{
+				Type:   model.EventTypeEngine,
+				Status: model.EventStatusSuccess,
+				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", nil),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewResourceEventEnd("mp2", "mr1", nil),
+					model.NewResourceEventEnd("mp2", "mr2", nil),
+					model.NewResourceEventEnd("mp2", "mr3", nil),
+				},
+			},
+		},
+		{
+			name: "failed-provider-status",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewProviderEventStart("mp1"),
+					model.NewProviderEventStart("mp2"),
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
+					model.NewResourceEventStart("mp1", "mr1"),
+					model.NewResourceEventStart("mp1", "mr2"),
+					model.NewResourceEventStart("mp1", "mr3"),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewEngineEventEnd(errors.New("mp2-error")),
+				},
+			},
+			expected: model.Event{
+				Type:   model.EventTypeEngine,
+				Status: model.EventStatusFailed,
+				Error:  "mp2-error",
+				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+				},
+			},
+		},
+		{
+			name: "failed-provider-failed-resource-status",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewProviderEventStart("mp1"),
+					model.NewProviderEventStart("mp2"),
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
+					model.NewResourceEventStart("mp1", "mr1"),
+					model.NewResourceEventStart("mp1", "mr2"),
+					model.NewResourceEventStart("mp1", "mr3"),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", errors.New("mp1-mr3-error")),
+					model.NewEngineEventEnd(multipleErrors),
+				},
+			},
+			expected: model.Event{
+				Type:   model.EventTypeEngine,
+				Status: model.EventStatusFailed,
+				Error:  multipleErrors.Error(),
+				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", errors.New("mp1-mr3-error")),
+					model.NewProviderEventEnd("mp2", errors.New("mp2-error")),
+				},
+			},
+		},
+		{
+			name: "fetching-status",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewProviderEventStart("mp1"),
+					model.NewProviderEventStart("mp2"),
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", nil),
+					model.NewResourceEventStart("mp1", "mr1"),
+					model.NewResourceEventStart("mp1", "mr2"),
+					model.NewResourceEventStart("mp1", "mr3"),
+					model.NewResourceEventStart("mp1", "mr4"),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewResourceEventStart("mp2", "mr1"),
+					model.NewResourceEventStart("mp2", "mr2"),
+					model.NewResourceEventStart("mp2", "mr3"),
+					model.NewResourceEventEnd("mp2", "mr1", nil),
+					model.NewResourceEventEnd("mp2", "mr2", nil),
+					model.NewResourceEventEnd("mp2", "mr3", nil),
+				},
+			},
+			expected: model.Event{
+				Type:   model.EventTypeEngine,
+				Status: model.EventStatusFetching,
+				ChildEvents: model.Events{
+					model.NewProviderEventEnd("mp1", nil),
+					model.NewProviderEventEnd("mp2", nil),
+					model.NewResourceEventEnd("mp1", "mr1", nil),
+					model.NewResourceEventEnd("mp1", "mr2", nil),
+					model.NewResourceEventEnd("mp1", "mr3", nil),
+					model.NewResourceEventStart("mp1", "mr4"),
+					model.NewResourceEventEnd("mp2", "mr1", nil),
+					model.NewResourceEventEnd("mp2", "mr2", nil),
+					model.NewResourceEventEnd("mp2", "mr3", nil),
+				},
+			},
+		},
+		{
+			name: "success-status-no-provider",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewEngineEventEnd(nil),
+				},
+			},
+			expected: model.Event{
+				Type:        model.EventTypeEngine,
+				Status:      model.EventStatusSuccess,
+				ChildEvents: model.Events{},
+			},
+		},
+		{
+			name: "success-error-no-provider",
+			args: args{
+				events: model.Events{
+					model.NewEngineEventStart(),
+					model.NewEngineEventEnd(errors.New("engine-error")),
+				},
+			},
+			expected: model.Event{
+				Type:        model.EventTypeEngine,
+				Status:      model.EventStatusFailed,
+				ChildEvents: model.Events{},
+				Error:       "engine-error",
+			},
+		},
+	}
+	ctx := context.Background()
+	datastores, _ := newDatastores(t, ctx)
+	for _, ds := range datastores {
+		for _, test := range tests {
+			name := fmt.Sprintf("%T-%s", ds, test.name)
+			t.Run(name, func(t *testing.T) {
+				for _, event := range test.args.events {
+					require.NoError(t, ds.WriteEvent(ctx, event))
+				}
+				es, err := ds.EngineStatus(ctx)
+				require.NoError(t, err)
+				testingutil.AssertEvent(t, test.expected, es)
+			})
+		}
 	}
 }
 

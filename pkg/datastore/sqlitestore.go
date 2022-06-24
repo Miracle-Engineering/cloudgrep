@@ -26,6 +26,7 @@ type SQLiteStore struct {
 	//fetchedAt is the last time the resources were fetched
 	fetchedAt time.Time
 	lock      sync.Mutex
+	runId     string
 }
 
 func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logger) (*SQLiteStore, error) {
@@ -55,7 +56,7 @@ func NewSQLiteStore(ctx context.Context, cfg config.Config, zapLogger *zap.Logge
 	}
 
 	// Migrate the schema
-	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.EngineStatus{}); err != nil {
+	if err = s.db.AutoMigrate(&model.Resource{}, &model.Tag{}, &model.Event{}); err != nil {
 		return nil, fmt.Errorf("can't create the SQLite data model: %w", err)
 	}
 
@@ -163,7 +164,7 @@ func (s *SQLiteStore) Stats(context.Context) (model.Stats, error) {
 	return model.Stats{ResourcesCount: count}, nil
 }
 
-func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
+func (s *SQLiteStore) getResourceField(name string, ids []model.ResourceId) (model.Field, error) {
 	/*
 		SELECT DISTINCT `type` , count(*) as count
 		FROM `resources`
@@ -171,11 +172,12 @@ func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 		order by `type`
 		sort by `count` desc
 	*/
-	rows, err := s.db.Model(&model.Resource{}).Select(name, "count() as count").
+	query := s.db.Model(&model.Resource{}).
+		Select(name, "count() as count").
 		Distinct().
 		Group(name).
-		Order("count desc").
-		Rows()
+		Order("count desc")
+	rows, err := query.Rows()
 	if err != nil {
 		return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
 	}
@@ -183,7 +185,12 @@ func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 	field := model.Field{
 		Name: name,
 	}
+
+	//used to update count later
 	var totalCount int
+	//use a map for efficient access the field value by their value
+	fieldValuesMap := make(map[string]*model.FieldValue)
+
 	for rows.Next() {
 		var value string
 		var count int
@@ -191,42 +198,60 @@ func (s *SQLiteStore) getResourceField(name string) (model.Field, error) {
 		if err != nil {
 			return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
 		}
-		field.Values = append(field.Values, model.FieldValue{
+		fieldValue := model.FieldValue{
 			Value: value,
-			Count: count,
-		})
-		totalCount = totalCount + count
+		}
+		if len(ids) == 0 {
+			//we don't need to go back to the DB
+			fieldValue.Count = fmt.Sprint(count)
+			totalCount = totalCount + count
+		} else {
+			//the count would be updated based on filter
+			fieldValue.Count = model.CountValueIgnored
+		}
+		field.Values = append(field.Values, &fieldValue)
+		fieldValuesMap[value] = &fieldValue
 	}
+
+	//if there is some ids - do another call to update the counts for the current query
+	if len(ids) > 0 {
+		rows, err = query.Where("id in ?", ids).Rows()
+		if err != nil {
+			return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var value string
+			var count int
+			err = rows.Scan(&value, &count)
+			if err != nil {
+				return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
+			}
+			fieldValuesMap[value].Count = fmt.Sprint(count)
+			totalCount = totalCount + count
+		}
+	}
+
 	field.Count = totalCount
 	return field, nil
 }
 
-func (s *SQLiteStore) getTagFields() (model.Fields, error) {
-	fields, err := s.getTagKeys()
-	if err != nil {
-		return model.Fields{}, fmt.Errorf("can't get tag keys from database: %w", err)
-	}
-	var result model.Fields
-	for _, f := range fields {
-		values, err := s.getTagValues(f.Name)
-		if err != nil {
-			return nil, err
-		}
-		f.Values = values
-		result = append(result, f)
-	}
-	return result, nil
-}
+//return the list of tag fields sorted by most popular
+func (s *SQLiteStore) getTagFields(ids []model.ResourceId) (model.Fields, error) {
 
-func (s *SQLiteStore) getTagKeys() (model.Fields, error) {
-	/*
-		SELECT distinct(`key`), count() as count
-		FROM `tags`
-		group by key
-		order by count desc
-	*/
+	// the tricky part of this function is to always return the same fields containing all the values but with different count
+	// the fields are always visible to the user and are ordered by popularity - if we would change this list for every call the UI would look shaky
+
+	// so this is implemented in 3 steps:
+	//1. get all tags keys sorted by most frequent first
+	//2. get all tags values sorted by most frequent first
+	//3. update count to reflect the current query, which relates to subset of resources (ids params)
+
+	// Steps 1 & 2 ensure that all fields and values are returned in the same order
+	// Step 3 updates the count values
+
+	//1.  get all tags keys sorted by most frequent first
 	rows, err := s.db.Model(&model.Tag{}).Select("key", "count() as count").
-		Distinct().
 		Group("key").
 		Order("count desc").
 		Rows()
@@ -234,6 +259,8 @@ func (s *SQLiteStore) getTagKeys() (model.Fields, error) {
 		return model.Fields{}, fmt.Errorf("can't get tag keys from database: %w", err)
 	}
 	var fields model.Fields
+	//use a map for efficient access (the model is a slice)
+	mapFields := make(map[string]*model.Field)
 	defer rows.Close()
 	for rows.Next() {
 		var key string
@@ -243,59 +270,116 @@ func (s *SQLiteStore) getTagKeys() (model.Fields, error) {
 			return nil, err
 		}
 		field := model.Field{
-			Name:  key,
-			Count: count,
+			Name: key,
 		}
-		fields = append(fields, field)
+		if len(ids) == 0 {
+			//the current count is for all resources, use it
+			field.Count = count
+		}
+		mapFields[key] = &field
+		fields = append(fields, &field)
 	}
+
+	//2.  get all tags values sorted by most frequent first
+	rows, err = s.db.Raw("SELECT key, value, count() as count FROM tags group by key, value").Rows()
+	if err != nil {
+		return model.Fields{}, fmt.Errorf("can't get tag values from database: %w", err)
+	}
+	keyFunc := func(key, val string) string {
+		return fmt.Sprintf("%v:%v", key, val)
+	}
+	//use a map for efficient access
+	mapFieldsValue := make(map[string]*model.FieldValue)
+	defer rows.Close()
+	for rows.Next() {
+		var key string
+		var value string
+		var count int
+		err = rows.Scan(&key, &value, &count)
+		if err != nil {
+			return nil, err
+		}
+		//add the tag value
+		fieldVal := model.FieldValue{
+			Value: value,
+		}
+		if len(ids) == 0 {
+			//the current count is for all resources, use it
+			fieldVal.Count = fmt.Sprint(count)
+		} else {
+			//this value will be set using the ids
+			fieldVal.Count = "-"
+		}
+		field := mapFields[key]
+		field.Values = append(field.Values, &fieldVal)
+
+		//update map for fast access
+		mapFieldsValue[keyFunc(key, value)] = &fieldVal
+	}
+
+	if len(ids) == 0 {
+		//we are done, no need to get specific values
+		return fields, nil
+	}
+
+	//3. update count to reflect the current query
+	rows, err = s.db.Raw(`SELECT key, value, count() as count `+
+		`FROM tags `+
+		`Where resource_id in ? `+
+		`group by key, value`, ids).Rows()
+	if err != nil {
+		return model.Fields{}, fmt.Errorf("can't get tag values from database: %w", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var key string
+		var value string
+		var count int
+		err = rows.Scan(&key, &value, &count)
+		if err != nil {
+			return nil, err
+		}
+
+		//update the tag value
+		fieldValue := mapFieldsValue[keyFunc(key, value)]
+		fieldValue.Count = fmt.Sprint(count)
+
+		//updte the count of the field
+		field := mapFields[key]
+		field.Count = field.Count + count
+	}
+
 	return fields, nil
 }
 
-func (s *SQLiteStore) getTagValues(key string) (model.FieldValues, error) {
-	/*
-		SELECT distinct(`value`), count() as count
-		FROM `tags`
-		where key=?
-		group by value
-		order by count desc
-	*/
-	var values model.FieldValues
-	db := s.db.Model(&model.Tag{}).Select("value", "count() as count").
-		Distinct().
-		Where("key=?", key).
-		Group("value").
-		Order("count desc").
-		Find(&values)
-
-	if db.Error != nil {
-		return nil, fmt.Errorf("can't get tag value for key '%v' : %w", key, db.Error)
-	}
-	return values, nil
+//TODO remove this api
+func (s *SQLiteStore) GetFields(ctx context.Context) (model.FieldGroups, error) {
+	return s.getFields(ctx, nil)
 }
 
-func (s *SQLiteStore) GetFields(context.Context) (model.FieldGroups, error) {
+func (s *SQLiteStore) getFields(ctx context.Context, ids []model.ResourceId) (model.FieldGroups, error) {
 	var fieldGroups model.FieldGroups
 
 	//get core fields
 	coreGroup := model.FieldGroup{
-		Name: "core",
+		Name: model.FieldGroupCore,
 	}
 	for _, name := range []string{"region", "type"} {
-		field, err := s.getResourceField(name)
+		field, err := s.getResourceField(name, ids)
 		if err != nil {
 			return nil, err
 		}
-		coreGroup.Fields = append(coreGroup.Fields, field)
+		coreGroup.Fields = append(coreGroup.Fields, &field)
 	}
 	fieldGroups = append(fieldGroups, coreGroup)
 
 	//get tag fields
-	tagFields, err := s.getTagFields()
+	tagFields, err := s.getTagFields(ids)
 	if err != nil {
 		return nil, err
 	}
 	tagsGroup := model.FieldGroup{
-		Name:   "tags",
+		Name:   model.FieldGroupTags,
 		Fields: tagFields,
 	}
 	fieldGroups = append(fieldGroups, tagsGroup)
@@ -304,61 +388,28 @@ func (s *SQLiteStore) GetFields(context.Context) (model.FieldGroups, error) {
 }
 
 func (s *SQLiteStore) GetResources(ctx context.Context, jsonQuery []byte) (model.ResourcesResponse, error) {
-	ids, totalCount, err := s.indexer.findResourceIds(*s.db, s.logger, jsonQuery)
+	ids, totalCount, err := s.indexer.findResourceIds(*s.db, s.logger, jsonQuery, true)
 	if err != nil {
 		return model.ResourcesResponse{}, err
 	}
 	resources, err := s.getResourcesById(ctx, ids)
-	return model.ResourcesResponse{Count: totalCount, Resources: resources}, err
-}
-
-func (s *SQLiteStore) WriteEngineStatusStart(ctx context.Context, resource string) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	status := model.NewEngineStatus(model.EngineStatusFetching, resource, nil)
-	s.logger.Sugar().Infow("Writing Engine Status: ",
-		zap.Any("status", status),
-	)
-	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
-	if result.RowsAffected == 1 {
-		result = s.db.Model(&status).Updates(status)
-	} else {
-		result = s.db.Create(&status)
-	}
-	if result.Error != nil {
-		return fmt.Errorf("can't write engine status to database: %w", result.Error)
-	}
-	s.fetchedAt = time.Now()
-	return nil
-}
-
-func (s *SQLiteStore) WriteEngineStatusEnd(ctx context.Context, resource string, err error) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	var status model.EngineStatus
 	if err != nil {
-		status = model.NewEngineStatus(model.EngineStatusFailed, resource, err)
-	} else {
-		status = model.NewEngineStatus(model.EngineStatusSuccess, resource, nil)
+		return model.ResourcesResponse{}, err
 	}
-	result := s.db.Model(&model.EngineStatus{}).Find(&model.EngineStatus{}, [1]string{resource})
-	if result.RowsAffected == 1 {
-		result = s.db.Model(&status).Updates(status)
-	} else {
-		result = s.db.Create(&status)
+	//update field count to match current query
+	allIds := ids
+	if totalCount > len(ids) {
+		// the response is paginated, but we need all ids to show correct count
+		allIds, _, err = s.indexer.findResourceIds(*s.db, s.logger, jsonQuery, false)
+		if err != nil {
+			return model.ResourcesResponse{}, err
+		}
 	}
-	if result.Error != nil {
-		return fmt.Errorf("can't write engine status to database: %w", result.Error)
-	}
-
-	//once engine is complete, we delete all the resources that no longer exist
-	_, err = s.deleteResourcesBefore(s.fetchedAt)
+	fields, err := s.getFields(ctx, allIds)
 	if err != nil {
-		return err
+		return model.ResourcesResponse{}, err
 	}
-	return nil
+	return model.ResourcesResponse{Count: totalCount, Resources: resources, FieldGroups: fields}, nil
 }
 
 func deleteTags(db *gorm.DB, ids []model.ResourceId) error {
@@ -422,13 +473,57 @@ func (s *SQLiteStore) deleteResourcesBefore(before time.Time) (int, error) {
 	return int(rowsAffected), nil
 }
 
-func (s *SQLiteStore) GetEngineStatus(context.Context) (model.EngineStatus, error) {
+func (s *SQLiteStore) EngineStatus(ctx context.Context) (model.Event, error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
-	var status model.EngineStatus
-	db := s.db.Model(&model.EngineStatus{}).Select("*").Order("fetched_at desc").Last(&status)
-	if db.Error != nil {
-		return model.EngineStatus{}, fmt.Errorf("can't fetch engine status' : %w", db.Error)
+	var resourceEvents model.Events
+	result := s.db.
+		Model(&model.Event{}).
+		Order("created_at").
+		Find(&resourceEvents, model.Event{RunId: s.runId})
+	if result.Error != nil {
+		return model.Event{}, fmt.Errorf("error while reading event from database %w", result.Error)
 	}
-	return status, nil
+	if len(resourceEvents) == 0 {
+		//no event found
+		return model.Event{}, nil
+	}
+	engineEvent := resourceEvents[0]
+	engineEvent.ChildEvents = resourceEvents[1:]
+	return engineEvent, nil
+}
+
+func (s *SQLiteStore) WriteEvent(ctx context.Context, event model.Event) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	if event.Type == model.EventTypeEngine && event.Status == model.EventStatusFetching {
+		s.runId = event.RunId
+		s.fetchedAt = time.Now()
+	}
+	event.RunId = s.runId
+
+	var existingEvent model.Event
+	result := s.db.Model(&model.Event{}).
+		Find(&existingEvent, model.Event{
+			RunId:        s.runId,
+			Type:         event.Type,
+			ProviderName: event.ProviderName,
+			ResourceType: event.ResourceType,
+		})
+	if result.Error != nil {
+		return fmt.Errorf("error occured while fetching event from database %w", result.Error)
+	}
+	event.Id = existingEvent.Id
+	result = s.db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&event)
+	if result.Error != nil {
+		return fmt.Errorf("error occured while upserting events into database %w", result.Error)
+	}
+	//once engine is complete, we delete all the resources that no longer exist
+	if event.Type == model.EventTypeEngine && (event.Status == model.EventStatusFailed || event.Status == model.EventStatusSuccess) {
+		_, err := s.deleteResourcesBefore(s.fetchedAt)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -27,13 +27,22 @@ func (as AsyncSequencer) Run(ctx context.Context, ds datastore.Datastore, provid
 		for resourceType, fetchFunc := range newFetchFuncs {
 			wg.Add(1)
 			go func(fetchFunc provider.FetchFunc, provider provider.Provider, resourceType string) {
+				var fetchErrors *multierror.Error
 				defer wg.Done()
+				if err := ds.WriteEvent(ctx, model.NewResourceEventStart(provider.String(), resourceType)); err != nil {
+					fetchErrors = multierror.Append(fetchErrors, err)
+				}
 				err := fetchFunc(ctx, resourceChan)
 				if err != nil {
-					// TODO: Log the error in like the future error table in db or somehow tell the user in the UI idk figure it out
-					as.Logger.Sugar().Errorf("Received an error when trying to handle resource %v in provider %v: %v", resourceType, provider, err)
+					fetchErrors = multierror.Append(fetchErrors, err)
+				}
+				if err = ds.WriteEvent(ctx, model.NewResourceEventEnd(provider.String(), resourceType, err)); err != nil {
+					fetchErrors = multierror.Append(fetchErrors, err)
+				}
+				if fetchErrors.ErrorOrNil() != nil {
+					as.Logger.Sugar().Errorf("Received an error when trying to fetch resource  %v in provider %v: %v", resourceType, provider, fetchErrors)
 					errorLock.Lock()
-					errors = multierror.Append(errors, err)
+					errors = multierror.Append(errors, fetchErrors)
 					errorLock.Unlock()
 				}
 			}(fetchFunc, p, resourceType)

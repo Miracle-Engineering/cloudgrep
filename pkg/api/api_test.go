@@ -63,8 +63,7 @@ type mockApi struct {
 
 //runEngine simulates running the engine by writing resources to the datastore
 func (m *mockApi) runEngine(ctx context.Context) error {
-	//simulate running the engine
-	err := m.ds.WriteEngineStatusStart(ctx, "engine")
+	err := m.ds.WriteEvent(ctx, model.NewEngineEventStart())
 	if err != nil {
 		return err
 	}
@@ -77,7 +76,7 @@ func (m *mockApi) runEngine(ctx context.Context) error {
 	time.Sleep(10 * time.Millisecond)
 
 	defer func() {
-		err := m.ds.WriteEngineStatusEnd(ctx, "engine", err)
+		err := m.ds.WriteEvent(ctx, model.NewEngineEventEnd(err))
 		if err != nil {
 			log.Default().Println(err.Error())
 		}
@@ -92,7 +91,7 @@ func (m *mockApi) runEngine(ctx context.Context) error {
 
 func (m *mockApi) waitForEngine(status string) {
 	for {
-		statusResp, _ := m.ds.GetEngineStatus(m.ctx)
+		statusResp, _ := m.ds.EngineStatus(m.ctx)
 		if statusResp.Status == status {
 			break
 		}
@@ -172,6 +171,24 @@ func TestResourcesPostRoute(t *testing.T) {
 		require.Equal(t, http.StatusOK, w.Code)
 		require.Equal(t, 2, response.Count)
 		testingutil.AssertEqualsResources(t, model.Resources{resourceInst1, resourceInst2}, response.Resources)
+
+		//check a few fields
+		fields := response.FieldGroups
+		testingutil.AssertEqualsField(t, model.Field{
+			Name:  "team",
+			Count: 2,
+			Values: model.FieldValues{
+				&model.FieldValue{Value: "infra", Count: "1"},
+				&model.FieldValue{Value: "dev", Count: "1"},
+			}}, *fields.FindField("tags", "team"))
+		testingutil.AssertEqualsField(t, model.Field{
+			Name:  "type",
+			Count: 2,
+			Values: model.FieldValues{
+				&model.FieldValue{Value: "test.Instance", Count: "2"},
+				&model.FieldValue{Value: "s3.Bucket", Count: "-"},
+			}}, *fields.FindField("core", "type"))
+
 	})
 
 	t.Run("FilterEmpty", func(t *testing.T) {
@@ -271,12 +288,12 @@ func TestResourceRoute(t *testing.T) {
 	})
 }
 
-func TestFieldsRoute(t *testing.T) {
+func TestResourceFieldsRoute(t *testing.T) {
 	m := prepareApiUnitTest(t)
-	path := "/api/fields"
+	path := "/api/resources"
 
 	t.Run("Standard", func(t *testing.T) {
-		var response model.FieldGroups
+		var response model.ResourcesResponse
 		w := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", path, nil)
 		require.NoError(t, err)
@@ -284,12 +301,13 @@ func TestFieldsRoute(t *testing.T) {
 		require.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 		require.Equal(t, http.StatusOK, w.Code)
 		require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
-		require.Equal(t, len(response), 2)
+		fields := response.FieldGroups
+		require.Equal(t, len(fields), 2)
 		//check number of groups
-		require.Equal(t, 2, len(response))
+		require.Equal(t, 2, len(fields))
 		//check fields by group
-		require.Equal(t, 2, len(response.FindGroup("core").Fields))
-		require.Equal(t, 10, len(response.FindGroup("tags").Fields))
+		require.Equal(t, 2, len(fields.FindGroup("core").Fields))
+		require.Equal(t, 10, len(fields.FindGroup("tags").Fields))
 	})
 }
 
@@ -320,7 +338,7 @@ func TestRefreshPostRoute(t *testing.T) {
 		body := make(map[string]interface{})
 		require.NoError(t, json.Unmarshal(record.Body.Bytes(), &body))
 		require.Equal(t, "success", body["status"])
-		require.Equal(t, "", body["errorMessage"])
+		require.Equal(t, "", body["error"])
 	})
 
 	t.Run("Engine Error", func(t *testing.T) {
@@ -351,7 +369,7 @@ func TestRefreshPostRoute(t *testing.T) {
 		body := make(map[string]interface{})
 		require.NoError(t, json.Unmarshal(record.Body.Bytes(), &body))
 		require.Equal(t, "failed", body["status"])
-		require.Equal(t, "There was an engine error", body["errorMessage"])
+		require.Equal(t, "There was an engine error", body["error"])
 	})
 
 	t.Run("Engine Already Running", func(t *testing.T) {
@@ -385,6 +403,6 @@ func TestRefreshPostRoute(t *testing.T) {
 		body = make(map[string]interface{})
 		require.NoError(t, json.Unmarshal(record.Body.Bytes(), &body))
 		require.Equal(t, "fetching", body["status"])
-		require.Equal(t, "", body["errorMessage"])
+		require.Equal(t, "", body["error"])
 	})
 }

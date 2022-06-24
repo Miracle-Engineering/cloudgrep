@@ -3,29 +3,35 @@ import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import AccordionFilter from 'components/AccordionFilter';
 import { DARK_BLUE } from 'constants/colors';
 import { CHECKED_BY_DEFAULT, PAGE_LENGTH, PAGE_START } from 'constants/globals';
 import { Field, FieldGroup, ValueType } from 'models/Field';
 import { Tag } from 'models/Tag';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { getFilteredResources, getResources } from 'store/resources/thunks';
+import { getFilteredResources } from 'store/resources/thunks';
+import { setFilterTags } from 'store/tags/slice';
 
 import { accordionStyles, filterStyles, overrideSummaryClasses } from '../style';
 import { capitalize } from './helper';
 
 const InsightFilter: FC = () => {
 	const { fields } = useAppSelector(state => state.tags);
-	const [filterTags, setFilterTags] = useState<Tag[]>([]);
+	const [filterTags, setTags] = useState<Tag[]>([]);
 	const dispatch = useAppDispatch();
+	const isFirstRun = useRef(true);
 
 	useEffect(() => {
 		if (filterTags?.length) {
+			if (isFirstRun.current) {
+				isFirstRun.current = false;
+				return;
+			}
+
 			dispatch(getFilteredResources({ data: filterTags, offset: PAGE_START, limit: PAGE_LENGTH }));
-		} else if (filterTags?.length === 0) {
-			dispatch(getResources());
 		}
 	}, [dispatch, filterTags]);
 
@@ -38,9 +44,10 @@ const InsightFilter: FC = () => {
 					})
 				)
 			);
-			setFilterTags(tags);
+			setTags(tags);
+			dispatch(setFilterTags(tags));
 		}
-	}, [fields, filterTags?.length]);
+	}, [fields, filterTags?.length, dispatch]);
 
 	return (
 		<Box
@@ -74,6 +81,13 @@ const InsightFilter: FC = () => {
 						</AccordionDetails>
 					</Accordion>
 				))}
+				{!fields?.length && (
+					<Box
+						sx={{ display: 'flex', justifyContent: 'center', height: '100px', alignItems: 'center' }}
+						mt={1}>
+						{<CircularProgress color="primary" />}
+					</Box>
+				)}
 			</Box>
 		</Box>
 	);
