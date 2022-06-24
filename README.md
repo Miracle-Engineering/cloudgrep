@@ -17,7 +17,7 @@ Cloud Asset Explorer</p>
 
 </p>
 <p align="center">
-<a href="https://slack.cloudgrep.dev">
+<a href="https://join.slack.com/t/cloudgrep/shared_invite/zt-1bl7fewv4-_iwch50U_pP8S3YKBvyyQQ">
     Slack Community
   </a>
   </p>
