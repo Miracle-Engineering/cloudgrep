@@ -94,7 +94,7 @@ Example of queries:
 //return resources missing the tag "team"
 {
   "filter":{
-	  "team": "(null)"
+	  "team": "(missing)"
   }
 }
 

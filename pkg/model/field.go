@@ -5,19 +5,6 @@ import (
 	"strconv"
 )
 
-const (
-	//NullValue used in a query, means that the resource should not have this field defined
-	NullValue = "(null)"
-	//NullValue used in a query, means that the resource should have this field defined
-	NotNullValue = "(not null)"
-
-	//CountValueIgnored means that the current value is ignored in the current query
-	CountValueIgnored = "-"
-
-	FieldGroupCore = "core"
-	FieldGroupTags = "tags"
-)
-
 //FieldGroup regroups some fields. Ex: "Tags"
 type FieldGroup struct {
 	Name   string `json:"name"`
@@ -93,8 +80,8 @@ func (fgs FieldGroups) count() int {
 	return 0
 }
 
-//AddNullValues adds the (null) value for each Field, it is used by the API to allow filtering on resources without the field.
-// If a field is always defined (ex: type), do not include the (null) value as it would mean excluding all resources from a query.
+//AddNullValues adds the (missing) value for each Field, it is used by the API to allow filtering on resources without the field.
+// If a field is always defined (ex: type), do not include the (missing) value as it would mean excluding all resources from a query.
 func (fgs FieldGroups) AddNullValues() FieldGroups {
 	var result []FieldGroup
 	totalCount := fgs.count()
@@ -107,7 +94,7 @@ func (fgs FieldGroups) AddNullValues() FieldGroups {
 			if nullCount > 0 {
 				field.Values = append(field.Values,
 					&FieldValue{
-						Value: NullValue,
+						Value: FieldMissing,
 						Count: fmt.Sprint(nullCount),
 					})
 			}
