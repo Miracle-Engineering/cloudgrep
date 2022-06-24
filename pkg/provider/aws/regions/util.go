@@ -3,13 +3,11 @@ package regions
 import (
 	"context"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
-	"github.com/manifoldco/promptui"
 	awsutil "github.com/run-x/cloudgrep/pkg/provider/aws/util"
 )
 
@@ -24,8 +22,7 @@ func validatePromptInput(input string) error {
 	if input == All || IsValid(input) {
 		return nil
 	}
-
-	return fmt.Errorf("invalid AWS region code: %v please refer to https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions", input)
+	return fmt.Errorf("invalid AWS region code: '%v'\nPlease refer to https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions", input)
 }
 
 func promptForRegion(ctx context.Context) (string, error) {
@@ -36,22 +33,16 @@ func promptForRegion(ctx context.Context) (string, error) {
 		default:
 		}
 
-		prompt := promptui.Prompt{
-			Label:    "No default AWS region found, please specify one region code or \"all\"",
-			Validate: validatePromptInput,
+		fmt.Print("No default AWS region found, please specify one region code or \"all\": ")
+		var region string
+		fmt.Scanln(&region)
+
+		err := validatePromptInput(region)
+		if err == nil {
+			return region, nil
 		}
 
-		result, err := prompt.Run()
-
-		if err != nil {
-			if err == promptui.ErrInterrupt {
-				os.Exit(1)
-			}
-
-			fmt.Printf("Encountered issue with input: %v\nPlease try again", err)
-		} else {
-			return result, nil
-		}
+		fmt.Printf("Encountered issue with input: %v\nPlease try again\n", err)
 	}
 }
 

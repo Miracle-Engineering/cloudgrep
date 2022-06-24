@@ -10,16 +10,11 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func TestIsValid_global(t *testing.T) {
+func TestIsValid(t *testing.T) {
 	assert.True(t, IsValid("global"))
-}
-
-func TestIsValid_invalid(t *testing.T) {
 	assert.False(t, IsValid("foo"))
-}
-
-func TestIsValid_valid(t *testing.T) {
 	assert.True(t, IsValid("us-east-1"))
+	assert.True(t, IsValid("all"))
 }
 
 func TestSetConfigRegion_nilConfig(t *testing.T) {
