@@ -1,5 +1,5 @@
 <p align="center"><img src="https://user-images.githubusercontent.com/855699/172711194-43330c43-c13e-4b04-9e4a-11eabe8cf850.png" width="250"><br/>
-Cloud Tags Explorer</p>
+Cloud Asset Explorer</p>
 
 <p align="center">
   <a href="https://github.com/run-x/cloudgrep/releases/latest">
@@ -17,22 +17,22 @@ Cloud Tags Explorer</p>
 
 </p>
 <p align="center">
-<a href="https://slack.opta.dev">
+<a href="https://slack.cloudgrep.dev">
     Slack Community
-  </a> | <a href="mailto:info@runx.dev">
-    Email: info@runx.dev
   </a>
   </p>
 
 # What is Cloudgrep?
-Cloudgrep is an asset explorer for cloud resources. It shows you everything you're running on your cloud account(s) and enables you to slice and dice these based on tags. It is a UI tool built on open source technologies and runs completely client side (so no data leaves your machine).
+Cloudgrep is an asset explorer for cloud resources. It shows you everything you're running on your cloud account(s) and enables you to slice and dice these based on tags and properties. It is a UI tool built on open source technologies and runs completely client side (so no data leaves your machine).
 
 TBD - screenshot
 
 ### Why use Cloudgrep?
 Cloudgrep's goal is to help your team ensure every resource follows consistent tagging schema. It helps identify missing tags, misspellings and unowned resources. Consistent tagging leads to better cost attribution and faster incident resolution.
 
-If you'd like to try it out or have any questions - feel free to join our [TBD - Slack](https://slack.opta.dev/) or explore the [TBD - Getting Started Guide](https://docs.opta.dev/getting-started)!
+Additionally, Cloudgrep is a great tool to visualize all your resources in one place - across regions, accounts and clouds. 
+
+If you'd like to try it out or have any questions - feel free to join our [Slack](https://slack.cloudgrep.dev/) or download it from the [releases](https://github.com/run-x/cloudgrep/releases) section.
 
 
 <p align="center">
@@ -56,23 +56,19 @@ operating systems are available.
 
 # Basic Usage
 
-Cloudgrep is a web-based cloud resource browser executed in your local machine. You can find our latest release
-[here](https://github.com/run-x/cloudgrep/releases) on our release page -- simply download the zip named for your
-OS/spec (or let us know if you can't find yours).
-
-Cloudgrep works by using the cloud provider credentials (e.g. AWS) found in your cli to scan your cloud for data about
+Cloudgrep works by using the cloud provider credentials (e.g. AWS) found in your terminal to scan your cloud for data about
 your existing resources. For it to work, make sure you set such credentials properly (see
 [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html) for AWS). These, and a stable
 internet connection, are its only prerequisites.
 
-**NOTE: Cloudgrep only ever needs ReadOnly credentials-- it creates nothing, it modifies nothing. Moreover, it will
+**NOTE: Cloudgrep only needs ReadOnly credentials-- it creates nothing, it modifies nothing. Moreover, it will
 do a best effort scan based on its permission, so the user does not need to have read access to all resources.**
 
 Once downloaded, (and assuming you have AWS credentials properly configured in your CLI) you can start using cloudgrep
 immediately by executing the binary (no args needed) on your cli:
 
 ```bash
-cloudgrep
+./cloudgrep
 ```
 
 Cloudgrep will then run with the default behavior which does the following:
@@ -141,4 +137,4 @@ We love user contributions! Check out our [Dev guide](https://github.com/run-x/c
 
 # Important Resources
 * [The Cloudgrep Team](https://www.runx.dev/about)
-* [Check Out The Blog](https://blog.runx.dev/)
+* [Check Out our Blog](https://blog.runx.dev/)
