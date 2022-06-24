@@ -88,7 +88,15 @@ const Header = () => {
 						src={`${process.env.REACT_APP_PATH_PREFIX}/logo.png`}
 					/>
 				</Box>
-				<Box sx={{ display: 'flex', position: 'absolute', left: '20%', alignItems: 'center' }}>
+				<Box
+					sx={{
+						display: 'flex',
+						position: 'absolute',
+						left: '20%',
+						top: '0%',
+						height: '66px',
+						alignItems: 'center',
+					}}>
 					<Link ml={4} sx={menuItems} href={SLACK} underline="none" target="_blank" rel="noopener">
 						{t('SLACK')}
 					</Link>
