@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/run-x/cloudgrep/pkg/model"
@@ -13,19 +14,19 @@ func (p *Provider) register_iam_manual(mapping map[string]mapper) {
 	mapping["iam.User"] = mapper{
 		ServiceEndpointID: "iam",
 		FetchFunc:         p.fetch_iam_User,
-		IdField:           "UserId",
+		IdField:           "Arn",
 		IsGlobal:          true,
 	}
 	mapping["iam.InstanceProfile"] = mapper{
 		ServiceEndpointID: "iam",
 		FetchFunc:         p.fetch_iam_InstanceProfile,
-		IdField:           "InstanceProfileId",
+		IdField:           "Arn",
 		IsGlobal:          true,
 	}
 	mapping["iam.Role"] = mapper{
 		ServiceEndpointID: "iam",
 		FetchFunc:         p.fetch_iam_Role,
-		IdField:           "RoleId",
+		IdField:           "Arn",
 		IsGlobal:          true,
 	}
 }
