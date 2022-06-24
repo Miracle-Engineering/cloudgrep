@@ -64,17 +64,20 @@ func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]
 		return nil, err
 	}
 
+	identity, err := awsutil.VerifyCreds(ctx, defaultConfig)
+	if err != nil {
+		if err.Error() == "no AWS credentials found" {
+			err = fmt.Errorf("%w\nPlease set your AWS credentials using this guide: https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html", err)
+		}
+		return nil, err
+	}
+
 	regions, err := regionutil.SelectRegions(ctx, cfg.Regions, defaultConfig)
 	if err != nil {
 		return nil, fmt.Errorf("cannot select regions for AWS provider: %w", err)
 	}
 
 	regionutil.SetConfigRegion(&defaultConfig, regions)
-
-	identity, err := awsutil.VerifyCreds(ctx, defaultConfig)
-	if err != nil {
-		return nil, err
-	}
 	logger.Sugar().Infof("Using the following identity: %v", *identity.Arn)
 	logger.Sugar().Infof("Will look in regions %v", regions)
 	var providers []types.Provider
