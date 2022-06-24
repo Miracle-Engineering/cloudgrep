@@ -25,6 +25,7 @@ i18n.use(initReactI18next).init({
 				SEARCH: 'Search',
 				SEARCH_TERM: 'Search term',
 				REFRESH: 'Refresh',
+				REFRESHING: 'Refreshing',
 				DETAILS: 'Details',
 
 				// HEADER:

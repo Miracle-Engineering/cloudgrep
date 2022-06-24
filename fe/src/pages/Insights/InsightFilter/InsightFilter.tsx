@@ -85,7 +85,7 @@ const InsightFilter: FC = () => {
 					<Box
 						sx={{ display: 'flex', justifyContent: 'center', height: '100px', alignItems: 'center' }}
 						mt={1}>
-						{<CircularProgress />}
+						{<CircularProgress color="primary" />}
 					</Box>
 				)}
 			</Box>

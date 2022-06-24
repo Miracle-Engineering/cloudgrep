@@ -4,7 +4,7 @@ import { Resource, Resources } from 'models/Resource';
 import { ResourceState } from './types';
 
 const initialState: ResourceState = {
-	resources: [],
+	resources: undefined,
 	count: 0,
 	currentResource: undefined,
 	sideMenuVisible: false,
@@ -19,7 +19,7 @@ const resourcesSlice = createSlice({
 			state.count = action.payload.count;
 		},
 		addResources: (state, action: PayloadAction<Resource[]>) => {
-			state.resources = state.resources.concat(action.payload);
+			state.resources = (state.resources || []).concat(action.payload);
 		},
 		setCurrentResource: (state, action: PayloadAction<Resource>) => {
 			state.currentResource = action.payload;
