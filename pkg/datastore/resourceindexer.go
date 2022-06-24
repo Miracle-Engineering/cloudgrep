@@ -318,10 +318,21 @@ func (ri *resourceIndexer) writeResourceIndexes(ctx context.Context, db *gorm.DB
 	}
 
 	//create the rows to insert in memory
-	rows := make([]map[string]interface{}, len(resources))
+	var rows []map[string]interface{}
+	uniqueIds := make(map[model.ResourceId]*model.Resource)
 	var ids []model.ResourceId
-	for i, r := range resources {
+	for _, r := range resources {
 		row := make(map[string]interface{})
+		id := model.ResourceId(r.Id)
+		if rExist, found := uniqueIds[id]; found {
+			ri.logger.Warn("Found duplicate key",
+				zap.String("key", string(id)),
+				zap.Object("resource 1", rExist),
+				zap.Object("resource 2", r),
+			)
+			continue
+		}
+		uniqueIds[id] = r
 		ids = append(ids, model.ResourceId(r.Id))
 		row["id"] = r.Id
 		row["type"] = r.Type
@@ -331,7 +342,7 @@ func (ri *resourceIndexer) writeResourceIndexes(ctx context.Context, db *gorm.DB
 			//ex: row["Col23"]="Jordan"
 			row[ri.fieldColumns[tag.Key].ColumnName] = tag.Value
 		}
-		rows[i] = row
+		rows = append(rows, row)
 	}
 
 	//delete all previous resource_index if they exist
