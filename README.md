@@ -85,7 +85,7 @@ To view documentation for them, simply add the `--help` flag like so:
 ./cloudgrep --help
 ```
 
-## Advanced Usage
+# Advanced Usage
 Cloudgrep's behavior can further be configured via a user-inputted config yaml. Configs are then resolved at runtime by
 considering the cli arguments, the user-passed config  yaml, and the defaults in that order of precedence.
 
