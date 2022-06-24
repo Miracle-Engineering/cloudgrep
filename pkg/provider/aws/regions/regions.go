@@ -65,7 +65,7 @@ func SelectRegions(ctx context.Context, configuredRegions []string, awsConfig aw
 
 // IsValid returns true if the given region is recognized as valid.
 func IsValid(region string) bool {
-	if region == Global {
+	if region == Global || region == All {
 		return true
 	}
 
