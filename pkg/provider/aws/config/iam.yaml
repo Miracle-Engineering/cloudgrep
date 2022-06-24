@@ -1,22 +1,6 @@
 global: true
 
 types:
-  - name: InstanceProfile
-    listApi:
-      call: ListInstanceProfiles
-      pagination: true
-      outputKey: InstanceProfiles
-      id: InstanceProfileName
-    getTagsApi:
-      call: ListInstanceProfileTags
-      type: InstanceProfile
-      inputIDField: InstanceProfileId
-      tags: &tags
-        style: struct
-        pointer: true
-        field: Tags
-        key: Key
-        value: Value
   - name: OpenIDConnectProvider
     listApi:
       call: ListOpenIDConnectProviders
@@ -26,7 +10,12 @@ types:
       call: ListOpenIDConnectProviderTags
       type: OpenIDConnectProviderListEntry
       inputIDField: OpenIDConnectProviderArn
-      tags: *tags
+      tags: &tags
+        style: struct
+        pointer: true
+        field: Tags
+        key: Key
+        value: Value
   - name: Policy
     listApi:
       call: ListPolicies
@@ -41,17 +30,6 @@ types:
       call: ListPolicyTags
       inputIDField: PolicyArn
       tags: *tags
-  - name: Role
-    listApi:
-      call: ListRoles
-      pagination: true
-      outputKey: Roles
-      id: RoleId
-    getTagsApi:
-      type: Role
-      call: ListRoleTags
-      inputIDField: RoleName
-      tags: *tags
   - name: SAMLProvider
     listApi:
       call: ListSAMLProviders
@@ -61,17 +39,6 @@ types:
       call: ListSAMLProviderTags
       type: SAMLProviderListEntry
       inputIDField: SAMLProviderArn
-      tags: *tags
-  - name: User
-    listApi:
-      call: ListUsers
-      pagination: true
-      outputKey: Users
-      id: UserId
-    getTagsApi:
-      type: User
-      call: ListUserTags
-      inputIDField: UserName
       tags: *tags
   - name: VirtualMFADevice
     listApi:
