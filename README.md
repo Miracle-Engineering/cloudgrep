@@ -129,6 +129,11 @@ providers:
     regions: [us-east-1, global]
 ```
 
+# Supported resources
+
+<!-- MARKDOWN-AUTO-DOCS:START (JSON_TO_HTML_TABLE:src=./pkg/provider/aws/zz_integration_stats.json) -->
+<!-- MARKDOWN-AUTO-DOCS:END -->
+
 # Development
 
 We love user contributions! Check out our [Dev guide](https://github.com/run-x/cloudgrep/blob/main/DEVELOP.md) to get started.
