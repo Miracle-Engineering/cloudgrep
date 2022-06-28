@@ -22,6 +22,10 @@ type FakeProvider struct {
 var _ types.Provider = &FakeProvider{}
 var _ fmt.Stringer = &FakeProvider{}
 
+func (p *FakeProvider) Id() string {
+	return p.String()
+}
+
 func (p *FakeProvider) String() string {
 	if p.ID == "" {
 		return "fake"

@@ -11,6 +11,7 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/util/amplitude"
 
 	"go.uber.org/zap"
 
@@ -33,7 +34,7 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 	}
 
 	//send amplitude event
-	util.SendEvent(ctx, logger, util.BaseEvent, nil)
+	amplitude.SendEvent(logger, amplitude.Load, nil)
 
 	//init the storage to contain cloud data
 	var err error

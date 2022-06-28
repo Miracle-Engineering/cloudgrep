@@ -44,6 +44,7 @@ load-test:
 	go clean -testcache && go test ./loadtest/...
 
 pre-commit:
+	go mod tidy
 	@$(MAKE) -f $(THIS_FILE) format
 	@$(MAKE) -f $(THIS_FILE) lint
 	@$(MAKE) -f $(THIS_FILE) test

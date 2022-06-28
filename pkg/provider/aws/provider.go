@@ -25,6 +25,10 @@ func (p Provider) String() string {
 	return fmt.Sprintf("AWS Provider for account %v, region %v", p.accountId, p.region.ID())
 }
 
+func (p Provider) Id() string {
+	return p.accountId
+}
+
 func (p Provider) FetchFunctions() map[string]types.FetchFunc {
 	funcMap := make(map[string]types.FetchFunc)
 	for resourceType, mapping := range p.getTypeMapping() {

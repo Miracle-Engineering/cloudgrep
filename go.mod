@@ -54,6 +54,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.11.4 // indirect
 	github.com/benbjohnson/clock v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/denisbrodbeck/machineid v1.0.1 // direct
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect

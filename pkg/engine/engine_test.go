@@ -2,14 +2,17 @@ package engine
 
 import (
 	"context"
+	"testing"
+
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/provider"
+	providerutil "github.com/run-x/cloudgrep/pkg/testingutil/provider"
+	"github.com/run-x/cloudgrep/pkg/util/amplitude"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
-	"testing"
 )
 
 func TestNewEngine(t *testing.T) {
@@ -78,16 +81,67 @@ func TestEngineRun(t *testing.T) {
 		}
 		cfg.Datastore = datastoreConfigs
 
+		//test events send to amplitude
+		amplitudeClient := amplitude.UseMemoryClient()
+
 		ds, err := datastore.NewDatastore(ctx, cfg, zaptest.NewLogger(t))
 		require.NoError(t, err)
-		cfg.Providers = []config.Provider{}
+		cfg.Providers = []config.Provider{
+			{
+				Cloud:   "fake",
+				Regions: []string{"all}"},
+			},
+		}
+		provider.RegisterExtraProviders("fake", fakeProviders())
+
 		e, err := NewEngine(ctx, cfg, logger, ds)
 		require.NoError(t, err)
-		require.Equal(t, 0, len(e.Providers))
+		require.Equal(t, 2, len(e.Providers))
 		require.Equal(t, logger, e.Logger)
-		ts := &TestSequencer{Ran: false}
-		e.Sequencer = ts
 		require.NoError(t, e.Run(ctx))
-		require.True(t, ts.Ran)
+
+		//test resources created in the datastore
+		resp, err := ds.GetResources(ctx, nil)
+		assert.NoError(t, err)
+		//the fake providers produce this number of resources
+		assert.Equal(t, 3, len(resp.Resources))
+
+		//check the datadtore events are correct
+		engineStatus, err := ds.EngineStatus(ctx)
+		assert.NoError(t, err)
+		require.Equal(t, "success", engineStatus.Status)
+		require.Equal(t, "", engineStatus.Error)
+
+		//the engine sends one amplitude event per cloud
+		require.Equal(t, 1, amplitudeClient.Size())
+		event, err := amplitudeClient.LastEvent()
+		require.NoError(t, err)
+		require.Equal(t, "CLOUD_CONNECTION", event["event_type"])
+		require.Equal(t, "spam", event["event_properties"].(map[string]string)["CLOUD_ID"])
+
 	})
+}
+
+func fakeProviders() []provider.Provider {
+	fakeProviders := []*providerutil.FakeProvider{
+		{
+			ID: "spam",
+			Foo: providerutil.FakeProviderResourceConfig{
+				Count: 1,
+			},
+		},
+		{
+			ID: "ham",
+			Bar: providerutil.FakeProviderResourceConfig{
+				Count: 2,
+			},
+		},
+	}
+
+	providers := make([]provider.Provider, len(fakeProviders))
+	for idx, provider := range fakeProviders {
+		providers[idx] = provider
+	}
+
+	return providers
 }
