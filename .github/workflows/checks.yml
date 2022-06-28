@@ -123,27 +123,8 @@ jobs:
       - run: make awsgen
       - run: git diff --exit-code
 
-  check-changes:
-    name: check-changes
-    runs-on: ubuntu-latest
-    outputs:
-      markdown: ${{ steps.changes.outputs.markdown }}
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - uses: dorny/paths-filter@v2
-      id: changes
-      with:
-        filters: |
-          markdown:
-            - '**.md.tmpl'
-            - 'pkg/provider/aws/zz_integration_stats.json'
-
   markdowngen:
     name: markdowngen
-    needs: [check-changes]
-    if: "needs.check-changes.outputs.markdown"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
