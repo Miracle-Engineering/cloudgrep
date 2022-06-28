@@ -26,8 +26,8 @@ jobs:
       - name: Commit the markdown files
         # this will commit the changes in the current branch 
         run: |
-          # git config --global user.name 'Cloudgrep'
-          # git config --global user.email 'cloudgrep@users.noreply.github.com'
+          git config --global user.name 'Cloudgrep'
+          git config --global user.email 'cloudgrep@users.noreply.github.com'
           git add **.md
           if ! git diff-index --quiet HEAD; then
             git commit -am "Update markdown files"
