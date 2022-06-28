@@ -43,16 +43,9 @@ jobs:
       - run: make test
         env:
           CGO_ENABLED: 1
-      - name: Commit the list of supported resources
-        # this will commit the generated json changes in the current branch 
-        run: |
-          git config --global user.name 'Cloudgrep'
-          git config --global user.email 'cloudgrep@users.noreply.github.com'
-          git add pkg/provider/aws/zz_integration_stats.json
-          if ! git diff-index --quiet HEAD; then
-            git commit -am "Update integration stats file"
-            git push
-          fi
+      - name: Check zz_integration_stats.json is up to date
+        # zz_integration_stats.json needs to be committed if it has changed
+        run: git diff --exit-code
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
@@ -132,8 +125,6 @@ jobs:
 
   check-changes:
     name: check-changes
-    # detect what has changed, used as condition for other jobs
-    needs: [go-test]
     runs-on: ubuntu-latest
     outputs:
       markdown: ${{ steps.changes.outputs.markdown }}
@@ -155,23 +146,32 @@ jobs:
     if: "needs.check-changes.outputs.markdown"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          # use ref_name to have the latest commit if pushed by the test job
-          ref: ${{ github.ref_name }}
-      - uses: actions/setup-go@v2
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - run: go mod download
-      - run: make markdown
-      - name: Commit the markdown files
-        # this will commit the markdown changes in the current branch 
-        run: |
-          git config --global user.name 'Cloudgrep'
-          git config --global user.email 'cloudgrep@users.noreply.github.com'
-          git add **.md
-          if ! git diff-index --quiet HEAD; then
-            git commit -am "Update markdown files"
-            git push
-          fi
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          markdown:
+            - '**.md.tmpl'
+            - 'pkg/provider/aws/zz_integration_stats.json'
+    - uses: actions/setup-go@v2
+      if: steps.changes.outputs.markdown == 'true'
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - run: go mod download
+      if: steps.changes.outputs.markdown == 'true'
+    - run: make markdown
+      if: steps.changes.outputs.markdown == 'true'
+    - name: Commit the markdown files
+      if: steps.changes.outputs.markdown == 'true'
+      # this will commit the markdown changes in the current branch 
+      run: |
+        git config --global user.name 'Cloudgrep'
+        git config --global user.email 'cloudgrep@users.noreply.github.com'
+        git add **.md
+        if ! git diff-index --quiet HEAD; then
+          git commit -am "Update markdown files"
+          git push
+        fi
