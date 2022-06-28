@@ -22,6 +22,8 @@ jobs:
     name: go test
     runs-on: ubuntu-latest
     steps:
+      # TODO remove this print
+      - run:  env
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
