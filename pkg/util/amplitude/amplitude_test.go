@@ -26,11 +26,11 @@ func TestSendAmplitudeEvent(t *testing.T) {
 		wantEventType   string
 	}{
 		{
-			eventType:     Load,
+			eventType:     EventLoad,
 			wantEventType: "LOAD",
 		},
 		{
-			eventType:       CloudConnection,
+			eventType:       EventCloudConnection,
 			eventProperties: map[string]string{"CLOUD_ID": "0987654321"},
 			wantEventType:   "CLOUD_CONNECTION",
 		},
@@ -76,7 +76,7 @@ func TestSendAmplitudeEventErrors(t *testing.T) {
 	client := amplitudeClient{}
 
 	t.Run("TestSendAmplitudeEventDevVersion", func(t *testing.T) {
-		err := client.sendEventHTTP(logger, amplitudeUrl, Load, nil)
+		err := client.sendEventHTTP(logger, amplitudeUrl, EventLoad, nil)
 		assert.ErrorContains(t, err, "dev application, not sending events to amplitude")
 	})
 
@@ -93,7 +93,7 @@ func TestSendAmplitudeEventErrors(t *testing.T) {
 	})
 
 	t.Run("TestSendAmplitudeEventInvalidUri", func(t *testing.T) {
-		err := client.sendEventHTTP(logger, "localhost:8080/", Load, nil)
+		err := client.sendEventHTTP(logger, "localhost:8080/", EventLoad, nil)
 		require.ErrorContains(t, err, "failed to get amplitude response: Post \"localhost:8080/\": unsupported protocol scheme \"localhost\"")
 	})
 

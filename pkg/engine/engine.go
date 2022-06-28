@@ -42,7 +42,7 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 			e.Providers = append(e.Providers, providers...)
 			//send one amplitude event per cloud id (not one per region)
 			if len(providers) > 0 {
-				amplitude.SendEvent(logger, amplitude.CloudConnection, map[string]string{"CLOUD_ID": e.Providers[0].Id()})
+				amplitude.SendEvent(logger, amplitude.EventCloudConnection, map[string]string{"CLOUD_ID": e.Providers[0].Id()})
 			}
 		} else {
 			errors = multierror.Append(errors, err)

@@ -34,7 +34,7 @@ func Run(ctx context.Context, cfg config.Config, logger *zap.Logger) error {
 	}
 
 	//send amplitude event
-	amplitude.SendEvent(logger, amplitude.Load, nil)
+	amplitude.SendEvent(logger, amplitude.EventLoad, nil)
 
 	//init the storage to contain cloud data
 	var err error

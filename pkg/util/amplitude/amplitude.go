@@ -36,8 +36,8 @@ type amplitudeClient struct {
 const (
 	Invalid = "invalid"
 	//When adding an event here, also add it to the String() function above
-	Load EventType = iota
-	CloudConnection
+	EventLoad EventType = iota
+	EventCloudConnection
 )
 
 var (
@@ -46,9 +46,9 @@ var (
 
 func (s EventType) String() string {
 	switch s {
-	case Load:
+	case EventLoad:
 		return "LOAD"
-	case CloudConnection:
+	case EventCloudConnection:
 		return "CLOUD_CONNECTION"
 	}
 	return Invalid
@@ -149,7 +149,6 @@ func (amplitudeClient) sendEventHTTP(logger *zap.Logger, amplitudeUri string, ev
 	return nil
 }
 
-//TODO remove context?
 func (c amplitudeClient) SendEvent(logger *zap.Logger, eventType EventType, eventProperties map[string]string) {
 	go func() {
 		err := c.sendEventHTTP(logger, amplitudeUrl, eventType, eventProperties)
