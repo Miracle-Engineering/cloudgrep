@@ -15,11 +15,14 @@ usage:
 	@echo ""
 	@echo "Task                 : Description"
 	@echo "-----------------    : -------------------"
+	@echo "make awsgen          : Generate the AWS provider resource functions"
 	@echo "make clean           : Remove all build files and reset assets"
 	@echo "make build           : Generate build for current OS"
 	@echo "make format      	: Format code"
 	@echo "make frontend-build  : Build the frontend assets"
 	@echo "make frontend-deploy : Deploy the frontend assets"
+	@echo "make load-test       : Execute load test suite"
+	@echo "make markdown        : Generate the markdown files"
 	@echo "make release-linux   : Generate binaries for Linux"
 	@echo "make release-windows : Generate binaries for Windows"
 	@echo "make release-darwin  : Generate binaries for macOS"
@@ -27,7 +30,6 @@ usage:
 	@echo "make run-demo       	: Run the demo"
 	@echo "make setup           : Install all necessary dependencies"
 	@echo "make test            : Execute test suite"
-	@echo "make load-test       : Execute load test suite"
 	@echo "make version         : Show version"
 	@echo ""
 
@@ -156,3 +158,5 @@ clean:
 awsgen:
 	CGO_ENABLED=1 go run -race ./hack/awsgen --config pkg/provider/aws/config/config.yaml --output-dir pkg/provider/aws
 
+markdown:
+	go run script/markdowngen.go
