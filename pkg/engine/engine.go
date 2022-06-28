@@ -2,12 +2,14 @@ package engine
 
 import (
 	"context"
+
 	"github.com/hashicorp/go-multierror"
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/provider"
 	"github.com/run-x/cloudgrep/pkg/sequencer"
+	"github.com/run-x/cloudgrep/pkg/util/amplitude"
 	"go.uber.org/zap"
 )
 
@@ -31,13 +33,17 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 		if len(cfg.Regions) > 0 {
 			c.Regions = cfg.Regions
 		}
-		// create a providers
 		if err := datastore.WriteEvent(ctx, model.NewProviderEventStart(c.String())); err != nil {
 			errors = multierror.Append(errors, err)
 		}
+		// create the providers - one per region
 		providers, err := provider.NewProviders(ctx, c, logger)
 		if err == nil {
 			e.Providers = append(e.Providers, providers...)
+			//send one amplitude event per cloud id (not one per region)
+			if len(providers) > 0 {
+				amplitude.SendEvent(logger, amplitude.CloudConnection, map[string]string{"CLOUD_ID": e.Providers[0].Id()})
+			}
 		} else {
 			errors = multierror.Append(errors, err)
 		}
