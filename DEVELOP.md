@@ -36,6 +36,11 @@ make build
 make test
 ```
 
+```shell
+# run all the pre commit checks: lint, format and test
+make pre-commit
+```
+
 ## Frontend
 Checkout the frontend development guide [here](https://github.com/run-x/cloudgrep/blob/main/fe/README.md)
 
