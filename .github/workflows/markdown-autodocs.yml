@@ -1,22 +1,16 @@
 name: markdown-autodocs
 
 on:
-  # TODO remove this trigger - only for testing
   push:
+    # branches:
+    #   - '**'
 
-  # workflow_run:
-  #   workflows:
-  #     - Release
-  #   types:
-  #     - completed
-
-jobs:        
+jobs:
   auto-update-readme:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
-        - name: Markdown autodocs
-          uses: dineshsonachalam/markdown-autodocs@v1.0.4
-          with:
-            commit_message: Update resource lists
-            output_file_paths: '[./README.md]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Markdown autodocs
+        uses: dineshsonachalam/markdown-autodocs@v1.0.4
+        with:
+          commit_message: 'docs: Update README.md'
