@@ -42,6 +42,11 @@ func FetchResources[T types.Provider](ctx context.Context, t *testing.T, provide
 
 		funcResources = testingutil.ResourceFilterTagKeyValue(funcResources, "IntegrationTest", "true")
 
+		if len(funcResources) > 0 {
+			// Only count stats when we actually retrieve resources with populated tags
+			stats.track(name)
+		}
+
 		for _, resource := range funcResources {
 			resourceLock.Lock()
 			resources = append(resources, resource)

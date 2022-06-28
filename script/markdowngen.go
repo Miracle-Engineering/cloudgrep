@@ -51,7 +51,10 @@ func main() {
 
 		//generate the markdown file from the template
 		log.Default().Printf("Writing file %v", targetFile)
-		template.Must(template.ParseFiles(tmplFile)).Execute(f, data)
+		err = template.Must(template.ParseFiles(tmplFile)).Execute(f, data)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 }

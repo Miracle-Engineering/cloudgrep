@@ -2,8 +2,9 @@ name: checks
 
 on:
   push:
-    branches:
-      - main
+  #TODO restore this - only for testing
+    # branches:
+    #   - main
   pull_request:
 
 env:
@@ -42,6 +43,16 @@ jobs:
       - run: make test
         env:
           CGO_ENABLED: 1
+      - name: Commit the list of supported resources
+        # this will commit the generated json changes in the current branch 
+        run: |
+          git config --global user.name 'Cloudgrep'
+          git config --global user.email 'cloudgrep@users.noreply.github.com'
+          git add pkg/provider/aws/zz_integration_stats.json
+          if ! git diff-index --quiet HEAD; then
+            git commit -am "Update integration stats file"
+            git push
+          fi
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
@@ -118,3 +129,47 @@ jobs:
       - run: go mod download
       - run: make awsgen
       - run: git diff --exit-code
+
+  check-changes:
+    name: check-changes
+    # detect what has changed, used as condition for other jobs
+    needs: [go-test]
+    runs-on: ubuntu-latest
+    outputs:
+      markdown: ${{ steps.changes.outputs.markdown }}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          markdown:
+            - '**.md.tmpl'
+            - 'pkg/provider/aws/zz_integration_stats.json'
+
+  markdowngen:
+    name: markdowngen
+    needs: [check-changes]
+    if: "needs.check-changes.outputs.markdown"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - run: go mod download
+      - run: make markdown
+      - name: Commit the markdown files
+        # this will commit the markdown changes in the current branch 
+        run: |
+          git config --global user.name 'Cloudgrep'
+          git config --global user.email 'cloudgrep@users.noreply.github.com'
+          git add **.md
+          if ! git diff-index --quiet HEAD; then
+            git commit -am "Update markdown files"
+            git push
+          fi
