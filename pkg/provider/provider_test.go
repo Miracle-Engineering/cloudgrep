@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/config"
@@ -20,7 +21,10 @@ func TestNewProviders(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 
 	_, err := NewProviders(ctx, awsCfg, logger)
-	require.ErrorContains(t, err, "invalid AWS region: invalid-region")
+	//if it can connect, it will error with invalid AWS region
+	require.True(t,
+		strings.Contains(err.Error(), "invalid AWS region: invalid-region") ||
+			strings.Contains(err.Error(), "no AWS credentials found"))
 
 	fakeCfg := config.Provider{
 		Cloud: "fake",
