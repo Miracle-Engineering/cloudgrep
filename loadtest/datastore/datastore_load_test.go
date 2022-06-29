@@ -67,6 +67,13 @@ func TestLoad(t *testing.T) {
 			BatchSize: 100,
 			Queries:   200,
 		},
+		//simulate a large batch
+		{
+			Resources: 1200,
+			Tags:      50,
+			BatchSize: 1200,
+			Queries:   1,
+		},
 	}
 
 	for _, tc := range testCases {
