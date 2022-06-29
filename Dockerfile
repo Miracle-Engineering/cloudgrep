@@ -2,7 +2,6 @@
 ## Build
 ##
 
-# TODO once this repo is public we can simply wget the binary from the latest release instead of building it
 FROM golang:1.18-buster AS build
 
 ARG VERSION

@@ -2,7 +2,7 @@
 #
 # The path follows a pattern
 # ./dist/BUILD-ID_TARGET/BINARY-NAME
-source = ["./bin/cloudgrep_darwin_amd64"]
+source = ["./bin/darwin_amd64/cloudgrep"]
 bundle_id = "dev.runx.cloudgrep"
 zip {
   output_path = "./bin/cloudgrep_darwin_amd64.zip"
