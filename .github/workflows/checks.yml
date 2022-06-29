@@ -55,19 +55,12 @@ jobs:
           name: cloudgrep_darwin
 
       - run: |
-          echo "hi1"
-          ls -lh
-          echo "hi2"
-          mkdir -p ./bin/
-          echo "hi3"
+          mkdir -p ./bin/darwin_amd64
+          mkdir -p ./bin/darwin_arm64
           ls -lh ./bin/
-          echo "hi4"
-          cp *.zip ./bin/
-          echo "hi5"
-          unzip ./bin/\*.zip
-          echo "hi6"
-          rm -f ./bin/*.zip
-          echo "hi7"
+          unzip ./cloudgrep_darwin_amd64.zip -d ./bin/darwin_amd64
+          unzip ./cloudgrep_darwin_arm64.zip -d ./bin/darwin_arm64
+          rm -f ./*.zip
           ls -lh ./bin/
 
       - name: Import Code-Signing Certificates
