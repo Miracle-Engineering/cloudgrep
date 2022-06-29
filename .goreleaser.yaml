@@ -1,0 +1,145 @@
+builds:
+  - id: darwin-amd64
+    env:
+      - CGO_ENABLED=1
+      - CC=o64-clang
+      - CXX=o64-clang++
+    ldflags:
+      - "-s -w"
+      - "-X {{ .ModulePath }}/pkg/version.GitCommit={{ .ShortCommit }}"
+      - "-X {{ .ModulePath }}/pkg/version.BuildTime={{ .Date }}"
+      - "-X {{ .ModulePath }}/pkg/version.GoVersion={{ .Env.GO_VERSION }}"
+      - "-X {{ .ModulePath }}/pkg/version.Version={{ .Version }}"
+      - "-linkmode=external"
+    binary: "./{{ .Os }}_{{ .Arch }}/{{ .ProjectName }}"
+    no_unique_dist_dir: true
+    goos:
+      - darwin
+    goarch:
+      - amd64
+  - id: darwin-arm64
+    env:
+      - CGO_ENABLED=1
+      - CC=oa64-clang
+      - CXX=oa64-clang++
+    ldflags:
+      - "-s -w"
+      - "-X {{ .ModulePath }}/pkg/version.GitCommit={{ .ShortCommit }}"
+      - "-X {{ .ModulePath }}/pkg/version.BuildTime={{ .Date }}"
+      - "-X {{ .ModulePath }}/pkg/version.GoVersion={{ .Env.GO_VERSION }}"
+      - "-X {{ .ModulePath }}/pkg/version.Version={{ .Version }}"
+      - "-linkmode=external"
+    binary: "./{{ .Os }}_{{ .Arch }}/{{ .ProjectName }}"
+    no_unique_dist_dir: true
+    goos:
+      - darwin
+    goarch:
+      - arm64
+  - id: linux-amd64
+    env:
+      - CGO_ENABLED=1
+      - CC=gcc
+      - CXX=g++
+    ldflags:
+      - "-s -w"
+      - "-X {{ .ModulePath }}/pkg/version.GitCommit={{ .ShortCommit }}"
+      - "-X {{ .ModulePath }}/pkg/version.BuildTime={{ .Date }}"
+      - "-X {{ .ModulePath }}/pkg/version.GoVersion={{ .Env.GO_VERSION }}"
+      - "-X {{ .ModulePath }}/pkg/version.Version={{ .Version }}"
+    binary: "./{{ .Os }}_{{ .Arch }}/{{ .ProjectName }}"
+    no_unique_dist_dir: true
+    goos:
+      - linux
+    goarch:
+      - amd64
+  - id: linux-arm64
+    env:
+      - CGO_ENABLED=1
+      - CC=aarch64-linux-gnu-gcc
+      - CXX=aarch64-linux-gnu-g++
+    ldflags:
+      - "-s -w"
+      - "-X {{ .ModulePath }}/pkg/version.GitCommit={{ .ShortCommit }}"
+      - "-X {{ .ModulePath }}/pkg/version.BuildTime={{ .Date }}"
+      - "-X {{ .ModulePath }}/pkg/version.GoVersion={{ .Env.GO_VERSION }}"
+      - "-X {{ .ModulePath }}/pkg/version.Version={{ .Version }}"
+      - "-linkmode=external"
+    binary: "./{{ .Os }}_{{ .Arch }}/{{ .ProjectName }}"
+    no_unique_dist_dir: true
+    goos:
+      - linux
+    goarch:
+      - arm64
+  - id: windows-amd64
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-w64-mingw32-gcc
+      - CXX=x86_64-w64-mingw32-g++
+      - CC_FOR_TARGET=x86_64-w64-mingw32-gcc
+    ldflags:
+      - "-s -w"
+      - "-X {{ .ModulePath }}/pkg/version.GitCommit={{ .ShortCommit }}"
+      - "-X {{ .ModulePath }}/pkg/version.BuildTime={{ .Date }}"
+      - "-X {{ .ModulePath }}/pkg/version.GoVersion={{ .Env.GO_VERSION }}"
+      - "-X {{ .ModulePath }}/pkg/version.Version={{ .Version }}"
+      - "-linkmode=external"
+    binary: "./{{ .Os }}_{{ .Arch }}/{{ .ProjectName }}"
+    no_unique_dist_dir: true
+    goos:
+      - windows
+    goarch:
+      - amd64
+  - id: windows-386
+    env:
+      - CGO_ENABLED=1
+      - CC=i686-w64-mingw32-gcc
+      - CXX=i686-w64-mingw32-g++
+      - CC_FOR_TARGET=i686-w64-mingw32-gcc
+    ldflags:
+      - "-s -w"
+      - "-X {{ .ModulePath }}/pkg/version.GitCommit={{ .ShortCommit }}"
+      - "-X {{ .ModulePath }}/pkg/version.BuildTime={{ .Date }}"
+      - "-X {{ .ModulePath }}/pkg/version.GoVersion={{ .Env.GO_VERSION }}"
+      - "-X {{ .ModulePath }}/pkg/version.Version={{ .Version }}"
+      - "-linkmode=external"
+    binary: "./{{ .Os }}_{{ .Arch }}/{{ .ProjectName }}"
+    no_unique_dist_dir: true
+    goos:
+      - windows
+    goarch:
+      - "386"
+archives:
+  - id: darwin
+    builds:
+      - darwin-amd64
+      - darwin-arm64
+    wrap_in_directory: true
+    replacements:
+      darwin: Darwin
+      amd64: x86_64
+  - id: linux-windows
+    builds:
+      - linux-amd64
+      - linux-arm64
+      - windows-amd64
+      - windows-386
+    format: zip
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    files:
+      - LICENSE
+dist: bin
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

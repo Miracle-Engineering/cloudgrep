@@ -23,9 +23,6 @@ usage:
 	@echo "make frontend-deploy : Deploy the frontend assets"
 	@echo "make load-test       : Execute load test suite"
 	@echo "make markdown        : Generate the markdown files"
-	@echo "make release-linux   : Generate binaries for Linux"
-	@echo "make release-windows : Generate binaries for Windows"
-	@echo "make release-darwin  : Generate binaries for macOS"
 	@echo "make run           	: Run using local code"
 	@echo "make run-demo       	: Run the demo"
 	@echo "make setup           : Install all necessary dependencies"
@@ -82,61 +79,6 @@ build: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
 build:
 	go build -race -ldflags "$(LDFLAGS)"
 	@echo "You can now execute ./cloudgrep"
-
-release-windows: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GITHUB_SHA)
-release-windows: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
-release-windows: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
-release-windows: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
-release-windows:
-	@echo "Building binary for 386."
-	@CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ CC_FOR_TARGET=i686-w64-mingw32-gcc GOOS=windows GOARCH=386 go build \
-		-ldflags "$(LDFLAGS) -extld=i686-w64-mingw32-gcc" \
-		-o "./bin/cloudgrep_windows_386.exe"
-
-	@echo "Building binary for amd64."
-	@CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CC_FOR_TARGET=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 go build \
-		-ldflags "$(LDFLAGS) -extld=x86_64-w64-mingw32-gcc" \
-		-o "./bin/cloudgrep_windows_amd64.exe"
-
-	@echo "\nPackaging binaries...\n"
-	@./script/package.sh
-
-release-linux: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GITHUB_SHA)
-release-linux: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
-release-linux: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
-release-linux: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
-release-linux:
-	@echo "Building binaries..."
-	@CGO_ENABLED=1 gox \
-		-osarch "$(LINUX_TARGETS)" \
-		-ldflags "$(LDFLAGS)" \
-		-output "./bin/cloudgrep_{{.OS}}_{{.Arch}}"
-
-	@echo "Building Linux ARM64 binaries..."
-	CC="/usr/bin/aarch64-linux-gnu-gcc" CGO_ENABLED=1 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_linux_arm64_v7"
-
-	@echo "\nPackaging binaries...\n"
-	@./script/package.sh
-
-release-darwin: LDFLAGS += -X $(PKG)/pkg/version.GitCommit=$(GITHUB_SHA)
-release-darwin: LDFLAGS += -X $(PKG)/pkg/version.BuildTime=$(BUILD_TIME)
-release-darwin: LDFLAGS += -X $(PKG)/pkg/version.GoVersion=$(GO_VERSION)
-release-darwin: LDFLAGS += -X $(PKG)/pkg/version.Version=$(VERSION)
-release-darwin: LDFLAGS += "-linkmode=external"
-release-darwin:
-	@echo "Building Darwin ARM64 binary"
-	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=arm64 GOOS=darwin \
-		go build -ldflags "$(LDFLAGS)" -o "./bin/cloudgrep_darwin_arm64"
-
-	@echo "Building Darwin AMD64 binary..."
-	CGO_LDFLAGS="-L/usr/lib" CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin \
-		go build -ldflags "$(LDFLAGS)"  -o "./bin/cloudgrep_darwin_amd64"
-
-	@echo "Signing Darwin ARM64 binary..."
-	gon gon_arm64.hcl
-
-	@echo "Signing Darwin AMD64 binary..."
-	gon gon_amd64.hcl
 
 docker-build:
 	docker build --no-cache -t $(DOCKER_RELEASE_TAG) .

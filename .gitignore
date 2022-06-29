@@ -48,3 +48,4 @@ terraform.rc
 # except for the demo DB which is committed
 !demo/demo.db
 !demo/setup/original-dump.db
+
