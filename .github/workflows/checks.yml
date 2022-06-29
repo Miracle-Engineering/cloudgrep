@@ -27,7 +27,7 @@ jobs:
       - name: Get Tags
         run: git fetch --prune --unshallow --tags
 
-      - name: Build Release Artifacts for Linux
+      - name: Build Release Artifacts for Darwin
         id: build
         run: |
           ./build.sh --debug --id darwin-amd64 --id darwin-arm64
@@ -55,12 +55,19 @@ jobs:
           name: cloudgrep_darwin
 
       - run: |
+          echo "hi1"
           ls -lh
+          echo "hi2"
           mkdir -p ./bin/
+          echo "hi3"
           ls -lh ./bin/
+          echo "hi4"
           cp *.zip ./bin/
+          echo "hi5"
           unzip ./bin/\*.zip
+          echo "hi6"
           rm -f ./bin/*.zip
+          echo "hi7"
           ls -lh ./bin/
 
       - name: Import Code-Signing Certificates
