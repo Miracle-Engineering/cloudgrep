@@ -141,7 +141,7 @@ func (s *SQLiteStore) WriteResources(ctx context.Context, resources model.Resour
 				return err
 			}
 
-			// Create or Update all rows
+			// Create or Update the resource rows
 			result := tx.Clauses(clause.OnConflict{UpdateAll: true}).Create(batch)
 			s.logger.Sugar().Infow("Writting resources: ", zap.Int64("count", result.RowsAffected))
 
