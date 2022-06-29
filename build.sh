@@ -30,7 +30,11 @@ for directory in $(find $DIR -mindepth 1 -maxdepth 1 -type d)
 do
   echo "Archiving ${directory}..."
   relative_name=`basename ${directory}`
-  fin=$directory/cloudgrep
+  if [[ $relative_name == windows* ]]; then
+    fin=$directory/cloudgrep.exe
+  else
+    fin=$directory/cloudgrep
+  fi
   fout=$DIR/cloudgrep_${relative_name}.zip
   zip -9 -q -j $fout $fin
 done
