@@ -17,6 +17,48 @@ permissions:
   id-token: write
 
 jobs:
+  build-linux-dev:
+    name: Build Darwin Binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Tags
+        run: git fetch --prune --unshallow --tags
+
+      - name: Build Release Artifacts for Darwin
+        id: build
+        run: |
+          ./build.sh --debug --id linux-amd64 --id linux-arm64
+
+      - name: Upload darwin artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: cloudgrep_linux
+          path: ./bin/*.zip
+
+  build-windows-dev:
+    name: Build Darwin Binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Tags
+        run: git fetch --prune --unshallow --tags
+
+      - name: Build Release Artifacts for Darwin
+        id: build
+        run: |
+          ./build.sh --debug --id windows-amd64 --id windows-386
+
+      - name: Upload darwin artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: cloudgrep_windows
+          path: ./bin/*.zip
+
   build-macos-dev:
     name: Build Darwin Binaries
     runs-on: ubuntu-latest
