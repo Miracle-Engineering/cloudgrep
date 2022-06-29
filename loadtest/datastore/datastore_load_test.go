@@ -59,13 +59,20 @@ func TestLoad(t *testing.T) {
 			BatchSize: 1,
 			Queries:   1,
 		},
-		//this is the load test
+		//this is the primary load test
 		{
 			Resources: 2000,
 			//total includes the mandatory fields (region, type) and should be under 2000
 			Tags:      1996,
 			BatchSize: 100,
 			Queries:   200,
+		},
+		//simulate a large batch
+		{
+			Resources: 1200,
+			Tags:      50,
+			BatchSize: 1200,
+			Queries:   1,
 		},
 	}
 
