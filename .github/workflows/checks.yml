@@ -2,9 +2,8 @@ name: checks
 
 on:
   push:
-  #TODO restore this - only for testing
-    # branches:
-    #   - main
+    branches:
+      - main
   pull_request:
 
 env:
@@ -129,6 +128,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
+        ref: ${{ github.event.pull_request.head.ref }}
         fetch-depth: 0
     - uses: dorny/paths-filter@v2
       id: changes
@@ -137,6 +137,7 @@ jobs:
           markdown:
             - '**.md.tmpl'
             - 'pkg/provider/aws/zz_integration_stats.json'
+            - 'pkg/config/config.yaml'
     - uses: actions/setup-go@v2
       if: steps.changes.outputs.markdown == 'true'
       with:
