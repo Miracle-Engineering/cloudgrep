@@ -13,7 +13,7 @@ env:
   AWS_REGION: us-east-1
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
@@ -42,6 +42,9 @@ jobs:
       - run: make test
         env:
           CGO_ENABLED: 1
+      - name: Check zz_integration_stats.json is up to date
+        # zz_integration_stats.json needs to be committed if it has changed
+        run: git diff --exit-code
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
@@ -118,3 +121,39 @@ jobs:
       - run: go mod download
       - run: make awsgen
       - run: git diff --exit-code
+
+  markdowngen:
+    name: markdowngen
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+        fetch-depth: 0
+    - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          markdown:
+            - '**.md.tmpl'
+            - 'pkg/provider/aws/zz_integration_stats.json'
+            - 'pkg/config/config.yaml'
+    - uses: actions/setup-go@v2
+      if: steps.changes.outputs.markdown == 'true'
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - run: go mod download
+      if: steps.changes.outputs.markdown == 'true'
+    - run: make markdown
+      if: steps.changes.outputs.markdown == 'true'
+    - name: Commit the markdown files
+      if: steps.changes.outputs.markdown == 'true'
+      # this will commit the markdown changes in the current branch 
+      run: |
+        git config --global user.name 'Cloudgrep'
+        git config --global user.email 'cloudgrep@users.noreply.github.com'
+        git add **.md
+        if ! git diff-index --quiet HEAD; then
+          git commit -am "Update markdown files"
+          git push
+        fi
