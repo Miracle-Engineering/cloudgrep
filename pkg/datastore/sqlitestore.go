@@ -12,11 +12,19 @@ import (
 
 	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/run-x/cloudgrep/pkg/util"
 	"go.uber.org/zap"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
+)
+
+const (
+	//how many resources can be inserted at one time
+	//the main concern is Maximum Length Of An SQL Statement (1,000,000 bytes)
+	//https://www.sqlite.org/limits.html
+	batchSize = 100
 )
 
 type SQLiteStore struct {
@@ -124,30 +132,30 @@ func (s *SQLiteStore) WriteResources(ctx context.Context, resources model.Resour
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	var count int64
-	err := s.db.Transaction(func(tx *gorm.DB) error {
-		//delete all the previously stored tags if any
-		ids := resources.Ids()
-		if err := deleteTags(tx, ids); err != nil {
-			return err
+	batches := util.Chunks(resources, batchSize)
+	for _, batch := range batches {
+		err := s.db.Transaction(func(tx *gorm.DB) error {
+			//delete all the previously stored tags if any
+			ids := model.ResourceIds(batch)
+			if err := deleteTags(tx, ids); err != nil {
+				return err
+			}
+
+			// Create or Update all rows
+			result := tx.Clauses(clause.OnConflict{UpdateAll: true}).Create(batch)
+			s.logger.Sugar().Infow("Writting resources: ", zap.Int64("count", result.RowsAffected))
+
+			// Create or Update the resource indexes
+			if err := s.indexer.writeResourceIndexes(ctx, tx, batch); err != nil {
+				return err
+			}
+			return result.Error
+		})
+		if err != nil {
+			return fmt.Errorf("can't write resources to database: %w", err)
 		}
-
-		// Create or Update all columns
-		result := tx.Clauses(clause.OnConflict{UpdateAll: true}).Create(resources)
-		count = result.RowsAffected
-
-		// Create or Update the resource indexes
-		if err := s.indexer.writeResourceIndexes(ctx, tx, resources); err != nil {
-			return err
-		}
-		return result.Error
-	})
-
-	s.logger.Sugar().Infow("Writting resources: ", zap.Int64("count", count))
-
-	if err != nil {
-		return fmt.Errorf("can't write resources to database: %w", err)
 	}
+
 	return nil
 }
 

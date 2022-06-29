@@ -59,8 +59,12 @@ func (rs Resources) FindById(id string) *Resource {
 }
 
 func (rs Resources) Ids() []ResourceId {
-	ids := make([]ResourceId, len(rs))
-	for i, r := range rs {
+	return ResourceIds(rs)
+}
+
+func ResourceIds(resources []*Resource) []ResourceId {
+	ids := make([]ResourceId, len(resources))
+	for i, r := range resources {
 		ids[i] = ResourceId(r.Id)
 	}
 	return ids
