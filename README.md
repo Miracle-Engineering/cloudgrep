@@ -1,3 +1,8 @@
+<!---
+Warning: This markdown file is generated, do not edit manually.
+Instead edit `README.md.tmpl` and run `make markdown`
+-->
+
 <p align="center"><img src="https://user-images.githubusercontent.com/855699/172711194-43330c43-c13e-4b04-9e4a-11eabe8cf850.png" width="250"><br/>
 Cloud Asset Explorer</p>
 
@@ -85,20 +90,25 @@ To view documentation for them, simply add the `--help` flag like so:
 ./cloudgrep --help
 ```
 
+To specify the regions, you can use the `--regions` flag.
+```bash
+cloudgrep --regions us-east-1,us-west-2
+```
+
 # Advanced Usage
 Cloudgrep's behavior can further be configured via a user-inputted config yaml. Configs are then resolved at runtime by
-considering the cli arguments, the user-passed config  yaml, and the defaults in that order of precedence.
+considering the cli arguments, the user-passed config yaml, and the defaults in that order of precedence.
 
 The config yaml can be passed in by using the `-c` or `--config` flag as follows:
 
 ```bash
 cloudgrep -c my_config.yaml
 ```
-The path is relative to the current working directory. Cloudgrep expects the follow possible values in the yaml
-(you do not need to markdown all if passing the file as it will always try to default to the original behavior):
+
+Here is the annotated config file, you only need to define this file if you wish to change the default values.
 
 ```yaml
-# This config represents all the user-configurable settings for cloudgrep:
+# This config represents all the user-configurable settings for cloudgrep and their default values
 # https://github.com/run-x/cloudgrep/blob/main/pkg/config/config.yaml
 
 # web represents the specs cloudgrep uses for creating the webapp server
@@ -119,20 +129,62 @@ datastore:
   #  skipRefresh determines whether to refresh the data (i.e. scan the cloud) on startup.
   skipRefresh: false
   # dataSourceName is the Type-specific data source name or uri for connecting to the desired data source
-  dataSourceName: "~/cloudgrep_data.db"
+  # default: use memory DB - no data stored locally
+  dataSourceName: "file::memory:?cache=shared"
+  # use a file DB - the data is persisted on your disk
+  # dataSourceName: "~/cloudgrep_data.db"
 
 # providers represents the cloud providers cloudgrep will scan w/ the current credentials
 providers:
   - cloud: aws # cloud is the type of the cloud provider (currently only AWS is supported)
     # regions is the list of different regions within the cloud provider to scan
-    # The special "all" region can be specified by itself to scan all available regions
-    regions: [us-east-1, global]
+    # default: use the default AWS region set in your terminal
+    # ex: use one region
+    # regions: [us-east-1]
+    # ex: use one region + global some resources like S3 Bucket are not region specific
+    # regions: [us-east-1, global]
+    # ex: use "all" region to scan all available regions
+    # regions: [all]
 ```
 
 # Supported resources
 
-<!-- MARKDOWN-AUTO-DOCS:START (JSON_TO_HTML_TABLE:src=./pkg/provider/aws/zz_integration_stats.json) -->
-<!-- MARKDOWN-AUTO-DOCS:END -->
+- autoscaling.AutoScalingGroup
+- cloudfront.Distribution
+- ec2.Address
+- ec2.Image
+- ec2.Instance
+- ec2.KeyPair
+- ec2.LaunchTemplate
+- ec2.NatGateway
+- ec2.NetworkAcl
+- ec2.NetworkInterface
+- ec2.RouteTable
+- ec2.SecurityGroup
+- ec2.Snapshot
+- ec2.Subnet
+- ec2.Volume
+- ec2.Vpc
+- eks.Cluster
+- eks.Nodegroup
+- elasticache.CacheCluster
+- elb.LoadBalancer
+- iam.InstanceProfile
+- iam.OpenIDConnectProvider
+- iam.Policy
+- iam.Role
+- iam.User
+- iam.VirtualMFADevice
+- lambda.Function
+- rds.DBCluster
+- rds.DBClusterSnapshot
+- rds.DBInstance
+- rds.DBSnapshot
+- route53.HealthCheck
+- route53.HostedZone
+- s3.Bucket
+- sns.SNS
+- sqs.Queue
 
 # Development
 
