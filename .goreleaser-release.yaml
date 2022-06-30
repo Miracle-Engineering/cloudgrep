@@ -75,7 +75,7 @@ release:
     **Full Changelog**: https://github.com/run-x/cloudgrep/compare/{{ .PreviousTag }}...{{ .Tag }}
     ## What to do next?
     - Read the [documentation](https://github.com/run-x/cloudgrep/)
-    - Join our [Slack Workspace](https://slack.cloudgrep.dev/)
+    - Join our [Slack Workspace](https://join.slack.com/t/cloudgrep/shared_invite/zt-1bl7fewv4-_iwch50U_pP8S3YKBvyyQQ)
 brews:
   - tap:
       owner: run-x

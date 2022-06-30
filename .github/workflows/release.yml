@@ -96,7 +96,7 @@ jobs:
     name: Create release
     needs: [bumpr,build-macos,build-linux,build-windows]
     if: "!needs.bumpr.outputs.skip"
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.url }}
 
