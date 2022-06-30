@@ -16,6 +16,7 @@
 cloudgrep
 bin
 tmp/
+TMP.md
 __debug_bin
 
 # visual studio
@@ -49,3 +50,4 @@ terraform.rc
 !demo/demo.db
 !demo/setup/original-dump.db
 
+dist/

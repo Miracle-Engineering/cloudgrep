@@ -35,6 +35,6 @@ do
   else
     fin=$directory/cloudgrep
   fi
-  fout=$DIR/cloudgrep_${relative_name}.zip
+  fout=$DIR/${relative_name}.zip
   zip -9 -q -j $fout $fin
 done

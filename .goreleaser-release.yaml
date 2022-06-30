@@ -1,0 +1,103 @@
+builds:
+  - id: darwin-amd64-prebuilt
+    goos:
+      - darwin
+    goarch:
+      - amd64
+    goamd64:
+      - v3
+    builder: prebuilt
+    prebuilt:
+      path: bin/darwin_amd64/cloudgrep
+    hooks:
+      post: gon gon_amd64.hcl
+  - id: darwin-arm64-prebuilt
+    goos:
+      - darwin
+    goarch:
+      - arm64
+    builder: prebuilt
+    prebuilt:
+      path: bin/darwin_arm64/cloudgrep
+    hooks:
+      post: gon gon_arm64.hcl
+  - id: linux-amd64-prebuilt
+    goos:
+      - linux
+    goarch:
+      - amd64
+    goamd64:
+      - v3
+    builder: prebuilt
+    prebuilt:
+      path: bin/linux_amd64/cloudgrep
+  - id: linux-arm64-prebuilt
+    builder: prebuilt
+    goos:
+      - linux
+    goarch:
+      - arm64
+    prebuilt:
+      path: bin/linux_arm64/cloudgrep
+  - id: windows-amd64-prebuilt
+    builder: prebuilt
+    goos:
+      - windows
+    goarch:
+      - amd64
+    goamd64:
+      - v3
+    prebuilt:
+      path: bin/windows_amd64/cloudgrep.exe
+  - id: windows-386-prebuilt
+    builder: prebuilt
+    goos:
+      - windows
+    goarch:
+      - "386"
+    prebuilt:
+      path: bin/windows_386/cloudgrep.exe
+archives:
+  -
+    format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - src: LICENSE
+      - src: README.md
+dist: dist
+release:
+  draft: true
+  mode: keep-existing
+  extra_files:
+    - glob: ./dist/cloudgrep_darwin_amd64.zip
+    - glob: ./dist/cloudgrep_darwin_arm64.zip
+  footer: |
+    **Full Changelog**: https://github.com/run-x/cloudgrep/compare/{{ .PreviousTag }}...{{ .Tag }}
+    ## What to do next?
+    - Read the [documentation](https://github.com/run-x/cloudgrep/)
+    - Join our [Slack Workspace](https://slack.cloudgrep.dev/)
+brews:
+  - tap:
+      owner: run-x
+      name: homebrew-tap
+    folder: Formula
+    goamd64: v3
+    homepage:  https://github.com/run-x/cloudgrep
+    description: Cloudgrep is an asset explorer for cloud resources
+    license: Apache
+    test: |
+      system "#{bin}/cloudgrep version"
+    dependencies:
+      - name: go
+        type: optional
+      - name: git
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

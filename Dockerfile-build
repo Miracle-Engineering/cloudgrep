@@ -1,4 +1,4 @@
 FROM ghcr.io/goreleaser/goreleaser-cross:v1.18.3
 
 RUN rm /usr/bin/goreleaser
-RUN go install github.com/juandiegopalomino/goreleaser@v1.9.2-beta.1
+RUN go install github.com/juandiegopalomino/goreleaser@v1.9.2-beta.2
