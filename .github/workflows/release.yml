@@ -112,6 +112,9 @@ jobs:
           if_true: ${{ github.ref }}
           if_false: ${{ needs.bumpr.outputs.next_version }}
 
+      - name: Get Tags
+        run: git fetch --prune --unshallow --tags
+
       # retrieve the darwin binaries built in the linux job
       - uses: actions/download-artifact@v2
         with:
