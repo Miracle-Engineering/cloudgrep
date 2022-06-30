@@ -4,10 +4,10 @@
 # ./dist/BUILD-ID_TARGET/BINARY-NAME
 source = ["./bin/darwin_arm64/cloudgrep"]
 bundle_id = "dev.runx.cloudgrep"
-zip {
-  output_path = "./bin/cloudgrep_darwin_arm64.zip"
+dmg {
+  output_path = "./dist/cloudgrep_darwin_arm64.dmg"
+  volume_name = "cloudgrep"
 }
-
 apple_id {
   password = "@env:AC_PASSWORD"
 }

@@ -108,30 +108,6 @@ builds:
       - windows
     goarch:
       - "386"
-archives:
-  - id: darwin
-    builds:
-      - darwin-amd64
-      - darwin-arm64
-    wrap_in_directory: true
-    replacements:
-      darwin: Darwin
-      amd64: x86_64
-  - id: linux-windows
-    builds:
-      - linux-amd64
-      - linux-arm64
-      - windows-amd64
-      - windows-386
-    format: zip
-    replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
-    files:
-      - LICENSE
 dist: bin
 checksum:
   name_template: 'checksums.txt'

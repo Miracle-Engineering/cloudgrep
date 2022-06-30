@@ -40,7 +40,7 @@ Cloudgrep's goal is to help engineering teams ensure every resource follows cons
 
 Additionally, Cloudgrep is a great tool to visualize all cloud resources in a single place - across regions, accounts and providers. 
 
-Try it out by downloading the latest [release](https://github.com/run-x/cloudgrep/releases)! For any questions, feel free to join our [Slack workspace](https://slack.cloudgrep.dev/).
+Try it out by downloading the latest [release](https://github.com/run-x/cloudgrep/releases)! For any questions, feel free to join our [Slack workspace](https://join.slack.com/t/cloudgrep/shared_invite/zt-1bl7fewv4-_iwch50U_pP8S3YKBvyyQQ).
 
 
 <p align="center">

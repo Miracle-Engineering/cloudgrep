@@ -92,17 +92,35 @@ jobs:
           name: cloudgrep_darwin
           path: ./bin/*.zip
 
-  notarize-macos:
-    name: Build macOS
-    runs-on: macos-latest
-    needs: [ build-macos,bumpr ]
+  release:
+    name: Create release
+    needs: [bumpr,build-macos,build-linux,build-windows]
     if: "!needs.bumpr.outputs.skip"
+    runs-on: macos-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.url }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Get Tags
-        run: git fetch --prune --unshallow --tags
+      - name: Get tag name
+        id: tag
+        uses: haya14busa/action-cond@v1
+        with:
+          cond: "${{ startsWith(github.ref, 'refs/tags/') }}"
+          if_true: ${{ github.ref }}
+          if_false: ${{ needs.bumpr.outputs.next_version }}
+
+      # retrieve the darwin binaries built in the linux job
+      - uses: actions/download-artifact@v2
+        with:
+          name: cloudgrep_linux
+
+        # retrieve the darwin binaries built in the windows job
+      - uses: actions/download-artifact@v2
+        with:
+          name: cloudgrep_windows
 
       # retrieve the darwin binaries built in the linux job
       - uses: actions/download-artifact@v2
@@ -110,11 +128,21 @@ jobs:
           name: cloudgrep_darwin
 
       - run: |
+          mkdir ./bin/
+          ls -lh ./bin/
           mkdir -p ./bin/darwin_amd64
           mkdir -p ./bin/darwin_arm64
+          mkdir -p ./bin/linux_amd64
+          mkdir -p ./bin/linux_arm64
+          mkdir -p ./bin/windows_amd64
+          mkdir -p ./bin/windows_386
           ls -lh ./bin/
-          unzip ./cloudgrep_darwin_amd64.zip -d ./bin/darwin_amd64
-          unzip ./cloudgrep_darwin_arm64.zip -d ./bin/darwin_arm64
+          unzip ./darwin_amd64.zip -d ./bin/darwin_amd64
+          unzip ./darwin_arm64.zip -d ./bin/darwin_arm64
+          unzip ./linux_amd64.zip -d ./bin/linux_amd64
+          unzip ./linux_arm64.zip -d ./bin/linux_arm64
+          unzip ./windows_amd64.zip -d ./bin/windows_amd64
+          unzip ./windows_386.zip -d ./bin/windows_386
           rm -f ./*.zip
           ls -lh ./bin/
 
@@ -131,69 +159,15 @@ jobs:
           brew tap mitchellh/gon
           brew install mitchellh/gon/gon
 
-      - name: Build Mac OS
-        id: build
-        run: |
-          gon gon_amd64.hcl
-          gon gon_arm64.hcl
-        env:
-          AC_USERNAME: ${{ secrets.AC_USERNAME }}
-          AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v3
         with:
-          name: cloudgrep_darwin_notarized
-          path: ./bin/*.zip
+          install-only: true
+          distribution: goreleaser-pro
+          version: latest
 
-  release:
-    name: Create release
-    needs: [bumpr,notarize-macos,build-linux,build-windows]
-    if: "!needs.bumpr.outputs.skip"
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.url }}
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Get tag name
-      id: tag
-      uses: haya14busa/action-cond@v1
-      with:
-        cond: "${{ startsWith(github.ref, 'refs/tags/') }}"
-        if_true: ${{ github.ref }}
-        if_false: ${{ needs.bumpr.outputs.next_version }}
-
-    # retrieve the darwin binaries built in the linux job
-    - uses: actions/download-artifact@v2
-      with:
-        name: cloudgrep_linux
-
-      # retrieve the darwin binaries built in the windows job
-    - uses: actions/download-artifact@v2
-      with:
-        name: cloudgrep_windows
-
-    # retrieve the darwin binaries built in the mac-os job
-    - uses: actions/download-artifact@v2
-      with:
-        name: cloudgrep_darwin_notarized
-
-    - run: |
-          mkdir ./bin/
-          cp *.zip ./bin/
-          ls -lh ./bin/
-
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ steps.tag.outputs.value }}
-        generate_release_notes: true
-        files: |
-          ./bin/*.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Create Release
+        run: goreleaser release -f .goreleaser-release.yaml --rm-dist --debug
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
