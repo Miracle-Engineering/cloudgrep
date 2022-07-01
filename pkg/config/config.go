@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"gopkg.in/yaml.v2"
+	"os"
 	"strings"
 )
 
@@ -72,4 +73,20 @@ func GetDefault() (Config, error) {
 	}
 	config.Regions = []string{}
 	return config, err
+}
+
+func LoadFromFile(file string) (Config, error) {
+	cfg, err := GetDefault()
+	if err != nil {
+		return cfg, err
+	}
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return cfg, err
+	}
+	if err != nil {
+		return cfg, err
+	}
+	err = yaml.UnmarshalStrict(data, &cfg)
+	return cfg, err
 }

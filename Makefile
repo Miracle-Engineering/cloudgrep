@@ -24,7 +24,6 @@ usage:
 	@echo "make load-test       : Execute load test suite"
 	@echo "make markdown        : Generate the markdown files"
 	@echo "make run           	: Run using local code"
-	@echo "make run-demo       	: Run the demo"
 	@echo "make setup           : Install all necessary dependencies"
 	@echo "make test            : Execute test suite"
 	@echo "make version         : Show version"
@@ -50,9 +49,6 @@ pre-commit:
 
 run:
 	go run -race main.go
-
-run-demo:
-	go run -race main.go  --config demo/demo.yaml
 
 version:
 	@go run -race main.go --version

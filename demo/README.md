@@ -24,7 +24,7 @@ Some interesting facts about the demo account:
 The cloudgrep demo database has been captured so you can run the cloudgrep demo account without an AWS account.
 
 ```
-./cloudgrep --config demo/demo.yaml
+./cloudgrep demo
 ```
 
 ## Interesting use cases to demo
