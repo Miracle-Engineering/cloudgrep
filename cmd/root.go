@@ -92,7 +92,7 @@ their cloud accounts.`,
 
 	flags := rootCmd.Flags()
 
-	flags.StringVarP(&rO.config, "config", "c", "", "Config file (default is $HOME/.cloudgrep.yaml)")
+	flags.StringVarP(&rO.config, "config", "c", "", "Config file (default is https://github.com/run-x/cloudgrep/blob/main/pkg/config/config.yaml)")
 	flags.StringVar(&rO.bind, "bind", "", "Host to bind on")
 	flags.StringVarP(&rO.regions, "regions", "r", "", "Comma separated list of regions to scan, or \"all\"")
 	flags.IntVarP(&rO.port, "port", "p", 0, "Port to use")
