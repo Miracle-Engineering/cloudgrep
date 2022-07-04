@@ -28,7 +28,12 @@ const bodyRow: CSSProperties = {
 	color: BLACK_ROW,
 };
 
-export const tableStyles = { hoverStyle, headerStyle, bodyRow };
+const regionRow: CSSProperties = {
+	...bodyRow,
+	whiteSpace: 'nowrap',
+}
+
+export const tableStyles = { hoverStyle, headerStyle, bodyRow, regionRow };
 
 export const overrideSummaryClasses = {
 	content: 'summary_content',
