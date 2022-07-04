@@ -31,7 +31,7 @@ const bodyRow: CSSProperties = {
 const regionRow: CSSProperties = {
 	...bodyRow,
 	whiteSpace: 'nowrap',
-}
+};
 
 export const tableStyles = { hoverStyle, headerStyle, bodyRow, regionRow };
 
