@@ -122,9 +122,12 @@ jobs:
       - run: go mod download
       - run: make awsgen
       - run: git diff --exit-code
+
   markdowngen:
     name: markdowngen
+    runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v3
     - name: Setup Node.js environment
       uses: actions/setup-node@v3.3.0
     - name: Downgrade doctoc version
