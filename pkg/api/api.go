@@ -99,20 +99,6 @@ func Stats(c *gin.Context) {
 	c.JSON(200, stats)
 }
 
-// Fields Return the list of fields available for filtering the resources
-func Fields(c *gin.Context) {
-	logger := c.MustGet("logger").(*zap.Logger)
-	logger.Sugar().Warn("API /fields is deprecated use /resources instead to get the fields")
-
-	ds := c.MustGet("datastore").(datastore.Datastore)
-	resourceResp, err := ds.GetResources(c, nil)
-	if err != nil {
-		badRequest(c, err)
-		return
-	}
-	c.JSON(200, resourceResp.FieldGroups)
-}
-
 //EngineStatus returns the status of the engine
 func EngineStatus(c *gin.Context) {
 	ds := c.MustGet("datastore").(datastore.Datastore)
