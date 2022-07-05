@@ -33,7 +33,8 @@ const Header = () => {
 	const handleStatus = async () => {
 		const response = await RefreshService.getStatus();
 		if (response.data.status === EngineStatusEnum.FAILED) {
-			setErrorMessage(response.data.errorMessage);
+			setErrorMessage(response.data.error);
+			setIsRefreshing(false);
 		} else if (response.data.status === EngineStatusEnum.SUCCESS) {
 			setEngineStatus(response.data);
 		} else if (response.data.status === EngineStatusEnum.FETCHING) {
