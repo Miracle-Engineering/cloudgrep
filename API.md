@@ -503,7 +503,6 @@ Sample Responses:
     }
 ]
 }
-
 ```
 
 If you need to know when the engine is done running, keep pulling this endpoint until the status is no longer **fetching**.
