@@ -60,7 +60,11 @@ Demo video</i></span>
 
 # Installation
 
-- [Precompiled binaries](https://github.com/run-x/cloudgrep/releases) for supported
+- Mac:
+  ```bash
+  brew install run-x/tap/cloudgrep
+  ```
+- Or use [Precompiled binaries](https://github.com/run-x/cloudgrep/releases) for supported
 operating systems are available.
 
 # Basic Usage
@@ -73,7 +77,7 @@ do a best effort scan based on available permissions, so the user does not need 
 
 Once downloaded, just execute the binary to run:
 ```bash
-./cloudgrep
+cloudgrep
 ```
 
 Cloudgrep will then:
@@ -87,7 +91,7 @@ what port to serve the webapp on, etc... The cli arguments are all fully documen
 To view documentation for them, simply add the `--help` flag like so:
 
 ```bash
-./cloudgrep --help
+cloudgrep --help
 ```
 
 To specify the regions, you can use the `--regions` flag.
