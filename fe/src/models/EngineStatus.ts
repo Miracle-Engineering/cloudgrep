@@ -5,8 +5,11 @@ export enum EngineStatusEnum {
 }
 
 export interface EngineStatus {
-	resourceType: string;
-	errorMessage: string;
+	eventType: string;
+	error: string;
 	status: EngineStatusEnum;
-	fetchedAt: string;
+	createdAt: string;
+	updatedAt: string;
+	runId: string;
+	providerName: string;
 }
