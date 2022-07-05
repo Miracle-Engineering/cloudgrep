@@ -40,7 +40,7 @@ Cloudgrep's goal is to help engineering teams ensure every resource follows cons
 
 Additionally, Cloudgrep is a great tool to visualize all cloud resources in a single place - across regions, accounts and providers. 
 
-Try it out by downloading the latest [release](https://github.com/run-x/cloudgrep/releases)! For any questions, feel free to join our [Slack workspace](https://join.slack.com/t/cloudgrep/shared_invite/zt-1bl7fewv4-_iwch50U_pP8S3YKBvyyQQ).
+Try it out by downloading the latest [release](https://github.com/run-x/cloudgrep/releases)! For any questions, feel free to join our [Slack workspace](https://slack.cloudgrep.dev/).
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=Ip-lY9x7bh4"><img width="478" alt="Group 2" src="https://user-images.githubusercontent.com/855699/175441143-5834e9f2-8e23-471a-95be-7b3388d1f455.png"></a>
@@ -110,84 +110,13 @@ cloudgrep -c my_config.yaml
 
 Here is the annotated config file, you only need to define this file if you wish to change the default values.
 
-```yaml
-# This config represents all the user-configurable settings for cloudgrep and their default values
-# https://github.com/run-x/cloudgrep/blob/main/pkg/config/config.yaml
-
-# web represents the specs cloudgrep uses for creating the webapp server
-web:
-  # host is the host the server is running as
-  host: localhost
-  # port is the port the server is running in
-  port: 8080
-  # prefix is the url prefix the server uses
-  prefix: "/"
-  # skipOpen determines whether to automatically open the webui on startup
-  skipOpen: false
-
-# datastore represents the specs cloudgrep uses for creating and/or connecting to the datastore/database used.
-datastore:
-  # type is the kind of datastore to be used by cloudgrep (currently only supports SQLite)
-  type: sqlite
-  #  skipRefresh determines whether to refresh the data (i.e. scan the cloud) on startup.
-  skipRefresh: false
-  # dataSourceName is the Type-specific data source name or uri for connecting to the desired data source
-  # default: use memory DB - no data stored locally
-  dataSourceName: "file::memory:?cache=shared"
-  # use a file DB - the data is persisted on your disk
-  # dataSourceName: "~/cloudgrep_data.db"
-
-# providers represents the cloud providers cloudgrep will scan w/ the current credentials
-providers:
-  - cloud: aws # cloud is the type of the cloud provider (currently only AWS is supported)
-    # regions is the list of different regions within the cloud provider to scan
-    # default: use the default AWS region set in your terminal
-    # ex: use one region
-    # regions: [us-east-1]
-    # ex: use one region + global some resources like S3 Bucket are not region specific
-    # regions: [us-east-1, global]
-    # ex: use "all" region to scan all available regions
-    # regions: [all]
-```
+<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./pkg/config/config.yaml) -->
+<!-- MARKDOWN-AUTO-DOCS:END -->
 
 # Supported resources
 
-- autoscaling.AutoScalingGroup
-- cloudfront.Distribution
-- ec2.Address
-- ec2.Image
-- ec2.Instance
-- ec2.KeyPair
-- ec2.LaunchTemplate
-- ec2.NatGateway
-- ec2.NetworkAcl
-- ec2.NetworkInterface
-- ec2.RouteTable
-- ec2.SecurityGroup
-- ec2.Snapshot
-- ec2.Subnet
-- ec2.Volume
-- ec2.Vpc
-- eks.Cluster
-- eks.Nodegroup
-- elasticache.CacheCluster
-- elb.LoadBalancer
-- iam.InstanceProfile
-- iam.OpenIDConnectProvider
-- iam.Policy
-- iam.Role
-- iam.User
-- iam.VirtualMFADevice
-- lambda.Function
-- rds.DBCluster
-- rds.DBClusterSnapshot
-- rds.DBInstance
-- rds.DBSnapshot
-- route53.HealthCheck
-- route53.HostedZone
-- s3.Bucket
-- sns.SNS
-- sqs.Queue
+<!-- MARKDOWN-AUTO-DOCS:START (JSON_TO_HTLM_TABLE:src=./pkg/provider/aws/zz_integration_stats.json) -->
+<!-- MARKDOWN-AUTO-DOCS:END -->
 
 # Development
 
