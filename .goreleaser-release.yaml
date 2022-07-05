@@ -9,8 +9,6 @@ builds:
     builder: prebuilt
     prebuilt:
       path: bin/darwin_amd64/cloudgrep
-    hooks:
-      post: gon gon_amd64.hcl
   - id: darwin-arm64-prebuilt
     goos:
       - darwin
@@ -19,8 +17,6 @@ builds:
     builder: prebuilt
     prebuilt:
       path: bin/darwin_arm64/cloudgrep
-    hooks:
-      post: gon gon_arm64.hcl
   - id: linux-amd64-prebuilt
     goos:
       - linux
