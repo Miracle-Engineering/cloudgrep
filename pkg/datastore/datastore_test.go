@@ -110,7 +110,7 @@ func TestSearchByQuery(t *testing.T) {
 			//only one resource has enabled=true
 			query := `{
   "filter":{
-    "enabled": "true"
+    "tags.enabled": "true"
   }
 }`
 
@@ -123,11 +123,11 @@ func TestSearchByQuery(t *testing.T) {
 
 			//check 2 tags filter: both resources have both tags - 2 results
 			query = `{
-  "filter":{
-    "vpc":"vpc-123",
-    "eks:nodegroup":"staging-default"
-  }
-}`
+			  "filter":{
+			    "tags.vpc":"vpc-123",
+			    "tags.eks:nodegroup":"staging-default"
+			  }
+			}`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 2, len(resourcesRead.Resources))
@@ -136,17 +136,17 @@ func TestSearchByQuery(t *testing.T) {
 
 			//check 2 tags filter on same key - 2 results
 			query = `{
-  "filter":{
-    "$or":[
-      {
-        "team":"infra"
-      },
-      {
-        "team":"dev"
-      }
-    ]
-  }
-}`
+			  "filter":{
+			    "$or":[
+			      {
+			        "tags.team":"infra"
+			      },
+			      {
+			        "tags.team":"dev"
+			      }
+			    ]
+			  }
+			}`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 2, len(resourcesRead.Resources))
@@ -155,18 +155,18 @@ func TestSearchByQuery(t *testing.T) {
 
 			//check 2 tags filter on same key - 2 results
 			query = `{
-  "filter":{
-    "$or":[
-      {
-        "team":"infra"
-      },
-      {
-        "team":"dev"
-      }
-    ]
-  },
-  "limit": 1
-}`
+			  "filter":{
+			    "$or":[
+			      {
+			        "tags.team":"infra"
+			      },
+			      {
+			        "tags.team":"dev"
+			      }
+			    ]
+			  },
+			  "limit": 1
+			}`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(resourcesRead.Resources))
@@ -176,23 +176,23 @@ func TestSearchByQuery(t *testing.T) {
 			//first $or returns 2 instances
 			//second $or returns 1 instance --> result should be 1
 			query = `{
-  "filter":{
-    "$or":[
-      {
-        "team":"infra"
-      },
-      {
-        "team":"dev"
-      }
-    ],
-        "$and": [
-            { "$or": [
-                { "enabled": "true" },
-                { "enabled": "not-found" }
-            ] }
-        ]
-  }
-}`
+			  "filter":{
+			    "$or":[
+			      {
+			        "tags.team":"infra"
+			      },
+			      {
+			        "tags.team":"dev"
+			      }
+			    ],
+			        "$and": [
+			            { "$or": [
+			                { "tags.enabled": "true" },
+			                { "tags.enabled": "not-found" }
+			            ] }
+			        ]
+			  }
+			}`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(resourcesRead.Resources))
@@ -204,30 +204,30 @@ func TestSearchByQuery(t *testing.T) {
 			//2. "enabled": "(not null) -> select both instances
 			//3. "id": "i-123" -> select 1 instance --> result should be 1
 			query = `{
-  "filter":{
-    "$or":[
-      {
-        "team":"(not null)"
-      }
-    ],
-    "$and":[
-      {
-        "$or":[
-          {
-            "enabled":"(not null)"
-          }
-        ]
-      },
-      {
-        "$or":[
-          {
-            "id":"i-123"
-          }
-        ]
-      }
-    ]
-  }
-}`
+			  "filter":{
+			    "$or":[
+			      {
+			        "tags.team":"(not null)"
+			      }
+			    ],
+			    "$and":[
+			      {
+			        "$or":[
+			          {
+			            "tags.enabled":"(not null)"
+			          }
+			        ]
+			      },
+			      {
+			        "$or":[
+			          {
+			            "core.id":"i-123"
+			          }
+			        ]
+			      }
+			    ]
+			  }
+			}`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(resourcesRead.Resources))
@@ -236,11 +236,11 @@ func TestSearchByQuery(t *testing.T) {
 
 			//check 2 distinct tags - but no resource has both - 0 result
 			query = `{
-  "filter":{
-    "team":"dev",
-    "env":"prod"
-  }
-}`
+			  "filter":{
+			    "tags.team":"dev",
+			    "tags.env":"prod"
+			  }
+			}`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 0, len(resourcesRead.Resources))
@@ -248,10 +248,10 @@ func TestSearchByQuery(t *testing.T) {
 
 			//tag present - 2 results
 			query = `{
-  "filter":{
-	  "team": { "$neq": "" }
-  }
-}`
+			  "filter":{
+				  "tags.team": { "$neq": "" }
+			  }
+			}`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 2, len(resourcesRead.Resources))
@@ -260,10 +260,10 @@ func TestSearchByQuery(t *testing.T) {
 
 			//test exclude - returns the resources without the tag release
 			query = `{
-  "filter":{
-    "release": "(missing)"
-  }
-}`
+			  "filter":{
+			    "tags.release": "(missing)"
+			  }
+			}`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 2, len(resourcesRead.Resources))
@@ -272,11 +272,11 @@ func TestSearchByQuery(t *testing.T) {
 
 			//test 2 exclusions - the s3 bucket is the only one without both tags
 			query = `{
-  "filter":{
-    "release": "(missing)",
-    "debug:info": "(missing)"
-  }
-}`
+			  "filter":{
+			    "tags.release": "(missing)",
+			    "tags.debug:info": "(missing)"
+			  }
+			}`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 1, resourcesRead.Count)
@@ -284,11 +284,11 @@ func TestSearchByQuery(t *testing.T) {
 
 			//mix include and exclude filters
 			query = `{
-  "filter":{
-    "release":"(not null)",
-    "vpc":"vpc-123"
-  }
-}`
+			  "filter":{
+			    "tags.release":"(not null)",
+			    "tags.vpc":"vpc-123"
+			  }
+			}`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(resourcesRead.Resources))
@@ -296,7 +296,7 @@ func TestSearchByQuery(t *testing.T) {
 			testingutil.AssertEqualsResourcePter(t, resourceInst1, resourcesRead.Resources[0])
 
 			//test on max value
-			query = fmt.Sprintf(`{"filter":{"%v":"%v"}}`, tagMaxKey, tagMaxValue)
+			query = fmt.Sprintf(`{"filter":{"tags.%v":"%v"}}`, tagMaxKey, tagMaxValue)
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(resourcesRead.Resources))
@@ -304,19 +304,41 @@ func TestSearchByQuery(t *testing.T) {
 			testingutil.AssertEqualsResourcePter(t, resourceInst2, resourcesRead.Resources[0])
 
 			//test on a tag called region - find the tag (ignore the core field)
-			// we can probably revisit this in the future and include the group in the query field
-			//ex: support "tags.region":"us-west-2" and "core.region":"us-west-2"
 			query = `{
-  "filter":{
-    "region":"us-west-2"
-  }
-}`
+			  "filter":{
+			    "tags.region":"us-west-2"
+			  }
+			}`
 			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(resourcesRead.Resources))
 			assert.Equal(t, 1, resourcesRead.Count)
 			testingutil.AssertEqualsResourcePter(t, resourceInst1, resourcesRead.Resources[0])
 
+			//TODO remove this support when FE uses the new convention
+			//test backward compatibility until FE uses the new name convention for fields
+			query = `{
+  "filter":{
+    "enabled": "true"
+  }
+}`
+
+			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(resourcesRead.Resources))
+			assert.Equal(t, 1, resourcesRead.Count)
+			testingutil.AssertEqualsResourcePter(t, resourceInst1, resourcesRead.Resources[0])
+			query = `{
+  "filter":{
+    "id": "i-123"
+  }
+}`
+
+			resourcesRead, err = datastore.GetResources(ctx, []byte(query))
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(resourcesRead.Resources))
+			assert.Equal(t, 1, resourcesRead.Count)
+			testingutil.AssertEqualsResourcePter(t, resourceInst1, resourcesRead.Resources[0])
 		})
 	}
 }
@@ -412,7 +434,7 @@ func TestFields(t *testing.T) {
 			//only one resource has enabled=false
 			query := `{
   "filter":{
-    "enabled": "false"
+    "tags.enabled": "false"
   }
 }`
 
