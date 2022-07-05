@@ -70,8 +70,14 @@ const PropertyItem: FC<PropertyItemProps> = props => {
 				renderArrayOrObjects(value, keyItem)
 			) : (
 				<Box sx={{ display: 'flex' }}>
-					<Typography mr={2} {...sideMenuLeftText} sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
-					<Typography {...sideMenuRightText}> {value !== null ? value : 'null'} </Typography>
+					<Typography
+						mr={2}
+						{...sideMenuLeftText}
+						align="left"
+						sx={{ display: 'flex', textAlign: 'left' }}>{`${keyItem} `}</Typography>
+					<Typography {...sideMenuRightText} align="left" sx={{ textAlign: 'left' }}>
+						{value !== null ? value : 'null'}
+					</Typography>
 				</Box>
 			)}
 		</>

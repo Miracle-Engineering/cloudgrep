@@ -20,7 +20,11 @@ const PropertyItemList: FC<PropertyItemListProps> = props => {
 	if (data?.length === 0) {
 		return (
 			<Box sx={{ display: 'flex' }}>
-				<Typography mr={2} {...sideMenuLeftText} sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
+				<Typography
+					align="left"
+					mr={2}
+					{...sideMenuLeftText}
+					sx={{ display: 'flex', textAlign: 'left' }}>{`${keyItem} `}</Typography>
 				<Typography color={TEXT_COLOR} sx={textDefaultStyle}>{`[ ]`}</Typography>
 			</Box>
 		);
@@ -30,7 +34,11 @@ const PropertyItemList: FC<PropertyItemListProps> = props => {
 		return (
 			<>
 				<Box sx={{ display: 'flex' }}>
-					<Typography mr={2} {...sideMenuLeftText} sx={{ display: 'flex' }}>{`${keyItem} `}</Typography>
+					<Typography
+						align="left"
+						mr={2}
+						{...sideMenuLeftText}
+						sx={{ display: 'flex', textAlign: 'left' }}>{`${keyItem} `}</Typography>
 					<IndeterminateCheckBoxIcon
 						color={'primary'}
 						fontSize="small"

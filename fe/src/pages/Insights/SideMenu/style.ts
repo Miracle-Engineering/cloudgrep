@@ -19,6 +19,7 @@ export const sideMenuLeftText = {
 	fontSize: '12px',
 	lineHeight: '19.2px',
 	fontFamily: 'Montserrat',
+	noWrap: true,
 };
 
 export const sideMenuRightText = {

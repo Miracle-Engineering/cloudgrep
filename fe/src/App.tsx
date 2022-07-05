@@ -1,4 +1,3 @@
-import './App.css';
 import 'utils/localisation/index';
 
 import ErrorBoundary from 'components/ErrorHandling/ErrorBoundary';
@@ -21,14 +20,14 @@ const App: FC = () => {
 	}, [dispatch, fields?.length]);
 
 	return (
-		<div className="App">
+		<>
 			<Router>
 				<ErrorBoundary>
 					<Header />
 					<Routes />
 				</ErrorBoundary>
 			</Router>
-		</div>
+		</>
 	);
 };
 
