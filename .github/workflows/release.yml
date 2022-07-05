@@ -164,6 +164,8 @@ jobs:
 
       - name: Run gon to notarize apps
         run: |
+          mkdir -p ./dist
+          ls -lh ./dist
           gon gon_amd64.hcl
           gon gon_arm64.hcl
         env:
