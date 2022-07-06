@@ -5,7 +5,7 @@
 source = ["./bin/darwin_amd64/cloudgrep"]
 bundle_id = "dev.runx.cloudgrep"
 dmg {
-  output_path = "./dist/cloudgrep_darwin_amd64.dmg"
+  output_path = "./bin/cloudgrep_darwin_amd64.dmg"
   volume_name = "cloudgrep"
 }
 apple_id {
