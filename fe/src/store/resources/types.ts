@@ -12,6 +12,8 @@ export interface FilterResourcesApiParams {
 	data: Tag[];
 	limit: number;
 	offset: number;
+	order?: string;
+	orderBy?: string;
 }
 
 export interface ResourcesNextPageParams {

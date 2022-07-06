@@ -11,7 +11,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Typography from '@mui/material/Typography';
 import { visuallyHidden } from '@mui/utils';
 import { BORDER_COLOR } from 'constants/colors';
-import { DEBOUNCE_PERIOD, PAGE_LENGTH } from 'constants/globals';
+import { DEBOUNCE_PERIOD, PAGE_LENGTH, PAGE_START } from 'constants/globals';
 import debounce from 'debounce';
 import { Resource } from 'models/Resource';
 import React, { FC, useEffect, useState } from 'react';
@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import ResourceService from 'services/ResourceService';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { setCurrentResource, toggleMenuVisible } from 'store/resources/slice';
-import { getFilteredResourcesNextPage } from 'store/resources/thunks';
+import { getFilteredResources, getFilteredResourcesNextPage } from 'store/resources/thunks';
 import usePagination from 'utils/hooks/usePagination';
 import { isScrolledForInfiniteScroll } from 'utils/uiHelper';
 
@@ -33,8 +33,8 @@ const InsightTable: FC = () => {
 	const [isInfiniteScroll, setIsInfiniteScroll] = useState<boolean>(false);
 	const [hasNext, setHasNext] = useState<boolean>(true);
 	const { currentPage, next } = usePagination(PAGE_LENGTH, count);
-	const [order, setOrder] = useState<'asc' | 'desc' | undefined>('asc');
-	const [orderBy, setOrderBy] = useState<string>('type');
+	const [order, setOrder] = useState<'asc' | 'desc' | undefined>();
+	const [orderBy, setOrderBy] = useState<string | undefined>();
 
 	useEffect(() => {
 		if (resources && isInfiniteScroll) {
@@ -43,14 +43,20 @@ const InsightTable: FC = () => {
 		}
 	}, [resources]);
 
+	useEffect(() => {
+		setOrderBy(undefined);
+	}, [filterTags]);
+
 	const handleInfiniteScroll = async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 		if (isScrolledForInfiniteScroll(e)) {
 			setIsInfiniteScroll(true);
-			const response = await ResourceService.getFilteredResources(
-				filterTags,
-				currentPage * PAGE_LENGTH,
-				PAGE_LENGTH
-			);
+			const response = await ResourceService.getFilteredResources({
+				data: filterTags,
+				offset: currentPage * PAGE_LENGTH,
+				limit: PAGE_LENGTH,
+				order,
+				orderBy,
+			});
 			if (response?.data?.resources && response.data.resources.length > 0) {
 				setHasNext(true);
 				dispatch(
@@ -83,8 +89,19 @@ const InsightTable: FC = () => {
 
 	const handleRequestSort = (_event: React.MouseEvent<unknown>, property: string) => {
 		const isAsc = orderBy === property && order === 'asc';
-		setOrder(isAsc ? 'desc' : 'asc');
+		const newOrder = isAsc ? 'desc' : 'asc';
+		setOrder(newOrder);
 		setOrderBy(property);
+
+		dispatch(
+			getFilteredResources({
+				data: filterTags,
+				offset: PAGE_START,
+				limit: PAGE_LENGTH,
+				order: newOrder,
+				orderBy: property,
+			})
+		);
 	};
 
 	const createSortHandler = (property: string) => (event: React.MouseEvent<unknown>) => {
