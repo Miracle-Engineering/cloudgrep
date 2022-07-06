@@ -168,6 +168,7 @@ jobs:
           ls -lh ./dist
           gon gon_amd64.hcl
           gon gon_arm64.hcl
+          ls -lh ./dist
         env:
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
