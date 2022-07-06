@@ -28,7 +28,6 @@ func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds d
 	api.GET("/resources", Resources)
 	api.POST("/resources", Resources)
 	api.GET("/stats", Stats)
-	api.GET("/fields", Fields)
 	api.GET("/enginestatus", EngineStatus)
 	api.POST("/refresh", Refresh)
 }
