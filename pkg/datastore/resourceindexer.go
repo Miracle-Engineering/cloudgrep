@@ -55,7 +55,7 @@ func newResourceIndexer(ctx context.Context, logger *zap.Logger, db *gorm.DB) (r
 //an explicit field means that the column will be named after the field
 func (f fieldColumns) addExplicitFields(group string, names ...string) {
 	for _, name := range names {
-		f.addFieldColumn(group, fieldName(group, name), name)
+		f.addFieldColumn(fieldName(group, name), name)
 	}
 }
 
@@ -65,14 +65,14 @@ func (f fieldColumns) addDynamicFields(group string, names ...string) bool {
 	for _, name := range names {
 		fieldName := fieldName(group, name)
 		if _, found := f[fieldName]; !found {
-			f.addFieldColumn(group, fieldName, f.newColumnName())
+			f.addFieldColumn(fieldName, f.newColumnName())
 			newField = true
 		}
 	}
 	return newField
 }
 
-func (f fieldColumns) addFieldColumn(group, fieldName, columnName string) {
+func (f fieldColumns) addFieldColumn(fieldName, columnName string) {
 	f[fieldName] = fieldColumn{
 		ColumnName: columnName,
 		FieldName:  fieldName,
