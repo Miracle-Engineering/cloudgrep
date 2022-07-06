@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/run-x/cloudgrep/pkg/model"
 	"reflect"
+
+	"github.com/run-x/cloudgrep/pkg/model"
 )
 
 type ResourceConverter interface {
-	ToResource(context.Context, any, model.Tags) (model.Resource, error)
+	ToResource(context.Context, any, *model.Resource) error
 }
 
 type TagField struct {
@@ -22,17 +23,43 @@ type TagField struct {
 	Value string `yaml:"value"`
 }
 
+func (f TagField) IsZero() bool {
+	return f.Name == ""
+}
+
 type ReflectionConverter struct {
 	ResourceType string
 	TagField     TagField
 	IdField      string
-	Region       string
 }
 
-func (rc *ReflectionConverter) ToResource(ctx context.Context, x any, tags model.Tags) (model.Resource, error) {
+func (rc *ReflectionConverter) ToResource(ctx context.Context, x any, res *model.Resource) error {
+	if res == nil {
+		panic("unexpected nil model.Resource")
+	}
+
 	t := reflect.TypeOf(x)
 
-	// get the id field
+	if err := rc.loadId(t, x, res); err != nil {
+		return err
+	}
+
+	if err := rc.loadTags(x, res); err != nil {
+		return err
+	}
+
+	if err := rc.loadRaw(x, res); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (rc *ReflectionConverter) loadId(t reflect.Type, x any, res *model.Resource) error {
+	if rc.IdField == "" {
+		return nil
+	}
+
 	var id string
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
@@ -48,27 +75,37 @@ func (rc *ReflectionConverter) ToResource(ctx context.Context, x any, tags model
 	}
 
 	if id == "" {
-		return model.Resource{}, fmt.Errorf("could not find id field '%v' for type '%v", rc.IdField, rc.ResourceType)
+		return fmt.Errorf("could not find id field '%v' for type '%v", rc.IdField, rc.ResourceType)
 	}
 
-	// generate tags field
-	if tags == nil {
-		//use field
-		tagsValue := reflect.ValueOf(x).FieldByName(rc.TagField.Name)
-		if !tagsValue.IsValid() {
-			return model.Resource{}, fmt.Errorf("Could not find tag field '%v' for type '%v", rc.TagField.Name, rc.ResourceType)
-		}
-		tags = getTags(tagsValue, rc.TagField)
+	res.Id = id
+
+	return nil
+}
+
+func (rc *ReflectionConverter) loadTags(x any, res *model.Resource) error {
+	if rc.TagField.IsZero() {
+		return nil
 	}
+
+	tagsValue := reflect.ValueOf(x).FieldByName(rc.TagField.Name)
+	if !tagsValue.IsValid() {
+		return fmt.Errorf("Could not find tag field '%v' for type '%v", rc.TagField.Name, rc.ResourceType)
+	}
+	tags := getTags(tagsValue, rc.TagField)
+
+	res.Tags = tags
+
+	return nil
+}
+
+func (rc *ReflectionConverter) loadRaw(x any, res *model.Resource) error {
 	marshaledStruct, err := json.Marshal(x)
+
 	if err != nil {
-		return model.Resource{}, err
+		return err
 	}
-	return model.Resource{
-		Id:      id,
-		Region:  rc.Region,
-		Type:    rc.ResourceType,
-		RawData: marshaledStruct,
-		Tags:    tags,
-	}, nil
+
+	res.RawData = marshaledStruct
+	return nil
 }

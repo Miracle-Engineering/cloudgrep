@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -11,7 +10,7 @@ func (api GetTagsAPI) Validate() []error {
 	if api.Has() {
 		errs = append(errs, validateFuncs(api,
 			validateTagAPICall,
-			validateTagAPIResourceType,
+			// validateTagAPIResourceType,
 			validateTagAPIInputIDField,
 			validateTagAPITags,
 			validateTagAPIAllowedAPIErrorCodes,
@@ -30,13 +29,13 @@ func validateTagAPICall(api GetTagsAPI) []error {
 	return validateAPICall(api.Call)
 }
 
-func validateTagAPIResourceType(api GetTagsAPI) []error {
-	if api.ResourceType == "" {
-		return []error{errors.New("resourceType required")}
-	}
+// func validateTagAPIResourceType(api GetTagsAPI) []error {
+// 	if api.ResourceType == "" {
+// 		return []error{errors.New("resourceType required")}
+// 	}
 
-	return validateExportedIdentifier("resourceType", api.ResourceType)
-}
+// 	return validateExportedIdentifier("resourceType", api.ResourceType)
+// }
 
 func validateTagAPIInputIDField(api GetTagsAPI) []error {
 	errs := api.InputIDField.Validate()
@@ -81,9 +80,9 @@ func validateTagAPIUnset(api GetTagsAPI) []error {
 		errs = append(errs, fmt.Errorf(msgFmt, name))
 	}
 
-	if api.ResourceType != "" {
-		add("type")
-	}
+	// if api.ResourceType != "" {
+	// 	add("type")
+	// }
 
 	if !api.InputIDField.Zero() {
 		add("inputIDField")

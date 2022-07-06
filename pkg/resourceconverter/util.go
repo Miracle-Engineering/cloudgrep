@@ -1,11 +1,10 @@
 package resourceconverter
 
 import (
-	"context"
 	"fmt"
-	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/util"
 	"reflect"
+
+	"github.com/run-x/cloudgrep/pkg/model"
 )
 
 func getTags(v reflect.Value, tagField TagField) []model.Tag {
@@ -53,41 +52,46 @@ func getPtrVal(v reflect.Value) reflect.Value {
 	return v
 }
 
-func SendAllConverted[T any](ctx context.Context, output chan<- model.Resource, converter ResourceConverter, resources []T) error {
-	var converted []model.Resource
+// func SendAllConverted[T any](ctx context.Context, output chan<- model.Resource, converter ResourceConverter, resources []T) error {
+// 	var converted []model.Resource
 
-	for _, raw := range resources {
-		resource, err := converter.ToResource(ctx, raw, nil)
-		if err != nil {
-			return err
-		}
+// 	for _, raw := range resources {
+// 		resource := model.Resource{}
+// 		err := converter.ToResource(ctx, raw, &resource)
+// 		if err != nil {
+// 			return err
+// 		}
 
-		converted = append(converted, resource)
-	}
+// 		converted = append(converted, resource)
+// 	}
 
-	return util.SendAllFromSlice(ctx, output, converted)
-}
+// 	return util.SendAllFromSlice(ctx, output, converted)
+// }
 
-type tagFunc[T any] func(context.Context, T) (model.Tags, error)
+// type tagFunc[T any] func(context.Context, T) (model.Tags, error)
 
-func SendAllConvertedTags[T any](ctx context.Context, output chan<- model.Resource, converter ResourceConverter, resources []T, tF tagFunc[T]) error {
-	var converted []model.Resource
+// func SendAllConvertedTags[T any](ctx context.Context, output chan<- model.Resource, converter ResourceConverter, resources []T, tF tagFunc[T]) error {
+// 	var converted []model.Resource
 
-	for _, raw := range resources {
-		tags, err := tF(ctx, raw)
-		if err != nil {
-			return err
-		}
-		if tags == nil {
-			tags = []model.Tag{}
-		}
-		resource, err := converter.ToResource(ctx, raw, tags)
-		if err != nil {
-			return err
-		}
+// 	for _, raw := range resources {
+// 		resource := model.Resource{}
+// 		err := converter.ToResource(ctx, raw, &resource)
+// 		if err != nil {
+// 			return err
+// 		}
 
-		converted = append(converted, resource)
-	}
+// 		tags, err := tF(ctx, raw)
+// 		if err != nil {
+// 			return err
+// 		}
+// 		if tags == nil {
+// 			tags = []model.Tag{}
+// 		}
 
-	return util.SendAllFromSlice(ctx, output, converted)
-}
+// 		resource.Tags = tags
+
+// 		converted = append(converted, resource)
+// 	}
+
+// 	return util.SendAllFromSlice(ctx, output, converted)
+// }

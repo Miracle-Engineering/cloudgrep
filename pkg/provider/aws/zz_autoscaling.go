@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	"github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
 
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
@@ -28,7 +29,12 @@ func (p *Provider) fetch_autoscaling_AutoScalingGroup(ctx context.Context, outpu
 	client := autoscaling.NewFromConfig(p.config)
 	input := &autoscaling.DescribeAutoScalingGroupsInput{}
 
-	resourceConverter := p.converterFor("autoscaling.AutoScalingGroup")
+	commonTransformers := p.baseTransformers("autoscaling.AutoScalingGroup")
+	converter := p.converterFor("autoscaling.AutoScalingGroup")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.AutoScalingGroup](commonTransformers...),
+		resourceconverter.WithConverter[types.AutoScalingGroup](converter),
+	)
 	paginator := autoscaling.NewDescribeAutoScalingGroupsPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -37,7 +43,7 @@ func (p *Provider) fetch_autoscaling_AutoScalingGroup(ctx context.Context, outpu
 			return fmt.Errorf("failed to fetch %s: %w", "autoscaling.AutoScalingGroup", err)
 		}
 
-		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.AutoScalingGroups); err != nil {
+		if err := resourceconverter.SendAll(ctx, output, page.AutoScalingGroups, transformers...); err != nil {
 			return err
 		}
 	}

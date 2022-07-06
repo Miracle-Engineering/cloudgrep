@@ -40,6 +40,13 @@ func (p *Provider) fetch_iam_InstanceProfile(ctx context.Context, output chan<- 
 	input := &iam.ListInstanceProfilesInput{}
 
 	resourceConverter := p.converterFor("iam.InstanceProfile")
+	commonTransformers := p.baseTransformers("iam.InstanceProfile")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.InstanceProfile](commonTransformers...),
+		resourceconverter.WithConverter[types.InstanceProfile](resourceConverter),
+		resourceconverter.WithTagFunc(p.getTags_iam_InstanceProfile),
+	)
+
 	paginator := iam.NewListInstanceProfilesPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -48,7 +55,7 @@ func (p *Provider) fetch_iam_InstanceProfile(ctx context.Context, output chan<- 
 			return fmt.Errorf("failed to fetch %s: %w", "iam.InstanceProfile", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.InstanceProfiles, p.getTags_iam_InstanceProfile); err != nil {
+		if err := resourceconverter.SendAll(ctx, output, page.InstanceProfiles, transformers...); err != nil {
 			return err
 		}
 	}
@@ -85,6 +92,13 @@ func (p *Provider) fetch_iam_Role(ctx context.Context, output chan<- model.Resou
 	input := &iam.ListRolesInput{}
 
 	resourceConverter := p.converterFor("iam.Role")
+	commonTransformers := p.baseTransformers("iam.Role")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.Role](commonTransformers...),
+		resourceconverter.WithConverter[types.Role](resourceConverter),
+		resourceconverter.WithTagFunc(p.getTags_iam_Role),
+	)
+
 	paginator := iam.NewListRolesPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -93,7 +107,7 @@ func (p *Provider) fetch_iam_Role(ctx context.Context, output chan<- model.Resou
 			return fmt.Errorf("failed to fetch %s: %w", "iam.Role", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Roles, p.getTags_iam_Role); err != nil {
+		if err := resourceconverter.SendAll(ctx, output, page.Roles, transformers...); err != nil {
 			return err
 		}
 	}
@@ -130,6 +144,13 @@ func (p *Provider) fetch_iam_User(ctx context.Context, output chan<- model.Resou
 	input := &iam.ListUsersInput{}
 
 	resourceConverter := p.converterFor("iam.User")
+	commonTransformers := p.baseTransformers("iam.User")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.User](commonTransformers...),
+		resourceconverter.WithConverter[types.User](resourceConverter),
+		resourceconverter.WithTagFunc(p.getTags_iam_User),
+	)
+
 	paginator := iam.NewListUsersPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -138,7 +159,7 @@ func (p *Provider) fetch_iam_User(ctx context.Context, output chan<- model.Resou
 			return fmt.Errorf("failed to fetch %s: %w", "iam.User", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Users, p.getTags_iam_User); err != nil {
+		if err := resourceconverter.SendAll(ctx, output, page.Users, transformers...); err != nil {
 			return err
 		}
 	}

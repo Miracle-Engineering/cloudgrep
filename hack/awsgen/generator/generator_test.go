@@ -30,14 +30,14 @@ func TestGenerator(t *testing.T) {
 							},
 							Pagination: true,
 							OutputKey:  config.NestedField{config.Field{Name: "Spam"}, config.Field{Name: "Ham"}},
+							SDKType:    "FooInfo",
 							IDField: config.Field{
 								Name:    "ID",
 								Pointer: true,
 							},
 						},
 						GetTagsAPI: config.GetTagsAPI{
-							ResourceType: "BarValue",
-							Call:         "GetBarTags",
+							Call: "GetBarTags",
 							InputIDField: config.Field{
 								Name:      "BarID",
 								SliceType: "types.BarIDType",

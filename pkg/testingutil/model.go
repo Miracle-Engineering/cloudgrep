@@ -1,10 +1,14 @@
 package testingutil
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 )
 
 const TestTag = "test"
@@ -106,7 +110,24 @@ func AssertResourceFilteredCount(t testing.TB, resources []model.Resource, count
 
 	filtered := filter.Filter(resources)
 
-	assert.Lenf(t, filtered, count, "expected %d resource(s) with filter %s", count, filter)
+	success := assert.Lenf(t, filtered, count, "expected %d resource(s) with filter %s", count, filter)
+	if !success {
+		partialFiltered := filter.PartialFilter(resources)
+
+		names := maps.Keys(partialFiltered)
+		slices.Sort(names)
+
+		var matches []string
+		for _, name := range names {
+			resources := partialFiltered[name]
+			matches = append(matches,
+				fmt.Sprintf("%s=%d", name, len(resources)),
+			)
+		}
+
+		t.Logf("filter %s partial matches: %s", filter, strings.Join(matches, ", "))
+	}
+
 	return filtered
 }
 

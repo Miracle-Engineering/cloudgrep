@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/aws/aws-sdk-go-v2/service/eks/types"
 	"github.com/hashicorp/go-multierror"
@@ -41,9 +42,22 @@ func (p *Provider) get_cluster_names(ctx context.Context) ([]string, error) {
 }
 
 func (p *Provider) fetch_eks_Cluster(ctx context.Context, output chan<- model.Resource) error {
-	var err error
 	client := eks.NewFromConfig(p.config)
 	resourceConverter := p.converterFor("eks.Cluster")
+
+	commonTransformers := p.baseTransformers("eks.Cluster")
+	transformers := append(
+		resourceconverter.AllToGeneric[string](commonTransformers...),
+		resourceconverter.WithConverterDetails[string](resourceConverter, p.describeEksCluster),
+		resourceconverter.WithTagFunc(p.getTags_eks_Cluster),
+	)
+
+	input := &eks.ListClustersInput{}
+	paginator := eks.NewListClustersPaginator(client, input)
+
+	var err error
+	// client := eks.NewFromConfig(p.config)
+	// resourceConverter := p.converterFor("eks.Cluster")
 	clusterNames, err := p.get_cluster_names(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to fetch %s: %w", "eks.Cluster", err)
@@ -65,6 +79,21 @@ func (p *Provider) fetch_eks_Cluster(ctx context.Context, output chan<- model.Re
 	}
 
 	return nil
+}
+
+func (p *Provider) describeEksCluster(ctx context.Context, name string) (types.Cluster, error) {
+	client := eks.NewFromConfig(p.config)
+
+	input := &eks.DescribeClusterInput{
+		Name: &name,
+	}
+
+	output, err := client.DescribeCluster(ctx, input)
+	if err != nil {
+		return types.Cluster{}, err
+	}
+
+	return *output.Cluster, nil
 }
 
 func (p *Provider) getTags_eks_Cluster(ctx context.Context, resource types.Cluster) (model.Tags, error) {

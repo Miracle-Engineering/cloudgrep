@@ -67,6 +67,11 @@ type ListAPI struct {
 	// Pointer and SliceType are not yet supported in these fields.
 	OutputKey NestedField `yaml:"outputKey"`
 
+	// SDKType is the name of the struct type in the service's `types` package returned by the API.
+	// Defaults to `Type.Name`
+	// TODO: Validation
+	SDKType string `yaml:"sdkType"`
+
 	// IDField points to the field within each resource struct that stores the ID of that resource
 	IDField Field `yaml:"id"`
 
@@ -77,10 +82,6 @@ type ListAPI struct {
 
 // GetTags is configuration for calling an AWS API to get the tags on a particular resource
 type GetTagsAPI struct {
-	// ResourceType is the name of the Go struct type within the services "types" package that represents this resource.
-	// This type must be what is returned by the list API.
-	ResourceType string `yaml:"type"`
-
 	// Call is the AWS API call to make within the service
 	Call string `yaml:"call"`
 

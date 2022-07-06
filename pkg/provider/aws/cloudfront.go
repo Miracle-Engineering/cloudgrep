@@ -20,10 +20,17 @@ func (p *Provider) register_cloudfront(mapping map[string]mapper) {
 
 func (p *Provider) fetch_cloudfront_Distribution(ctx context.Context, output chan<- model.Resource) error {
 	client := cloudfront.NewFromConfig(p.config)
+
 	resourceConverter := p.converterFor("cloudfront.Distribution")
+	commonTransformers := p.baseTransformers("cloudfront.Distribution")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.DistributionSummary](commonTransformers...),
+		resourceconverter.WithConverter[types.DistributionSummary](resourceConverter),
+		resourceconverter.WithTagFunc(p.getTags_cloudfront_Distribution),
+	)
+
 	input := &cloudfront.ListDistributionsInput{}
 	paginator := cloudfront.NewListDistributionsPaginator(client, input)
-	var distributions []types.DistributionSummary
 
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -31,11 +38,10 @@ func (p *Provider) fetch_cloudfront_Distribution(ctx context.Context, output cha
 		if err != nil {
 			return fmt.Errorf("failed to fetch %s: %w", "cloudfront.Distribution", err)
 		}
-		distributions = append(distributions, page.DistributionList.Items...)
-	}
 
-	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, distributions, p.getTags_cloudfront_Distribution); err != nil {
-		return err
+		if err := resourceconverter.SendAll(ctx, output, page.DistributionList.Items, transformers...); err != nil {
+			return err
+		}
 	}
 
 	return nil

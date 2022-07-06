@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/rds"
+	"github.com/aws/aws-sdk-go-v2/service/rds/types"
 
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
@@ -61,7 +62,12 @@ func (p *Provider) fetch_rds_DBCluster(ctx context.Context, output chan<- model.
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBClustersInput{}
 
-	resourceConverter := p.converterFor("rds.DBCluster")
+	commonTransformers := p.baseTransformers("rds.DBCluster")
+	converter := p.converterFor("rds.DBCluster")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.DBCluster](commonTransformers...),
+		resourceconverter.WithConverter[types.DBCluster](converter),
+	)
 	paginator := rds.NewDescribeDBClustersPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -70,7 +76,7 @@ func (p *Provider) fetch_rds_DBCluster(ctx context.Context, output chan<- model.
 			return fmt.Errorf("failed to fetch %s: %w", "rds.DBCluster", err)
 		}
 
-		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBClusters); err != nil {
+		if err := resourceconverter.SendAll(ctx, output, page.DBClusters, transformers...); err != nil {
 			return err
 		}
 	}
@@ -82,7 +88,12 @@ func (p *Provider) fetch_rds_DBClusterSnapshot(ctx context.Context, output chan<
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBClusterSnapshotsInput{}
 
-	resourceConverter := p.converterFor("rds.DBClusterSnapshot")
+	commonTransformers := p.baseTransformers("rds.DBClusterSnapshot")
+	converter := p.converterFor("rds.DBClusterSnapshot")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.DBClusterSnapshot](commonTransformers...),
+		resourceconverter.WithConverter[types.DBClusterSnapshot](converter),
+	)
 	paginator := rds.NewDescribeDBClusterSnapshotsPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -91,7 +102,7 @@ func (p *Provider) fetch_rds_DBClusterSnapshot(ctx context.Context, output chan<
 			return fmt.Errorf("failed to fetch %s: %w", "rds.DBClusterSnapshot", err)
 		}
 
-		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBClusterSnapshots); err != nil {
+		if err := resourceconverter.SendAll(ctx, output, page.DBClusterSnapshots, transformers...); err != nil {
 			return err
 		}
 	}
@@ -103,7 +114,12 @@ func (p *Provider) fetch_rds_DBInstance(ctx context.Context, output chan<- model
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBInstancesInput{}
 
-	resourceConverter := p.converterFor("rds.DBInstance")
+	commonTransformers := p.baseTransformers("rds.DBInstance")
+	converter := p.converterFor("rds.DBInstance")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.DBInstance](commonTransformers...),
+		resourceconverter.WithConverter[types.DBInstance](converter),
+	)
 	paginator := rds.NewDescribeDBInstancesPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -112,7 +128,7 @@ func (p *Provider) fetch_rds_DBInstance(ctx context.Context, output chan<- model
 			return fmt.Errorf("failed to fetch %s: %w", "rds.DBInstance", err)
 		}
 
-		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBInstances); err != nil {
+		if err := resourceconverter.SendAll(ctx, output, page.DBInstances, transformers...); err != nil {
 			return err
 		}
 	}
@@ -124,7 +140,12 @@ func (p *Provider) fetch_rds_DBSnapshot(ctx context.Context, output chan<- model
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBSnapshotsInput{}
 
-	resourceConverter := p.converterFor("rds.DBSnapshot")
+	commonTransformers := p.baseTransformers("rds.DBSnapshot")
+	converter := p.converterFor("rds.DBSnapshot")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.DBSnapshot](commonTransformers...),
+		resourceconverter.WithConverter[types.DBSnapshot](converter),
+	)
 	paginator := rds.NewDescribeDBSnapshotsPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -133,7 +154,7 @@ func (p *Provider) fetch_rds_DBSnapshot(ctx context.Context, output chan<- model
 			return fmt.Errorf("failed to fetch %s: %w", "rds.DBSnapshot", err)
 		}
 
-		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.DBSnapshots); err != nil {
+		if err := resourceconverter.SendAll(ctx, output, page.DBSnapshots, transformers...); err != nil {
 			return err
 		}
 	}

@@ -28,6 +28,7 @@ func (g Generator) generateType(service config.Service, typ config.Type) (string
 // generateTypeListFunction generates the code for listing a specific type
 func (g Generator) generateTypeListFunction(service config.Service, typ config.Type) (string, util.ImportSet) {
 	data := struct {
+		SDKType      string
 		ResourceName string
 
 		FuncName     string
@@ -41,6 +42,7 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 		OutputKey   *util.RecursiveAppend[config.Field]
 		TagFuncName string
 	}{
+		SDKType:      sdkType(typ),
 		ResourceName: resourceName(service, typ),
 
 		FuncName:     fetchFuncName(service, typ),
@@ -60,6 +62,7 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 	imports.AddPath("context")
 	imports.AddPath("fmt")
 	imports.AddPath(awsServicePackage(service.ServicePackage))
+	imports.AddPath(awsServicePackage(service.ServicePackage, "types"))
 	imports.AddPath("github.com/run-x/cloudgrep/pkg/resourceconverter")
 	imports.AddPath("github.com/run-x/cloudgrep/pkg/model")
 
@@ -103,7 +106,7 @@ func (g Generator) generateTypeTagFunction(service config.Service, typ config.Ty
 
 		ServicePkg:           service.ServicePackage,
 		APIAction:            typ.GetTagsAPI.Call,
-		SDKType:              typ.GetTagsAPI.ResourceType,
+		SDKType:              sdkType(typ),
 		AllowedAPIErrorCodes: typ.GetTagsAPI.AllowedAPIErrorCodes,
 		InputOverrides:       typ.GetTagsAPI.InputOverrides,
 

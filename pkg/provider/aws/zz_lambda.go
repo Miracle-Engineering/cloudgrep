@@ -24,7 +24,13 @@ func (p *Provider) fetch_lambda_Function(ctx context.Context, output chan<- mode
 	client := lambda.NewFromConfig(p.config)
 	input := &lambda.ListFunctionsInput{}
 
-	resourceConverter := p.converterFor("lambda.Function")
+	commonTransformers := p.baseTransformers("lambda.Function")
+	converter := p.converterFor("lambda.Function")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.FunctionConfiguration](commonTransformers...),
+		resourceconverter.WithConverter[types.FunctionConfiguration](converter),
+		resourceconverter.WithTagFunc(p.getTags_lambda_Function),
+	)
 	paginator := lambda.NewListFunctionsPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -33,7 +39,7 @@ func (p *Provider) fetch_lambda_Function(ctx context.Context, output chan<- mode
 			return fmt.Errorf("failed to fetch %s: %w", "lambda.Function", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Functions, p.getTags_lambda_Function); err != nil {
+		if err := resourceconverter.SendAll(ctx, output, page.Functions, transformers...); err != nil {
 			return err
 		}
 	}

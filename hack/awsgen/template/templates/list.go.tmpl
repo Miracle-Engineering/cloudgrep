@@ -6,7 +6,7 @@ if err != nil {
 
 {{- define "output" }}
 {{- if .IsLast }}
-if err := resourceconverter.{{ .Data.ConvertCall }}(ctx, output, resourceConverter, {{ .IterVar }}.{{ .Current.Name }} {{- .Data.ConvertTail }}); err != nil {
+if err := resourceconverter.SendAll(ctx, output, {{ .IterVar }}.{{ .Current.Name }}, transformers...); err != nil {
 	return err
 }
 {{- else }}
@@ -34,17 +34,14 @@ func (p *{{ .ProviderName}}) {{ .FuncName }}(ctx context.Context, output chan<- 
 	{{- end }}
 
 	resourceConverter := p.converterFor({{ .ResourceName | quote }})
-
-	{{- $convertCall := "SendAllConverted" }}
-	{{- $convertTail := "" }}
-
-	{{- if .TagFuncName }}
-		{{- $convertCall = "SendAllConvertedTags" }}
-		{{- $convertTail = (cat ", p." .TagFuncName) }}
-	{{- end }}
-
-	{{- quiet (.OutputKey.SetData "ConvertCall" $convertCall) }}
-	{{- quiet (.OutputKey.SetData "ConvertTail" $convertTail) }}
+	commonTransformers := p.baseTransformers({{ .ResourceName | quote }})
+	transformers := append(
+		resourceconverter.AllToGeneric[types.{{ .SDKType }}](commonTransformers...),
+		resourceconverter.WithConverter[types.{{ .SDKType }}](resourceConverter),
+		{{- if .TagFuncName }}
+		resourceconverter.WithTagFunc(p.{{ .TagFuncName }}),
+		{{- end }}
+	)
 
 	{{- if .Paginated }}
 	paginator := {{ .ServicePkg }}.New{{ .APIAction }}Paginator(client, input)

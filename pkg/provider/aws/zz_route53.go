@@ -30,7 +30,13 @@ func (p *Provider) fetch_route53_HealthCheck(ctx context.Context, output chan<- 
 	client := route53.NewFromConfig(p.config)
 	input := &route53.ListHealthChecksInput{}
 
-	resourceConverter := p.converterFor("route53.HealthCheck")
+	commonTransformers := p.baseTransformers("route53.HealthCheck")
+	converter := p.converterFor("route53.HealthCheck")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.HealthCheck](commonTransformers...),
+		resourceconverter.WithConverter[types.HealthCheck](converter),
+		resourceconverter.WithTagFunc(p.getTags_route53_HealthCheck),
+	)
 	paginator := route53.NewListHealthChecksPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -39,7 +45,7 @@ func (p *Provider) fetch_route53_HealthCheck(ctx context.Context, output chan<- 
 			return fmt.Errorf("failed to fetch %s: %w", "route53.HealthCheck", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.HealthChecks, p.getTags_route53_HealthCheck); err != nil {
+		if err := resourceconverter.SendAll(ctx, output, page.HealthChecks, transformers...); err != nil {
 			return err
 		}
 	}
@@ -84,7 +90,13 @@ func (p *Provider) fetch_route53_HostedZone(ctx context.Context, output chan<- m
 	client := route53.NewFromConfig(p.config)
 	input := &route53.ListHostedZonesInput{}
 
-	resourceConverter := p.converterFor("route53.HostedZone")
+	commonTransformers := p.baseTransformers("route53.HostedZone")
+	converter := p.converterFor("route53.HostedZone")
+	transformers := append(
+		resourceconverter.AllToGeneric[types.HostedZone](commonTransformers...),
+		resourceconverter.WithConverter[types.HostedZone](converter),
+		resourceconverter.WithTagFunc(p.getTags_route53_HostedZone),
+	)
 	paginator := route53.NewListHostedZonesPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -93,7 +105,7 @@ func (p *Provider) fetch_route53_HostedZone(ctx context.Context, output chan<- m
 			return fmt.Errorf("failed to fetch %s: %w", "route53.HostedZone", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.HostedZones, p.getTags_route53_HostedZone); err != nil {
+		if err := resourceconverter.SendAll(ctx, output, page.HostedZones, transformers...); err != nil {
 			return err
 		}
 	}

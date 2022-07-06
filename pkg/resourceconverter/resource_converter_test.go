@@ -33,13 +33,16 @@ func TestReflectionConverter(t *testing.T) {
 			Attr3:     map[string]interface{}{"a": "b", "c": 2},
 			WeirdTags: []WeirdTags{{WeirdKey: "key1", WeirdValue: "val1"}, {WeirdKey: "key2", WeirdValue: "val2"}},
 		}
+		resource := model.Resource{
+			Region: "dummyRegion",
+			Type:   "DummyResource",
+		}
 		rC := &ReflectionConverter{
 			IdField:      "ID",
 			TagField:     TagField{Name: "WeirdTags", Key: "WeirdKey", Value: "WeirdValue"},
 			ResourceType: "DummyResource",
-			Region:       "dummyRegion",
 		}
-		resource, err := rC.ToResource(ctx, entry, nil)
+		err := rC.ToResource(ctx, entry, &resource)
 		require.NoError(t, err)
 		expectedResource := model.Resource{
 			Region:  "dummyRegion",
@@ -59,12 +62,16 @@ func TestReflectionConverter(t *testing.T) {
 			Attr3:     map[string]interface{}{"a": "b", "c": 2},
 			WeirdTags: []WeirdTags{{WeirdKey: "key1", WeirdValue: "val1"}, {WeirdKey: "key2", WeirdValue: "val2"}},
 		}
+		resource := model.Resource{
+			Region: "dummyRegion",
+			Type:   "DummyResource",
+			Tags:   model.Tags{{Key: "key1", Value: "val3"}, {Key: "key2", Value: "val4"}},
+		}
 		rC := &ReflectionConverter{
 			IdField:      "ID",
 			ResourceType: "DummyResource",
-			Region:       "dummyRegion",
 		}
-		resource, err := rC.ToResource(ctx, entry, model.Tags{{Key: "key1", Value: "val3"}, {Key: "key2", Value: "val4"}})
+		err := rC.ToResource(ctx, entry, &resource)
 		require.NoError(t, err)
 		expectedResource := model.Resource{
 			Region:  "dummyRegion",
@@ -84,13 +91,16 @@ func TestReflectionConverter(t *testing.T) {
 			Attr3:     map[string]interface{}{"a": "b", "c": 2},
 			WeirdTags: []WeirdTags{{WeirdKey: "key1", WeirdValue: "val1"}, {WeirdKey: "key2", WeirdValue: "val2"}},
 		}
+		resource := model.Resource{
+			Region: "dummyRegion",
+			Type:   "DummyResource",
+		}
 		rC := &ReflectionConverter{
 			IdField:      "ID",
 			ResourceType: "DummyResource",
-			Region:       "dummyRegion",
 			TagField:     TagField{Name: "WeirdTags2", Key: "WeirdKey", Value: "WeirdValue"},
 		}
-		_, err := rC.ToResource(ctx, entry, nil)
+		err := rC.ToResource(ctx, entry, &resource)
 		require.Error(t, err)
 	})
 
@@ -102,12 +112,16 @@ func TestReflectionConverter(t *testing.T) {
 			Attr3:     map[string]interface{}{"a": "b", "c": 2},
 			WeirdTags: []WeirdTags{{WeirdKey: "key1", WeirdValue: "val1"}, {WeirdKey: "key2", WeirdValue: "val2"}},
 		}
+		resource := model.Resource{
+			Region: "dummyRegion",
+			Type:   "DummyResource",
+			Tags:   model.Tags{{Key: "key1", Value: "val3"}, {Key: "key2", Value: "val4"}},
+		}
 		rC := &ReflectionConverter{
 			IdField:      "ID2",
 			ResourceType: "DummyResource",
-			Region:       "dummyRegion",
 		}
-		_, err := rC.ToResource(ctx, entry, model.Tags{{Key: "key1", Value: "val3"}, {Key: "key2", Value: "val4"}})
+		err := rC.ToResource(ctx, entry, &resource)
 		require.Error(t, err)
 	})
 }

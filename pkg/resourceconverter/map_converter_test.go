@@ -2,11 +2,12 @@ package resourceconverter
 
 import (
 	"context"
+	"testing"
+
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/testingutil"
 	"github.com/stretchr/testify/require"
 	"gorm.io/datatypes"
-	"testing"
 )
 
 func TestMapConverter(t *testing.T) {
@@ -22,9 +23,13 @@ func TestMapConverter(t *testing.T) {
 		rC := &MapConverter{
 			IdField:      "ID",
 			ResourceType: "DummyResource",
-			Region:       "dummyRegion",
 		}
-		resource, err := rC.ToResource(ctx, entry, model.Tags{{Key: "key1", Value: "val3"}, {Key: "key2", Value: "val4"}})
+		resource := model.Resource{
+			Region: "dummyRegion",
+			Type:   "DummyResource",
+			Tags:   model.Tags{{Key: "key1", Value: "val3"}, {Key: "key2", Value: "val4"}},
+		}
+		err := rC.ToResource(ctx, entry, &resource)
 		require.NoError(t, err)
 		expectedResource := model.Resource{
 			Region:  "dummyRegion",

@@ -45,23 +45,27 @@ func (p Provider) FetchFunctions() map[string]types.FetchFunc {
 	return funcMap
 }
 
+func (p *Provider) baseTransformers(resourceType string) []resourceconverter.ResourceTransformer {
+	return []resourceconverter.ResourceTransformer{
+		resourceconverter.WithType(resourceType),
+		resourceconverter.WithRegion(p.region.ID()),
+	}
+}
+
 func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceConverter {
 	mapping, ok := p.getTypeMapping()[resourceType]
 	if !ok {
 		panic(fmt.Sprintf("Could not find mapping for resource type %v", resourceType))
 	}
 
-	region := p.region.ID()
 	if mapping.UseMapConverter {
 		return &resourceconverter.MapConverter{
-			Region:       region,
 			ResourceType: resourceType,
 			TagField:     mapping.TagField,
 			IdField:      mapping.IdField,
 		}
 	}
 	return &resourceconverter.ReflectionConverter{
-		Region:       region,
 		ResourceType: resourceType,
 		TagField:     mapping.TagField,
 		IdField:      mapping.IdField,
