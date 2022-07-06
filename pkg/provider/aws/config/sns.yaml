@@ -1,8 +1,9 @@
 types:
-  - name: Topic
+  - name: SNS
     listApi:
       call: ListTopics
       outputKey: Topics
+      sdkType: Topic
       id: TopicArn
       pagination: true
     getTagsApi:

@@ -62,11 +62,11 @@ func (p *Provider) fetch_rds_DBCluster(ctx context.Context, output chan<- model.
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBClustersInput{}
 
+	resourceConverter := p.converterFor("rds.DBCluster")
 	commonTransformers := p.baseTransformers("rds.DBCluster")
-	converter := p.converterFor("rds.DBCluster")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.DBCluster](commonTransformers...),
-		resourceconverter.WithConverter[types.DBCluster](converter),
+		resourceconverter.WithConverter[types.DBCluster](resourceConverter),
 	)
 	paginator := rds.NewDescribeDBClustersPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -88,11 +88,11 @@ func (p *Provider) fetch_rds_DBClusterSnapshot(ctx context.Context, output chan<
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBClusterSnapshotsInput{}
 
+	resourceConverter := p.converterFor("rds.DBClusterSnapshot")
 	commonTransformers := p.baseTransformers("rds.DBClusterSnapshot")
-	converter := p.converterFor("rds.DBClusterSnapshot")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.DBClusterSnapshot](commonTransformers...),
-		resourceconverter.WithConverter[types.DBClusterSnapshot](converter),
+		resourceconverter.WithConverter[types.DBClusterSnapshot](resourceConverter),
 	)
 	paginator := rds.NewDescribeDBClusterSnapshotsPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -114,11 +114,11 @@ func (p *Provider) fetch_rds_DBInstance(ctx context.Context, output chan<- model
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBInstancesInput{}
 
+	resourceConverter := p.converterFor("rds.DBInstance")
 	commonTransformers := p.baseTransformers("rds.DBInstance")
-	converter := p.converterFor("rds.DBInstance")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.DBInstance](commonTransformers...),
-		resourceconverter.WithConverter[types.DBInstance](converter),
+		resourceconverter.WithConverter[types.DBInstance](resourceConverter),
 	)
 	paginator := rds.NewDescribeDBInstancesPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -140,11 +140,11 @@ func (p *Provider) fetch_rds_DBSnapshot(ctx context.Context, output chan<- model
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBSnapshotsInput{}
 
+	resourceConverter := p.converterFor("rds.DBSnapshot")
 	commonTransformers := p.baseTransformers("rds.DBSnapshot")
-	converter := p.converterFor("rds.DBSnapshot")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.DBSnapshot](commonTransformers...),
-		resourceconverter.WithConverter[types.DBSnapshot](converter),
+		resourceconverter.WithConverter[types.DBSnapshot](resourceConverter),
 	)
 	paginator := rds.NewDescribeDBSnapshotsPaginator(client, input)
 	for paginator.HasMorePages() {

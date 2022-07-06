@@ -42,11 +42,11 @@ func (p *Provider) fetch_iam_OpenIDConnectProvider(ctx context.Context, output c
 	client := iam.NewFromConfig(p.config)
 	input := &iam.ListOpenIDConnectProvidersInput{}
 
+	resourceConverter := p.converterFor("iam.OpenIDConnectProvider")
 	commonTransformers := p.baseTransformers("iam.OpenIDConnectProvider")
-	converter := p.converterFor("iam.OpenIDConnectProvider")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.OpenIDConnectProviderListEntry](commonTransformers...),
-		resourceconverter.WithConverter[types.OpenIDConnectProviderListEntry](converter),
+		resourceconverter.WithConverter[types.OpenIDConnectProviderListEntry](resourceConverter),
 		resourceconverter.WithTagFunc(p.getTags_iam_OpenIDConnectProvider),
 	)
 	results, err := client.ListOpenIDConnectProviders(ctx, input)
@@ -88,11 +88,11 @@ func (p *Provider) fetch_iam_Policy(ctx context.Context, output chan<- model.Res
 	input := &iam.ListPoliciesInput{}
 	input.Scope = listPoliciesScope()
 
+	resourceConverter := p.converterFor("iam.Policy")
 	commonTransformers := p.baseTransformers("iam.Policy")
-	converter := p.converterFor("iam.Policy")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.Policy](commonTransformers...),
-		resourceconverter.WithConverter[types.Policy](converter),
+		resourceconverter.WithConverter[types.Policy](resourceConverter),
 		resourceconverter.WithTagFunc(p.getTags_iam_Policy),
 	)
 	paginator := iam.NewListPoliciesPaginator(client, input)
@@ -138,11 +138,11 @@ func (p *Provider) fetch_iam_SAMLProvider(ctx context.Context, output chan<- mod
 	client := iam.NewFromConfig(p.config)
 	input := &iam.ListSAMLProvidersInput{}
 
+	resourceConverter := p.converterFor("iam.SAMLProvider")
 	commonTransformers := p.baseTransformers("iam.SAMLProvider")
-	converter := p.converterFor("iam.SAMLProvider")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.SAMLProviderListEntry](commonTransformers...),
-		resourceconverter.WithConverter[types.SAMLProviderListEntry](converter),
+		resourceconverter.WithConverter[types.SAMLProviderListEntry](resourceConverter),
 		resourceconverter.WithTagFunc(p.getTags_iam_SAMLProvider),
 	)
 	results, err := client.ListSAMLProviders(ctx, input)
@@ -183,11 +183,11 @@ func (p *Provider) fetch_iam_VirtualMFADevice(ctx context.Context, output chan<-
 	client := iam.NewFromConfig(p.config)
 	input := &iam.ListVirtualMFADevicesInput{}
 
+	resourceConverter := p.converterFor("iam.VirtualMFADevice")
 	commonTransformers := p.baseTransformers("iam.VirtualMFADevice")
-	converter := p.converterFor("iam.VirtualMFADevice")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.VirtualMFADevice](commonTransformers...),
-		resourceconverter.WithConverter[types.VirtualMFADevice](converter),
+		resourceconverter.WithConverter[types.VirtualMFADevice](resourceConverter),
 		resourceconverter.WithTagFunc(p.getTags_iam_VirtualMFADevice),
 	)
 	paginator := iam.NewListVirtualMFADevicesPaginator(client, input)

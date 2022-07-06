@@ -10,7 +10,6 @@ types:
         name: LoadBalancerArn
         pointer: true
     getTagsApi:
-      type: LoadBalancer
       call: DescribeTags
       inputIDField:
         name: ResourceArns

@@ -30,11 +30,11 @@ func (p *Provider) fetch_route53_HealthCheck(ctx context.Context, output chan<- 
 	client := route53.NewFromConfig(p.config)
 	input := &route53.ListHealthChecksInput{}
 
+	resourceConverter := p.converterFor("route53.HealthCheck")
 	commonTransformers := p.baseTransformers("route53.HealthCheck")
-	converter := p.converterFor("route53.HealthCheck")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.HealthCheck](commonTransformers...),
-		resourceconverter.WithConverter[types.HealthCheck](converter),
+		resourceconverter.WithConverter[types.HealthCheck](resourceConverter),
 		resourceconverter.WithTagFunc(p.getTags_route53_HealthCheck),
 	)
 	paginator := route53.NewListHealthChecksPaginator(client, input)
@@ -90,11 +90,11 @@ func (p *Provider) fetch_route53_HostedZone(ctx context.Context, output chan<- m
 	client := route53.NewFromConfig(p.config)
 	input := &route53.ListHostedZonesInput{}
 
+	resourceConverter := p.converterFor("route53.HostedZone")
 	commonTransformers := p.baseTransformers("route53.HostedZone")
-	converter := p.converterFor("route53.HostedZone")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.HostedZone](commonTransformers...),
-		resourceconverter.WithConverter[types.HostedZone](converter),
+		resourceconverter.WithConverter[types.HostedZone](resourceConverter),
 		resourceconverter.WithTagFunc(p.getTags_route53_HostedZone),
 	)
 	paginator := route53.NewListHostedZonesPaginator(client, input)

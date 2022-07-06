@@ -238,11 +238,11 @@ func (p *Provider) fetch_ec2_Address(ctx context.Context, output chan<- model.Re
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeAddressesInput{}
 
+	resourceConverter := p.converterFor("ec2.Address")
 	commonTransformers := p.baseTransformers("ec2.Address")
-	converter := p.converterFor("ec2.Address")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.Address](commonTransformers...),
-		resourceconverter.WithConverter[types.Address](converter),
+		resourceconverter.WithConverter[types.Address](resourceConverter),
 	)
 	results, err := client.DescribeAddresses(ctx, input)
 	if err != nil {
@@ -260,11 +260,11 @@ func (p *Provider) fetch_ec2_CapacityReservation(ctx context.Context, output cha
 	input := &ec2.DescribeCapacityReservationsInput{}
 	input.Filters = describeCapacityReservationsFilters()
 
+	resourceConverter := p.converterFor("ec2.CapacityReservation")
 	commonTransformers := p.baseTransformers("ec2.CapacityReservation")
-	converter := p.converterFor("ec2.CapacityReservation")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.CapacityReservation](commonTransformers...),
-		resourceconverter.WithConverter[types.CapacityReservation](converter),
+		resourceconverter.WithConverter[types.CapacityReservation](resourceConverter),
 	)
 	paginator := ec2.NewDescribeCapacityReservationsPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -286,11 +286,11 @@ func (p *Provider) fetch_ec2_ClientVpnEndpoint(ctx context.Context, output chan<
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeClientVpnEndpointsInput{}
 
+	resourceConverter := p.converterFor("ec2.ClientVpnEndpoint")
 	commonTransformers := p.baseTransformers("ec2.ClientVpnEndpoint")
-	converter := p.converterFor("ec2.ClientVpnEndpoint")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.ClientVpnEndpoint](commonTransformers...),
-		resourceconverter.WithConverter[types.ClientVpnEndpoint](converter),
+		resourceconverter.WithConverter[types.ClientVpnEndpoint](resourceConverter),
 	)
 	paginator := ec2.NewDescribeClientVpnEndpointsPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -313,11 +313,11 @@ func (p *Provider) fetch_ec2_Fleet(ctx context.Context, output chan<- model.Reso
 	input := &ec2.DescribeFleetsInput{}
 	input.Filters = describeFleetsFilters()
 
+	resourceConverter := p.converterFor("ec2.Fleet")
 	commonTransformers := p.baseTransformers("ec2.Fleet")
-	converter := p.converterFor("ec2.Fleet")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.FleetData](commonTransformers...),
-		resourceconverter.WithConverter[types.FleetData](converter),
+		resourceconverter.WithConverter[types.FleetData](resourceConverter),
 	)
 	paginator := ec2.NewDescribeFleetsPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -339,11 +339,11 @@ func (p *Provider) fetch_ec2_FlowLog(ctx context.Context, output chan<- model.Re
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeFlowLogsInput{}
 
+	resourceConverter := p.converterFor("ec2.FlowLog")
 	commonTransformers := p.baseTransformers("ec2.FlowLog")
-	converter := p.converterFor("ec2.FlowLog")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.FlowLog](commonTransformers...),
-		resourceconverter.WithConverter[types.FlowLog](converter),
+		resourceconverter.WithConverter[types.FlowLog](resourceConverter),
 	)
 	paginator := ec2.NewDescribeFlowLogsPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -366,11 +366,11 @@ func (p *Provider) fetch_ec2_Image(ctx context.Context, output chan<- model.Reso
 	input := &ec2.DescribeImagesInput{}
 	input.Owners = describeImagesOwners()
 
+	resourceConverter := p.converterFor("ec2.Image")
 	commonTransformers := p.baseTransformers("ec2.Image")
-	converter := p.converterFor("ec2.Image")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.Image](commonTransformers...),
-		resourceconverter.WithConverter[types.Image](converter),
+		resourceconverter.WithConverter[types.Image](resourceConverter),
 	)
 	results, err := client.DescribeImages(ctx, input)
 	if err != nil {
@@ -388,11 +388,11 @@ func (p *Provider) fetch_ec2_Instance(ctx context.Context, output chan<- model.R
 	input := &ec2.DescribeInstancesInput{}
 	input.Filters = describeInstancesFilters()
 
+	resourceConverter := p.converterFor("ec2.Instance")
 	commonTransformers := p.baseTransformers("ec2.Instance")
-	converter := p.converterFor("ec2.Instance")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.Instance](commonTransformers...),
-		resourceconverter.WithConverter[types.Instance](converter),
+		resourceconverter.WithConverter[types.Instance](resourceConverter),
 	)
 	paginator := ec2.NewDescribeInstancesPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -416,11 +416,11 @@ func (p *Provider) fetch_ec2_KeyPair(ctx context.Context, output chan<- model.Re
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeKeyPairsInput{}
 
+	resourceConverter := p.converterFor("ec2.KeyPair")
 	commonTransformers := p.baseTransformers("ec2.KeyPair")
-	converter := p.converterFor("ec2.KeyPair")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.KeyPairInfo](commonTransformers...),
-		resourceconverter.WithConverter[types.KeyPairInfo](converter),
+		resourceconverter.WithConverter[types.KeyPairInfo](resourceConverter),
 	)
 	results, err := client.DescribeKeyPairs(ctx, input)
 	if err != nil {
@@ -437,11 +437,11 @@ func (p *Provider) fetch_ec2_LaunchTemplate(ctx context.Context, output chan<- m
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeLaunchTemplatesInput{}
 
+	resourceConverter := p.converterFor("ec2.LaunchTemplate")
 	commonTransformers := p.baseTransformers("ec2.LaunchTemplate")
-	converter := p.converterFor("ec2.LaunchTemplate")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.LaunchTemplate](commonTransformers...),
-		resourceconverter.WithConverter[types.LaunchTemplate](converter),
+		resourceconverter.WithConverter[types.LaunchTemplate](resourceConverter),
 	)
 	paginator := ec2.NewDescribeLaunchTemplatesPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -463,11 +463,11 @@ func (p *Provider) fetch_ec2_NatGateway(ctx context.Context, output chan<- model
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeNatGatewaysInput{}
 
+	resourceConverter := p.converterFor("ec2.NatGateway")
 	commonTransformers := p.baseTransformers("ec2.NatGateway")
-	converter := p.converterFor("ec2.NatGateway")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.NatGateway](commonTransformers...),
-		resourceconverter.WithConverter[types.NatGateway](converter),
+		resourceconverter.WithConverter[types.NatGateway](resourceConverter),
 	)
 	paginator := ec2.NewDescribeNatGatewaysPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -489,11 +489,11 @@ func (p *Provider) fetch_ec2_NetworkAcl(ctx context.Context, output chan<- model
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeNetworkAclsInput{}
 
+	resourceConverter := p.converterFor("ec2.NetworkAcl")
 	commonTransformers := p.baseTransformers("ec2.NetworkAcl")
-	converter := p.converterFor("ec2.NetworkAcl")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.NetworkAcl](commonTransformers...),
-		resourceconverter.WithConverter[types.NetworkAcl](converter),
+		resourceconverter.WithConverter[types.NetworkAcl](resourceConverter),
 	)
 	paginator := ec2.NewDescribeNetworkAclsPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -515,11 +515,11 @@ func (p *Provider) fetch_ec2_NetworkInterface(ctx context.Context, output chan<-
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeNetworkInterfacesInput{}
 
+	resourceConverter := p.converterFor("ec2.NetworkInterface")
 	commonTransformers := p.baseTransformers("ec2.NetworkInterface")
-	converter := p.converterFor("ec2.NetworkInterface")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.NetworkInterface](commonTransformers...),
-		resourceconverter.WithConverter[types.NetworkInterface](converter),
+		resourceconverter.WithConverter[types.NetworkInterface](resourceConverter),
 	)
 	paginator := ec2.NewDescribeNetworkInterfacesPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -542,11 +542,11 @@ func (p *Provider) fetch_ec2_ReservedInstance(ctx context.Context, output chan<-
 	input := &ec2.DescribeReservedInstancesInput{}
 	input.Filters = describeReservedInstancesFilters()
 
+	resourceConverter := p.converterFor("ec2.ReservedInstance")
 	commonTransformers := p.baseTransformers("ec2.ReservedInstance")
-	converter := p.converterFor("ec2.ReservedInstance")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.ReservedInstances](commonTransformers...),
-		resourceconverter.WithConverter[types.ReservedInstances](converter),
+		resourceconverter.WithConverter[types.ReservedInstances](resourceConverter),
 	)
 	results, err := client.DescribeReservedInstances(ctx, input)
 	if err != nil {
@@ -563,11 +563,11 @@ func (p *Provider) fetch_ec2_RouteTable(ctx context.Context, output chan<- model
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeRouteTablesInput{}
 
+	resourceConverter := p.converterFor("ec2.RouteTable")
 	commonTransformers := p.baseTransformers("ec2.RouteTable")
-	converter := p.converterFor("ec2.RouteTable")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.RouteTable](commonTransformers...),
-		resourceconverter.WithConverter[types.RouteTable](converter),
+		resourceconverter.WithConverter[types.RouteTable](resourceConverter),
 	)
 	paginator := ec2.NewDescribeRouteTablesPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -589,11 +589,11 @@ func (p *Provider) fetch_ec2_SecurityGroup(ctx context.Context, output chan<- mo
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeSecurityGroupsInput{}
 
+	resourceConverter := p.converterFor("ec2.SecurityGroup")
 	commonTransformers := p.baseTransformers("ec2.SecurityGroup")
-	converter := p.converterFor("ec2.SecurityGroup")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.SecurityGroup](commonTransformers...),
-		resourceconverter.WithConverter[types.SecurityGroup](converter),
+		resourceconverter.WithConverter[types.SecurityGroup](resourceConverter),
 	)
 	paginator := ec2.NewDescribeSecurityGroupsPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -616,11 +616,11 @@ func (p *Provider) fetch_ec2_Snapshot(ctx context.Context, output chan<- model.R
 	input := &ec2.DescribeSnapshotsInput{}
 	input.OwnerIds = describeSnapshotsOwners()
 
+	resourceConverter := p.converterFor("ec2.Snapshot")
 	commonTransformers := p.baseTransformers("ec2.Snapshot")
-	converter := p.converterFor("ec2.Snapshot")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.Snapshot](commonTransformers...),
-		resourceconverter.WithConverter[types.Snapshot](converter),
+		resourceconverter.WithConverter[types.Snapshot](resourceConverter),
 	)
 	paginator := ec2.NewDescribeSnapshotsPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -643,11 +643,11 @@ func (p *Provider) fetch_ec2_SpotInstanceRequest(ctx context.Context, output cha
 	input := &ec2.DescribeSpotInstanceRequestsInput{}
 	input.Filters = describeSpotInstanceRequestsFilters()
 
+	resourceConverter := p.converterFor("ec2.SpotInstanceRequest")
 	commonTransformers := p.baseTransformers("ec2.SpotInstanceRequest")
-	converter := p.converterFor("ec2.SpotInstanceRequest")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.SpotInstanceRequest](commonTransformers...),
-		resourceconverter.WithConverter[types.SpotInstanceRequest](converter),
+		resourceconverter.WithConverter[types.SpotInstanceRequest](resourceConverter),
 	)
 	paginator := ec2.NewDescribeSpotInstanceRequestsPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -669,11 +669,11 @@ func (p *Provider) fetch_ec2_Subnet(ctx context.Context, output chan<- model.Res
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeSubnetsInput{}
 
+	resourceConverter := p.converterFor("ec2.Subnet")
 	commonTransformers := p.baseTransformers("ec2.Subnet")
-	converter := p.converterFor("ec2.Subnet")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.Subnet](commonTransformers...),
-		resourceconverter.WithConverter[types.Subnet](converter),
+		resourceconverter.WithConverter[types.Subnet](resourceConverter),
 	)
 	paginator := ec2.NewDescribeSubnetsPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -695,11 +695,11 @@ func (p *Provider) fetch_ec2_Volume(ctx context.Context, output chan<- model.Res
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeVolumesInput{}
 
+	resourceConverter := p.converterFor("ec2.Volume")
 	commonTransformers := p.baseTransformers("ec2.Volume")
-	converter := p.converterFor("ec2.Volume")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.Volume](commonTransformers...),
-		resourceconverter.WithConverter[types.Volume](converter),
+		resourceconverter.WithConverter[types.Volume](resourceConverter),
 	)
 	paginator := ec2.NewDescribeVolumesPaginator(client, input)
 	for paginator.HasMorePages() {
@@ -721,11 +721,11 @@ func (p *Provider) fetch_ec2_Vpc(ctx context.Context, output chan<- model.Resour
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeVpcsInput{}
 
+	resourceConverter := p.converterFor("ec2.Vpc")
 	commonTransformers := p.baseTransformers("ec2.Vpc")
-	converter := p.converterFor("ec2.Vpc")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.Vpc](commonTransformers...),
-		resourceconverter.WithConverter[types.Vpc](converter),
+		resourceconverter.WithConverter[types.Vpc](resourceConverter),
 	)
 	paginator := ec2.NewDescribeVpcsPaginator(client, input)
 	for paginator.HasMorePages() {

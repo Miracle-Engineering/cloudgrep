@@ -92,6 +92,19 @@ func WithRawDataFunc[T any](rawFunc func(context.Context, T) (any, error)) Gener
 	}
 }
 
+func WithRegionFunc[T any](regionFunc func(context.Context, T) (string, error)) GenericTransformer[T] {
+	return func(ctx context.Context, raw T, res *model.Resource) error {
+		region, err := regionFunc(ctx, raw)
+		if err != nil {
+			return err
+		}
+
+		res.Region = region
+
+		return nil
+	}
+}
+
 func WithIDTransformer(idFunc func(string) (string, error)) ResourceTransformer {
 	return func(ctx context.Context, res *model.Resource) error {
 		id, err := idFunc(res.Id)

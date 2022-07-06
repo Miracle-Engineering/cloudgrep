@@ -13,11 +13,11 @@ func TestFetchSnsTopic(t *testing.T) {
 
 	ctx := setupIntegrationTest(t)
 
-	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "sns.Topic")
+	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "sns.SNS")
 
 	testingutil.AssertResourceCount(t, resources, "", 1)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "sns.Topic",
+		Type:   "sns.SNS",
 		Region: defaultRegion,
 		Tags: model.Tags{
 			{

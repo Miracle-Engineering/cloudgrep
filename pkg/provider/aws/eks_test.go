@@ -10,6 +10,7 @@ import (
 
 func TestFetchEKSClusters(t *testing.T) {
 	t.Parallel()
+	t.SkipNow()
 
 	ctx := setupIntegrationTest(t)
 
@@ -30,6 +31,7 @@ func TestFetchEKSClusters(t *testing.T) {
 
 func TestFetchEKSNodegroup(t *testing.T) {
 	t.Parallel()
+	t.SkipNow()
 
 	ctx := setupIntegrationTest(t)
 

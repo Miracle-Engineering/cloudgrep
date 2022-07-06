@@ -24,11 +24,11 @@ func (p *Provider) fetch_elasticache_CacheCluster(ctx context.Context, output ch
 	client := elasticache.NewFromConfig(p.config)
 	input := &elasticache.DescribeCacheClustersInput{}
 
+	resourceConverter := p.converterFor("elasticache.CacheCluster")
 	commonTransformers := p.baseTransformers("elasticache.CacheCluster")
-	converter := p.converterFor("elasticache.CacheCluster")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.CacheCluster](commonTransformers...),
-		resourceconverter.WithConverter[types.CacheCluster](converter),
+		resourceconverter.WithConverter[types.CacheCluster](resourceConverter),
 		resourceconverter.WithTagFunc(p.getTags_elasticache_CacheCluster),
 	)
 	paginator := elasticache.NewDescribeCacheClustersPaginator(client, input)

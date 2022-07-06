@@ -24,11 +24,11 @@ func (p *Provider) fetch_lambda_Function(ctx context.Context, output chan<- mode
 	client := lambda.NewFromConfig(p.config)
 	input := &lambda.ListFunctionsInput{}
 
+	resourceConverter := p.converterFor("lambda.Function")
 	commonTransformers := p.baseTransformers("lambda.Function")
-	converter := p.converterFor("lambda.Function")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.FunctionConfiguration](commonTransformers...),
-		resourceconverter.WithConverter[types.FunctionConfiguration](converter),
+		resourceconverter.WithConverter[types.FunctionConfiguration](resourceConverter),
 		resourceconverter.WithTagFunc(p.getTags_lambda_Function),
 	)
 	paginator := lambda.NewListFunctionsPaginator(client, input)

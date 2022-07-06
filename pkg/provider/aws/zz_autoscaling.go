@@ -29,11 +29,11 @@ func (p *Provider) fetch_autoscaling_AutoScalingGroup(ctx context.Context, outpu
 	client := autoscaling.NewFromConfig(p.config)
 	input := &autoscaling.DescribeAutoScalingGroupsInput{}
 
+	resourceConverter := p.converterFor("autoscaling.AutoScalingGroup")
 	commonTransformers := p.baseTransformers("autoscaling.AutoScalingGroup")
-	converter := p.converterFor("autoscaling.AutoScalingGroup")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.AutoScalingGroup](commonTransformers...),
-		resourceconverter.WithConverter[types.AutoScalingGroup](converter),
+		resourceconverter.WithConverter[types.AutoScalingGroup](resourceConverter),
 	)
 	paginator := autoscaling.NewDescribeAutoScalingGroupsPaginator(client, input)
 	for paginator.HasMorePages() {

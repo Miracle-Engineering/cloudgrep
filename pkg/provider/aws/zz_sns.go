@@ -12,31 +12,31 @@ import (
 )
 
 func (p *Provider) register_sns(mapping map[string]mapper) {
-	mapping["sns.Topic"] = mapper{
+	mapping["sns.SNS"] = mapper{
 		ServiceEndpointID: "sns",
-		FetchFunc:         p.fetch_sns_Topic,
+		FetchFunc:         p.fetch_sns_SNS,
 		IdField:           "TopicArn",
 		IsGlobal:          false,
 	}
 }
 
-func (p *Provider) fetch_sns_Topic(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetch_sns_SNS(ctx context.Context, output chan<- model.Resource) error {
 	client := sns.NewFromConfig(p.config)
 	input := &sns.ListTopicsInput{}
 
-	commonTransformers := p.baseTransformers("sns.Topic")
-	converter := p.converterFor("sns.Topic")
+	resourceConverter := p.converterFor("sns.SNS")
+	commonTransformers := p.baseTransformers("sns.SNS")
 	transformers := append(
 		resourceconverter.AllToGeneric[types.Topic](commonTransformers...),
-		resourceconverter.WithConverter[types.Topic](converter),
-		resourceconverter.WithTagFunc(p.getTags_sns_Topic),
+		resourceconverter.WithConverter[types.Topic](resourceConverter),
+		resourceconverter.WithTagFunc(p.getTags_sns_SNS),
 	)
 	paginator := sns.NewListTopicsPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return fmt.Errorf("failed to fetch %s: %w", "sns.Topic", err)
+			return fmt.Errorf("failed to fetch %s: %w", "sns.SNS", err)
 		}
 
 		if err := resourceconverter.SendAll(ctx, output, page.Topics, transformers...); err != nil {
@@ -46,7 +46,7 @@ func (p *Provider) fetch_sns_Topic(ctx context.Context, output chan<- model.Reso
 
 	return nil
 }
-func (p *Provider) getTags_sns_Topic(ctx context.Context, resource types.Topic) (model.Tags, error) {
+func (p *Provider) getTags_sns_SNS(ctx context.Context, resource types.Topic) (model.Tags, error) {
 	client := sns.NewFromConfig(p.config)
 	input := &sns.ListTagsForResourceInput{}
 
@@ -54,7 +54,7 @@ func (p *Provider) getTags_sns_Topic(ctx context.Context, resource types.Topic) 
 
 	output, err := client.ListTagsForResource(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch %s tags: %w", "sns.Topic", err)
+		return nil, fmt.Errorf("failed to fetch %s tags: %w", "sns.SNS", err)
 	}
 	tagField_0 := output.Tags
 
