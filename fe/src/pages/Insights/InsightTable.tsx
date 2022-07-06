@@ -7,9 +7,11 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TableSortLabel from '@mui/material/TableSortLabel';
 import Typography from '@mui/material/Typography';
+import { visuallyHidden } from '@mui/utils';
 import { BORDER_COLOR } from 'constants/colors';
-import { DEBOUNCE_PERIOD, PAGE_LENGTH } from 'constants/globals';
+import { DEBOUNCE_PERIOD, PAGE_LENGTH, PAGE_START } from 'constants/globals';
 import debounce from 'debounce';
 import { Resource } from 'models/Resource';
 import React, { FC, useEffect, useState } from 'react';
@@ -17,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import ResourceService from 'services/ResourceService';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { setCurrentResource, toggleMenuVisible } from 'store/resources/slice';
-import { getFilteredResourcesNextPage } from 'store/resources/thunks';
+import { getFilteredResources, getFilteredResourcesNextPage } from 'store/resources/thunks';
 import usePagination from 'utils/hooks/usePagination';
 import { isScrolledForInfiniteScroll } from 'utils/uiHelper';
 
@@ -31,6 +33,8 @@ const InsightTable: FC = () => {
 	const [isInfiniteScroll, setIsInfiniteScroll] = useState<boolean>(false);
 	const [hasNext, setHasNext] = useState<boolean>(true);
 	const { currentPage, next } = usePagination(PAGE_LENGTH, count);
+	const [order, setOrder] = useState<'asc' | 'desc' | undefined>();
+	const [orderBy, setOrderBy] = useState<string | undefined>();
 
 	useEffect(() => {
 		if (resources && isInfiniteScroll) {
@@ -39,14 +43,20 @@ const InsightTable: FC = () => {
 		}
 	}, [resources]);
 
+	useEffect(() => {
+		setOrderBy(undefined);
+	}, [filterTags]);
+
 	const handleInfiniteScroll = async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 		if (isScrolledForInfiniteScroll(e)) {
 			setIsInfiniteScroll(true);
-			const response = await ResourceService.getFilteredResources(
-				filterTags,
-				currentPage * PAGE_LENGTH,
-				PAGE_LENGTH
-			);
+			const response = await ResourceService.getFilteredResources({
+				data: filterTags,
+				offset: currentPage * PAGE_LENGTH,
+				limit: PAGE_LENGTH,
+				order,
+				orderBy,
+			});
 			if (response?.data?.resources && response.data.resources.length > 0) {
 				setHasNext(true);
 				dispatch(
@@ -77,6 +87,27 @@ const InsightTable: FC = () => {
 
 	const debouncedContainerScroll = debounce(onContainerScroll, DEBOUNCE_PERIOD);
 
+	const handleRequestSort = (_event: React.MouseEvent<unknown>, property: string) => {
+		const isAsc = orderBy === property && order === 'asc';
+		const newOrder = isAsc ? 'desc' : 'asc';
+		setOrder(newOrder);
+		setOrderBy(property);
+
+		dispatch(
+			getFilteredResources({
+				data: filterTags,
+				offset: PAGE_START,
+				limit: PAGE_LENGTH,
+				order: newOrder,
+				orderBy: property,
+			})
+		);
+	};
+
+	const createSortHandler = (property: string) => (event: React.MouseEvent<unknown>) => {
+		handleRequestSort(event, property);
+	};
+
 	return (
 		<Box
 			sx={{
@@ -99,12 +130,52 @@ const InsightTable: FC = () => {
 				<Table stickyHeader sx={{ minWidth: 650, overflowY: 'scroll' }} size="small" aria-label="a dense table">
 					<TableHead>
 						<TableRow sx={{ height: '46px', borderBottom: `1px solid ${BORDER_COLOR}` }}>
-							<TableCell sx={tableStyles.headerStyle}>{t('TYPE')} </TableCell>
-							<TableCell align="left" sx={tableStyles.headerStyle}>
-								{t('ID')}
+							<TableCell
+								sortDirection={orderBy === t('TYPE') ? order : false}
+								sx={tableStyles.headerStyle}>
+								<TableSortLabel
+									active={orderBy === t('TYPE')}
+									direction={orderBy === t('TYPE') ? order : 'asc'}
+									onClick={createSortHandler(t('TYPE'))}>
+									{t('TYPE')}
+									{orderBy === t('TYPE') ? (
+										<Box component="span" sx={visuallyHidden}>
+											{order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+										</Box>
+									) : null}
+								</TableSortLabel>
 							</TableCell>
-							<TableCell align="left" sx={tableStyles.headerStyle}>
-								{t('REGION')}
+							<TableCell
+								sortDirection={orderBy === t('ID') ? order : false}
+								align="left"
+								sx={tableStyles.headerStyle}>
+								<TableSortLabel
+									active={orderBy === t('ID')}
+									direction={orderBy === t('ID') ? order : 'asc'}
+									onClick={createSortHandler(t('ID'))}>
+									{t('ID')}
+									{orderBy === t('ID') ? (
+										<Box component="span" sx={visuallyHidden}>
+											{order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+										</Box>
+									) : null}
+								</TableSortLabel>
+							</TableCell>
+							<TableCell
+								sortDirection={orderBy === t('REGION') ? order : false}
+								align="left"
+								sx={tableStyles.headerStyle}>
+								<TableSortLabel
+									active={orderBy === t('REGION')}
+									direction={orderBy === t('REGION') ? order : 'asc'}
+									onClick={createSortHandler(t('REGION'))}>
+									{t('REGION')}
+									{orderBy === t('REGION') ? (
+										<Box component="span" sx={visuallyHidden}>
+											{order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+										</Box>
+									) : null}
+								</TableSortLabel>
 							</TableCell>
 						</TableRow>
 					</TableHead>
@@ -115,7 +186,6 @@ const InsightTable: FC = () => {
 								key={row.id + row.type + index}
 								sx={{
 									height: '66px',
-									// '&:last-child td, &:last-child th': { border: 0 },
 									'&:hover': tableStyles.hoverStyle,
 								}}>
 								<TableCell sx={tableStyles.bodyRow} component="th" scope="row">

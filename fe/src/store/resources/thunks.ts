@@ -19,9 +19,9 @@ const getResources = createAsyncThunk('resources/getResources', async (_, thunkA
 const getFilteredResources = createAsyncThunk(
 	'resources/getFilteredResources',
 	async (apiParams: FilterResourcesApiParams, thunkAPI) => {
-		const { data, limit, offset } = apiParams;
+		const { data } = apiParams;
 		try {
-			const response = await ResourceService.getFilteredResources(data, offset, limit);
+			const response = await ResourceService.getFilteredResources(apiParams);
 			thunkAPI.dispatch(setResources(response.data));
 			thunkAPI.dispatch(setFields(response.data.fieldGroups));
 			thunkAPI.dispatch(setFilterTags(data));

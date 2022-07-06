@@ -1,5 +1,7 @@
-import { AND_OPERATOR, OR_OPERATOR, PAGE_LENGTH } from 'constants/globals';
+import { AND_OPERATOR, OR_OPERATOR } from 'constants/globals';
 import { Tag } from 'models/Tag';
+
+import { FilterResourcesProps } from './types';
 
 export const getArrayOfObjects = (data: Tag[]) => {
 	return data.map((tag: Tag) => {
@@ -9,7 +11,9 @@ export const getArrayOfObjects = (data: Tag[]) => {
 	});
 };
 
-export const getResourcesFilters = (data: Tag[], offset = 0, limit = PAGE_LENGTH) => {
+export const getResourcesFilters = (filterData: FilterResourcesProps) => {
+	const { data, offset, limit, order, orderBy } = filterData;
+
 	const filter: {
 		[key: string]: Array<Object>;
 	} = {};
@@ -22,5 +26,7 @@ export const getResourcesFilters = (data: Tag[], offset = 0, limit = PAGE_LENGTH
 		filter[AND_OPERATOR] = [...(filter[AND_OPERATOR] || []), { [OR_OPERATOR]: [...currentFilters] }];
 	});
 
-	return { filter, limit: limit, offset: offset };
+	const sortByProperty = order === 'desc' ? '-' + orderBy : orderBy;
+
+	return { filter, limit: limit, offset: offset, sort: orderBy ? [sortByProperty?.toLowerCase()] : undefined };
 };
