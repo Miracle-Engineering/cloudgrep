@@ -65,8 +65,8 @@ release:
   draft: true
   mode: keep-existing
   extra_files:
-    - glob: ./dist/cloudgrep_darwin_amd64.dmg
-    - glob: ./dist/cloudgrep_darwin_arm64.dmg
+    - glob: ./bin/cloudgrep_darwin_amd64.dmg
+    - glob: ./bin/cloudgrep_darwin_arm64.dmg
   footer: |
     **Full Changelog**: https://github.com/run-x/cloudgrep/compare/{{ .PreviousTag }}...{{ .Tag }}
     ## What to do next?
