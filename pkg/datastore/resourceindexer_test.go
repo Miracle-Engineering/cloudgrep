@@ -19,20 +19,20 @@ func TestUpdateQueryFields(t *testing.T) {
 	ri, err := newResourceIndexer(context.Background(), zaptest.NewLogger(t), nil)
 	//for this test we don't have a DB, we can still proceed
 	assert.Error(t, err, "no DB provided")
-	ri.fieldColumns.addExplicitFields("type", "region", "id")
+	ri.fieldColumns.addExplicitFields("core", "type", "region", "id")
 	assert.True(t,
-		ri.fieldColumns.addDynamicFields("aws:ec2:fleet-id", "team-name", "cluster", "env"),
+		ri.fieldColumns.addDynamicFields("tags", "aws:ec2:fleet-id", "team-name", "cluster", "env"),
 	)
 
 	testCases := []testCase{
 		{`{
   "limit":5,
   "filter":{
-    "type":"ec2.Instance",
-    "aws:ec2:fleet-id":"fleet-bafee5d7-215d-addb-2632-290ab09da4e7"
+    "core.type":"ec2.Instance",
+    "tags.aws:ec2:fleet-id":"fleet-bafee5d7-215d-addb-2632-290ab09da4e7"
   },
   "sort":[
-    "-aws:ec2:fleet-id"
+    "-tags.aws:ec2:fleet-id"
   ]
 }`, `{
   "limit":5,
@@ -46,9 +46,9 @@ func TestUpdateQueryFields(t *testing.T) {
 }`},
 		{`{
   "filter":{
-    "type": "s3.Bucket"
+    "core.type": "s3.Bucket"
   },
-  "sort": ["region"]
+  "sort": ["core.region"]
 }`, `{
   "filter":{
     "type": "s3.Bucket"
@@ -58,10 +58,10 @@ func TestUpdateQueryFields(t *testing.T) {
 		{
 			`{
   "filter":{
-    "type":"ec2.Volume",
+    "core.type":"ec2.Volume",
     "$or": [
-      { "team-name": "marketplace" },
-      { "team-name": "shipping" }
+      { "tags.team-name": "marketplace" },
+      { "tags.team-name": "shipping" }
     ]
   }
 }`,
@@ -78,12 +78,12 @@ func TestUpdateQueryFields(t *testing.T) {
 		{
 			`{
   "filter":{
-    "unknown-field":"ec2.Volume"
+    "tags.unknown-field":"ec2.Volume"
   }
 }`,
 			`{
   "filter":{
-    "unknown-field":"ec2.Volume"
+    "tags.unknown-field":"ec2.Volume"
   }
 }`,
 		},
@@ -91,12 +91,12 @@ func TestUpdateQueryFields(t *testing.T) {
 		{
 			`{
   "filter2":{
-    "aws:ec2:fleet-id":"fleet-bafee5d7-215d-addb-2632-290ab09da4e7"
+    "tags.aws:ec2:fleet-id":"fleet-bafee5d7-215d-addb-2632-290ab09da4e7"
   }
 }`,
 			`{
   "filter2":{
-    "aws:ec2:fleet-id":"fleet-bafee5d7-215d-addb-2632-290ab09da4e7"
+    "tags.aws:ec2:fleet-id":"fleet-bafee5d7-215d-addb-2632-290ab09da4e7"
   }
 }`,
 		},
@@ -104,19 +104,19 @@ func TestUpdateQueryFields(t *testing.T) {
 		{
 			`{
   "filter":{
-    "type":"ec2.Volume",
+    "core.type":"ec2.Volume",
     "$or": [
-      { "team-name": "marketplace" },
-      { "team-name": "shipping" }
+      { "tags.team-name": "marketplace" },
+      { "tags.team-name": "shipping" }
     ],
 	"$and": [
 		{ "$or": [
-			{ "cluster": "dev" },
-			{ "cluster": "prod" }
+			{ "tags.cluster": "dev" },
+			{ "tags.cluster": "prod" }
 		] },
 		{ "$or": [
-			{ "env": "staging" },
-			{ "env": "prod" }
+			{ "tags.env": "staging" },
+			{ "tags.env": "prod" }
 		] }
 	]
   }

@@ -159,10 +159,11 @@ func TestLoad(t *testing.T) {
 					//add some fields
 					filter := make(map[string]interface{})
 					for t, tag := range randResource.Tags {
-						filter[tag.Key] = tag.Value
+						fieldName := fmt.Sprintf("%v.%v", model.FieldGroupTags, tag.Key)
+						filter[fieldName] = tag.Value
 						if t == 0 {
 							//add sort
-							query["sort"] = []string{tag.Key}
+							query["sort"] = []string{fieldName}
 						}
 						//cap at 30 filter max
 						if t == 30 {

@@ -153,10 +153,10 @@ func TestResourcesPostRoute(t *testing.T) {
   "filter":{
     "$or":[
       {
-        "team":"infra"
+        "tags.team":"infra"
       },
       {
-        "team":"dev"
+        "tags.team":"dev"
       }
     ]
   }

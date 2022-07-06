@@ -52,39 +52,42 @@ func newResourceIndexer(ctx context.Context, logger *zap.Logger, db *gorm.DB) (r
 	return qb, err
 }
 
-//newFieldColumns creates the map from a slice of fieldColumn
-func newFieldColumns(fields []fieldColumn) fieldColumns {
-	result := make(map[string]fieldColumn)
-	for _, field := range fields {
-		result[field.FieldName] = field
-	}
-	return result
-}
-
 //an explicit field means that the column will be named after the field
-func (f fieldColumns) addExplicitFields(names ...string) {
+func (f fieldColumns) addExplicitFields(group string, names ...string) {
 	for _, name := range names {
-		f[name] = fieldColumn{
-			ColumnName: name,
-			FieldName:  name,
-		}
+		f.addFieldColumn(fieldName(group, name), name)
 	}
 }
 
 //a dynamic field would have a generated column name
-func (f fieldColumns) addDynamicFields(names ...string) bool {
+func (f fieldColumns) addDynamicFields(group string, names ...string) bool {
 	newField := false
 	for _, name := range names {
-		if _, found := f[name]; !found {
-			columnName := f.newColumnName()
-			f[name] = fieldColumn{
-				ColumnName: columnName,
-				FieldName:  name,
-			}
+		fieldName := fieldName(group, name)
+		if _, found := f[fieldName]; !found {
+			f.addFieldColumn(fieldName, f.newColumnName())
 			newField = true
 		}
 	}
 	return newField
+}
+
+func (f fieldColumns) addFieldColumn(fieldName, columnName string) {
+	f[fieldName] = fieldColumn{
+		ColumnName: columnName,
+		FieldName:  fieldName,
+	}
+}
+
+func fieldName(group string, name string) string {
+	return fmt.Sprintf("%v.%v", group, name)
+}
+
+func (f fieldColumns) columnName(group string, name string) string {
+	if v, ok := f[fieldName(group, name)]; ok {
+		return v.ColumnName
+	}
+	return ""
 }
 
 //note: this code is inneficient but only done when a new tag key is found (unfrequent)
@@ -115,11 +118,19 @@ func (f fieldColumns) asSlice() []fieldColumn {
 }
 
 //update a query field to map the datamodel
-//ex: "aws:ec2:fleet-id" -> "col_3"
+//ex: "tags.aws:ec2:fleet-id" -> "col_3"
 func (ri *resourceIndexer) toColumnName(fieldName string) string {
 	if fieldCol, ok := ri.fieldColumns[fieldName]; ok {
 		return fieldCol.ColumnName
 	}
+	//TODO remove this extra try once FE uses new field name convention
+	//this allows the query "team=consumer" to be equivalent to "tags.team=consumer"
+	for _, group := range []string{model.FieldGroupCore, model.FieldGroupTags} {
+		if fieldCol, ok := ri.fieldColumns[fmt.Sprintf("%v.%v", group, fieldName)]; ok {
+			return fieldCol.ColumnName
+		}
+	}
+
 	//do not do any change - rql would throw an unknown field error
 	return fieldName
 }
@@ -141,9 +152,12 @@ func (ri *resourceIndexer) rebuildDataModel(db *gorm.DB) error {
 			//load existing fields from the DB
 			db.Find(&fieldColumns)
 		}
-		ri.fieldColumns = newFieldColumns(fieldColumns)
+		ri.fieldColumns = make(map[string]fieldColumn)
+		for _, field := range fieldColumns {
+			ri.fieldColumns[field.FieldName] = field
+		}
 		//always include these
-		ri.fieldColumns.addExplicitFields("id", "type", "region")
+		ri.fieldColumns.addExplicitFields(model.FieldGroupCore, "id", "type", "region")
 	}
 
 	builder := dynamicstruct.NewStruct()
@@ -183,6 +197,7 @@ func (ri *resourceIndexer) rebuildDataModel(db *gorm.DB) error {
 	return nil
 }
 
+//updateQueryFields update the field name to use SQL column names
 func (ri *resourceIndexer) updateQueryFields(jsonQuery []byte) ([]byte, error) {
 	var query map[string]interface{}
 	err := json.Unmarshal(jsonQuery, &query)
@@ -211,10 +226,10 @@ func (ri *resourceIndexer) updateQueryFields(jsonQuery []byte) ([]byte, error) {
 func updateQueryFilter(filter map[string]interface{}, f func(string) string) map[string]interface{} {
 	/*{
 	  "filter":{
-	    "type":"ec2.Volume",
+	    "core.type":"ec2.Volume",
 	    "$or": [
-	      { "team": "marketplace" },
-	      { "team": "shipping" }
+	      { "tags.team": "marketplace" },
+	      { "tags.team": "shipping" }
 	    ]
 	  }
 	}
@@ -305,7 +320,7 @@ func (ri *resourceIndexer) writeResourceIndexes(ctx context.Context, db *gorm.DB
 	rebuildModel := false
 	for _, r := range resources {
 		for _, tag := range r.Tags {
-			if ri.fieldColumns.addDynamicFields(tag.Key) {
+			if ri.fieldColumns.addDynamicFields(model.FieldGroupTags, tag.Key) {
 				//new tag key found - need to rebuild the model
 				rebuildModel = true
 			}
@@ -339,8 +354,8 @@ func (ri *resourceIndexer) writeResourceIndexes(ctx context.Context, db *gorm.DB
 		row["region"] = r.Region
 		//add the tags
 		for _, tag := range r.Tags {
-			//ex: row["Col23"]="Jordan"
-			row[ri.fieldColumns[tag.Key].ColumnName] = tag.Value
+			//ex: row["Col23"]="Team"
+			row[ri.fieldColumns.columnName(model.FieldGroupTags, tag.Key)] = tag.Value
 		}
 		rows = append(rows, row)
 	}

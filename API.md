@@ -22,11 +22,11 @@ To filter the resources, send a body containing a query.
   "offset": 0,
   //filter the resources
   "filter": {
-    "type": "ec2.Instance"
-    "env": "prod"
+    "core.type": "ec2.Instance"
+    "tags.env": "prod"
   }
   //optional sort
-  "sort": ["type"]
+  "sort": ["core.type"]
 }
 ```
 
@@ -53,10 +53,10 @@ The response contains:
   "offset": 0,
   //filter the resources
   "filter": {
-    "type": "ec2.Instance"
+    "core.type": "ec2.Instance"
   }
   //optional sort
-  "sort": ["type"]
+  "sort": ["core.type"]
 }
 ```
 
@@ -65,7 +65,7 @@ curl --location --request POST 'http://localhost:8080/api/resources' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "filter": {
-        "kubernetes.io/created-for/pv/name": "opta-persistent-0-hellopv-hellopv-k8s-service-0"
+        "tags.kubernetes.io/created-for/pv/name": "opta-persistent-0-hellopv-hellopv-k8s-service-0"
     }
 }'
 ```
@@ -79,22 +79,22 @@ Example of queries:
 //return resources of type "ec2.Instance" with the tag "team" equals "marketplace"
 {
   "filter":{
-    "type": "ec2.Instance",
-	  "team": "marketplace"
+    "core.type": "ec2.Instance",
+	  "tags.team": "marketplace"
   }
 }
 
 //return resources with the tag "team" defined
 {
   "filter":{
-	  "team": "(not null)"
+	  "tags.team": "(not null)"
   }
 }
 
 //return resources missing the tag "team"
 {
   "filter":{
-	  "team": "(missing)"
+	  "tags.team": "(missing)"
   }
 }
 
@@ -102,10 +102,10 @@ Example of queries:
 // will return resources with type=ec2.Volume AND (team="marketplace" OR team="shipping")
 {
   "filter":{
-    "type":"ec2.Volume",
+    "core.type":"ec2.Volume",
     "$or": [
-      { "team": "marketplace" },
-      { "team": "shipping" }
+      { "tags.team": "marketplace" },
+      { "tags.team": "shipping" }
     ]
   } 
 }
@@ -115,17 +115,17 @@ Example of queries:
 {
   "filter":{
     "$or": [
-      { "team": "marketplace" },
-      { "team": "shipping" }
+      { "tags.team": "marketplace" },
+      { "tags.team": "shipping" }
     ],
     "$and": [
       { "$or": [
-        { "cluster": "dev" },
-        { "cluster": "prod" }
+        { "tags.cluster": "dev" },
+        { "tags.cluster": "prod" }
       ] },
       { "$or": [
-        { "size": "large" },
-        { "size": "medium" }
+        { "tags.size": "large" },
+        { "tags.size": "medium" }
       ] }
     ]
   }
@@ -134,18 +134,18 @@ Example of queries:
 //sort by a field
 {
   "filter":{
-    "type": "s3.Bucket"
+    "core.type": "s3.Bucket"
   },
-  "sort": ["region"]
+  "sort": ["core.region"]
 }
 
 //The default order for column is ascending order but you can control it with an optional prefix: + or -. + means ascending order, and - means descending order.
 //sort by region desc
 {
   "filter":{
-    "type": "s3.Bucket"
+    "core.type": "s3.Bucket"
   },
-  "sort": ["-region"]
+  "sort": ["-core.region"]
 }
 
 //Set a limit: default 25, Max is 100
@@ -153,7 +153,7 @@ Example of queries:
 {
   "limit": 10,
   "filter":{
-    "type": "ec2.Instance"
+    "core.type": "ec2.Instance"
   }
 }
 
@@ -163,7 +163,7 @@ Example of queries:
   "limit": 10,
   "offset": 0,
   "filter":{
-    "type": "ec2.Instance"
+    "core.type": "ec2.Instance"
   }
 }
 //second page: next 10 results
@@ -171,7 +171,7 @@ Example of queries:
   "limit": 10,
   "offset": 10,
   "filter":{
-    "type": "ec2.Instance"
+    "core.type": "ec2.Instance"
   }
 }
 
@@ -503,7 +503,6 @@ Sample Responses:
     }
 ]
 }
-
 ```
 
 If you need to know when the engine is done running, keep pulling this endpoint until the status is no longer **fetching**.
