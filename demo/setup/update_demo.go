@@ -22,7 +22,7 @@ import (
 
 const configInput = "./demo/setup/demo-setup.yaml"
 const configOutput = "./demo/demo.yaml"
-const targetDB = "demo/demo.db"
+const targetDB = "./demo/demo.db"
 
 //generate the demo data from the original dump
 func main() {
@@ -30,7 +30,7 @@ func main() {
 	//clean up previous target db
 	e := os.Remove(targetDB)
 	if e != nil {
-		log.Fatal(e)
+		log.Print(e)
 	}
 
 	input := readConfig(configInput)
@@ -45,10 +45,10 @@ func main() {
 	}
 
 	//copy the tags from the ec2.instance to their ec2.NetworkInterface
-	for _, instance := range input.getResources(map[string]string{"type": "ec2.Instance"}) {
+	for _, instance := range input.getResources(map[string]string{"core.type": "ec2.Instance"}) {
 		eni := getEni(instance)
 		if eni != "" {
-			eniResource := input.getResources(map[string]string{"id": eni})[0]
+			eniResource := input.getResources(map[string]string{"core.id": eni})[0]
 			eniResource.Tags = instance.Tags
 			if err := output.ds.WriteResources(ctx, model.Resources{eniResource}); err != nil {
 				log.Fatal(e)
@@ -62,7 +62,7 @@ func main() {
 		"billing":          "consumer",
 		"data-management":  "marketplace"}
 	for team, original := range newTeams {
-		toCopy := output.getResources(map[string]string{"team": original})
+		toCopy := output.getResources(map[string]string{"tags.team": original})
 		fnResource := func(r model.Resource) model.Resource {
 			r.Tags = r.Tags.Delete("team").Add("team", team)
 			return r
@@ -75,7 +75,7 @@ func main() {
 	//assign 95% of the ec2.NetworkInterface, ec2.SecurityGroup, ec2.Subnet without tags to infra team
 	//leave some aside for default vpc and such
 	for _, _type := range []string{"ec2.NetworkInterface", "ec2.SecurityGroup", "ec2.Subnet"} {
-		toUpdate := output.getResources(map[string]string{"type": _type, "team": "(missing)"})
+		toUpdate := output.getResources(map[string]string{"core.type": _type, "tags.team": "(missing)"})
 		fnResource := func(r model.Resource) model.Resource {
 			r.Tags = model.Tags{model.Tag{Key: "team", Value: "infra"}}
 			return r
@@ -86,10 +86,10 @@ func main() {
 	// set a wrong value -> prod -> production for 1 resource
 	output.updateTag(
 		map[string]string{
-			"env":    "prod",
-			"type":   "eks.Cluster",
-			"market": "Europe",
-			"team":   "marketplace",
+			"tags.env":    "prod",
+			"core.type":   "eks.Cluster",
+			"tags.market": "Europe",
+			"tags.team":   "marketplace",
 		},
 		"env", "production",
 	)
@@ -98,7 +98,7 @@ func main() {
 	// identify the cloudformation stuff
 	output.updateTag(
 		map[string]string{
-			"aws:cloudformation:logical-id": "(not null)",
+			"tags.aws:cloudformation:logical-id": "(not null)",
 		},
 		"managed-by", "cloudformation",
 	)
@@ -113,13 +113,13 @@ func main() {
 	// fix a wrong tag (in the original data)
 	output.updateTag(
 		map[string]string{
-			"market": "North America/",
+			"tags.market": "North America/",
 		},
 		"market", "North America",
 	)
 
 	//create some EC2 intances that looks like manually created (without any tag)
-	ec2Instances := output.getResources(map[string]string{"type": "ec2.Instance"})[0:2]
+	ec2Instances := output.getResources(map[string]string{"core.type": "ec2.Instance"})[0:2]
 	fnResource = func(r model.Resource) model.Resource {
 		r.Tags = model.Tags{}
 		return r
@@ -127,7 +127,7 @@ func main() {
 	output.copyResources(ec2Instances, fnResource)
 
 	// remove the tag "team" to one of the RDS
-	rdsInstance := output.getResources(map[string]string{"type": "rds.DBInstance", "team": "(not null)"})[0:1]
+	rdsInstance := output.getResources(map[string]string{"core.type": "rds.DBInstance", "tags.team": "(not null)"})[0:1]
 	fnResource = func(r model.Resource) model.Resource {
 		team := r.Tags.Find("team").Value
 		//remove the tag, add another one to help with the demo
@@ -136,7 +136,8 @@ func main() {
 	}
 	output.updateResources(rdsInstance, fnResource)
 
-	output.logger.Sugar().Infof("Demo data is ready")
+	allResources = output.getResources(nil)
+	output.logger.Sugar().Infof("Demo data is ready: %v resources", len(allResources))
 }
 
 type demo struct {
@@ -158,7 +159,7 @@ func readConfig(path string) *demo {
 
 	// connect to the database
 	ctx := context.Background()
-	logger, _ := zap.NewProduction()
+	logger, _ := zap.NewDevelopment()
 	ds, err := datastore.NewDatastore(ctx, cfg, logger)
 	if err != nil {
 		log.Fatal(err)

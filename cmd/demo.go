@@ -2,11 +2,10 @@ package cmd
 
 import (
 	"context"
+	"os"
+
 	"github.com/run-x/cloudgrep/demo"
 	"github.com/spf13/cobra"
-	"io"
-	"os"
-	"path/filepath"
 )
 
 type demoOptions struct {
@@ -14,36 +13,24 @@ type demoOptions struct {
 	port int
 }
 
-func (dO *demoOptions) run(ctx context.Context, out io.Writer) error {
-	file, err := os.CreateTemp("", "cloudgrepdemodb")
-	if err != nil {
-		return err
-	}
-	defer os.Remove(file.Name())
-	logger.Sugar().Infof("writing temporary file to store demo db: %v", file.Name())
-	_, err = file.Write(demo.DemoDB)
-	if err != nil {
-		return err
-	}
+func (dO *demoOptions) run(ctx context.Context) error {
 	cfg, err := demo.GetDemoConfig()
 	if err != nil {
 		return err
 	}
+	//clean up the temporary file
+	defer os.Remove(cfg.Datastore.DataSourceName)
 	if dO.bind != "" {
 		cfg.Web.Host = dO.bind
 	}
 	if dO.port != 0 {
 		cfg.Web.Port = dO.port
 	}
-	cfg.Datastore.DataSourceName, err = filepath.Abs(file.Name())
-	if err != nil {
-		return err
-	}
 	return runCmd(ctx, cfg, logger)
 }
 
 // NewDemoCommand returns the demo subcommand
-func NewDemoCommand(out io.Writer) *cobra.Command {
+func NewDemoCommand() *cobra.Command {
 	var dO demoOptions
 	var demoCmd = &cobra.Command{
 		Use:   "demo",
@@ -56,7 +43,7 @@ This demo demonstrates how cloudgrep can help with:
 - Verifying that your tag values are correct, quickly identifying the misconfigured values.
 - Enforcing your tag policies by identifying the resources missing some tags.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return dO.run(cmd.Context(), out)
+			return dO.run(cmd.Context())
 		},
 	}
 

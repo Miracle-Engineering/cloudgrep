@@ -24,6 +24,7 @@ usage:
 	@echo "make load-test       : Execute load test suite"
 	@echo "make markdown        : Generate the markdown files"
 	@echo "make run           	: Run using local code"
+	@echo "make run-demo        : Run using local code with demo data"
 	@echo "make setup           : Install all necessary dependencies"
 	@echo "make test            : Execute test suite"
 	@echo "make version         : Show version"
@@ -36,7 +37,7 @@ lint:
 	golangci-lint run ./...
 
 test:
-	go test -race ./hack/... ./pkg/... ./cmd/... -coverprofile=coverage.out -covermode=atomic
+	go test -race ./hack/... ./pkg/... ./cmd/... ./demo/... -coverprofile=coverage.out -covermode=atomic
 
 load-test:
 	go clean -testcache && go test ./loadtest/...
@@ -49,6 +50,9 @@ pre-commit:
 
 run:
 	go run -race main.go
+
+run-demo:
+	go run -race main.go demo
 
 version:
 	@go run -race main.go --version
