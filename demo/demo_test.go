@@ -5,30 +5,23 @@ import (
 	"os"
 	"testing"
 
-	"github.com/run-x/cloudgrep/pkg/config"
 	"github.com/run-x/cloudgrep/pkg/datastore"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 )
 
-func TestGetDemoConfig(t *testing.T) {
+func TestDemoData(t *testing.T) {
+	//load the demo data
 	cfg, err := GetDemoConfig()
 	require.NoError(t, err)
 	defer os.Remove(cfg.Datastore.DataSourceName)
 
-	//check a temporary file was used
+	//check a temporary file is used
 	require.Contains(t, cfg.Datastore.DataSourceName, "cloudgrepdemodb")
 
 	//demo doesn't fetch any data
 	require.True(t, cfg.Datastore.SkipRefresh)
-}
 
-func TestDemoData(t *testing.T) {
-	//load the demo data
-	cfg, err := config.LoadFromFile("demo.yaml")
-	require.NoError(t, err)
-	//the DB file is in the same directory as this test
-	cfg.Datastore.DataSourceName = "demo.db"
 	ctx := context.Background()
 	logger := zaptest.NewLogger(t)
 
