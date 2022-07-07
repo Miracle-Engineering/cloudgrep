@@ -17,9 +17,8 @@ func TestFetchSnsTopic(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 1)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		AccountId: ctx.accountId,
-		Type:      "sns.SNS",
-		Region:    defaultRegion,
+		Type:   "sns.SNS",
+		Region: defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

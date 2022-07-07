@@ -17,9 +17,8 @@ func TestFetchEKSClusters(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 1)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		AccountId: ctx.accountId,
-		Type:      "eks.Cluster",
-		Region:    defaultRegion,
+		Type:   "eks.Cluster",
+		Region: defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -38,9 +37,8 @@ func TestFetchEKSNodegroup(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 1)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		AccountId: ctx.accountId,
-		Type:      "eks.Nodegroup",
-		Region:    defaultRegion,
+		Type:   "eks.Nodegroup",
+		Region: defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

@@ -17,9 +17,8 @@ func TestFetchCloudfrontDistributions(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 1)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		AccountId: ctx.accountId,
-		Type:      "cloudfront.Distribution",
-		Region:    globalRegion,
+		Type:   "cloudfront.Distribution",
+		Region: globalRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

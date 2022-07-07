@@ -38,7 +38,7 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 			e.Providers = append(e.Providers, providers...)
 			//send one amplitude event per AWS account
 			for _, p := range providers {
-				amplitude.SendEvent(logger, amplitude.EventCloudConnection, map[string]string{"CLOUD_ID": p.Id()})
+				amplitude.SendEvent(logger, amplitude.EventCloudConnection, map[string]string{"CLOUD_ID": p.AccountId()})
 			}
 		} else {
 			errors = multierror.Append(errors, err)

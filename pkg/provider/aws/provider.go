@@ -25,7 +25,7 @@ func (p Provider) String() string {
 	return fmt.Sprintf("AWS Provider for account %v, region %v", p.accountId, p.region.ID())
 }
 
-func (p Provider) Id() string {
+func (p Provider) AccountId() string {
 	return p.accountId
 }
 

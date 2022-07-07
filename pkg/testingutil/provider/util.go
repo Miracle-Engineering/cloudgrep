@@ -9,6 +9,7 @@ import (
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/provider/types"
 	"github.com/run-x/cloudgrep/pkg/testingutil"
+	"github.com/stretchr/testify/assert"
 )
 
 func FetchResources[T types.Provider](ctx context.Context, t *testing.T, providers []T, name string) []model.Resource {
@@ -63,6 +64,12 @@ func FetchResources[T types.Provider](ctx context.Context, t *testing.T, provide
 
 	if foundCount == 0 {
 		t.Fatalf("no providers found that define type %s", name)
+	}
+	accountId := providers[0].AccountId()
+
+	//validate provider attributes set in each resource
+	for _, r := range resources {
+		assert.Equal(t, accountId, r.AccountId)
 	}
 
 	return resources
