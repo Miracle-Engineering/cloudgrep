@@ -17,8 +17,9 @@ func TestFetchFunctions(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "lambda.Function",
-		Region: defaultRegion,
+		AccountId: ctx.accountId,
+		Type:      "lambda.Function",
+		Region:    defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

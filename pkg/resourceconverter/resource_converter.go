@@ -28,17 +28,19 @@ func (f TagField) IsZero() bool {
 }
 
 type ReflectionConverter struct {
+	AccountId      string
+	Region         string
 	ResourceType   string
-	TagField       TagField
 	IdField        string
 	DisplayIdField string
-	Region         string
+	TagField       TagField
 }
 
 func (rc *ReflectionConverter) ToResource(ctx context.Context, x any, tags model.Tags) (model.Resource, error) {
 	resource := model.Resource{
-		Region: rc.Region,
-		Type:   rc.ResourceType,
+		AccountId: rc.AccountId,
+		Region:    rc.Region,
+		Type:      rc.ResourceType,
 	}
 
 	resource.Id = rc.findId(rc.IdField, x)

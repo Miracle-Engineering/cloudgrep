@@ -17,8 +17,9 @@ func TestFetchLoadBalancers(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "elb.LoadBalancer",
-		Region: defaultRegion,
+		AccountId: ctx.accountId,
+		Type:      "elb.LoadBalancer",
+		Region:    defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

@@ -16,8 +16,9 @@ func TestFetchRDSInstances(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "rds.DBInstance")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "rds.DBInstance",
-		Region: defaultRegion,
+		AccountId: ctx.accountId,
+		Type:      "rds.DBInstance",
+		Region:    defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -39,8 +40,9 @@ func TestFetchRDSClusters(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "rds.DBCluster")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "rds.DBCluster",
-		Region: defaultRegion,
+		AccountId: ctx.accountId,
+		Type:      "rds.DBCluster",
+		Region:    defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -61,8 +63,9 @@ func TestFetchRDSClusterSnapshots(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "rds.DBClusterSnapshot")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "rds.DBClusterSnapshot",
-		Region: defaultRegion,
+		AccountId: ctx.accountId,
+		Type:      "rds.DBClusterSnapshot",
+		Region:    defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -80,8 +83,9 @@ func TestFetchRDSSnapshots(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "rds.DBSnapshot")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "rds.DBSnapshot",
-		Region: defaultRegion,
+		AccountId: ctx.accountId,
+		Type:      "rds.DBSnapshot",
+		Region:    defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

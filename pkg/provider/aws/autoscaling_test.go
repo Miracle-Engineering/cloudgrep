@@ -17,8 +17,9 @@ func TestFetchAutoscalingGroup(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "autoscaling.AutoScalingGroup",
-		Region: defaultRegion,
+		AccountId: ctx.accountId,
+		Type:      "autoscaling.AutoScalingGroup",
+		Region:    defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

@@ -10,11 +10,12 @@ import (
 )
 
 type MapConverter struct {
+	AccountId      string
+	Region         string
 	ResourceType   string
-	TagField       TagField
 	IdField        string
 	DisplayIdField string
-	Region         string
+	TagField       TagField
 }
 
 func (mc *MapConverter) ToResource(ctx context.Context, x any, tags model.Tags) (model.Resource, error) {
@@ -65,6 +66,7 @@ func (mc *MapConverter) ToResource(ctx context.Context, x any, tags model.Tags) 
 	return model.Resource{
 		Id:        idString,
 		DisplayId: displayIdString,
+		AccountId: mc.AccountId,
 		Region:    mc.Region,
 		Type:      mc.ResourceType,
 		RawData:   marshaledMap,

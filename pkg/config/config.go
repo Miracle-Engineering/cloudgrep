@@ -3,9 +3,10 @@ package config
 import (
 	_ "embed"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"os"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 //go:embed config.yaml
@@ -22,8 +23,10 @@ type Config struct {
 	Datastore Datastore `yaml:"datastore"`
 	// Web is the web specs to be used
 	Web Web `yaml:"web"`
-	// Adding regions as where cli regions override will be stored
+	// Adding regions as where cli regions override is stored
 	Regions []string
+	// Adding regions as where cli profiles override is stored
+	Profiles []string
 }
 
 // Provider represents a cloud provider cloudgrep will scan w/ the current credentials
@@ -32,6 +35,8 @@ type Provider struct {
 	Cloud string `yaml:"cloud"`
 	// Regions is the list of different regions within the cloud provider to scan
 	Regions []string `yaml:"regions"`
+	// Profile is the AWS profile to use, if not set use the default profile
+	Profile string `yaml:"profile"`
 }
 
 func (p *Provider) String() string {
@@ -71,11 +76,10 @@ func GetDefault() (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
-	config.Regions = []string{}
-	return config, err
+	return config, nil
 }
 
-func LoadFromFile(file string) (Config, error) {
+func ReadFile(file string) (Config, error) {
 	cfg, err := GetDefault()
 	if err != nil {
 		return cfg, err
@@ -88,5 +92,53 @@ func LoadFromFile(file string) (Config, error) {
 		return cfg, err
 	}
 	err = yaml.UnmarshalStrict(data, &cfg)
-	return cfg, err
+	if err != nil {
+		return Config{}, err
+	}
+	return cfg, nil
+}
+
+//Load will load the config files making sure that the options override are correct
+func (c Config) Load() (Config, error) {
+	err := c.loadProfiles()
+	if err != nil {
+		return Config{}, err
+	}
+	err = c.loadRegions()
+	return c, err
+}
+
+//loadRegions will replace the regions with the --region option if set
+func (c *Config) loadRegions() error {
+	if len(c.Regions) == 0 {
+		return nil
+	}
+	providers := make([]Provider, 0)
+	for _, provider := range c.Providers {
+		provider.Regions = c.Regions
+		providers = append(providers, provider)
+	}
+	c.Providers = providers
+	return nil
+}
+
+//loadProfiles will load a provider for each profile if set
+func (c *Config) loadProfiles() error {
+	if len(c.Profiles) == 0 {
+		return nil
+	}
+	//create the provider for each profile
+	providers := make([]Provider, 0)
+	for _, profile := range c.Profiles {
+		for _, provider := range c.Providers {
+			if provider.Profile != "" {
+				return fmt.Errorf("the config file already defines a profile, using the option `--profiles` is not supported")
+			}
+			providerNew := provider
+			providerNew.Profile = profile
+			providers = append(providers, providerNew)
+		}
+	}
+	c.Providers = providers
+	return nil
 }

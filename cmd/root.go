@@ -18,6 +18,7 @@ var runCmd = cli.Run
 type rootOptions struct {
 	bind        string
 	regions     string
+	profiles    string
 	port        int
 	prefix      string
 	skipOpen    bool
@@ -30,7 +31,7 @@ func (rO rootOptions) loadConfig() (config.Config, error) {
 	var cfg config.Config
 	var err error
 	if rO.config != "" {
-		cfg, err = config.LoadFromFile(rO.config)
+		cfg, err = config.ReadFile(rO.config)
 	} else {
 		cfg, err = config.GetDefault()
 	}
@@ -42,6 +43,9 @@ func (rO rootOptions) loadConfig() (config.Config, error) {
 	}
 	if rO.regions != "" {
 		cfg.Regions = strings.Split(rO.regions, ",")
+	}
+	if rO.profiles != "" {
+		cfg.Profiles = strings.Split(rO.profiles, ",")
 	}
 	if rO.port != 0 {
 		cfg.Web.Port = rO.port
@@ -55,7 +59,7 @@ func (rO rootOptions) loadConfig() (config.Config, error) {
 	if rO.skipRefresh {
 		cfg.Datastore.SkipRefresh = true
 	}
-	return cfg, nil
+	return cfg.Load()
 }
 
 // NewRootCmd returns the base command when called without any subcommands
@@ -95,6 +99,7 @@ their cloud accounts.`,
 	flags.StringVarP(&rO.config, "config", "c", "", "Config file (default is https://github.com/run-x/cloudgrep/blob/main/pkg/config/config.yaml)")
 	flags.StringVar(&rO.bind, "bind", "", "Host to bind on")
 	flags.StringVarP(&rO.regions, "regions", "r", "", "Comma separated list of regions to scan, or \"all\"")
+	flags.StringVarP(&rO.profiles, "profiles", "", "", "Comma separated list of AWS profiles to scan.")
 	flags.IntVarP(&rO.port, "port", "p", 0, "Port to use")
 	flags.StringVar(&rO.prefix, "prefix", "", "URL prefix to use")
 	flags.BoolVar(&rO.skipOpen, "skip-open", false, "Skip running the open command to open default browser")

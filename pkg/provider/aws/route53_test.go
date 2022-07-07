@@ -16,8 +16,9 @@ func TestFetchHealthChecks(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "route53.HealthCheck")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "route53.HealthCheck",
-		Region: globalRegion,
+		AccountId: ctx.accountId,
+		Type:      "route53.HealthCheck",
+		Region:    globalRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -35,8 +36,9 @@ func TestFetchHostedZones(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "route53.HostedZone")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "route53.HostedZone",
-		Region: globalRegion,
+		AccountId: ctx.accountId,
+		Type:      "route53.HostedZone",
+		Region:    globalRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

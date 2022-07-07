@@ -54,6 +54,7 @@ func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceC
 	region := p.region.ID()
 	if mapping.UseMapConverter {
 		return &resourceconverter.MapConverter{
+			AccountId:      p.accountId,
 			Region:         region,
 			ResourceType:   resourceType,
 			TagField:       mapping.TagField,
@@ -62,6 +63,7 @@ func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceC
 		}
 	}
 	return &resourceconverter.ReflectionConverter{
+		AccountId:      p.accountId,
 		Region:         region,
 		ResourceType:   resourceType,
 		TagField:       mapping.TagField,
@@ -72,7 +74,13 @@ func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceC
 
 func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]types.Provider, error) {
 	logger.Info("Connecting to AWS account")
-	defaultConfig, err := config.LoadDefaultConfig(ctx, config.WithDefaultsMode(aws.DefaultsModeCrossRegion))
+	if cfg.Profile != "" {
+		logger.Sugar().Infof("Using AWS profile '%v'", cfg.Profile)
+	}
+	defaultConfig, err := config.LoadDefaultConfig(ctx,
+		config.WithSharedConfigProfile(cfg.Profile),
+		config.WithDefaultsMode(aws.DefaultsModeCrossRegion),
+	)
 	if err != nil {
 		return nil, err
 	}

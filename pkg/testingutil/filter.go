@@ -11,14 +11,19 @@ import (
 )
 
 type ResourceFilter struct {
-	Region  string
-	Type    string
-	Tags    model.Tags
-	RawData map[string]any
+	AccountId string
+	Region    string
+	Type      string
+	Tags      model.Tags
+	RawData   map[string]any
 }
 
 func (f ResourceFilter) String() string {
 	var parts []string
+
+	if f.AccountId != "" {
+		parts = append(parts, fmt.Sprintf("AccountId=%s", f.AccountId))
+	}
 
 	if f.Type != "" {
 		parts = append(parts, fmt.Sprintf("Type=%s", f.Type))
@@ -56,6 +61,12 @@ func (f ResourceFilter) String() string {
 }
 
 func (f ResourceFilter) Matches(resource model.Resource) bool {
+	if f.AccountId != "" {
+		if resource.AccountId != f.AccountId {
+			return false
+		}
+	}
+
 	if f.Region != "" {
 		if resource.Region != f.Region {
 			return false

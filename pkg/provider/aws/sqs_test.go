@@ -1,10 +1,11 @@
 package aws
 
 import (
+	"testing"
+
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/testingutil"
 	testprovider "github.com/run-x/cloudgrep/pkg/testingutil/provider"
-	"testing"
 )
 
 func TestFetchSqsQueue(t *testing.T) {
@@ -16,8 +17,9 @@ func TestFetchSqsQueue(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 1)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "sqs.Queue",
-		Region: defaultRegion,
+		AccountId: ctx.accountId,
+		Type:      "sqs.Queue",
+		Region:    defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

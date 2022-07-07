@@ -29,10 +29,6 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 	e.Sequencer = sequencer.AsyncSequencer{Logger: e.Logger}
 	var errors error
 	for _, c := range cfg.Providers {
-		// Manual regions trumps any written region.
-		if len(cfg.Regions) > 0 {
-			c.Regions = cfg.Regions
-		}
 		if err := datastore.WriteEvent(ctx, model.NewProviderEventStart(c.String())); err != nil {
 			errors = multierror.Append(errors, err)
 		}
@@ -40,9 +36,9 @@ func NewEngine(ctx context.Context, cfg config.Config, logger *zap.Logger, datas
 		providers, err := provider.NewProviders(ctx, c, logger)
 		if err == nil {
 			e.Providers = append(e.Providers, providers...)
-			//send one amplitude event per cloud id (not one per region)
-			if len(providers) > 0 {
-				amplitude.SendEvent(logger, amplitude.EventCloudConnection, map[string]string{"CLOUD_ID": e.Providers[0].Id()})
+			//send one amplitude event per AWS account
+			for _, p := range providers {
+				amplitude.SendEvent(logger, amplitude.EventCloudConnection, map[string]string{"CLOUD_ID": p.Id()})
 			}
 		} else {
 			errors = multierror.Append(errors, err)

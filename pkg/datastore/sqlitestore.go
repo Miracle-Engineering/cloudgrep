@@ -172,7 +172,7 @@ func (s *SQLiteStore) Stats(context.Context) (model.Stats, error) {
 	return model.Stats{ResourcesCount: count}, nil
 }
 
-func (s *SQLiteStore) getResourceField(name string, ids []model.ResourceId) (model.Field, error) {
+func (s *SQLiteStore) getResourceField(columnName string, ids []model.ResourceId) (model.Field, error) {
 	/*
 		SELECT DISTINCT `type` , count(*) as count
 		FROM `resources`
@@ -181,17 +181,17 @@ func (s *SQLiteStore) getResourceField(name string, ids []model.ResourceId) (mod
 		sort by `count` desc
 	*/
 	query := s.db.Model(&model.Resource{}).
-		Select(name, "count() as count").
+		Select(columnName, "count() as count").
 		Distinct().
-		Group(name).
+		Group(columnName).
 		Order("count desc")
 	rows, err := query.Rows()
 	if err != nil {
-		return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
+		return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", columnName, err)
 	}
 	defer rows.Close()
 	field := model.Field{
-		Name: name,
+		Name: columnName,
 	}
 
 	//used to update count later
@@ -204,7 +204,7 @@ func (s *SQLiteStore) getResourceField(name string, ids []model.ResourceId) (mod
 		var count int
 		err = rows.Scan(&value, &count)
 		if err != nil {
-			return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
+			return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", columnName, err)
 		}
 		fieldValue := model.FieldValue{
 			Value: value,
@@ -225,7 +225,7 @@ func (s *SQLiteStore) getResourceField(name string, ids []model.ResourceId) (mod
 	if len(ids) > 0 {
 		rows, err = query.Where("id in ?", ids).Rows()
 		if err != nil {
-			return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
+			return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", columnName, err)
 		}
 		defer rows.Close()
 		for rows.Next() {
@@ -233,7 +233,7 @@ func (s *SQLiteStore) getResourceField(name string, ids []model.ResourceId) (mod
 			var count int
 			err = rows.Scan(&value, &count)
 			if err != nil {
-				return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", name, err)
+				return model.Field{}, fmt.Errorf("can't get resource field '%v' from database: %w", columnName, err)
 			}
 			fieldValuesMap[value].Count = fmt.Sprint(count)
 			totalCount = totalCount + count
@@ -372,7 +372,7 @@ func (s *SQLiteStore) getFields(ctx context.Context, ids []model.ResourceId) (mo
 	coreGroup := model.FieldGroup{
 		Name: model.FieldGroupCore,
 	}
-	for _, name := range []string{"region", "type"} {
+	for _, name := range []string{"region", "type", "account_id"} {
 		field, err := s.getResourceField(name, ids)
 		if err != nil {
 			return nil, err

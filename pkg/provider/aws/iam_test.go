@@ -18,8 +18,9 @@ func TestFetchInstanceProfiles(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.InstanceProfile")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.InstanceProfile",
-		Region: globalRegion,
+		AccountId: ctx.accountId,
+		Type:      "iam.InstanceProfile",
+		Region:    globalRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -40,8 +41,9 @@ func TestFetchOpenIDConnectProviders(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.OpenIDConnectProvider")
 
 	resources = testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.OpenIDConnectProvider",
-		Region: globalRegion,
+		AccountId: ctx.accountId,
+		Type:      "iam.OpenIDConnectProvider",
+		Region:    globalRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -67,8 +69,9 @@ func TestFetchPolicies(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.Policy")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.Policy",
-		Region: globalRegion,
+		AccountId: ctx.accountId,
+		Type:      "iam.Policy",
+		Region:    globalRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -89,8 +92,9 @@ func TestFetchRoles(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.Role")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.Role",
-		Region: globalRegion,
+		AccountId: ctx.accountId,
+		Type:      "iam.Role",
+		Region:    globalRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -111,8 +115,9 @@ func TestFetchUsers(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.User")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.User",
-		Region: globalRegion,
+		AccountId: ctx.accountId,
+		Type:      "iam.User",
+		Region:    globalRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -133,8 +138,9 @@ func TestFetchVirtualMFADevices(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.VirtualMFADevice")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.VirtualMFADevice",
-		Region: globalRegion,
+		AccountId: ctx.accountId,
+		Type:      "iam.VirtualMFADevice",
+		Region:    globalRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
