@@ -100,7 +100,7 @@ their cloud accounts.`,
 	flags.BoolVar(&rO.skipOpen, "skip-open", false, "Skip running the open command to open default browser")
 	flags.BoolVar(&rO.skipRefresh, "skip-refresh", false, "Skip running data refresh on start up")
 
-	rootCmd.AddCommand(NewVersionCommand(out), NewDemoCommand(out))
+	rootCmd.AddCommand(NewVersionCommand(out), NewDemoCommand())
 	rootCmd.Commands()
 	return rootCmd
 }
