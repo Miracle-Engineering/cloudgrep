@@ -1,5 +1,6 @@
 export const BACKGROUND_COLOR = '#F7F9FD';
 export const DARK_BLUE = '#2B3A67';
+export const HOVER_BLUE = '#8FCAF9';
 export const GREY = '#6B7595';
 export const GREY_ONLY_ITEM = '#959DB3';
 export const GREY_TAB_ITEM = '#959DB3';

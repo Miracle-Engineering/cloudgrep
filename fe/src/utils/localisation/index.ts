@@ -29,10 +29,8 @@ i18n.use(initReactI18next).init({
 				DETAILS: 'Details',
 
 				// HEADER:
-				HOME: 'Home',
 				SLACK: 'Slack',
 				GITHUB: 'Github',
-				CONTACT: 'Contact',
 
 				// Application specific
 				TAGS: 'Tags',
@@ -47,6 +45,7 @@ i18n.use(initReactI18next).init({
 				COUNT_RESOURCES: 'resource(s) found',
 				REFRESH_SUCCESS: 'Refresh completed successfully',
 				NO_MORE_RESULTS: 'No more resources found',
+				RESET_FILTERS: 'Reset filters',
 			},
 		},
 	},

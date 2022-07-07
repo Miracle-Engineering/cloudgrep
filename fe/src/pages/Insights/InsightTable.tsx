@@ -32,7 +32,7 @@ const InsightTable: FC = () => {
 	const dispatch = useAppDispatch();
 	const [isInfiniteScroll, setIsInfiniteScroll] = useState<boolean>(false);
 	const [hasNext, setHasNext] = useState<boolean>(true);
-	const { currentPage, next } = usePagination(PAGE_LENGTH, count);
+	const { currentPage, next, setCurrentPage } = usePagination(PAGE_LENGTH, count);
 	const [order, setOrder] = useState<'asc' | 'desc' | undefined>();
 	const [orderBy, setOrderBy] = useState<string | undefined>();
 
@@ -41,11 +41,14 @@ const InsightTable: FC = () => {
 			setIsInfiniteScroll(false);
 			next();
 		}
-	}, [resources]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [resources, isInfiniteScroll]);
 
 	useEffect(() => {
 		setOrderBy(undefined);
-	}, [filterTags]);
+		setCurrentPage(1);
+		setHasNext(true);
+	}, [filterTags, setCurrentPage]);
 
 	const handleInfiniteScroll = async (e: React.MouseEvent<HTMLInputElement>): Promise<void> => {
 		if (isScrolledForInfiniteScroll(e)) {

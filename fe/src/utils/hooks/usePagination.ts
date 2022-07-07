@@ -18,7 +18,7 @@ function usePagination(itemsPerPage: number, maxData: number): PaginationType {
 		setCurrentPage(Math.min(pageNumber, maxPage));
 	}
 
-	return { next, prev, jump, currentPage, maxPage };
+	return { next, prev, jump, currentPage, maxPage, setCurrentPage };
 }
 
 export default usePagination;
