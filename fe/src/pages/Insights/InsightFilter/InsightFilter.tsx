@@ -59,7 +59,6 @@ const InsightFilter: FC = () => {
 		e.stopPropagation();
 		e.preventDefault();
 
-		const allOtherTags = filterTags.filter(tag => tag.key !== fieldName);
 		const resetTags = fields
 			.filter(field => field.name === fieldName)
 			.flatMap(field =>
@@ -69,7 +68,22 @@ const InsightFilter: FC = () => {
 					})
 				)
 			);
-		const newTags = allOtherTags.concat(resetTags);
+
+		const restOfTags = fields
+			.filter(field => field.name !== fieldName)
+			.flatMap(field =>
+				field.fields.flatMap((fieldItem: Field) =>
+					fieldItem.values
+						.filter((valueItem: ValueType) =>
+							filterTags.some(tag => tag.key === fieldItem.name && tag.value === valueItem.value)
+						)
+						.flatMap((valueItem: ValueType) => {
+							return { key: fieldItem.name, value: valueItem.value };
+						})
+				)
+			);
+
+		const newTags = restOfTags.concat(resetTags);
 		dispatch(getFilteredResources({ data: newTags, offset: PAGE_START, limit: PAGE_LENGTH }));
 	};
 
