@@ -99,13 +99,13 @@ func ReadFile(file string) (Config, error) {
 }
 
 //Load will load the config files making sure that the options override are correct
-func (c Config) Load() (Config, error) {
+func (c *Config) Load() error {
 	err := c.loadProfiles()
 	if err != nil {
-		return Config{}, err
+		return err
 	}
 	err = c.loadRegions()
-	return c, err
+	return err
 }
 
 //loadRegions will replace the regions with the --region option if set

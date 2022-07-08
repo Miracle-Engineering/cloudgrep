@@ -62,6 +62,15 @@ func TestRootCommand(t *testing.T) {
 			args:     []string{"--port", "8081", "--regions", "us-west-1,us-west-2", "--profiles", "prod,dev"},
 		},
 		{
+			name:     "-r us-west-1 -r us-west-2 --profile dev --profile prod",
+			host:     "localhost",
+			port:     8080,
+			regions:  []string{"us-west-1", "us-west-2"},
+			profiles: []string{"dev", "prod"},
+			verbose:  false,
+			args:     []string{"-r", "us-west-1", "-r", "us-west-2", "--profiles", "dev", "--profiles", "prod"},
+		},
+		{
 			name:     "-c ../pkg/config/test/custom-host-port.yaml",
 			host:     "helloworld",
 			port:     8082,

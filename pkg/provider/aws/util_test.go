@@ -42,10 +42,9 @@ var integrationTestVars = []string{
 var credCheck credChecker
 
 type integrationTestContext struct {
-	p         []Provider
-	accountId string
-	log       *zap.Logger
-	ctx       context.Context
+	p   []Provider
+	log *zap.Logger
+	ctx context.Context
 }
 
 func setupIntegrationTest(t testing.TB) *integrationTestContext {
@@ -124,7 +123,6 @@ func setupIntegrationProvider(t testing.TB, ctx *integrationTestContext) {
 	}
 
 	ctx.p = awsProviders
-	ctx.accountId = awsProviders[0].accountId
 }
 
 func setupIntegrationLogs(t testing.TB, ctx *integrationTestContext) {

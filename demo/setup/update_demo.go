@@ -46,10 +46,10 @@ func main() {
 	}
 
 	//copy the tags from the ec2.instance to their ec2.NetworkInterface
-	for _, instance := range input.getResources(map[string]interface{}{"core.type": "ec2.Instance"}) {
+	for _, instance := range input.getResources(map[string]any{"core.type": "ec2.Instance"}) {
 		eni := getEni(instance)
 		if eni != "" {
-			eniResource := input.getResources(map[string]interface{}{"core.id": eni})[0]
+			eniResource := input.getResources(map[string]any{"core.id": eni})[0]
 			eniResource.Tags = instance.Tags
 			if err := output.ds.WriteResources(ctx, model.Resources{eniResource}); err != nil {
 				log.Fatal(e)
@@ -79,7 +79,7 @@ func main() {
 		"billing":          "consumer",
 		"data-management":  "marketplace"}
 	for team, original := range newTeams {
-		toCopy := output.getResources(map[string]interface{}{"tags.team": original})
+		toCopy := output.getResources(map[string]any{"tags.team": original})
 		fnResource := func(r model.Resource) model.Resource {
 			r.Tags = r.Tags.Delete("team").Add("team", team)
 			return r
@@ -92,7 +92,7 @@ func main() {
 	//assign 95% of the ec2.NetworkInterface, ec2.SecurityGroup, ec2.Subnet without tags to infra team
 	//leave some aside for default vpc and such
 	for _, _type := range []string{"ec2.NetworkInterface", "ec2.SecurityGroup", "ec2.Subnet"} {
-		toUpdate := output.getResources(map[string]interface{}{"core.type": _type, "tags.team": "(missing)"})
+		toUpdate := output.getResources(map[string]any{"core.type": _type, "tags.team": "(missing)"})
 		fnResource := func(r model.Resource) model.Resource {
 			r.Tags = model.Tags{model.Tag{Key: "team", Value: "infra"}}
 			return r
@@ -102,7 +102,7 @@ func main() {
 
 	// set a wrong value -> prod -> production for 1 resource
 	output.updateTag(
-		map[string]interface{}{
+		map[string]any{
 			"core.account_id": realAccountId,
 			"tags.env":        "prod",
 			"core.type":       "eks.Cluster",
@@ -115,13 +115,13 @@ func main() {
 	//set the "managed-by" tag
 	// identify the cloudformation stuff
 	output.updateTag(
-		map[string]interface{}{
+		map[string]any{
 			"tags.aws:cloudformation:logical-id": "(not null)",
 		},
 		"managed-by", "cloudformation",
 	)
 	// for the rest - 80% is terraform - leave some unassigned for demo
-	toUpdate := output.getResources(map[string]interface{}{"managed-by": "(missing)"})
+	toUpdate := output.getResources(map[string]any{"managed-by": "(missing)"})
 	fnResource := func(r model.Resource) model.Resource {
 		r.Tags = model.Tags{model.Tag{Key: "managed-by", Value: "terraform"}}
 		return r
@@ -130,14 +130,14 @@ func main() {
 
 	// fix a wrong tag (in the original data)
 	output.updateTag(
-		map[string]interface{}{
+		map[string]any{
 			"tags.market": "North America/",
 		},
 		"market", "North America",
 	)
 
 	//create some EC2 intances that looks like manually created (without any tag)
-	ec2Instances := output.getResources(map[string]interface{}{"core.type": "ec2.Instance"})[0:2]
+	ec2Instances := output.getResources(map[string]any{"core.type": "ec2.Instance"})[0:2]
 	fnResource = func(r model.Resource) model.Resource {
 		r.Tags = model.Tags{}
 		return r
@@ -145,7 +145,7 @@ func main() {
 	output.copyResources(ec2Instances, fnResource)
 
 	// remove the tag "team" to one of the RDS
-	rdsInstance := output.getResources(map[string]interface{}{"core.type": "rds.DBInstance", "tags.team": "(not null)"})[0:1]
+	rdsInstance := output.getResources(map[string]any{"core.type": "rds.DBInstance", "tags.team": "(not null)"})[0:1]
 	fnResource = func(r model.Resource) model.Resource {
 		team := r.Tags.Find("team").Value
 		//remove the tag, add another one to help with the demo
@@ -194,8 +194,8 @@ func percent(resources model.Resources, percent int) model.Resources {
 	return resources[0:newSize]
 }
 
-func (d *demo) getResources(filter map[string]interface{}) model.Resources {
-	filterObj := map[string]interface{}{
+func (d *demo) getResources(filter map[string]any) model.Resources {
+	filterObj := map[string]any{
 		"filter": filter,
 		"limit":  2000,
 	}
@@ -210,7 +210,7 @@ func (d *demo) getResources(filter map[string]interface{}) model.Resources {
 	return resp.Resources
 }
 
-func (d *demo) updateTag(filter map[string]interface{}, key string, val string) {
+func (d *demo) updateTag(filter map[string]any, key string, val string) {
 	resources := d.getResources(filter)
 	for i, r := range resources {
 		d.logger.Sugar().Infof("Updating resource %v, setting tag %v=%v", r.Id, key, val)
