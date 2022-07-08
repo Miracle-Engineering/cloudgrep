@@ -10,10 +10,10 @@ import (
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
-func (p *Provider) register_rds(mapping map[string]mapper) {
+func (p *Provider) registerRds(mapping map[string]mapper) {
 	mapping["rds.DBCluster"] = mapper{
 		ServiceEndpointID: "rds",
-		FetchFunc:         p.fetch_rds_DBCluster,
+		FetchFunc:         p.fetchRdsDBCluster,
 		IdField:           "DBClusterIdentifier",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -24,7 +24,7 @@ func (p *Provider) register_rds(mapping map[string]mapper) {
 	}
 	mapping["rds.DBClusterSnapshot"] = mapper{
 		ServiceEndpointID: "rds",
-		FetchFunc:         p.fetch_rds_DBClusterSnapshot,
+		FetchFunc:         p.fetchRdsDBClusterSnapshot,
 		IdField:           "DBClusterSnapshotIdentifier",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -35,7 +35,7 @@ func (p *Provider) register_rds(mapping map[string]mapper) {
 	}
 	mapping["rds.DBInstance"] = mapper{
 		ServiceEndpointID: "rds",
-		FetchFunc:         p.fetch_rds_DBInstance,
+		FetchFunc:         p.fetchRdsDBInstance,
 		IdField:           "DBInstanceIdentifier",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -46,7 +46,7 @@ func (p *Provider) register_rds(mapping map[string]mapper) {
 	}
 	mapping["rds.DBSnapshot"] = mapper{
 		ServiceEndpointID: "rds",
-		FetchFunc:         p.fetch_rds_DBSnapshot,
+		FetchFunc:         p.fetchRdsDBSnapshot,
 		IdField:           "DBSnapshotIdentifier",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -57,7 +57,7 @@ func (p *Provider) register_rds(mapping map[string]mapper) {
 	}
 }
 
-func (p *Provider) fetch_rds_DBCluster(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchRdsDBCluster(ctx context.Context, output chan<- model.Resource) error {
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBClustersInput{}
 
@@ -78,7 +78,7 @@ func (p *Provider) fetch_rds_DBCluster(ctx context.Context, output chan<- model.
 	return nil
 }
 
-func (p *Provider) fetch_rds_DBClusterSnapshot(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchRdsDBClusterSnapshot(ctx context.Context, output chan<- model.Resource) error {
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBClusterSnapshotsInput{}
 
@@ -99,7 +99,7 @@ func (p *Provider) fetch_rds_DBClusterSnapshot(ctx context.Context, output chan<
 	return nil
 }
 
-func (p *Provider) fetch_rds_DBInstance(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchRdsDBInstance(ctx context.Context, output chan<- model.Resource) error {
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBInstancesInput{}
 
@@ -120,7 +120,7 @@ func (p *Provider) fetch_rds_DBInstance(ctx context.Context, output chan<- model
 	return nil
 }
 
-func (p *Provider) fetch_rds_DBSnapshot(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchRdsDBSnapshot(ctx context.Context, output chan<- model.Resource) error {
 	client := rds.NewFromConfig(p.config)
 	input := &rds.DescribeDBSnapshotsInput{}
 

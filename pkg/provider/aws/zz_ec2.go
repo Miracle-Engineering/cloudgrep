@@ -10,10 +10,10 @@ import (
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
-func (p *Provider) register_ec2(mapping map[string]mapper) {
+func (p *Provider) registerEc2(mapping map[string]mapper) {
 	mapping["ec2.Address"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_Address,
+		FetchFunc:         p.fetchEc2Address,
 		IdField:           "AllocationId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -24,7 +24,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.CapacityReservation"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_CapacityReservation,
+		FetchFunc:         p.fetchEc2CapacityReservation,
 		IdField:           "CapacityReservationId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -35,7 +35,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.ClientVpnEndpoint"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_ClientVpnEndpoint,
+		FetchFunc:         p.fetchEc2ClientVpnEndpoint,
 		IdField:           "ClientVpnEndpointId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -46,7 +46,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.Fleet"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_Fleet,
+		FetchFunc:         p.fetchEc2Fleet,
 		IdField:           "FleetId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -57,7 +57,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.FlowLogs"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_FlowLogs,
+		FetchFunc:         p.fetchEc2FlowLogs,
 		IdField:           "FlowLogId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -68,7 +68,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.Image"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_Image,
+		FetchFunc:         p.fetchEc2Image,
 		IdField:           "ImageId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -79,7 +79,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.Instance"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_Instance,
+		FetchFunc:         p.fetchEc2Instance,
 		IdField:           "InstanceId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -90,7 +90,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.KeyPair"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_KeyPair,
+		FetchFunc:         p.fetchEc2KeyPair,
 		IdField:           "KeyPairId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -101,7 +101,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.LaunchTemplate"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_LaunchTemplate,
+		FetchFunc:         p.fetchEc2LaunchTemplate,
 		IdField:           "LaunchTemplateId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -112,7 +112,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.NatGateway"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_NatGateway,
+		FetchFunc:         p.fetchEc2NatGateway,
 		IdField:           "NatGatewayId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -123,7 +123,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.NetworkAcl"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_NetworkAcl,
+		FetchFunc:         p.fetchEc2NetworkAcl,
 		IdField:           "NetworkAclId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -134,7 +134,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.NetworkInterface"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_NetworkInterface,
+		FetchFunc:         p.fetchEc2NetworkInterface,
 		IdField:           "NetworkInterfaceId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -145,7 +145,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.ReservedInstance"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_ReservedInstance,
+		FetchFunc:         p.fetchEc2ReservedInstance,
 		IdField:           "ReservedInstancesId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -156,7 +156,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.RouteTable"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_RouteTable,
+		FetchFunc:         p.fetchEc2RouteTable,
 		IdField:           "RouteTableId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -167,7 +167,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.SecurityGroup"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_SecurityGroup,
+		FetchFunc:         p.fetchEc2SecurityGroup,
 		IdField:           "GroupId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -178,7 +178,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.Snapshot"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_Snapshot,
+		FetchFunc:         p.fetchEc2Snapshot,
 		IdField:           "SnapshotId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -189,7 +189,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.SpotInstanceRequest"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_SpotInstanceRequest,
+		FetchFunc:         p.fetchEc2SpotInstanceRequest,
 		IdField:           "SpotInstanceRequestId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -200,7 +200,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.Subnet"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_Subnet,
+		FetchFunc:         p.fetchEc2Subnet,
 		IdField:           "SubnetId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -211,7 +211,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.Volume"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_Volume,
+		FetchFunc:         p.fetchEc2Volume,
 		IdField:           "VolumeId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -222,7 +222,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 	mapping["ec2.Vpc"] = mapper{
 		ServiceEndpointID: "ec2",
-		FetchFunc:         p.fetch_ec2_Vpc,
+		FetchFunc:         p.fetchEc2Vpc,
 		IdField:           "VpcId",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -233,7 +233,7 @@ func (p *Provider) register_ec2(mapping map[string]mapper) {
 	}
 }
 
-func (p *Provider) fetch_ec2_Address(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2Address(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeAddressesInput{}
 
@@ -249,7 +249,7 @@ func (p *Provider) fetch_ec2_Address(ctx context.Context, output chan<- model.Re
 	return nil
 }
 
-func (p *Provider) fetch_ec2_CapacityReservation(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2CapacityReservation(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeCapacityReservationsInput{}
 	input.Filters = describeCapacityReservationsFilters()
@@ -271,7 +271,7 @@ func (p *Provider) fetch_ec2_CapacityReservation(ctx context.Context, output cha
 	return nil
 }
 
-func (p *Provider) fetch_ec2_ClientVpnEndpoint(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2ClientVpnEndpoint(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeClientVpnEndpointsInput{}
 
@@ -292,7 +292,7 @@ func (p *Provider) fetch_ec2_ClientVpnEndpoint(ctx context.Context, output chan<
 	return nil
 }
 
-func (p *Provider) fetch_ec2_Fleet(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2Fleet(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeFleetsInput{}
 	input.Filters = describeFleetsFilters()
@@ -314,7 +314,7 @@ func (p *Provider) fetch_ec2_Fleet(ctx context.Context, output chan<- model.Reso
 	return nil
 }
 
-func (p *Provider) fetch_ec2_FlowLogs(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2FlowLogs(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeFlowLogsInput{}
 
@@ -335,7 +335,7 @@ func (p *Provider) fetch_ec2_FlowLogs(ctx context.Context, output chan<- model.R
 	return nil
 }
 
-func (p *Provider) fetch_ec2_Image(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2Image(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeImagesInput{}
 	input.Owners = describeImagesOwners()
@@ -352,7 +352,7 @@ func (p *Provider) fetch_ec2_Image(ctx context.Context, output chan<- model.Reso
 	return nil
 }
 
-func (p *Provider) fetch_ec2_Instance(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2Instance(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeInstancesInput{}
 	input.Filters = describeInstancesFilters()
@@ -376,7 +376,7 @@ func (p *Provider) fetch_ec2_Instance(ctx context.Context, output chan<- model.R
 	return nil
 }
 
-func (p *Provider) fetch_ec2_KeyPair(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2KeyPair(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeKeyPairsInput{}
 
@@ -392,7 +392,7 @@ func (p *Provider) fetch_ec2_KeyPair(ctx context.Context, output chan<- model.Re
 	return nil
 }
 
-func (p *Provider) fetch_ec2_LaunchTemplate(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2LaunchTemplate(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeLaunchTemplatesInput{}
 
@@ -413,7 +413,7 @@ func (p *Provider) fetch_ec2_LaunchTemplate(ctx context.Context, output chan<- m
 	return nil
 }
 
-func (p *Provider) fetch_ec2_NatGateway(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2NatGateway(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeNatGatewaysInput{}
 
@@ -434,7 +434,7 @@ func (p *Provider) fetch_ec2_NatGateway(ctx context.Context, output chan<- model
 	return nil
 }
 
-func (p *Provider) fetch_ec2_NetworkAcl(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2NetworkAcl(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeNetworkAclsInput{}
 
@@ -455,7 +455,7 @@ func (p *Provider) fetch_ec2_NetworkAcl(ctx context.Context, output chan<- model
 	return nil
 }
 
-func (p *Provider) fetch_ec2_NetworkInterface(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2NetworkInterface(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeNetworkInterfacesInput{}
 
@@ -476,7 +476,7 @@ func (p *Provider) fetch_ec2_NetworkInterface(ctx context.Context, output chan<-
 	return nil
 }
 
-func (p *Provider) fetch_ec2_ReservedInstance(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2ReservedInstance(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeReservedInstancesInput{}
 	input.Filters = describeReservedInstancesFilters()
@@ -493,7 +493,7 @@ func (p *Provider) fetch_ec2_ReservedInstance(ctx context.Context, output chan<-
 	return nil
 }
 
-func (p *Provider) fetch_ec2_RouteTable(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2RouteTable(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeRouteTablesInput{}
 
@@ -514,7 +514,7 @@ func (p *Provider) fetch_ec2_RouteTable(ctx context.Context, output chan<- model
 	return nil
 }
 
-func (p *Provider) fetch_ec2_SecurityGroup(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2SecurityGroup(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeSecurityGroupsInput{}
 
@@ -535,7 +535,7 @@ func (p *Provider) fetch_ec2_SecurityGroup(ctx context.Context, output chan<- mo
 	return nil
 }
 
-func (p *Provider) fetch_ec2_Snapshot(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2Snapshot(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeSnapshotsInput{}
 	input.OwnerIds = describeSnapshotsOwners()
@@ -557,7 +557,7 @@ func (p *Provider) fetch_ec2_Snapshot(ctx context.Context, output chan<- model.R
 	return nil
 }
 
-func (p *Provider) fetch_ec2_SpotInstanceRequest(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2SpotInstanceRequest(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeSpotInstanceRequestsInput{}
 	input.Filters = describeSpotInstanceRequestsFilters()
@@ -579,7 +579,7 @@ func (p *Provider) fetch_ec2_SpotInstanceRequest(ctx context.Context, output cha
 	return nil
 }
 
-func (p *Provider) fetch_ec2_Subnet(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2Subnet(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeSubnetsInput{}
 
@@ -600,7 +600,7 @@ func (p *Provider) fetch_ec2_Subnet(ctx context.Context, output chan<- model.Res
 	return nil
 }
 
-func (p *Provider) fetch_ec2_Volume(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2Volume(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeVolumesInput{}
 
@@ -621,7 +621,7 @@ func (p *Provider) fetch_ec2_Volume(ctx context.Context, output chan<- model.Res
 	return nil
 }
 
-func (p *Provider) fetch_ec2_Vpc(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchEc2Vpc(ctx context.Context, output chan<- model.Resource) error {
 	client := ec2.NewFromConfig(p.config)
 	input := &ec2.DescribeVpcsInput{}
 

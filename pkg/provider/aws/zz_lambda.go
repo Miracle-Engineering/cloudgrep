@@ -11,16 +11,16 @@ import (
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
-func (p *Provider) register_lambda(mapping map[string]mapper) {
+func (p *Provider) registerLambda(mapping map[string]mapper) {
 	mapping["lambda.Function"] = mapper{
 		ServiceEndpointID: "lambda",
-		FetchFunc:         p.fetch_lambda_Function,
+		FetchFunc:         p.fetchLambdaFunction,
 		IdField:           "FunctionArn",
 		IsGlobal:          false,
 	}
 }
 
-func (p *Provider) fetch_lambda_Function(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchLambdaFunction(ctx context.Context, output chan<- model.Resource) error {
 	client := lambda.NewFromConfig(p.config)
 	input := &lambda.ListFunctionsInput{}
 
@@ -33,14 +33,14 @@ func (p *Provider) fetch_lambda_Function(ctx context.Context, output chan<- mode
 			return fmt.Errorf("failed to fetch %s: %w", "lambda.Function", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Functions, p.getTags_lambda_Function); err != nil {
+		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Functions, p.getTagsLambdaFunction); err != nil {
 			return err
 		}
 	}
 
 	return nil
 }
-func (p *Provider) getTags_lambda_Function(ctx context.Context, resource types.FunctionConfiguration) (model.Tags, error) {
+func (p *Provider) getTagsLambdaFunction(ctx context.Context, resource types.FunctionConfiguration) (model.Tags, error) {
 	client := lambda.NewFromConfig(p.config)
 	input := &lambda.GetFunctionInput{}
 

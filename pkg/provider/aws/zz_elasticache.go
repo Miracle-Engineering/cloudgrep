@@ -11,16 +11,16 @@ import (
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
-func (p *Provider) register_elasticache(mapping map[string]mapper) {
+func (p *Provider) registerElasticache(mapping map[string]mapper) {
 	mapping["elasticache.CacheCluster"] = mapper{
 		ServiceEndpointID: "elasticache",
-		FetchFunc:         p.fetch_elasticache_CacheCluster,
+		FetchFunc:         p.fetchElasticacheCacheCluster,
 		IdField:           "ARN",
 		IsGlobal:          false,
 	}
 }
 
-func (p *Provider) fetch_elasticache_CacheCluster(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchElasticacheCacheCluster(ctx context.Context, output chan<- model.Resource) error {
 	client := elasticache.NewFromConfig(p.config)
 	input := &elasticache.DescribeCacheClustersInput{}
 
@@ -33,14 +33,14 @@ func (p *Provider) fetch_elasticache_CacheCluster(ctx context.Context, output ch
 			return fmt.Errorf("failed to fetch %s: %w", "elasticache.CacheCluster", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.CacheClusters, p.getTags_elasticache_CacheCluster); err != nil {
+		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.CacheClusters, p.getTagsElasticacheCacheCluster); err != nil {
 			return err
 		}
 	}
 
 	return nil
 }
-func (p *Provider) getTags_elasticache_CacheCluster(ctx context.Context, resource types.CacheCluster) (model.Tags, error) {
+func (p *Provider) getTagsElasticacheCacheCluster(ctx context.Context, resource types.CacheCluster) (model.Tags, error) {
 	client := elasticache.NewFromConfig(p.config)
 	input := &elasticache.ListTagsForResourceInput{}
 

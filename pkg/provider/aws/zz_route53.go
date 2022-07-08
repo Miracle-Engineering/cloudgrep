@@ -11,23 +11,23 @@ import (
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
-func (p *Provider) register_route53(mapping map[string]mapper) {
+func (p *Provider) registerRoute53(mapping map[string]mapper) {
 	mapping["route53.HealthCheck"] = mapper{
 		ServiceEndpointID: "route53",
-		FetchFunc:         p.fetch_route53_HealthCheck,
+		FetchFunc:         p.fetchRoute53HealthCheck,
 		IdField:           "Id",
 		IsGlobal:          true,
 	}
 	mapping["route53.HostedZone"] = mapper{
 		ServiceEndpointID: "route53",
-		FetchFunc:         p.fetch_route53_HostedZone,
+		FetchFunc:         p.fetchRoute53HostedZone,
 		IdField:           "Id",
 		DisplayIDField:    "Name",
 		IsGlobal:          true,
 	}
 }
 
-func (p *Provider) fetch_route53_HealthCheck(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchRoute53HealthCheck(ctx context.Context, output chan<- model.Resource) error {
 	client := route53.NewFromConfig(p.config)
 	input := &route53.ListHealthChecksInput{}
 
@@ -40,14 +40,14 @@ func (p *Provider) fetch_route53_HealthCheck(ctx context.Context, output chan<- 
 			return fmt.Errorf("failed to fetch %s: %w", "route53.HealthCheck", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.HealthChecks, p.getTags_route53_HealthCheck); err != nil {
+		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.HealthChecks, p.getTagsRoute53HealthCheck); err != nil {
 			return err
 		}
 	}
 
 	return nil
 }
-func (p *Provider) getTags_route53_HealthCheck(ctx context.Context, resource types.HealthCheck) (model.Tags, error) {
+func (p *Provider) getTagsRoute53HealthCheck(ctx context.Context, resource types.HealthCheck) (model.Tags, error) {
 	client := route53.NewFromConfig(p.config)
 	input := &route53.ListTagsForResourcesInput{}
 
@@ -81,7 +81,7 @@ func (p *Provider) getTags_route53_HealthCheck(ctx context.Context, resource typ
 	return tags, nil
 }
 
-func (p *Provider) fetch_route53_HostedZone(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchRoute53HostedZone(ctx context.Context, output chan<- model.Resource) error {
 	client := route53.NewFromConfig(p.config)
 	input := &route53.ListHostedZonesInput{}
 
@@ -94,14 +94,14 @@ func (p *Provider) fetch_route53_HostedZone(ctx context.Context, output chan<- m
 			return fmt.Errorf("failed to fetch %s: %w", "route53.HostedZone", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.HostedZones, p.getTags_route53_HostedZone); err != nil {
+		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.HostedZones, p.getTagsRoute53HostedZone); err != nil {
 			return err
 		}
 	}
 
 	return nil
 }
-func (p *Provider) getTags_route53_HostedZone(ctx context.Context, resource types.HostedZone) (model.Tags, error) {
+func (p *Provider) getTagsRoute53HostedZone(ctx context.Context, resource types.HostedZone) (model.Tags, error) {
 	client := route53.NewFromConfig(p.config)
 	input := &route53.ListTagsForResourcesInput{}
 

@@ -10,10 +10,10 @@ import (
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
-func (p *Provider) register_autoscaling(mapping map[string]mapper) {
+func (p *Provider) registerAutoscaling(mapping map[string]mapper) {
 	mapping["autoscaling.AutoScalingGroup"] = mapper{
 		ServiceEndpointID: "autoscaling",
-		FetchFunc:         p.fetch_autoscaling_AutoScalingGroup,
+		FetchFunc:         p.fetchAutoscalingAutoScalingGroup,
 		IdField:           "AutoScalingGroupName",
 		IsGlobal:          false,
 		TagField: resourceconverter.TagField{
@@ -24,7 +24,7 @@ func (p *Provider) register_autoscaling(mapping map[string]mapper) {
 	}
 }
 
-func (p *Provider) fetch_autoscaling_AutoScalingGroup(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchAutoscalingAutoScalingGroup(ctx context.Context, output chan<- model.Resource) error {
 	client := autoscaling.NewFromConfig(p.config)
 	input := &autoscaling.DescribeAutoScalingGroupsInput{}
 
