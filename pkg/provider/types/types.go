@@ -8,8 +8,8 @@ import (
 
 type FetchFunc func(context.Context, chan<- model.Resource) error
 type Provider interface {
-	//Id identifies the current cloud provider. For AWS, it returns the AWS Account ID.
-	Id() string
+	//For a cloud provider this would be the account/project ID, set to empty if not relevant
+	AccountId() string
 	String() string
 	FetchFunctions() map[string]FetchFunc
 }

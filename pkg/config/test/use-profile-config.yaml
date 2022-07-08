@@ -1,0 +1,5 @@
+providers:
+  - cloud: aws
+    profile: my-profile
+    regions: 
+      - us-east-1

@@ -22,7 +22,7 @@ type FakeProvider struct {
 var _ types.Provider = &FakeProvider{}
 var _ fmt.Stringer = &FakeProvider{}
 
-func (p *FakeProvider) Id() string {
+func (p *FakeProvider) AccountId() string {
 	return p.String()
 }
 

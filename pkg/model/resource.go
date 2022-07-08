@@ -11,6 +11,7 @@ import (
 type Resource struct {
 	Id        string         `json:"id" gorm:"primaryKey"`
 	DisplayId string         `json:"displayId"`
+	AccountId string         `json:"accountId"`
 	Region    string         `json:"region"`
 	Type      string         `json:"type"`
 	Tags      Tags           `json:"tags"`

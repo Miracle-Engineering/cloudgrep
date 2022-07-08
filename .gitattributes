@@ -5,3 +5,6 @@
 zz_*.go linguist-generated
 /static/** linguist-generated
 go.sum linguist-generated
+
+# sqlite dump files
+*.db binary

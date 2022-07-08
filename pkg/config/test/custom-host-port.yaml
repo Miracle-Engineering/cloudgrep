@@ -2,13 +2,12 @@
 
 web:
   host: helloworld
-  port: 8080
+  port: 8082
   prefix: "/"
   skipOpen: false
 
 datastore:
   type: sqlite
-  # TODO once we support updating existing resources switch to disk
   dataSourceName: file::memory:?cache=shared
 
 providers:

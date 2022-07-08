@@ -79,7 +79,7 @@ func (cli *cli) runEngine(ctx context.Context) error {
 				cli.logger.Sugar().Errorw("some error(s) when running the provider engine", "error", err)
 			} else {
 				// nothing to view - exit
-				errors = multierror.Append(errors, fmt.Errorf("can't run the provider engine: %w", errors))
+				errors = multierror.Append(errors, fmt.Errorf("can't run the provider engine: %w", err))
 			}
 		}
 	}

@@ -27,6 +27,7 @@ datastore:
 # providers represents the cloud providers cloudgrep will scan w/ the current credentials
 providers:
   - cloud: aws # cloud is the type of the cloud provider (currently only AWS is supported)
+  
     # regions is the list of different regions within the cloud provider to scan
     # default: use the default AWS region set in your terminal
     # ex: use one region
@@ -35,3 +36,6 @@ providers:
     # regions: [us-east-1, global]
     # ex: use "all" region to scan all available regions
     # regions: [all]
+
+    # use a specific AWS profile
+    # profile: dev-AKIAXXXXXXXXXXXXXX
