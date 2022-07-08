@@ -31,6 +31,8 @@ func (p *Provider) fetch_route53_HealthCheck(ctx context.Context, output chan<- 
 	input := &route53.ListHealthChecksInput{}
 
 	resourceConverter := p.converterFor("route53.HealthCheck")
+	var transformers resourceconverter.Transformers[types.HealthCheck]
+	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_route53_HealthCheck))
 	paginator := route53.NewListHealthChecksPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -39,7 +41,7 @@ func (p *Provider) fetch_route53_HealthCheck(ctx context.Context, output chan<- 
 			return fmt.Errorf("failed to fetch %s: %w", "route53.HealthCheck", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.HealthChecks, p.getTags_route53_HealthCheck); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.HealthChecks, transformers); err != nil {
 			return err
 		}
 	}
@@ -85,6 +87,8 @@ func (p *Provider) fetch_route53_HostedZone(ctx context.Context, output chan<- m
 	input := &route53.ListHostedZonesInput{}
 
 	resourceConverter := p.converterFor("route53.HostedZone")
+	var transformers resourceconverter.Transformers[types.HostedZone]
+	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_route53_HostedZone))
 	paginator := route53.NewListHostedZonesPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -93,7 +97,7 @@ func (p *Provider) fetch_route53_HostedZone(ctx context.Context, output chan<- m
 			return fmt.Errorf("failed to fetch %s: %w", "route53.HostedZone", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.HostedZones, p.getTags_route53_HostedZone); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.HostedZones, transformers); err != nil {
 			return err
 		}
 	}

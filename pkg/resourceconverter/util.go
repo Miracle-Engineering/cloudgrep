@@ -3,9 +3,10 @@ package resourceconverter
 import (
 	"context"
 	"fmt"
+	"reflect"
+
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/run-x/cloudgrep/pkg/util"
-	"reflect"
 )
 
 func getTags(v reflect.Value, tagField TagField) []model.Tag {
@@ -53,7 +54,7 @@ func getPtrVal(v reflect.Value) reflect.Value {
 	return v
 }
 
-func SendAllConverted[T any](ctx context.Context, output chan<- model.Resource, converter ResourceConverter, resources []T) error {
+func SendAllConverted[T any](ctx context.Context, output chan<- model.Resource, converter ResourceConverter, resources []T, transformerLists ...Transformers[T]) error {
 	var converted []model.Resource
 
 	for _, raw := range resources {
@@ -62,15 +63,20 @@ func SendAllConverted[T any](ctx context.Context, output chan<- model.Resource, 
 			return err
 		}
 
+		for _, transformers := range transformerLists {
+			if err := transformers.Apply(ctx, raw, &resource); err != nil {
+				return err
+			}
+		}
+
 		converted = append(converted, resource)
 	}
 
 	return util.SendAllFromSlice(ctx, output, converted)
 }
 
-type tagFunc[T any] func(context.Context, T) (model.Tags, error)
-
-func SendAllConvertedTags[T any](ctx context.Context, output chan<- model.Resource, converter ResourceConverter, resources []T, tF tagFunc[T]) error {
+// Deprecated: Use SendAllConverted with a Transformers value instead (using the TagTransformer helper method)
+func SendAllConvertedTags[T any](ctx context.Context, output chan<- model.Resource, converter ResourceConverter, resources []T, tF TagFunc[T]) error {
 	var converted []model.Resource
 
 	for _, raw := range resources {

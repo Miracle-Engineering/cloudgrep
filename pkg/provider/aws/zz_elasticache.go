@@ -25,6 +25,8 @@ func (p *Provider) fetch_elasticache_CacheCluster(ctx context.Context, output ch
 	input := &elasticache.DescribeCacheClustersInput{}
 
 	resourceConverter := p.converterFor("elasticache.CacheCluster")
+	var transformers resourceconverter.Transformers[types.CacheCluster]
+	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_elasticache_CacheCluster))
 	paginator := elasticache.NewDescribeCacheClustersPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -33,7 +35,7 @@ func (p *Provider) fetch_elasticache_CacheCluster(ctx context.Context, output ch
 			return fmt.Errorf("failed to fetch %s: %w", "elasticache.CacheCluster", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.CacheClusters, p.getTags_elasticache_CacheCluster); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.CacheClusters, transformers); err != nil {
 			return err
 		}
 	}

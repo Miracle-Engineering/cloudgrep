@@ -8,6 +8,7 @@ import (
 type mapper struct {
 	IdField         string
 	TagField        resourceconverter.TagField
+	DisplayIDField  string
 	FetchFunc       types.FetchFunc
 	IsGlobal        bool
 	UseMapConverter bool

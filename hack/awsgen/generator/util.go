@@ -73,3 +73,11 @@ func resourceName(service config.Service, typ config.Type) string {
 func registerFuncName(svc config.Service) string {
 	return "register_" + svc.Name
 }
+
+func sdkType(typ config.Type) string {
+	if typ.ListAPI.SDKType != "" {
+		return typ.ListAPI.SDKType
+	}
+
+	return typ.Name
+}

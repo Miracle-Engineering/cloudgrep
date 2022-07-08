@@ -30,14 +30,14 @@ func TestGenerator(t *testing.T) {
 							},
 							Pagination: true,
 							OutputKey:  config.NestedField{config.Field{Name: "Spam"}, config.Field{Name: "Ham"}},
+							SDKType:    "Foo",
 							IDField: config.Field{
 								Name:    "ID",
 								Pointer: true,
 							},
 						},
 						GetTagsAPI: config.GetTagsAPI{
-							ResourceType: "BarValue",
-							Call:         "GetBarTags",
+							Call: "GetBarTags",
 							InputIDField: config.Field{
 								Name:      "BarID",
 								SliceType: "types.BarIDType",
@@ -53,6 +53,22 @@ func TestGenerator(t *testing.T) {
 							},
 							AllowedAPIErrorCodes: []string{
 								"SpamError",
+							},
+						},
+						Transformers: []config.Transformer{
+							{
+								Name: "foo",
+								Expr: "bar",
+							},
+							{
+								Name: "spam",
+								Expr: "ham[%type]",
+							},
+							{
+								Expr: "a",
+							},
+							{
+								Expr: "b[%type]",
 							},
 						},
 					},

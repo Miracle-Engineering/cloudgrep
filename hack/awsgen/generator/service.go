@@ -54,11 +54,12 @@ func (g Generator) generateServiceRegister(service config.Service) (string, util
 		}
 
 		data.Types = append(data.Types, typeRegisterInfo{
-			ResourceName:  resourceName(service, typ),
-			FetchFuncName: fetchFuncName(service, typ),
-			IDField:       typ.ListAPI.IDField,
-			Global:        global,
-			Tags:          typ.ListAPI.Tags,
+			ResourceName:   resourceName(service, typ),
+			FetchFuncName:  fetchFuncName(service, typ),
+			IDField:        typ.ListAPI.IDField,
+			DisplayIDField: typ.ListAPI.DisplayIDField,
+			Global:         global,
+			Tags:           typ.ListAPI.Tags,
 		})
 
 		if !typ.GetTagsAPI.Tags.Zero() {
@@ -73,7 +74,8 @@ type typeRegisterInfo struct {
 	ResourceName  string
 	FetchFuncName string
 
-	IDField config.Field
-	Global  bool
-	Tags    *config.TagField
+	IDField        config.Field
+	DisplayIDField config.Field
+	Global         bool
+	Tags           *config.TagField
 }

@@ -10,11 +10,22 @@ import (
 //TODO store provider info in resource (needed when we can have more than one provider)
 type Resource struct {
 	Id        string         `json:"id" gorm:"primaryKey"`
+	DisplayId string         `json:"displayId"`
 	Region    string         `json:"region"`
 	Type      string         `json:"type"`
 	Tags      Tags           `json:"tags"`
 	RawData   datatypes.JSON `json:"rawData"`
 	UpdatedAt time.Time      `json:"updatedAt"`
+}
+
+// EffectiveDisplayId returns the ID displayed to the user,
+// which is the DisplayId if set, else the Id
+func (r Resource) EffectiveDisplayId() string {
+	if r.DisplayId != "" {
+		return r.DisplayId
+	}
+
+	return r.Id
 }
 
 type Resources []*Resource

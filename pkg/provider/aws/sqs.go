@@ -16,6 +16,7 @@ func (p *Provider) register_sqs(mapping map[string]mapper) {
 	mapping["sqs.Queue"] = mapper{
 		FetchFunc:       p.fetch_sqs_Queue,
 		IdField:         "QueueUrl",
+		DisplayIDField:  "QueueArn",
 		IsGlobal:        false,
 		UseMapConverter: true,
 	}
@@ -60,7 +61,12 @@ func (p *Provider) fetch_sqs_Queue(ctx context.Context, output chan<- model.Reso
 		getQueueAttributesResult.Attributes[SqsQueueIdentifier] = queueUrl
 		queuesAttributes = append(queuesAttributes, getQueueAttributesResult.Attributes)
 	}
-	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, queuesAttributes, p.getTags_sqs_Queue); err != nil {
+
+	var transformers resourceconverter.Transformers[map[string]string]
+	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_sqs_Queue))
+	transformers.AddNamedResource("displayId", displayIdArn)
+
+	if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, queuesAttributes, transformers); err != nil {
 		return err
 	}
 	return nil

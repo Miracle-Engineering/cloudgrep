@@ -10,6 +10,7 @@ func (api ListAPI) Validate() []error {
 	errs = append(errs, validateFuncs(api,
 		validateListAPICall,
 		validateListAPIOutputKey,
+		validateListAPISDKType,
 		validateListAPIIDField,
 		validateListAPITagField,
 		validateListAPIInputOverrides,
@@ -24,6 +25,14 @@ func validateListAPICall(api ListAPI) []error {
 
 func validateListAPIOutputKey(api ListAPI) []error {
 	return api.OutputKey.ValidateSimple("outputKey")
+}
+
+func validateListAPISDKType(api ListAPI) []error {
+	if api.SDKType == "" {
+		return nil
+	}
+
+	return validateExportedIdentifier("sdkType", api.SDKType)
 }
 
 func validateListAPIIDField(api ListAPI) []error {

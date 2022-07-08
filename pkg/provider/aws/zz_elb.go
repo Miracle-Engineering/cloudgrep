@@ -25,6 +25,8 @@ func (p *Provider) fetch_elb_LoadBalancer(ctx context.Context, output chan<- mod
 	input := &elasticloadbalancingv2.DescribeLoadBalancersInput{}
 
 	resourceConverter := p.converterFor("elb.LoadBalancer")
+	var transformers resourceconverter.Transformers[types.LoadBalancer]
+	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_elb_LoadBalancer))
 	paginator := elasticloadbalancingv2.NewDescribeLoadBalancersPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -33,7 +35,7 @@ func (p *Provider) fetch_elb_LoadBalancer(ctx context.Context, output chan<- mod
 			return fmt.Errorf("failed to fetch %s: %w", "elb.LoadBalancer", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.LoadBalancers, p.getTags_elb_LoadBalancer); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.LoadBalancers, transformers); err != nil {
 			return err
 		}
 	}

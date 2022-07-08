@@ -122,7 +122,7 @@ const InsightTable: FC = () => {
 									{row.type}
 								</TableCell>
 								<TableCell sx={tableStyles.bodyRow} align="left">
-									{row.id}
+									{row.displayId || row.id}
 								</TableCell>
 								<TableCell sx={tableStyles.regionRow} align="left">
 									{row.region}

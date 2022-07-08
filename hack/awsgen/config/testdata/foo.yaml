@@ -10,7 +10,6 @@ types:
         name: LoadBalancerArn
         pointer: true
     getTagsApi:
-      type: LoadBalancer
       call: DescribeTags
       inputIDField:
         name: ResourceArns
@@ -24,3 +23,6 @@ types:
             sliceType: types.Tag
         key: Key
         value: Value
+    transformers:
+      - foo.Bar
+      - spam[%type]

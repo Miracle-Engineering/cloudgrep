@@ -49,6 +49,9 @@ type Type struct {
 	// GetTagsAPI contains the configuration used for pulling the tags for each resource of this type.
 	// It is not required if the ListAPI is able to pull tags itself.
 	GetTagsAPI GetTagsAPI `yaml:"getTagsApi"`
+
+	// Transformers is the list of transformer functions to apply to resources before persisting them.
+	Transformers []Transformer `yaml:"transformers"`
 }
 
 // ListAPI is configuration for calling an AWS API to list resources of a type
@@ -67,8 +70,16 @@ type ListAPI struct {
 	// Pointer and SliceType are not yet supported in these fields.
 	OutputKey NestedField `yaml:"outputKey"`
 
+	// SDKType is the name of the struct type in the service's `types` package returned by the API.
+	// Defaults to `Type.Name`
+	SDKType string `yaml:"sdkType"`
+
 	// IDField points to the field within each resource struct that stores the ID of that resource
 	IDField Field `yaml:"id"`
+
+	// DisplayIDField points to the field within each resource struct that stores the display ID of that resource.
+	// The display ID should be an easily readable identifier, and is intended to be consumed by humans.
+	DisplayIDField Field `yaml:"displayId"`
 
 	// Tags configures where to look for tags on this resource.
 	// Required if the getTagsApi is not configured.
@@ -77,10 +88,6 @@ type ListAPI struct {
 
 // GetTags is configuration for calling an AWS API to get the tags on a particular resource
 type GetTagsAPI struct {
-	// ResourceType is the name of the Go struct type within the services "types" package that represents this resource.
-	// This type must be what is returned by the list API.
-	ResourceType string `yaml:"type"`
-
 	// Call is the AWS API call to make within the service
 	Call string `yaml:"call"`
 
@@ -150,4 +157,21 @@ type InputOverrides struct {
 	// FullFuncs is a list functions to call with a pointer to the input struct.
 	// Each function must have a return type of an error.
 	FullFuncs []string `yaml:"fullFuncs"`
+}
+
+// Transformer refers to a transformer function that modifies the created resource in some way before it is persisted.
+// If specified as a plain string in YAML, it will be decoded with the string in the `Expr` field.
+type Transformer struct {
+	// Name is an optional identifier for this transformer, which will be used to add error information.
+	Name string `yaml:"name"`
+
+	// Expr is the Go expression that evaluates to a transformer function.
+	// If the expression needs to resolve the ListAPI.SDKType, it can use the special replacement string "%type",
+	// which will be replaced before validating the expression.
+	// If "%type" is not included and ForceGeneric is false, the expression must evalutate to a resourceconverter.TransformResourceFunc value.
+	// Otherwise, the expression must evaluate to a TransformFunc[%type]
+	Expr string `yaml:"expr"`
+
+	// ForceGeneric causes the Expr to be treated as resolving to a resourceconverter.TransformFunc[%type], regardless of the expression's contents.
+	ForceGeneric bool `yaml:"generic"`
 }

@@ -34,19 +34,21 @@ func TestReflectionConverter(t *testing.T) {
 			WeirdTags: []WeirdTags{{WeirdKey: "key1", WeirdValue: "val1"}, {WeirdKey: "key2", WeirdValue: "val2"}},
 		}
 		rC := &ReflectionConverter{
-			IdField:      "ID",
-			TagField:     TagField{Name: "WeirdTags", Key: "WeirdKey", Value: "WeirdValue"},
-			ResourceType: "DummyResource",
-			Region:       "dummyRegion",
+			IdField:        "ID",
+			DisplayIdField: "Attr2",
+			TagField:       TagField{Name: "WeirdTags", Key: "WeirdKey", Value: "WeirdValue"},
+			ResourceType:   "DummyResource",
+			Region:         "dummyRegion",
 		}
 		resource, err := rC.ToResource(ctx, entry, nil)
 		require.NoError(t, err)
 		expectedResource := model.Resource{
-			Region:  "dummyRegion",
-			Id:      "id1",
-			Type:    "DummyResource",
-			Tags:    model.Tags{{Key: "key1", Value: "val1"}, {Key: "key2", Value: "val2"}},
-			RawData: datatypes.JSON([]byte(`{"ID":"id1","Attr1":1,"Attr2":"hi","Attr3":{"a":"b","c":2},"WeirdTags":[{"WeirdKey":"key1","WeirdValue":"val1"},{"WeirdKey":"key2","WeirdValue":"val2"}]}`)),
+			Region:    "dummyRegion",
+			Id:        "id1",
+			DisplayId: "hi",
+			Type:      "DummyResource",
+			Tags:      model.Tags{{Key: "key1", Value: "val1"}, {Key: "key2", Value: "val2"}},
+			RawData:   datatypes.JSON([]byte(`{"ID":"id1","Attr1":1,"Attr2":"hi","Attr3":{"a":"b","c":2},"WeirdTags":[{"WeirdKey":"key1","WeirdValue":"val1"},{"WeirdKey":"key2","WeirdValue":"val2"}]}`)),
 		}
 		testingutil.AssertEqualsResource(t, expectedResource, resource)
 	})

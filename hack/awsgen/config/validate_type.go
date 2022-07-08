@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
@@ -14,6 +15,7 @@ func (t Type) Validate() []error {
 	errs = append(errs, validateFuncs(t,
 		validateTypeName,
 		validateTypeTags,
+		validateTypeTransformers,
 	)...)
 
 	errs = append(errs, t.subValidate()...)
@@ -87,6 +89,35 @@ func validateTypeTags(typ Type) []error {
 				typeValidationErrorS(typ, msg),
 			)
 		}
+	}
+
+	return errs
+}
+
+func validateTypeTransformers(typ Type) []error {
+	var errs []error
+
+	names := make(map[string]struct{})
+
+	for idx, transformer := range typ.Transformers {
+		name := transformer.Name
+		if name == "" {
+			name = strconv.Itoa(idx)
+		} else if _, err := strconv.Atoi(name); err == nil {
+			errs = append(errs, fmt.Errorf("transformers[%d]: name cannot be an int", idx))
+			continue
+		} else if _, has := names[name]; has {
+			errs = append(errs, fmt.Errorf("transformers[%d]: name is duplicated: %s", idx, name))
+			name = strconv.Itoa(idx)
+		}
+
+		names[name] = struct{}{}
+
+		key := fmt.Sprintf("transformers[%s]", name)
+
+		transformerErrs := transformer.Validate()
+		setErrContextExtraPrepend(key, transformerErrs)
+		errs = append(errs, transformerErrs...)
 	}
 
 	return errs

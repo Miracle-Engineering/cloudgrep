@@ -43,11 +43,13 @@ func (p *Provider) fetch_iam_OpenIDConnectProvider(ctx context.Context, output c
 	input := &iam.ListOpenIDConnectProvidersInput{}
 
 	resourceConverter := p.converterFor("iam.OpenIDConnectProvider")
+	var transformers resourceconverter.Transformers[types.OpenIDConnectProviderListEntry]
+	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_iam_OpenIDConnectProvider))
 	results, err := client.ListOpenIDConnectProviders(ctx, input)
 	if err != nil {
 		return fmt.Errorf("failed to fetch %s: %w", "iam.OpenIDConnectProvider", err)
 	}
-	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, results.OpenIDConnectProviderList, p.getTags_iam_OpenIDConnectProvider); err != nil {
+	if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, results.OpenIDConnectProviderList, transformers); err != nil {
 		return err
 	}
 
@@ -83,6 +85,8 @@ func (p *Provider) fetch_iam_Policy(ctx context.Context, output chan<- model.Res
 	input.Scope = listPoliciesScope()
 
 	resourceConverter := p.converterFor("iam.Policy")
+	var transformers resourceconverter.Transformers[types.Policy]
+	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_iam_Policy))
 	paginator := iam.NewListPoliciesPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -91,7 +95,7 @@ func (p *Provider) fetch_iam_Policy(ctx context.Context, output chan<- model.Res
 			return fmt.Errorf("failed to fetch %s: %w", "iam.Policy", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Policies, p.getTags_iam_Policy); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.Policies, transformers); err != nil {
 			return err
 		}
 	}
@@ -127,11 +131,13 @@ func (p *Provider) fetch_iam_SAMLProvider(ctx context.Context, output chan<- mod
 	input := &iam.ListSAMLProvidersInput{}
 
 	resourceConverter := p.converterFor("iam.SAMLProvider")
+	var transformers resourceconverter.Transformers[types.SAMLProviderListEntry]
+	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_iam_SAMLProvider))
 	results, err := client.ListSAMLProviders(ctx, input)
 	if err != nil {
 		return fmt.Errorf("failed to fetch %s: %w", "iam.SAMLProvider", err)
 	}
-	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, results.SAMLProviderList, p.getTags_iam_SAMLProvider); err != nil {
+	if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, results.SAMLProviderList, transformers); err != nil {
 		return err
 	}
 
@@ -166,6 +172,8 @@ func (p *Provider) fetch_iam_VirtualMFADevice(ctx context.Context, output chan<-
 	input := &iam.ListVirtualMFADevicesInput{}
 
 	resourceConverter := p.converterFor("iam.VirtualMFADevice")
+	var transformers resourceconverter.Transformers[types.VirtualMFADevice]
+	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_iam_VirtualMFADevice))
 	paginator := iam.NewListVirtualMFADevicesPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -174,7 +182,7 @@ func (p *Provider) fetch_iam_VirtualMFADevice(ctx context.Context, output chan<-
 			return fmt.Errorf("failed to fetch %s: %w", "iam.VirtualMFADevice", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.VirtualMFADevices, p.getTags_iam_VirtualMFADevice); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.VirtualMFADevices, transformers); err != nil {
 			return err
 		}
 	}
