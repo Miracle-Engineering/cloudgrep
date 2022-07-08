@@ -16,6 +16,7 @@ func (p *Provider) register_sqs(mapping map[string]mapper) {
 	mapping["sqs.Queue"] = mapper{
 		FetchFunc:       p.fetch_sqs_Queue,
 		IdField:         "QueueUrl",
+		DisplayIDField:  "QueueArn",
 		IsGlobal:        false,
 		UseMapConverter: true,
 	}

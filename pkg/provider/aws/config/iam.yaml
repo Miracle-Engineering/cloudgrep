@@ -25,6 +25,7 @@ types:
           Scope: listPoliciesScope
       outputKey: Policies
       id: Arn
+      displayId: PolicyName
     getTagsApi:
       type: Policy
       call: ListPolicyTags

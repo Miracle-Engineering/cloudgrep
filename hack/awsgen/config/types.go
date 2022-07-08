@@ -70,6 +70,10 @@ type ListAPI struct {
 	// IDField points to the field within each resource struct that stores the ID of that resource
 	IDField Field `yaml:"id"`
 
+	// DisplayIDField points to the field within each resource struct that stores the display ID of that resource.
+	// The display ID should be an easily readable identifier, and is intended to be consumed by humans.
+	DisplayIDField Field `yaml:"displayId"`
+
 	// Tags configures where to look for tags on this resource.
 	// Required if the getTagsApi is not configured.
 	Tags *TagField `yaml:"tags"`
