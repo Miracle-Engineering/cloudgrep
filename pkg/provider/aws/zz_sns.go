@@ -16,6 +16,7 @@ func (p *Provider) register_sns(mapping map[string]mapper) {
 		ServiceEndpointID: "sns",
 		FetchFunc:         p.fetch_sns_SNS,
 		IdField:           "TopicArn",
+		DisplayIDField:    "Name",
 		IsGlobal:          false,
 	}
 }
