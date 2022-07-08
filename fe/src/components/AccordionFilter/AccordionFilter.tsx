@@ -67,6 +67,12 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [tags, isChanged]);
 
+	useEffect(() => {
+		setIsChanged(false);
+		const allRelatedTags = filterTags.filter(tag => tag.key === field.name);
+		setTags(allRelatedTags);
+	}, [filterTags, field.name]);
+
 	const handleExpand = () => {
 		setExpanded(!expanded);
 	};
