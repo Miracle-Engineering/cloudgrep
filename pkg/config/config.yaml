@@ -39,3 +39,7 @@ providers:
 
     # use a specific AWS profile
     # profile: dev-AKIAXXXXXXXXXXXXXX
+
+    # use a specific AWS role
+    # roleArn: arn:aws:iam::123456789012:role/ReadOnlyAcces
+

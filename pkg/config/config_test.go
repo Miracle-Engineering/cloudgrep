@@ -74,3 +74,46 @@ func TestRegions(t *testing.T) {
 	require.Equal(t, optionRegions, config.Providers[0].Regions)
 
 }
+
+func TestRoleARNs(t *testing.T) {
+	//check that the no role is set by default
+	config, err := ReadFile("test/multi-region-config.yaml")
+	require.NoError(t, err)
+	err = config.Load()
+	require.NoError(t, err)
+	require.Equal(t, "", config.Providers[0].RoleArn)
+
+	//check that each role is declined in a dedicated provider
+	config, _ = ReadFile("test/multi-region-config.yaml")
+	config.RoleArns = []string{"arn:aws:iam::1234567890:role/EC2Read", "arn:aws:iam::1234567890:role/S3Read"}
+	err = config.Load()
+	require.NoError(t, err)
+	require.Equal(t, 2, len(config.Providers))
+	require.Equal(t, "arn:aws:iam::1234567890:role/EC2Read", config.Providers[0].RoleArn)
+	require.Equal(t, "arn:aws:iam::1234567890:role/S3Read", config.Providers[1].RoleArn)
+
+	//check that profile can't be redefined if already set
+	config, err = ReadFile("test/use-role-config.yaml")
+	require.NoError(t, err)
+	config.RoleArns = []string{"arn:aws:iam::1234567890:role/EC2Read", "arn:aws:iam::1234567890:role/S3Read"}
+	err = config.Load()
+	require.ErrorContains(t, err, "using the option `--role-arns` is not supported")
+
+	//test roles and profiles combined
+	config, err = ReadFile("test/multi-region-config.yaml")
+	require.NoError(t, err)
+	config.Profiles = []string{"dev", "prod"}
+	config.RoleArns = []string{"arn:aws:iam::1234567890:role/EC2Read", "arn:aws:iam::1234567890:role/S3Read"}
+	err = config.Load()
+	require.NoError(t, err)
+	require.Equal(t, 4, len(config.Providers))
+	require.Equal(t, "arn:aws:iam::1234567890:role/EC2Read", config.Providers[0].RoleArn)
+	require.Equal(t, "dev", config.Providers[0].Profile)
+	require.Equal(t, "arn:aws:iam::1234567890:role/EC2Read", config.Providers[1].RoleArn)
+	require.Equal(t, "prod", config.Providers[1].Profile)
+	require.Equal(t, "arn:aws:iam::1234567890:role/S3Read", config.Providers[2].RoleArn)
+	require.Equal(t, "dev", config.Providers[2].Profile)
+	require.Equal(t, "arn:aws:iam::1234567890:role/S3Read", config.Providers[3].RoleArn)
+	require.Equal(t, "prod", config.Providers[3].Profile)
+
+}

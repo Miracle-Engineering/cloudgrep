@@ -94,19 +94,29 @@ cloudgrep --help
 ```
 
 
-To specify the AWS regions, you can use the `--regions` flag.
+To specify the AWS region(s), you can use the `--regions` flag.
 ```bash
 # will scan using the default AWS credentials for regions us-east-1,us-west-2
 cloudgrep --regions us-east-1,us-west-2
 ```
 
-To use multiple AWS accounts, you can use the `--profiles` flag.
+To use multiple AWS account(s), you can use the `--profiles` flag.
 ```bash
 # will scan 2 accounts using the AWS profiles called "dev" and "prod", using the default region for each profile
 cloudgrep --profiles dev,prod
 
 # combine regions and profiles
 cloudgrep --profiles dev,prod --regions us-east-1,us-west-2
+```
+
+To assume some AWS roles(s), you can use the `--role-arns` flag.
+```bash
+# will assume the provided role
+cloudgrep --role-arns arn:aws:iam::123456789012:role/ReadOnlyAcces
+
+# will use the 'dev' profile and then assume the provided role
+cloudgrep  --profiles dev --role-arns arn:aws:iam::123456789012:role/ReadOnlyAcces
+
 ```
 
 # Advanced Usage
@@ -163,6 +173,10 @@ providers:
 
     # use a specific AWS profile
     # profile: dev-AKIAXXXXXXXXXXXXXX
+
+    # use a specific AWS role
+    # roleArn: arn:aws:iam::123456789012:role/ReadOnlyAcces
+
 
 ```
 

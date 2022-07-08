@@ -18,6 +18,7 @@ type rootOptions struct {
 	bind        string
 	regions     []string
 	profiles    []string
+	roles       []string
 	port        int
 	prefix      string
 	skipOpen    bool
@@ -42,6 +43,7 @@ func (rO rootOptions) loadConfig() (config.Config, error) {
 	}
 	cfg.Regions = rO.regions
 	cfg.Profiles = rO.profiles
+	cfg.RoleArns = rO.roles
 	if rO.port != 0 {
 		cfg.Web.Port = rO.port
 	}
@@ -98,6 +100,7 @@ their cloud accounts.`,
 	flags.StringVar(&rO.bind, "bind", "", "Host to bind on")
 	flags.StringSliceVarP(&rO.regions, "regions", "r", []string(nil), "Comma separated list of regions to scan, or \"all\"")
 	flags.StringSliceVar(&rO.profiles, "profiles", []string(nil), "Comma separated list of AWS profiles to scan.")
+	flags.StringSliceVar(&rO.roles, "role-arns", []string(nil), "Comma separated list of AWS role ARNs to assume.")
 	flags.IntVarP(&rO.port, "port", "p", 0, "Port to use")
 	flags.StringVar(&rO.prefix, "prefix", "", "URL prefix to use")
 	flags.BoolVar(&rO.skipOpen, "skip-open", false, "Skip running the open command to open default browser")

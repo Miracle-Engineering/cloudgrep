@@ -27,6 +27,8 @@ type Config struct {
 	Regions []string
 	// Adding regions as where cli profiles override is stored
 	Profiles []string
+	// Adding roles as where cli profiles override is stored
+	RoleArns []string
 }
 
 // Provider represents a cloud provider cloudgrep will scan w/ the current credentials
@@ -37,6 +39,8 @@ type Provider struct {
 	Regions []string `yaml:"regions"`
 	// Profile is the AWS profile to use, if not set use the default profile
 	Profile string `yaml:"profile"`
+	// RoleArn is the AWS role ARN to assume. If not set, do not assume any role
+	RoleArn string `yaml:"roleArn"`
 }
 
 func (p *Provider) String() string {
@@ -104,11 +108,18 @@ func (c *Config) Load() error {
 	if err != nil {
 		return err
 	}
+	err = c.loadRoleArns()
+	if err != nil {
+		return err
+	}
 	err = c.loadRegions()
+	if err != nil {
+		return err
+	}
 	return err
 }
 
-//loadRegions will replace the regions with the --region option if set
+//loadRegions will replace the providers/regions if the --regions option if set
 func (c *Config) loadRegions() error {
 	if len(c.Regions) == 0 {
 		return nil
@@ -122,7 +133,7 @@ func (c *Config) loadRegions() error {
 	return nil
 }
 
-//loadProfiles will load a provider for each profile if set
+//loadProfiles will replace the providers/profile if the --providers option if set
 func (c *Config) loadProfiles() error {
 	if len(c.Profiles) == 0 {
 		return nil
@@ -136,6 +147,27 @@ func (c *Config) loadProfiles() error {
 			}
 			providerNew := provider
 			providerNew.Profile = profile
+			providers = append(providers, providerNew)
+		}
+	}
+	c.Providers = providers
+	return nil
+}
+
+//loadRoleArns will replace the providers/roleArn if the --role-arns option if set
+func (c *Config) loadRoleArns() error {
+	if len(c.RoleArns) == 0 {
+		return nil
+	}
+	//create the provider for each role
+	providers := make([]Provider, 0)
+	for _, roleArn := range c.RoleArns {
+		for _, provider := range c.Providers {
+			if provider.RoleArn != "" {
+				return fmt.Errorf("the config file already defines a roleArn, using the option `--role-arns` is not supported")
+			}
+			providerNew := provider
+			providerNew.RoleArn = roleArn
 			providers = append(providers, providerNew)
 		}
 	}

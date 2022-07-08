@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	cfg "github.com/run-x/cloudgrep/pkg/config"
 	regionutil "github.com/run-x/cloudgrep/pkg/provider/aws/regions"
 	awsutil "github.com/run-x/cloudgrep/pkg/provider/aws/util"
@@ -74,18 +75,38 @@ func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceC
 
 func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]types.Provider, error) {
 	logger.Info("Connecting to AWS account")
+
+	optFns := []func(options *config.LoadOptions) error{
+		config.WithDefaultsMode(aws.DefaultsModeCrossRegion),
+	}
+
 	if cfg.Profile != "" {
 		logger.Sugar().Infof("Using AWS profile '%v'", cfg.Profile)
+		optFns = append(optFns, config.WithSharedConfigProfile(cfg.Profile))
 	}
-	defaultConfig, err := config.LoadDefaultConfig(ctx,
-		config.WithSharedConfigProfile(cfg.Profile),
-		config.WithDefaultsMode(aws.DefaultsModeCrossRegion),
-	)
+	awsConfig, err := config.LoadDefaultConfig(ctx, optFns...)
 	if err != nil {
 		return nil, err
 	}
 
-	identity, err := awsutil.VerifyCreds(ctx, defaultConfig)
+	if cfg.RoleArn != "" {
+		logger.Sugar().Infof("Assuming AWS role '%v'", cfg.RoleArn)
+		creds, err := assumeRoleCredentials(awsConfig, cfg.RoleArn)
+		if err != nil {
+			return nil, err
+		}
+		optFns = append(optFns, config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(creds.AccessKeyID, creds.SecretAccessKey, creds.SessionToken)))
+		awsConfig, err = config.LoadDefaultConfig(
+			ctx,
+			optFns...,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	identity, err := awsutil.VerifyCreds(ctx, awsConfig)
 	if err != nil {
 		if err.Error() == "no AWS credentials found" {
 			err = fmt.Errorf("%w\nPlease set your AWS credentials using this guide: https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html", err)
@@ -93,18 +114,18 @@ func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]
 		return nil, err
 	}
 
-	regions, err := regionutil.SelectRegions(ctx, cfg.Regions, defaultConfig)
+	regions, err := regionutil.SelectRegions(ctx, cfg.Regions, awsConfig)
 	if err != nil {
 		return nil, fmt.Errorf("cannot select regions for AWS provider: %w", err)
 	}
 
-	regionutil.SetConfigRegion(&defaultConfig, regions)
+	regionutil.SetConfigRegion(&awsConfig, regions)
 	logger.Sugar().Infof("Using the following identity: %v", *identity.Arn)
 	logger.Sugar().Infof("Will look in regions %v", regions)
 	var providers []types.Provider
 
 	for _, region := range regions {
-		newConfig := defaultConfig.Copy()
+		newConfig := awsConfig.Copy()
 		if !region.IsGlobal() {
 			newConfig.Region = region.ID()
 		}
