@@ -1,5 +1,5 @@
 types:
-  - name: SNS
+  - name: Topic
     listApi:
       call: ListTopics
       outputKey: Topics
