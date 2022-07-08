@@ -43,7 +43,7 @@ func (rc *ReflectionConverter) ToResource(ctx context.Context, x any, tags model
 
 	resource.Id = rc.findId(rc.IdField, x)
 	if resource.Id == "" {
-		return model.Resource{}, fmt.Errorf("could not find id field '%v' for type '%v", rc.IdField, rc.ResourceType)
+		return model.Resource{}, fmt.Errorf("could not find id field '%v' for type '%v'", rc.IdField, rc.ResourceType)
 	}
 
 	if err := rc.loadDisplayId(x, &resource); err != nil {
@@ -55,7 +55,7 @@ func (rc *ReflectionConverter) ToResource(ctx context.Context, x any, tags model
 		//use field
 		tagsValue := reflect.ValueOf(x).FieldByName(rc.TagField.Name)
 		if !tagsValue.IsValid() {
-			return model.Resource{}, fmt.Errorf("could not find tag field '%v' for type '%v", rc.TagField.Name, rc.ResourceType)
+			return model.Resource{}, fmt.Errorf("could not find tag field '%v' for type '%v'", rc.TagField.Name, rc.ResourceType)
 		}
 		resource.Tags = getTags(tagsValue, rc.TagField)
 	}
@@ -80,7 +80,7 @@ func (rc *ReflectionConverter) loadDisplayId(x any, resource *model.Resource) er
 	id := rc.findId(rc.DisplayIdField, x)
 
 	if id == "" {
-		return fmt.Errorf("could not find display id field '%v' for type '%v", rc.DisplayIdField, rc.ResourceType)
+		return fmt.Errorf("could not find display id field '%v' for type '%v'", rc.DisplayIdField, rc.ResourceType)
 	}
 
 	resource.DisplayId = id
@@ -89,21 +89,21 @@ func (rc *ReflectionConverter) loadDisplayId(x any, resource *model.Resource) er
 }
 
 func (rc *ReflectionConverter) findId(fieldName string, x any) string {
-	t := reflect.TypeOf(x)
-
-	var id string
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		name := field.Name
-		if name == fieldName {
-			fieldPtrRef := reflect.ValueOf(x).FieldByName(name)
-			fieldRef := reflect.Indirect(fieldPtrRef)
-			if !fieldRef.IsZero() {
-				id = fmt.Sprintf("%v", fieldRef.Interface())
-			}
-			break
-		}
+	v := reflect.ValueOf(x)
+	if v.IsZero() {
+		return ""
 	}
 
-	return id
+	fieldPtrRef := v.FieldByName(fieldName)
+	if !fieldPtrRef.IsValid() || fieldPtrRef.IsZero() {
+		// Field not on x
+		return ""
+	}
+
+	fieldRef := reflect.Indirect(fieldPtrRef)
+	if !fieldRef.IsValid() || fieldRef.IsZero() {
+		return ""
+	}
+
+	return fmt.Sprint(fieldRef.Interface())
 }
