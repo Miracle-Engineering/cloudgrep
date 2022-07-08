@@ -22,6 +22,7 @@ func (p *Provider) register_iam(mapping map[string]mapper) {
 		ServiceEndpointID: "iam",
 		FetchFunc:         p.fetch_iam_Policy,
 		IdField:           "Arn",
+		DisplayIDField:    "PolicyName",
 		IsGlobal:          true,
 	}
 	mapping["iam.SAMLProvider"] = mapper{
@@ -45,6 +46,7 @@ func (p *Provider) fetch_iam_OpenIDConnectProvider(ctx context.Context, output c
 	resourceConverter := p.converterFor("iam.OpenIDConnectProvider")
 	var transformers resourceconverter.Transformers[types.OpenIDConnectProviderListEntry]
 	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_iam_OpenIDConnectProvider))
+	transformers.AddResource(displayIdArnPrefix("oidc-provider/"))
 	results, err := client.ListOpenIDConnectProviders(ctx, input)
 	if err != nil {
 		return fmt.Errorf("failed to fetch %s: %w", "iam.OpenIDConnectProvider", err)
@@ -133,6 +135,7 @@ func (p *Provider) fetch_iam_SAMLProvider(ctx context.Context, output chan<- mod
 	resourceConverter := p.converterFor("iam.SAMLProvider")
 	var transformers resourceconverter.Transformers[types.SAMLProviderListEntry]
 	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_iam_SAMLProvider))
+	transformers.AddResource(displayIdArnPrefix("saml-provider/"))
 	results, err := client.ListSAMLProviders(ctx, input)
 	if err != nil {
 		return fmt.Errorf("failed to fetch %s: %w", "iam.SAMLProvider", err)
@@ -174,6 +177,7 @@ func (p *Provider) fetch_iam_VirtualMFADevice(ctx context.Context, output chan<-
 	resourceConverter := p.converterFor("iam.VirtualMFADevice")
 	var transformers resourceconverter.Transformers[types.VirtualMFADevice]
 	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTags_iam_VirtualMFADevice))
+	transformers.AddResource(displayIdArnPrefix("mfa/"))
 	paginator := iam.NewListVirtualMFADevicesPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)

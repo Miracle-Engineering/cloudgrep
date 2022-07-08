@@ -6,6 +6,7 @@ types:
       outputKey: Functions
       sdkType: FunctionConfiguration
       id: FunctionArn
+      displayId: FunctionName
     getTagsApi:
       call: GetFunction
       inputIDField: FunctionName

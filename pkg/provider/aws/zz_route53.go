@@ -22,6 +22,7 @@ func (p *Provider) register_route53(mapping map[string]mapper) {
 		ServiceEndpointID: "route53",
 		FetchFunc:         p.fetch_route53_HostedZone,
 		IdField:           "Id",
+		DisplayIDField:    "Name",
 		IsGlobal:          true,
 	}
 }

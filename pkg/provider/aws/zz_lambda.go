@@ -16,6 +16,7 @@ func (p *Provider) register_lambda(mapping map[string]mapper) {
 		ServiceEndpointID: "lambda",
 		FetchFunc:         p.fetch_lambda_Function,
 		IdField:           "FunctionArn",
+		DisplayIDField:    "FunctionName",
 		IsGlobal:          false,
 	}
 }

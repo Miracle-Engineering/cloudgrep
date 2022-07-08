@@ -34,6 +34,7 @@ types:
       id:
         name: Id
         pointer: true
+      displayId: Name
     getTagsApi:
       call: ListTagsForResources
       inputIDField:

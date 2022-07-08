@@ -11,10 +11,11 @@ import (
 )
 
 type ResourceFilter struct {
-	Region  string
-	Type    string
-	Tags    model.Tags
-	RawData map[string]any
+	Region          string
+	Type            string
+	Tags            model.Tags
+	DisplayIdPrefix string
+	RawData         map[string]any
 }
 
 func (f ResourceFilter) String() string {
@@ -26,6 +27,10 @@ func (f ResourceFilter) String() string {
 
 	if f.Region != "" {
 		parts = append(parts, fmt.Sprintf("Region=%s", f.Region))
+	}
+
+	if f.DisplayIdPrefix != "" {
+		parts = append(parts, fmt.Sprintf("DisplayIdPrefix=%s", f.DisplayIdPrefix))
 	}
 
 	if f.Tags != nil && len(f.Tags) == 0 {
@@ -64,6 +69,12 @@ func (f ResourceFilter) Matches(resource model.Resource) bool {
 
 	if f.Type != "" {
 		if resource.Type != f.Type {
+			return false
+		}
+	}
+
+	if f.DisplayIdPrefix != "" {
+		if !strings.HasPrefix(resource.EffectiveDisplayId(), f.DisplayIdPrefix) {
 			return false
 		}
 	}

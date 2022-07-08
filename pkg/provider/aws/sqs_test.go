@@ -17,8 +17,9 @@ func TestFetchSqsQueue(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 1)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "sqs.Queue",
-		Region: defaultRegion,
+		Type:            "sqs.Queue",
+		DisplayIdPrefix: "testing-",
+		Region:          defaultRegion,
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

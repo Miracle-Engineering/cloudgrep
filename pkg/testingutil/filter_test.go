@@ -179,6 +179,46 @@ func TestResourceFilter_Matches(t *testing.T) {
 				RawData: []byte(`{"foo":"ham"}`),
 			},
 		},
+		{
+			name: "displayIdPrefixMatchNoDisplay",
+			want: true,
+			filter: ResourceFilter{
+				DisplayIdPrefix: "foo-",
+			},
+			resource: model.Resource{
+				Id: "foo-1",
+			},
+		},
+		{
+			name: "displayIdPrefixMismatchNoDisplay",
+			filter: ResourceFilter{
+				DisplayIdPrefix: "bar",
+			},
+			resource: model.Resource{
+				Id: "ba",
+			},
+		},
+		{
+			name: "displayIdPrefixMatch",
+			want: true,
+			filter: ResourceFilter{
+				DisplayIdPrefix: "foo-",
+			},
+			resource: model.Resource{
+				Id:        "bar-1",
+				DisplayId: "foo-2",
+			},
+		},
+		{
+			name: "displayIdPrefixMismatch",
+			filter: ResourceFilter{
+				DisplayIdPrefix: "bar",
+			},
+			resource: model.Resource{
+				Id:        "bar",
+				DisplayId: "foo-2",
+			},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

@@ -15,18 +15,21 @@ func (p *Provider) register_iam_manual(mapping map[string]mapper) {
 		ServiceEndpointID: "iam",
 		FetchFunc:         p.fetch_iam_User,
 		IdField:           "Arn",
+		DisplayIDField:    "UserName",
 		IsGlobal:          true,
 	}
 	mapping["iam.InstanceProfile"] = mapper{
 		ServiceEndpointID: "iam",
 		FetchFunc:         p.fetch_iam_InstanceProfile,
 		IdField:           "Arn",
+		DisplayIDField:    "InstanceProfileName",
 		IsGlobal:          true,
 	}
 	mapping["iam.Role"] = mapper{
 		ServiceEndpointID: "iam",
 		FetchFunc:         p.fetch_iam_Role,
 		IdField:           "Arn",
+		DisplayIDField:    "RoleName",
 		IsGlobal:          true,
 	}
 }
