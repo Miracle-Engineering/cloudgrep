@@ -4,7 +4,6 @@ types:
       call: ListTopics
       outputKey: Topics
       id: TopicArn
-      displayId: Name
       pagination: true
     getTagsApi:
       type: Topic
