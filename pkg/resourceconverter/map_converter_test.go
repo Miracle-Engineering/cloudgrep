@@ -23,8 +23,12 @@ func TestMapConverter(t *testing.T) {
 		rC := &MapConverter{
 			IdField:        "ID",
 			DisplayIdField: "Attr2",
-			ResourceType:   "DummyResource",
-			Region:         "dummyRegion",
+			ResourceFactory: func() model.Resource {
+				return model.Resource{
+					Type:   "DummyResource",
+					Region: "dummyRegion",
+				}
+			},
 		}
 		resource, err := rC.ToResource(ctx, entry, model.Tags{{Key: "key1", Value: "val3"}, {Key: "key2", Value: "val4"}})
 		require.NoError(t, err)

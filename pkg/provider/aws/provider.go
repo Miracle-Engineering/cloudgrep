@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	cfg "github.com/run-x/cloudgrep/pkg/config"
+	"github.com/run-x/cloudgrep/pkg/model"
 	regionutil "github.com/run-x/cloudgrep/pkg/provider/aws/regions"
 	awsutil "github.com/run-x/cloudgrep/pkg/provider/aws/util"
 	"github.com/run-x/cloudgrep/pkg/provider/types"
@@ -52,23 +53,27 @@ func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceC
 	}
 
 	region := p.region.ID()
+	factory := func() model.Resource {
+		return model.Resource{
+			AccountId: p.accountId,
+			Region:    region,
+			Type:      resourceType,
+		}
+	}
+
 	if mapping.UseMapConverter {
 		return &resourceconverter.MapConverter{
-			AccountId:      p.accountId,
-			Region:         region,
-			ResourceType:   resourceType,
-			TagField:       mapping.TagField,
-			IdField:        mapping.IdField,
-			DisplayIdField: mapping.DisplayIDField,
+			ResourceFactory: factory,
+			TagField:        mapping.TagField,
+			IdField:         mapping.IdField,
+			DisplayIdField:  mapping.DisplayIDField,
 		}
 	}
 	return &resourceconverter.ReflectionConverter{
-		AccountId:      p.accountId,
-		Region:         region,
-		ResourceType:   resourceType,
-		TagField:       mapping.TagField,
-		IdField:        mapping.IdField,
-		DisplayIdField: mapping.DisplayIDField,
+		ResourceFactory: factory,
+		TagField:        mapping.TagField,
+		IdField:         mapping.IdField,
+		DisplayIdField:  mapping.DisplayIDField,
 	}
 }
 
