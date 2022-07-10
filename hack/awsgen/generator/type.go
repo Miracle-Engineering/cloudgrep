@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/run-x/cloudgrep/hack/awsgen/config"
@@ -38,8 +39,10 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 		Paginated      bool
 		InputOverrides config.InputOverrides
 
-		OutputKey   *util.RecursiveAppend[config.Field]
-		TagFuncName string
+		OutputKey *util.RecursiveAppend[config.Field]
+
+		SDKType      string
+		Transformers []config.Transformer
 	}{
 		ResourceName: resourceName(service, typ),
 
@@ -54,6 +57,8 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 		OutputKey: &util.RecursiveAppend[config.Field]{
 			Keys: typ.ListAPI.OutputKey,
 		},
+
+		SDKType: "types." + sdkType(typ),
 	}
 
 	var imports util.ImportSet
@@ -64,8 +69,19 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 	imports.AddPath("github.com/run-x/cloudgrep/pkg/model")
 
 	if typ.GetTagsAPI.Has() {
-		data.TagFuncName = tagFuncName(service, typ)
+		imports.AddPath(awsServicePackage(service.ServicePackage))
+
+		tagFunc := tagFuncName(service, typ)
+		data.Transformers = append(data.Transformers,
+			config.Transformer{
+				Name:         "tags",
+				Expr:         fmt.Sprintf("resourceconverter.TagTransformer(p.%s)", tagFunc),
+				ForceGeneric: true,
+			},
+		)
 	}
+
+	data.Transformers = append(data.Transformers, typ.Transformers...)
 
 	return template.RenderTemplate("list.go", data), imports
 }
@@ -103,7 +119,7 @@ func (g Generator) generateTypeTagFunction(service config.Service, typ config.Ty
 
 		ServicePkg:           service.ServicePackage,
 		APIAction:            typ.GetTagsAPI.Call,
-		SDKType:              typ.GetTagsAPI.ResourceType,
+		SDKType:              sdkType(typ),
 		AllowedAPIErrorCodes: typ.GetTagsAPI.AllowedAPIErrorCodes,
 		InputOverrides:       typ.GetTagsAPI.InputOverrides,
 

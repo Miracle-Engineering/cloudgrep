@@ -4,9 +4,9 @@ types:
       call: ListTopics
       outputKey: Topics
       id: TopicArn
+      sdkType: Topic
       pagination: true
     getTagsApi:
-      type: Topic
       call: ListTagsForResource
       inputIDField: ResourceArn
       tags:

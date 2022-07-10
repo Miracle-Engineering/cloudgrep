@@ -1,12 +1,18 @@
 package config
 
 import (
+	"go/parser"
 	"go/token"
 	"strings"
 )
 
 func isValidExportedIdentifier(id string) bool {
 	return token.IsIdentifier(id) && token.IsExported(id)
+}
+
+func isValidGoExpression(expr string) bool {
+	_, err := parser.ParseExpr(expr)
+	return err == nil
 }
 
 func isValidTypeRef(typ string) bool {

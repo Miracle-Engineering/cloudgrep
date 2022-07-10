@@ -5,10 +5,10 @@ types:
     listApi:
       call: ListOpenIDConnectProviders
       outputKey: OpenIDConnectProviderList
+      sdkType: OpenIDConnectProviderListEntry
       id: Arn
     getTagsApi:
       call: ListOpenIDConnectProviderTags
-      type: OpenIDConnectProviderListEntry
       inputIDField: OpenIDConnectProviderArn
       tags: &tags
         style: struct
@@ -27,7 +27,6 @@ types:
       id: Arn
       displayId: PolicyName
     getTagsApi:
-      type: Policy
       call: ListPolicyTags
       inputIDField: PolicyArn
       tags: *tags
@@ -35,10 +34,10 @@ types:
     listApi:
       call: ListSAMLProviders
       outputKey: SAMLProviderList
+      sdkType: SAMLProviderListEntry
       id: Arn
     getTagsApi:
       call: ListSAMLProviderTags
-      type: SAMLProviderListEntry
       inputIDField: SAMLProviderArn
       tags: *tags
   - name: VirtualMFADevice
@@ -48,7 +47,6 @@ types:
       outputKey: VirtualMFADevices
       id: SerialNumber
     getTagsApi:
-      type: VirtualMFADevice
       call: ListMFADeviceTags
       inputIDField: SerialNumber
       tags: *tags

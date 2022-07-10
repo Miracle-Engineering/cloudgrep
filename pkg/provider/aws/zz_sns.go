@@ -25,6 +25,8 @@ func (p *Provider) fetchSnsTopic(ctx context.Context, output chan<- model.Resour
 	input := &sns.ListTopicsInput{}
 
 	resourceConverter := p.converterFor("sns.Topic")
+	var transformers resourceconverter.Transformers[types.Topic]
+	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTagsSnsTopic))
 	paginator := sns.NewListTopicsPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
@@ -33,7 +35,7 @@ func (p *Provider) fetchSnsTopic(ctx context.Context, output chan<- model.Resour
 			return fmt.Errorf("failed to fetch %s: %w", "sns.Topic", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Topics, p.getTagsSnsTopic); err != nil {
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, page.Topics, transformers); err != nil {
 			return err
 		}
 	}
