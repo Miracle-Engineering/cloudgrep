@@ -74,26 +74,3 @@ func SendAllConverted[T any](ctx context.Context, output chan<- model.Resource, 
 
 	return util.SendAllFromSlice(ctx, output, converted)
 }
-
-// Deprecated: Use SendAllConverted with a Transformers value instead (using the TagTransformer helper method)
-func SendAllConvertedTags[T any](ctx context.Context, output chan<- model.Resource, converter ResourceConverter, resources []T, tF TagFunc[T]) error {
-	var converted []model.Resource
-
-	for _, raw := range resources {
-		tags, err := tF(ctx, raw)
-		if err != nil {
-			return err
-		}
-		if tags == nil {
-			tags = []model.Tag{}
-		}
-		resource, err := converter.ToResource(ctx, raw, tags)
-		if err != nil {
-			return err
-		}
-
-		converted = append(converted, resource)
-	}
-
-	return util.SendAllFromSlice(ctx, output, converted)
-}

@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/aws/aws-sdk-go-v2/service/eks/types"
 	"github.com/hashicorp/go-multierror"
@@ -60,7 +61,11 @@ func (p *Provider) fetch_eks_Cluster(ctx context.Context, output chan<- model.Re
 		}
 		clusters = append(clusters, *describeClusterResults.Cluster)
 	}
-	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, clusters, p.getTags_eks_Cluster); err != nil {
+
+	var transformers resourceconverter.Transformers[types.Cluster]
+	transformers.AddTags(p.getTags_eks_Cluster)
+
+	if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, clusters, transformers); err != nil {
 		return err
 	}
 
@@ -88,6 +93,10 @@ func (p *Provider) fetch_eks_Nodegroup(ctx context.Context, output chan<- model.
 	if err != nil {
 		return fmt.Errorf("failed to fetch %s: %w", "eks.Nodegroup", err)
 	}
+
+	var transformers resourceconverter.Transformers[types.Nodegroup]
+	transformers.AddTags(p.getTags_eks_Nodegroup)
+
 	for _, clusterName := range clusterNames {
 		input := &eks.ListNodegroupsInput{ClusterName: &clusterName}
 
@@ -115,7 +124,8 @@ func (p *Provider) fetch_eks_Nodegroup(ctx context.Context, output chan<- model.
 			}
 			nodegroups = append(nodegroups, *describeNodegroupResults.Nodegroup)
 		}
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, nodegroups, p.getTags_eks_Nodegroup); err != nil {
+
+		if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, nodegroups, transformers); err != nil {
 			return err
 		}
 	}

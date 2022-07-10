@@ -34,7 +34,10 @@ func (p *Provider) fetch_cloudfront_Distribution(ctx context.Context, output cha
 		distributions = append(distributions, page.DistributionList.Items...)
 	}
 
-	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, distributions, p.getTags_cloudfront_Distribution); err != nil {
+	var transformers resourceconverter.Transformers[types.DistributionSummary]
+	transformers.AddTags(p.getTags_cloudfront_Distribution)
+
+	if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, distributions, transformers); err != nil {
 		return err
 	}
 

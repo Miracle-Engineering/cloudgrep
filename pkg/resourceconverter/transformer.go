@@ -66,6 +66,11 @@ func (t *Transformers[T]) AddNamedResource(name string, f TransformResourceFunc)
 	t.AddNamed(name, genericFunc)
 }
 
+// AddTags is a convienience function to add a tag func as a transformer
+func (t *Transformers[T]) AddTags(f TagFunc[T]) {
+	t.AddNamed("tags", TagTransformer(f))
+}
+
 // Apply applies all transform funcs in order to the specified raw SDK value and model.Resource.
 func (t Transformers[T]) Apply(ctx context.Context, raw T, resource *model.Resource) error {
 	for _, entry := range t.entries {

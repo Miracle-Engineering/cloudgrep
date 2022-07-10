@@ -3,3 +3,6 @@
 run:
   go: '1.17'
   timeout: 5m
+linters:
+  disable:
+    - structcheck # This linter is abandoned, with the last update several years ago.

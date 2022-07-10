@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/smithy-go"
@@ -24,12 +25,15 @@ func (p *Provider) fetch_s3_Bucket(ctx context.Context, output chan<- model.Reso
 	client := s3.NewFromConfig(p.config)
 	input := &s3.ListBucketsInput{}
 
+	var transformers resourceconverter.Transformers[types.Bucket]
+	transformers.AddTags(p.getTags_s3_Bucket)
+
 	resourceConverter := p.converterFor("s3.Bucket")
 	results, err := client.ListBuckets(ctx, input)
 	if err != nil {
 		return fmt.Errorf("failed to fetch %s: %w", "s3.Bucket", err)
 	}
-	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, results.Buckets, p.getTags_s3_Bucket); err != nil {
+	if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, results.Buckets, transformers); err != nil {
 		return err
 	}
 
