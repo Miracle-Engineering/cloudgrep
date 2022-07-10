@@ -35,8 +35,9 @@ func TestFetchHostedZones(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "route53.HostedZone")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "route53.HostedZone",
-		Region: globalRegion,
+		Type:            "route53.HostedZone",
+		Region:          globalRegion,
+		DisplayIdPrefix: "0.example.",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
