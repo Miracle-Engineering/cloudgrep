@@ -1,0 +1,13 @@
+environments:
+  - name: staging
+    path: "git@github.com:run-x/runx-infra.git//staging/opta.yml?ref=main"
+  - name: prod
+    path: "git@github.com:run-x/runx-infra.git//production/opta.yml?ref=main"
+name: cloud-grep
+modules:
+  - type: k8s-service
+    name: app
+    port:
+      http: 8080
+    image: AUTO
+    public_uri: "cloudgrep.{parent.domain}"

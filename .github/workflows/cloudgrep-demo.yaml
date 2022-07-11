@@ -1,0 +1,50 @@
+name: cloudgrep-demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      aws_key_id:
+        description: "AWS key ID"
+        required: true
+      aws_secret_key:
+        description: "AWS secret key"
+        required: true
+      aws_session_token:
+        description: "AWS session token"
+        required: true
+  release:
+    types: [ "published" ]
+
+env:
+  GO_VERSION: 1.18
+  CGO_ENABLED: 0
+
+  AWS_REGION: us-east-1
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  deploy-cloudgrep-demo:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ github.event.inputs.aws_key_id }}
+      AWS_SECRET_ACCESS_KEY: ${{ github.event.inputs.aws_secret_key }}
+      AWS_SESSION_TOKEN: ${{ github.event.inputs.aws_session_token }}
+      AWS_REGION: ${{ env.AWS_REGION }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: "Download Opta Binary"
+        run: /bin/bash -c "$(curl -fsSL https://docs.opta.dev/install.sh)"
+      - name: "Version Check"
+        run: $HOME/.opta/opta version
+      - name: "Build Cloudgrep demo Docker Image"
+        run: docker build . -f Dockerfile-demo -t cloudgrep:demo
+      - name: "Deploy Cloudgrep demo"
+        run: $HOME/.opta/opta deploy --env prod --image cloudgrep:demo

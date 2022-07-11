@@ -1,0 +1,12 @@
+FROM golang:1.18-buster
+
+WORKDIR /app
+
+RUN apt-get update
+RUN apt-get install -y jq
+
+COPY demo.sh .
+
+EXPOSE 8080
+
+CMD [ "./demo.sh" ]
