@@ -46,7 +46,7 @@ const InsightFilter: FC = () => {
 			const allTags = fields.flatMap(field =>
 				field.fields.flatMap((fieldItem: Field) =>
 					fieldItem.values.flatMap((valueItem: ValueType) => {
-						return { key: fieldItem.name, value: valueItem.value };
+						return { key: fieldItem.name, value: valueItem.value, group: field.name };
 					})
 				)
 			);
@@ -64,25 +64,12 @@ const InsightFilter: FC = () => {
 			.flatMap(field =>
 				field.fields.flatMap((fieldItem: Field) =>
 					fieldItem.values.flatMap((valueItem: ValueType) => {
-						return { key: fieldItem.name, value: valueItem.value };
+						return { key: fieldItem.name, value: valueItem.value, group: field.name };
 					})
 				)
 			);
 
-		const restOfTags = fields
-			.filter(field => field.name !== fieldName)
-			.flatMap(field =>
-				field.fields.flatMap((fieldItem: Field) =>
-					fieldItem.values
-						.filter((valueItem: ValueType) =>
-							filterTags.some(tag => tag.key === fieldItem.name && tag.value === valueItem.value)
-						)
-						.flatMap((valueItem: ValueType) => {
-							return { key: fieldItem.name, value: valueItem.value };
-						})
-				)
-			);
-
+		const restOfTags = filterTags.filter(tag => tag.group !== fieldName);
 		const newTags = restOfTags.concat(resetTags);
 		dispatch(getFilteredResources({ data: newTags, offset: PAGE_START, limit: PAGE_LENGTH }));
 	};
@@ -124,6 +111,7 @@ const InsightFilter: FC = () => {
 									hasSearch={true}
 									label={fieldItem.name}
 									id={fieldItem.name + index}
+									fieldGroup={field}
 								/>
 							))}
 						</AccordionDetails>

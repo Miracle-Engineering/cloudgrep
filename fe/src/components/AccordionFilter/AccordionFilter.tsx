@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import SearchInput from 'components/SearchInput/SearchInput';
 import { SEARCH_ELEMENTS_NUMBER } from 'constants/globals';
 import { PAGE_LENGTH, PAGE_START } from 'constants/globals';
-import { Field, ValueType } from 'models/Field';
+import { Field, FieldGroup, ValueType } from 'models/Field';
 import { Tag } from 'models/Tag';
 import React, { ChangeEvent, FC, useEffect, useMemo, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -20,7 +20,7 @@ import { accordionStyles, filterStyles, overrideSummaryClasses } from './style';
 import { AccordionFilterProps } from './types';
 
 const AccordionFilter: FC<AccordionFilterProps> = props => {
-	const { label, hasSearch, id, field } = props;
+	const { label, hasSearch, id, field, fieldGroup } = props;
 	const [searchTerm, setSearchTerm] = useState('');
 	const [applyHover, setApplyHover] = useState(false);
 	const [boxHeight, setBoxHeight] = useState('unset');
@@ -31,9 +31,9 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 	const initialTags = useMemo(
 		() =>
 			field?.values?.map((item: ValueType) => {
-				return { key: field.name, value: item.value };
+				return { key: field.name, value: item.value, group: fieldGroup.name };
 			}),
-		[field]
+		[field, fieldGroup]
 	);
 	const [tags, setTags] = useState<Tag[]>(initialTags);
 	const { filterTags } = useAppSelector(state => state.tags);
@@ -82,7 +82,7 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 	};
 
 	const handleOnly = (item: ValueType) => {
-		setTags([{ key: field.name, value: item.value }]);
+		setTags([{ key: field.name, value: item.value, group: fieldGroup.name }]);
 		setSingleItem(item.value);
 		setIsChanged(true);
 	};
@@ -93,14 +93,24 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 		setIsChanged(true);
 	};
 
-	const handleChange = (event: React.ChangeEvent<HTMLInputElement>, field: Field, item: ValueType) => {
-		const tag = { key: field.name, value: item.value };
-		const existingTag = tags?.some(filterTag => filterTag.key === tag.key && filterTag.value === tag.value);
+	const handleChange = (
+		event: React.ChangeEvent<HTMLInputElement>,
+		currentFieldGroup: FieldGroup,
+		currentField: Field,
+		item: ValueType
+	) => {
+		const tag = { key: currentField.name, value: item.value, group: currentFieldGroup.name };
+		const existingTag = tags?.some(
+			filterTag => filterTag.key === tag.key && filterTag.value === tag.value && filterTag.group === tag.group
+		);
 
 		if (event.target.checked && !existingTag) {
 			setTags([...tags, tag]);
 		} else if (!event.target.checked && existingTag && tags?.length > 0) {
-			const newFilters = tags.filter(filterTag => !(filterTag.key === tag.key && filterTag.value === tag.value));
+			const newFilters = tags.filter(
+				filterTag =>
+					!(filterTag.key === tag.key && filterTag.value === tag.value && filterTag.group === tag.group)
+			);
 			setTags(newFilters);
 		}
 		setIsChanged(true);
@@ -134,11 +144,15 @@ const AccordionFilter: FC<AccordionFilterProps> = props => {
 												item={item}
 												handleChange={handleChange}
 												isChecked={tags.some(
-													tag => tag.key === field.name && tag.value === item.value
+													tag =>
+														tag.key === field.name &&
+														tag.value === item.value &&
+														tag.group === fieldGroup.name
 												)}
 												handleOnly={handleOnly}
 												handleAll={handleAll}
 												singleItem={singleItem}
+												fieldGroup={fieldGroup}
 											/>
 										))}
 							</FormGroup>

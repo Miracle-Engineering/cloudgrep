@@ -11,7 +11,7 @@ import { accordionItem, labelClasses, onlyAndAll } from './style';
 import { AccordionItemProps } from './types';
 
 const AccordionItem: FC<AccordionItemProps> = props => {
-	const { field, handleChange, isChecked, item, handleOnly, singleItem, handleAll } = props;
+	const { field, handleChange, isChecked, item, handleOnly, singleItem, handleAll, fieldGroup } = props;
 	const [containerRef, isHovered] = useHover<HTMLDivElement>();
 	const isOnlyUsed = singleItem && singleItem === item.value;
 
@@ -47,7 +47,7 @@ const AccordionItem: FC<AccordionItemProps> = props => {
 							}}
 							size={'small'}
 							checked={isChecked}
-							onChange={e => handleChange(e, field, item)}
+							onChange={e => handleChange(e, fieldGroup, field, item)}
 						/>
 					}
 					label={item.value}

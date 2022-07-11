@@ -8,6 +8,7 @@ export interface MockTag {
 export interface Tag {
 	key: string;
 	value: string;
+	group: string;
 }
 
 export type TagType = { [key: string]: string };
