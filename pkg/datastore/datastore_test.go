@@ -378,7 +378,7 @@ func TestFields(t *testing.T) {
 			//check number of groups
 			assert.Equal(t, 2, len(fields))
 			//check fields by group
-			assert.Equal(t, 2, len(fields.FindGroup("core").Fields))
+			assert.Equal(t, 3, len(fields.FindGroup("core").Fields))
 			assert.Equal(t, 10, len(fields.FindGroup("tags").Fields))
 
 			//test a few fields
@@ -398,6 +398,16 @@ func TestFields(t *testing.T) {
 					&model.FieldValue{Value: "test.Instance", Count: "2"},
 				},
 			}, typeField)
+
+			accountIdField := *fields.FindField("core", "account_id")
+			testingutil.AssertEqualsField(t, model.Field{
+				Name:  "account_id",
+				Count: 3,
+				Values: model.FieldValues{
+					//note: we don't have account id set in test data, it's coming back as empty value
+					&model.FieldValue{Value: "", Count: "3"},
+				},
+			}, accountIdField)
 
 			//check that values are sorted by count desc
 			assert.Equal(t, typeField.Values[0].Count, "2")
@@ -444,7 +454,7 @@ func TestFields(t *testing.T) {
 
 			//check all groups and tags are returned
 			assert.Equal(t, 2, len(fields))
-			assert.Equal(t, 2, len(fields.FindGroup("core").Fields))
+			assert.Equal(t, 3, len(fields.FindGroup("core").Fields))
 			assert.Equal(t, 10, len(fields.FindGroup("tags").Fields))
 
 			//check the values were updated

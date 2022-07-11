@@ -25,7 +25,7 @@ func (p Provider) String() string {
 	return fmt.Sprintf("AWS Provider for account %v, region %v", p.accountId, p.region.ID())
 }
 
-func (p Provider) Id() string {
+func (p Provider) AccountId() string {
 	return p.accountId
 }
 
@@ -54,23 +54,33 @@ func (p *Provider) converterFor(resourceType string) resourceconverter.ResourceC
 	region := p.region.ID()
 	if mapping.UseMapConverter {
 		return &resourceconverter.MapConverter{
-			Region:       region,
-			ResourceType: resourceType,
-			TagField:     mapping.TagField,
-			IdField:      mapping.IdField,
+			AccountId:      p.accountId,
+			Region:         region,
+			ResourceType:   resourceType,
+			TagField:       mapping.TagField,
+			IdField:        mapping.IdField,
+			DisplayIdField: mapping.DisplayIDField,
 		}
 	}
 	return &resourceconverter.ReflectionConverter{
-		Region:       region,
-		ResourceType: resourceType,
-		TagField:     mapping.TagField,
-		IdField:      mapping.IdField,
+		AccountId:      p.accountId,
+		Region:         region,
+		ResourceType:   resourceType,
+		TagField:       mapping.TagField,
+		IdField:        mapping.IdField,
+		DisplayIdField: mapping.DisplayIDField,
 	}
 }
 
 func NewProviders(ctx context.Context, cfg cfg.Provider, logger *zap.Logger) ([]types.Provider, error) {
 	logger.Info("Connecting to AWS account")
-	defaultConfig, err := config.LoadDefaultConfig(ctx, config.WithDefaultsMode(aws.DefaultsModeCrossRegion))
+	if cfg.Profile != "" {
+		logger.Sugar().Infof("Using AWS profile '%v'", cfg.Profile)
+	}
+	defaultConfig, err := config.LoadDefaultConfig(ctx,
+		config.WithSharedConfigProfile(cfg.Profile),
+		config.WithDefaultsMode(aws.DefaultsModeCrossRegion),
+	)
 	if err != nil {
 		return nil, err
 	}

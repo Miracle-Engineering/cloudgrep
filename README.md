@@ -93,9 +93,20 @@ To view documentation for them, simply add the `--help` flag like so:
 cloudgrep --help
 ```
 
-To specify the regions, you can use the `--regions` flag.
+
+To specify the AWS regions, you can use the `--regions` flag.
 ```bash
+# will scan using the default AWS credentials for regions us-east-1,us-west-2
 cloudgrep --regions us-east-1,us-west-2
+```
+
+To use multiple AWS accounts, you can use the `--profiles` flag.
+```bash
+# will scan 2 accounts using the AWS profiles called "dev" and "prod", using the default region for each profile
+cloudgrep --profiles dev,prod
+
+# combine regions and profiles
+cloudgrep --profiles dev,prod --regions us-east-1,us-west-2
 ```
 
 # Advanced Usage
@@ -140,6 +151,7 @@ datastore:
 # providers represents the cloud providers cloudgrep will scan w/ the current credentials
 providers:
   - cloud: aws # cloud is the type of the cloud provider (currently only AWS is supported)
+  
     # regions is the list of different regions within the cloud provider to scan
     # default: use the default AWS region set in your terminal
     # ex: use one region
@@ -148,6 +160,10 @@ providers:
     # regions: [us-east-1, global]
     # ex: use "all" region to scan all available regions
     # regions: [all]
+
+    # use a specific AWS profile
+    # profile: dev-AKIAXXXXXXXXXXXXXX
+
 ```
 
 # Supported resources

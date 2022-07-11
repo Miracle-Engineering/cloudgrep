@@ -306,7 +306,7 @@ func TestResourceFieldsRoute(t *testing.T) {
 		//check number of groups
 		require.Equal(t, 2, len(fields))
 		//check fields by group
-		require.Equal(t, 2, len(fields.FindGroup("core").Fields))
+		require.Equal(t, 3, len(fields.FindGroup("core").Fields))
 		require.Equal(t, 10, len(fields.FindGroup("tags").Fields))
 	})
 }

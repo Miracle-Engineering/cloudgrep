@@ -9,6 +9,7 @@ export interface Property {
 export interface Resource {
 	type: string;
 	id: string;
+	displayId: string;
 	region: string;
 	rawData: Object;
 	tags?: Tag[];

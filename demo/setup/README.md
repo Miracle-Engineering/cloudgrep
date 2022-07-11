@@ -39,7 +39,7 @@ The only reason to generate the original is to have new resource types that didn
 rm demo/setup/original-dump.db
 
 # run cloudgrep once to fetch the database
-./cloudgrep --config demo/setup/demo-setup.yaml
+go run main.go --config demo/setup/demo-setup.yaml
 
 ```
 
@@ -56,6 +56,6 @@ go run demo/setup/update_demo.go
 
 ```shell
 # run cloudgrep using the newly created demo db
-./cloudgrep --config demo/demo.yaml
+go run main.go --config demo/demo.yaml
 
 ```

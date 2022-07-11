@@ -36,7 +36,7 @@ func TestNewProviders(t *testing.T) {
 	RegisterExtraProviders("fake", fakeProviders())
 	providers, err := NewProviders(ctx, fakeCfg, logger)
 	require.NoError(t, err)
-	require.Equal(t, "foo", providers[0].Id())
+	require.Equal(t, "foo", providers[0].AccountId())
 
 }
 

@@ -112,12 +112,12 @@ func TestEngineRun(t *testing.T) {
 		require.Equal(t, "success", engineStatus.Status)
 		require.Equal(t, "", engineStatus.Error)
 
-		//the engine sends one amplitude event per cloud
-		require.Equal(t, 1, amplitudeClient.Size())
+		//the engine sends one amplitude event per cloud id
+		require.Equal(t, 2, amplitudeClient.Size())
 		event, err := amplitudeClient.LastEvent()
 		require.NoError(t, err)
 		require.Equal(t, "CLOUD_CONNECTION", event["event_type"])
-		require.Equal(t, "spam", event["event_properties"].(map[string]string)["CLOUD_ID"])
+		require.Equal(t, "fake-provider-2", event["event_properties"].(map[string]string)["CLOUD_ID"])
 
 	})
 }
@@ -125,13 +125,13 @@ func TestEngineRun(t *testing.T) {
 func fakeProviders() []provider.Provider {
 	fakeProviders := []*providerutil.FakeProvider{
 		{
-			ID: "spam",
+			ID: "fake-provider-1",
 			Foo: providerutil.FakeProviderResourceConfig{
 				Count: 1,
 			},
 		},
 		{
-			ID: "ham",
+			ID: "fake-provider-2",
 			Bar: providerutil.FakeProviderResourceConfig{
 				Count: 2,
 			},

@@ -4,15 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/run-x/cloudgrep/pkg/model"
 	"reflect"
+
+	"github.com/run-x/cloudgrep/pkg/model"
 )
 
 type MapConverter struct {
-	ResourceType string
-	TagField     TagField
-	IdField      string
-	Region       string
+	AccountId      string
+	Region         string
+	ResourceType   string
+	IdField        string
+	DisplayIdField string
+	TagField       TagField
 }
 
 func (mc *MapConverter) ToResource(ctx context.Context, x any, tags model.Tags) (model.Resource, error) {
@@ -37,12 +40,21 @@ func (mc *MapConverter) ToResource(ctx context.Context, x any, tags model.Tags) 
 	}
 	idString := fmt.Sprintf("%v", id)
 
+	var displayIdString string
+	if mc.DisplayIdField != "" {
+		displayId, ok := xConverted[mc.DisplayIdField]
+		if !ok {
+			return model.Resource{}, fmt.Errorf("could not find display id field %v in map %v", mc.DisplayIdField, xConverted)
+		}
+		displayIdString = fmt.Sprintf("%v", displayId)
+	}
+
 	// generate tags field
-	if tags == nil {
+	if !mc.TagField.IsZero() {
 		//use field
 		tagsValue, ok := xConverted[mc.TagField.Name]
 		if !ok {
-			return model.Resource{}, fmt.Errorf("Could not find tag field '%v' for type '%v", mc.TagField.Name, mc.ResourceType)
+			return model.Resource{}, fmt.Errorf("could not find tag field '%v' for type '%v", mc.TagField.Name, mc.ResourceType)
 		}
 
 		tags = getTags(reflect.ValueOf(tagsValue), mc.TagField)
@@ -52,10 +64,12 @@ func (mc *MapConverter) ToResource(ctx context.Context, x any, tags model.Tags) 
 		return model.Resource{}, err
 	}
 	return model.Resource{
-		Id:      idString,
-		Region:  mc.Region,
-		Type:    mc.ResourceType,
-		RawData: marshaledMap,
-		Tags:    tags,
+		Id:        idString,
+		DisplayId: displayIdString,
+		AccountId: mc.AccountId,
+		Region:    mc.Region,
+		Type:      mc.ResourceType,
+		RawData:   marshaledMap,
+		Tags:      tags,
 	}, nil
 }

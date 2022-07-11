@@ -10,6 +10,8 @@ import (
 //TODO store provider info in resource (needed when we can have more than one provider)
 type Resource struct {
 	Id        string         `json:"id" gorm:"primaryKey"`
+	DisplayId string         `json:"displayId"`
+	AccountId string         `json:"accountId"`
 	Region    string         `json:"region"`
 	Type      string         `json:"type"`
 	Tags      Tags           `json:"tags"`

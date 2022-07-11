@@ -22,6 +22,7 @@ func (p *Provider) register_iam(mapping map[string]mapper) {
 		ServiceEndpointID: "iam",
 		FetchFunc:         p.fetch_iam_Policy,
 		IdField:           "Arn",
+		DisplayIDField:    "PolicyName",
 		IsGlobal:          true,
 	}
 	mapping["iam.SAMLProvider"] = mapper{

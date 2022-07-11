@@ -37,7 +37,7 @@ type resourceIndexer struct {
 type fieldColumn struct {
 	//Generated column name, ex: tag1, tag2 ...
 	ColumnName string `gorm:"primaryKey"`
-	//The actual field name: ex: aws:ec2:fleet-id
+	//The actual field name: ex: tags.aws:ec2:fleet-id
 	FieldName string
 }
 
@@ -157,7 +157,7 @@ func (ri *resourceIndexer) rebuildDataModel(db *gorm.DB) error {
 			ri.fieldColumns[field.FieldName] = field
 		}
 		//always include these
-		ri.fieldColumns.addExplicitFields(model.FieldGroupCore, "id", "type", "region")
+		ri.fieldColumns.addExplicitFields(model.FieldGroupCore, "id", "type", "region", "account_id")
 	}
 
 	builder := dynamicstruct.NewStruct()
@@ -352,6 +352,7 @@ func (ri *resourceIndexer) writeResourceIndexes(ctx context.Context, db *gorm.DB
 		row["id"] = r.Id
 		row["type"] = r.Type
 		row["region"] = r.Region
+		row["account_id"] = r.AccountId
 		//add the tags
 		for _, tag := range r.Tags {
 			//ex: row["Col23"]="Team"
