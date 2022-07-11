@@ -13,14 +13,16 @@ import (
 
 func (p *Provider) register_eks(mapping map[string]mapper) {
 	mapping["eks.Cluster"] = mapper{
-		FetchFunc: p.fetch_eks_Cluster,
-		IdField:   "Arn",
-		IsGlobal:  false,
+		FetchFunc:      p.fetch_eks_Cluster,
+		IdField:        "Arn",
+		DisplayIDField: "Name",
+		IsGlobal:       false,
 	}
 	mapping["eks.Nodegroup"] = mapper{
-		FetchFunc: p.fetch_eks_Nodegroup,
-		IdField:   "NodegroupArn",
-		IsGlobal:  false,
+		FetchFunc:      p.fetch_eks_Nodegroup,
+		IdField:        "NodegroupArn",
+		DisplayIDField: "NodegroupName",
+		IsGlobal:       false,
 	}
 }
 

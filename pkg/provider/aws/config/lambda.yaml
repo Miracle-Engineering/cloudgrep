@@ -6,11 +6,10 @@ types:
       outputKey: Functions
       sdkType: FunctionConfiguration
       id: FunctionArn
+      displayId: FunctionName
     getTagsApi:
       call: GetFunction
       inputIDField: FunctionName
       tags:
         style: map
         field: Tags
-    transformers:
-      - displayIdArnPrefix("function:")

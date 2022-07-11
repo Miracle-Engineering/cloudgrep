@@ -10,6 +10,7 @@ types:
       id:
         name: LoadBalancerArn
         pointer: true
+      displayId: LoadBalancerName
     getTagsApi:
       call: DescribeTags
       inputIDField:

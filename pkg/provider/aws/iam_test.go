@@ -18,8 +18,9 @@ func TestFetchInstanceProfiles(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.InstanceProfile")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.InstanceProfile",
-		Region: globalRegion,
+		Type:            "iam.InstanceProfile",
+		Region:          globalRegion,
+		DisplayIdPrefix: "test-0-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -40,8 +41,9 @@ func TestFetchOpenIDConnectProviders(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.OpenIDConnectProvider")
 
 	resources = testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.OpenIDConnectProvider",
-		Region: globalRegion,
+		Type:            "iam.OpenIDConnectProvider",
+		Region:          globalRegion,
+		DisplayIdPrefix: "oidc.eks.",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -90,8 +92,9 @@ func TestFetchRoles(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.Role")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.Role",
-		Region: globalRegion,
+		Type:            "iam.Role",
+		Region:          globalRegion,
+		DisplayIdPrefix: "test-0-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -112,8 +115,9 @@ func TestFetchUsers(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.User")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.User",
-		Region: globalRegion,
+		Type:            "iam.User",
+		Region:          globalRegion,
+		DisplayIdPrefix: "test-0",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -134,8 +138,9 @@ func TestFetchVirtualMFADevices(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.VirtualMFADevice")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.VirtualMFADevice",
-		Region: globalRegion,
+		Type:            "iam.VirtualMFADevice",
+		Region:          globalRegion,
+		DisplayIdPrefix: "test/test-0-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

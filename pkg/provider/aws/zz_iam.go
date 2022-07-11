@@ -46,6 +46,7 @@ func (p *Provider) fetchIamOpenIDConnectProvider(ctx context.Context, output cha
 	resourceConverter := p.converterFor("iam.OpenIDConnectProvider")
 	var transformers resourceconverter.Transformers[types.OpenIDConnectProviderListEntry]
 	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTagsIamOpenIDConnectProvider))
+	transformers.AddResource(displayIdArnPrefix("oidc-provider/"))
 	results, err := client.ListOpenIDConnectProviders(ctx, input)
 	if err != nil {
 		return fmt.Errorf("failed to fetch %s: %w", "iam.OpenIDConnectProvider", err)
@@ -134,6 +135,7 @@ func (p *Provider) fetchIamSAMLProvider(ctx context.Context, output chan<- model
 	resourceConverter := p.converterFor("iam.SAMLProvider")
 	var transformers resourceconverter.Transformers[types.SAMLProviderListEntry]
 	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTagsIamSAMLProvider))
+	transformers.AddResource(displayIdArnPrefix("saml-provider/"))
 	results, err := client.ListSAMLProviders(ctx, input)
 	if err != nil {
 		return fmt.Errorf("failed to fetch %s: %w", "iam.SAMLProvider", err)
@@ -175,6 +177,7 @@ func (p *Provider) fetchIamVirtualMFADevice(ctx context.Context, output chan<- m
 	resourceConverter := p.converterFor("iam.VirtualMFADevice")
 	var transformers resourceconverter.Transformers[types.VirtualMFADevice]
 	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTagsIamVirtualMFADevice))
+	transformers.AddResource(displayIdArnPrefix("mfa/"))
 	paginator := iam.NewListVirtualMFADevicesPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)

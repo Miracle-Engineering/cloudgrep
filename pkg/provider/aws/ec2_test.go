@@ -17,8 +17,9 @@ func TestFetchEC2Instances(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.Instance",
-		Region: defaultRegion,
+		Type:            "ec2.Instance",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "i-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -40,8 +41,9 @@ func TestFetchEBSVolumes(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.Volume",
-		Region: defaultRegion,
+		Type:            "ec2.Volume",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "vol-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -60,8 +62,9 @@ func TestFetchAddresses(t *testing.T) {
 	ctx := setupIntegrationTest(t)
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.Address")
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.Address",
-		Region: defaultRegion,
+		Type:            "ec2.Address",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "eipalloc-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -77,8 +80,9 @@ func TestFetchImages(t *testing.T) {
 	ctx := setupIntegrationTest(t)
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.Image")
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.Image",
-		Region: defaultRegion,
+		Type:            "ec2.Image",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "ami-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -97,8 +101,9 @@ func TestFetchKeyPairs(t *testing.T) {
 	ctx := setupIntegrationTest(t)
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.KeyPair")
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.KeyPair",
-		Region: defaultRegion,
+		Type:            "ec2.KeyPair",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "key-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -116,8 +121,9 @@ func TestFetchLaunchTemplates(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.LaunchTemplate",
-		Region: defaultRegion,
+		Type:            "ec2.LaunchTemplate",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "lt-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -134,8 +140,9 @@ func TestFetchNatGateways(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.NatGateway")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.NatGateway",
-		Region: defaultRegion,
+		Type:            "ec2.NatGateway",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "nat-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -152,8 +159,9 @@ func TestFetchNetworkAcl(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.NetworkAcl")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.NetworkAcl",
-		Region: defaultRegion,
+		Type:            "ec2.NetworkAcl",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "acl-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -170,8 +178,9 @@ func TestFetchNetworkInterface(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.NetworkInterface")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.NetworkInterface",
-		Region: defaultRegion,
+		Type:            "ec2.NetworkInterface",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "eni-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -188,8 +197,9 @@ func TestFetchRouteTable(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.RouteTable")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.RouteTable",
-		Region: defaultRegion,
+		Type:            "ec2.RouteTable",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "rtb-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -206,8 +216,9 @@ func TestFetchSecurityGroups(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.SecurityGroup")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.SecurityGroup",
-		Region: defaultRegion,
+		Type:            "ec2.SecurityGroup",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "sg-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -224,8 +235,9 @@ func TestFetchSnapshots(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.Snapshot")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.Snapshot",
-		Region: defaultRegion,
+		Type:            "ec2.Snapshot",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "snap-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -242,8 +254,9 @@ func TestFetchSubnets(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.Subnet")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.Subnet",
-		Region: defaultRegion,
+		Type:            "ec2.Subnet",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "subnet-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
@@ -260,8 +273,9 @@ func TestFetchVpcs(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "ec2.Vpc")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "ec2.Vpc",
-		Region: defaultRegion,
+		Type:            "ec2.Vpc",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "vpc-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

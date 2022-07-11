@@ -16,6 +16,8 @@ types:
         field: Tags
         key: Key
         value: Value
+    transformers:
+      - displayIdArnPrefix("oidc-provider/")
   - name: Policy
     listApi:
       call: ListPolicies
@@ -40,6 +42,8 @@ types:
       call: ListSAMLProviderTags
       inputIDField: SAMLProviderArn
       tags: *tags
+    transformers:
+      - displayIdArnPrefix("saml-provider/")
   - name: VirtualMFADevice
     listApi:
       call: ListVirtualMFADevices
@@ -50,3 +54,5 @@ types:
       call: ListMFADeviceTags
       inputIDField: SerialNumber
       tags: *tags
+    transformers:
+      - displayIdArnPrefix("mfa/")

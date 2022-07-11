@@ -27,6 +27,7 @@ func (p *Provider) fetchSnsTopic(ctx context.Context, output chan<- model.Resour
 	resourceConverter := p.converterFor("sns.Topic")
 	var transformers resourceconverter.Transformers[types.Topic]
 	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTagsSnsTopic))
+	transformers.AddResource(displayIdArn)
 	paginator := sns.NewListTopicsPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
