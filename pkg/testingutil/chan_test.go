@@ -71,7 +71,8 @@ func TestMustFetchAllCanceled(t *testing.T) {
 		return util.SendAllFromSlice(ctx, out, in)
 	}
 
-	assert.PanicsWithError(t, "error with testingutil.FetchAll: context canceled", func() {
-		MustFetchAll(ctx, Fake(t), fetchFunc)
-	})
+	fake := Fake(t)
+	MustFetchAll(ctx, fake, fetchFunc)
+	assert.Contains(t, fake.Logs, "error with testingutil.FetchAll: context canceled")
+	assert.True(t, fake.IsFail)
 }
