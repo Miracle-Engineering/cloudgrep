@@ -4,28 +4,28 @@ env:
   AWS_REGION: us-east-1
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: "Environment to run terraform in"
-        type: choice
-        options:
-          - dev
-          - prod
+  # workflow_dispatch:
+  #   inputs:
+  #     environment:
+  #       description: "Environment to run terraform in"
+  #       type: choice
+  #       options:
+  #         - dev
+  #         - prod
 
-  push:
-    branches:
-      - main
-    paths:
-      - "integration/aws/terraform/**"
-      - ".github/scripts/integration-setup.yml"
-      - ".github/scripts/integration-setup-aws-account.js"
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "integration/aws/terraform/**"
+  #     - ".github/scripts/integration-setup.yml"
+  #     - ".github/scripts/integration-setup-aws-account.js"
 
-  pull_request:
-    types: [opened, synchronize]
-    paths:
-      - "integration/aws/terraform/**"
-      - ".github/workflows/integration-setup.yml"
+  # pull_request:
+  #   types: [opened, synchronize]
+  #   paths:
+  #     - "integration/aws/terraform/**"
+  #     - ".github/workflows/integration-setup.yml"
 
 concurrency: terraform-integration
 

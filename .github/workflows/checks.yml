@@ -27,17 +27,17 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ env.GO_VERSION }}
-      - name: Select AWS account
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const script = require('.github/scripts/go-test-aws-account.js')
-            await script({ context, core, exec, require })
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: "${{ env.AWS_REGION }}"
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-actions-tests
+      # - name: Select AWS account
+      #   uses: actions/github-script@v6
+      #   with:
+      #     script: |
+      #       const script = require('.github/scripts/go-test-aws-account.js')
+      #       await script({ context, core, exec, require })
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-region: "${{ env.AWS_REGION }}"
+      #     role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-actions-tests
       - run: go mod download
       - run: make test
         env:
@@ -148,7 +148,7 @@ jobs:
       if: steps.changes.outputs.markdown == 'true'
     - name: Commit the markdown files
       if: steps.changes.outputs.markdown == 'true'
-      # this will commit the markdown changes in the current branch 
+      # this will commit the markdown changes in the current branch
       run: |
         git config --global user.name 'Cloudgrep'
         git config --global user.email 'cloudgrep@users.noreply.github.com'
