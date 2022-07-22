@@ -3,6 +3,7 @@ package resourceconverter
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -10,15 +11,19 @@ import (
 )
 
 type MapConverter struct {
-	AccountId      string
-	Region         string
-	ResourceType   string
-	IdField        string
-	DisplayIdField string
-	TagField       TagField
+	ResourceFactory ResourceFactory
+	IdField         string
+	DisplayIdField  string
+	TagField        TagField
 }
 
 func (mc *MapConverter) ToResource(ctx context.Context, x any, tags model.Tags) (model.Resource, error) {
+	if mc.ResourceFactory == nil {
+		panic(errors.New("expected ResourceFactory to be set"))
+	}
+
+	resource := mc.ResourceFactory()
+
 	xKind := reflect.TypeOf(x).Kind()
 	if xKind != reflect.Map {
 		return model.Resource{}, fmt.Errorf("invalid format %v, expected map", xKind)
@@ -27,6 +32,9 @@ func (mc *MapConverter) ToResource(ctx context.Context, x any, tags model.Tags) 
 	if err != nil {
 		return model.Resource{}, err
 	}
+
+	resource.RawData = marshaledMap
+
 	var xConverted map[string]any
 	err = json.Unmarshal(marshaledMap, &xConverted)
 	if err != nil {
@@ -38,15 +46,14 @@ func (mc *MapConverter) ToResource(ctx context.Context, x any, tags model.Tags) 
 	if !ok {
 		return model.Resource{}, fmt.Errorf("could not find id field %v in map %v", mc.IdField, xConverted)
 	}
-	idString := fmt.Sprintf("%v", id)
+	resource.Id = fmt.Sprint(id)
 
-	var displayIdString string
 	if mc.DisplayIdField != "" {
 		displayId, ok := xConverted[mc.DisplayIdField]
 		if !ok {
 			return model.Resource{}, fmt.Errorf("could not find display id field %v in map %v", mc.DisplayIdField, xConverted)
 		}
-		displayIdString = fmt.Sprintf("%v", displayId)
+		resource.DisplayId = fmt.Sprint(displayId)
 	}
 
 	// generate tags field
@@ -54,22 +61,13 @@ func (mc *MapConverter) ToResource(ctx context.Context, x any, tags model.Tags) 
 		//use field
 		tagsValue, ok := xConverted[mc.TagField.Name]
 		if !ok {
-			return model.Resource{}, fmt.Errorf("could not find tag field '%v' for type '%v", mc.TagField.Name, mc.ResourceType)
+			return model.Resource{}, fmt.Errorf("could not find tag field '%v' for type '%v", mc.TagField.Name, resource.Type)
 		}
 
-		tags = getTags(reflect.ValueOf(tagsValue), mc.TagField)
+		tags = append(tags, getTags(reflect.ValueOf(tagsValue), mc.TagField)...)
 	}
 
-	if err != nil {
-		return model.Resource{}, err
-	}
-	return model.Resource{
-		Id:        idString,
-		DisplayId: displayIdString,
-		AccountId: mc.AccountId,
-		Region:    mc.Region,
-		Type:      mc.ResourceType,
-		RawData:   marshaledMap,
-		Tags:      tags,
-	}, nil
+	resource.Tags = append(resource.Tags, tags...)
+
+	return resource, nil
 }

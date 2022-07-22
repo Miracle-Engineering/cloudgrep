@@ -3,11 +3,16 @@ package resourceconverter
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 
 	"github.com/run-x/cloudgrep/pkg/model"
 )
+
+// ResourceFactory is a factory function configured on a ResourceConverter to create a new resource
+// with the standard, known fields filed, namely type, region, and account ID.
+type ResourceFactory func() model.Resource
 
 type ResourceConverter interface {
 	ToResource(context.Context, any, model.Tags) (model.Resource, error)
@@ -28,24 +33,22 @@ func (f TagField) IsZero() bool {
 }
 
 type ReflectionConverter struct {
-	AccountId      string
-	Region         string
-	ResourceType   string
-	IdField        string
-	DisplayIdField string
-	TagField       TagField
+	ResourceFactory ResourceFactory
+	IdField         string
+	DisplayIdField  string
+	TagField        TagField
 }
 
 func (rc *ReflectionConverter) ToResource(ctx context.Context, x any, tags model.Tags) (model.Resource, error) {
-	resource := model.Resource{
-		AccountId: rc.AccountId,
-		Region:    rc.Region,
-		Type:      rc.ResourceType,
+	if rc.ResourceFactory == nil {
+		panic(errors.New("expected ResourceFactory to be set"))
 	}
+
+	resource := rc.ResourceFactory()
 
 	resource.Id = rc.findId(rc.IdField, x)
 	if resource.Id == "" {
-		return model.Resource{}, fmt.Errorf("could not find id field '%v' for type '%v'", rc.IdField, rc.ResourceType)
+		return model.Resource{}, fmt.Errorf("could not find id field '%v' for type '%v'", rc.IdField, resource.Type)
 	}
 
 	if err := rc.loadDisplayId(x, &resource); err != nil {
@@ -57,9 +60,9 @@ func (rc *ReflectionConverter) ToResource(ctx context.Context, x any, tags model
 		//use field
 		tagsValue := reflect.ValueOf(x).FieldByName(rc.TagField.Name)
 		if !tagsValue.IsValid() {
-			return model.Resource{}, fmt.Errorf("could not find tag field '%v' for type '%v'", rc.TagField.Name, rc.ResourceType)
+			return model.Resource{}, fmt.Errorf("could not find tag field '%v' for type '%v'", rc.TagField.Name, resource.Type)
 		}
-		resource.Tags = getTags(tagsValue, rc.TagField)
+		tags = append(tags, getTags(tagsValue, rc.TagField)...)
 	}
 
 	resource.Tags = append(resource.Tags, tags...)
@@ -82,7 +85,7 @@ func (rc *ReflectionConverter) loadDisplayId(x any, resource *model.Resource) er
 	id := rc.findId(rc.DisplayIdField, x)
 
 	if id == "" {
-		return fmt.Errorf("could not find display id field '%v' for type '%v'", rc.DisplayIdField, rc.ResourceType)
+		return fmt.Errorf("could not find display id field '%v' for type '%v'", rc.DisplayIdField, resource.Type)
 	}
 
 	resource.DisplayId = id

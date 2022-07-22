@@ -25,6 +25,14 @@ type WeirdTags struct {
 
 func TestReflectionConverter(t *testing.T) {
 	ctx := context.Background()
+
+	factory := func() model.Resource {
+		return model.Resource{
+			Type:   "DummyResource",
+			Region: "dummyRegion",
+		}
+	}
+
 	t.Run("SimpleConversion", func(t *testing.T) {
 		entry := TestEntry{
 			ID:        "id1",
@@ -34,11 +42,10 @@ func TestReflectionConverter(t *testing.T) {
 			WeirdTags: []WeirdTags{{WeirdKey: "key1", WeirdValue: "val1"}, {WeirdKey: "key2", WeirdValue: "val2"}},
 		}
 		rC := &ReflectionConverter{
-			IdField:        "ID",
-			DisplayIdField: "Attr2",
-			TagField:       TagField{Name: "WeirdTags", Key: "WeirdKey", Value: "WeirdValue"},
-			ResourceType:   "DummyResource",
-			Region:         "dummyRegion",
+			IdField:         "ID",
+			DisplayIdField:  "Attr2",
+			TagField:        TagField{Name: "WeirdTags", Key: "WeirdKey", Value: "WeirdValue"},
+			ResourceFactory: factory,
 		}
 		resource, err := rC.ToResource(ctx, entry, nil)
 		require.NoError(t, err)
@@ -62,9 +69,8 @@ func TestReflectionConverter(t *testing.T) {
 			WeirdTags: []WeirdTags{{WeirdKey: "key1", WeirdValue: "val1"}, {WeirdKey: "key2", WeirdValue: "val2"}},
 		}
 		rC := &ReflectionConverter{
-			IdField:      "ID",
-			ResourceType: "DummyResource",
-			Region:       "dummyRegion",
+			IdField:         "ID",
+			ResourceFactory: factory,
 		}
 		resource, err := rC.ToResource(ctx, entry, model.Tags{{Key: "key1", Value: "val3"}, {Key: "key2", Value: "val4"}})
 		require.NoError(t, err)
@@ -87,10 +93,9 @@ func TestReflectionConverter(t *testing.T) {
 			WeirdTags: []WeirdTags{{WeirdKey: "key1", WeirdValue: "val1"}, {WeirdKey: "key2", WeirdValue: "val2"}},
 		}
 		rC := &ReflectionConverter{
-			IdField:      "ID",
-			ResourceType: "DummyResource",
-			Region:       "dummyRegion",
-			TagField:     TagField{Name: "WeirdTags2", Key: "WeirdKey", Value: "WeirdValue"},
+			IdField:         "ID",
+			ResourceFactory: factory,
+			TagField:        TagField{Name: "WeirdTags2", Key: "WeirdKey", Value: "WeirdValue"},
 		}
 		_, err := rC.ToResource(ctx, entry, nil)
 		require.ErrorContains(t, err, "could not find tag field 'WeirdTags2' for type 'DummyResource'")
@@ -105,9 +110,8 @@ func TestReflectionConverter(t *testing.T) {
 			WeirdTags: []WeirdTags{{WeirdKey: "key1", WeirdValue: "val1"}, {WeirdKey: "key2", WeirdValue: "val2"}},
 		}
 		rC := &ReflectionConverter{
-			IdField:      "ID2",
-			ResourceType: "DummyResource",
-			Region:       "dummyRegion",
+			IdField:         "ID2",
+			ResourceFactory: factory,
 		}
 		_, err := rC.ToResource(ctx, entry, model.Tags{{Key: "key1", Value: "val3"}, {Key: "key2", Value: "val4"}})
 		require.ErrorContains(t, err, "could not find id field 'ID2' for type 'DummyResource'")
@@ -122,10 +126,9 @@ func TestReflectionConverter(t *testing.T) {
 			WeirdTags: []WeirdTags{{WeirdKey: "key1", WeirdValue: "val1"}, {WeirdKey: "key2", WeirdValue: "val2"}},
 		}
 		rC := &ReflectionConverter{
-			IdField:        "ID",
-			DisplayIdField: "DispID",
-			ResourceType:   "DummyResource",
-			Region:         "dummyRegion",
+			IdField:         "ID",
+			DisplayIdField:  "DispID",
+			ResourceFactory: factory,
 		}
 		_, err := rC.ToResource(ctx, entry, model.Tags{{Key: "key1", Value: "val3"}, {Key: "key2", Value: "val4"}})
 		require.ErrorContains(t, err, "could not find display id field 'DispID' for type 'DummyResource'")
