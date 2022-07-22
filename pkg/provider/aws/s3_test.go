@@ -17,8 +17,9 @@ func TestFetchS3Buckets(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 2)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "s3.Bucket",
-		Region: "global",
+		Type:            "s3.Bucket",
+		Region:          "global",
+		DisplayIdPrefix: "cloudgrep-testing-0-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

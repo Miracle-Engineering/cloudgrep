@@ -16,6 +16,7 @@ func (p *Provider) registerLambda(mapping map[string]mapper) {
 		ServiceEndpointID: "lambda",
 		FetchFunc:         p.fetchLambdaFunction,
 		IdField:           "FunctionArn",
+		DisplayIDField:    "FunctionName",
 		IsGlobal:          false,
 	}
 }
@@ -27,7 +28,6 @@ func (p *Provider) fetchLambdaFunction(ctx context.Context, output chan<- model.
 	resourceConverter := p.converterFor("lambda.Function")
 	var transformers resourceconverter.Transformers[types.FunctionConfiguration]
 	transformers.AddNamed("tags", resourceconverter.TagTransformer(p.getTagsLambdaFunction))
-	transformers.AddResource(displayIdArnPrefix("function:"))
 	paginator := lambda.NewListFunctionsPaginator(client, input)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)

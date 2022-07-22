@@ -16,6 +16,7 @@ func (p *Provider) registerElb(mapping map[string]mapper) {
 		ServiceEndpointID: "elasticloadbalancing",
 		FetchFunc:         p.fetchElbLoadBalancer,
 		IdField:           "LoadBalancerArn",
+		DisplayIDField:    "LoadBalancerName",
 		IsGlobal:          false,
 	}
 }

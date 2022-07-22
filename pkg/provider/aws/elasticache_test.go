@@ -17,8 +17,9 @@ func TestFetchElasticacheClusters(t *testing.T) {
 
 	testingutil.AssertResourceCount(t, resources, "", 1)
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "elasticache.CacheCluster",
-		Region: defaultRegion,
+		Type:            "elasticache.CacheCluster",
+		Region:          defaultRegion,
+		DisplayIdPrefix: "test-0-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,
