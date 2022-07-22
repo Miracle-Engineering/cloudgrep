@@ -11,35 +11,35 @@ import (
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
-func (p *Provider) register_iam(mapping map[string]mapper) {
+func (p *Provider) registerIam(mapping map[string]mapper) {
 	mapping["iam.OpenIDConnectProvider"] = mapper{
 		ServiceEndpointID: "iam",
-		FetchFunc:         p.fetch_iam_OpenIDConnectProvider,
+		FetchFunc:         p.fetchIamOpenIDConnectProvider,
 		IdField:           "Arn",
 		IsGlobal:          true,
 	}
 	mapping["iam.Policy"] = mapper{
 		ServiceEndpointID: "iam",
-		FetchFunc:         p.fetch_iam_Policy,
+		FetchFunc:         p.fetchIamPolicy,
 		IdField:           "Arn",
 		DisplayIDField:    "PolicyName",
 		IsGlobal:          true,
 	}
 	mapping["iam.SAMLProvider"] = mapper{
 		ServiceEndpointID: "iam",
-		FetchFunc:         p.fetch_iam_SAMLProvider,
+		FetchFunc:         p.fetchIamSAMLProvider,
 		IdField:           "Arn",
 		IsGlobal:          true,
 	}
 	mapping["iam.VirtualMFADevice"] = mapper{
 		ServiceEndpointID: "iam",
-		FetchFunc:         p.fetch_iam_VirtualMFADevice,
+		FetchFunc:         p.fetchIamVirtualMFADevice,
 		IdField:           "SerialNumber",
 		IsGlobal:          true,
 	}
 }
 
-func (p *Provider) fetch_iam_OpenIDConnectProvider(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchIamOpenIDConnectProvider(ctx context.Context, output chan<- model.Resource) error {
 	client := iam.NewFromConfig(p.config)
 	input := &iam.ListOpenIDConnectProvidersInput{}
 
@@ -48,13 +48,13 @@ func (p *Provider) fetch_iam_OpenIDConnectProvider(ctx context.Context, output c
 	if err != nil {
 		return fmt.Errorf("failed to fetch %s: %w", "iam.OpenIDConnectProvider", err)
 	}
-	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, results.OpenIDConnectProviderList, p.getTags_iam_OpenIDConnectProvider); err != nil {
+	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, results.OpenIDConnectProviderList, p.getTagsIamOpenIDConnectProvider); err != nil {
 		return err
 	}
 
 	return nil
 }
-func (p *Provider) getTags_iam_OpenIDConnectProvider(ctx context.Context, resource types.OpenIDConnectProviderListEntry) (model.Tags, error) {
+func (p *Provider) getTagsIamOpenIDConnectProvider(ctx context.Context, resource types.OpenIDConnectProviderListEntry) (model.Tags, error) {
 	client := iam.NewFromConfig(p.config)
 	input := &iam.ListOpenIDConnectProviderTagsInput{}
 
@@ -78,7 +78,7 @@ func (p *Provider) getTags_iam_OpenIDConnectProvider(ctx context.Context, resour
 	return tags, nil
 }
 
-func (p *Provider) fetch_iam_Policy(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchIamPolicy(ctx context.Context, output chan<- model.Resource) error {
 	client := iam.NewFromConfig(p.config)
 	input := &iam.ListPoliciesInput{}
 	input.Scope = listPoliciesScope()
@@ -92,14 +92,14 @@ func (p *Provider) fetch_iam_Policy(ctx context.Context, output chan<- model.Res
 			return fmt.Errorf("failed to fetch %s: %w", "iam.Policy", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Policies, p.getTags_iam_Policy); err != nil {
+		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Policies, p.getTagsIamPolicy); err != nil {
 			return err
 		}
 	}
 
 	return nil
 }
-func (p *Provider) getTags_iam_Policy(ctx context.Context, resource types.Policy) (model.Tags, error) {
+func (p *Provider) getTagsIamPolicy(ctx context.Context, resource types.Policy) (model.Tags, error) {
 	client := iam.NewFromConfig(p.config)
 	input := &iam.ListPolicyTagsInput{}
 
@@ -123,7 +123,7 @@ func (p *Provider) getTags_iam_Policy(ctx context.Context, resource types.Policy
 	return tags, nil
 }
 
-func (p *Provider) fetch_iam_SAMLProvider(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchIamSAMLProvider(ctx context.Context, output chan<- model.Resource) error {
 	client := iam.NewFromConfig(p.config)
 	input := &iam.ListSAMLProvidersInput{}
 
@@ -132,13 +132,13 @@ func (p *Provider) fetch_iam_SAMLProvider(ctx context.Context, output chan<- mod
 	if err != nil {
 		return fmt.Errorf("failed to fetch %s: %w", "iam.SAMLProvider", err)
 	}
-	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, results.SAMLProviderList, p.getTags_iam_SAMLProvider); err != nil {
+	if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, results.SAMLProviderList, p.getTagsIamSAMLProvider); err != nil {
 		return err
 	}
 
 	return nil
 }
-func (p *Provider) getTags_iam_SAMLProvider(ctx context.Context, resource types.SAMLProviderListEntry) (model.Tags, error) {
+func (p *Provider) getTagsIamSAMLProvider(ctx context.Context, resource types.SAMLProviderListEntry) (model.Tags, error) {
 	client := iam.NewFromConfig(p.config)
 	input := &iam.ListSAMLProviderTagsInput{}
 
@@ -162,7 +162,7 @@ func (p *Provider) getTags_iam_SAMLProvider(ctx context.Context, resource types.
 	return tags, nil
 }
 
-func (p *Provider) fetch_iam_VirtualMFADevice(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchIamVirtualMFADevice(ctx context.Context, output chan<- model.Resource) error {
 	client := iam.NewFromConfig(p.config)
 	input := &iam.ListVirtualMFADevicesInput{}
 
@@ -175,14 +175,14 @@ func (p *Provider) fetch_iam_VirtualMFADevice(ctx context.Context, output chan<-
 			return fmt.Errorf("failed to fetch %s: %w", "iam.VirtualMFADevice", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.VirtualMFADevices, p.getTags_iam_VirtualMFADevice); err != nil {
+		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.VirtualMFADevices, p.getTagsIamVirtualMFADevice); err != nil {
 			return err
 		}
 	}
 
 	return nil
 }
-func (p *Provider) getTags_iam_VirtualMFADevice(ctx context.Context, resource types.VirtualMFADevice) (model.Tags, error) {
+func (p *Provider) getTagsIamVirtualMFADevice(ctx context.Context, resource types.VirtualMFADevice) (model.Tags, error) {
 	client := iam.NewFromConfig(p.config)
 	input := &iam.ListMFADeviceTagsInput{}
 

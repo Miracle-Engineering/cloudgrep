@@ -11,16 +11,16 @@ import (
 	"github.com/run-x/cloudgrep/pkg/resourceconverter"
 )
 
-func (p *Provider) register_sns(mapping map[string]mapper) {
+func (p *Provider) registerSns(mapping map[string]mapper) {
 	mapping["sns.Topic"] = mapper{
 		ServiceEndpointID: "sns",
-		FetchFunc:         p.fetch_sns_Topic,
+		FetchFunc:         p.fetchSnsTopic,
 		IdField:           "TopicArn",
 		IsGlobal:          false,
 	}
 }
 
-func (p *Provider) fetch_sns_Topic(ctx context.Context, output chan<- model.Resource) error {
+func (p *Provider) fetchSnsTopic(ctx context.Context, output chan<- model.Resource) error {
 	client := sns.NewFromConfig(p.config)
 	input := &sns.ListTopicsInput{}
 
@@ -33,14 +33,14 @@ func (p *Provider) fetch_sns_Topic(ctx context.Context, output chan<- model.Reso
 			return fmt.Errorf("failed to fetch %s: %w", "sns.Topic", err)
 		}
 
-		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Topics, p.getTags_sns_Topic); err != nil {
+		if err := resourceconverter.SendAllConvertedTags(ctx, output, resourceConverter, page.Topics, p.getTagsSnsTopic); err != nil {
 			return err
 		}
 	}
 
 	return nil
 }
-func (p *Provider) getTags_sns_Topic(ctx context.Context, resource types.Topic) (model.Tags, error) {
+func (p *Provider) getTagsSnsTopic(ctx context.Context, resource types.Topic) (model.Tags, error) {
 	client := sns.NewFromConfig(p.config)
 	input := &sns.ListTagsForResourceInput{}
 

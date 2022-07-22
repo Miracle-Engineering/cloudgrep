@@ -3,13 +3,13 @@ package aws
 import ()
 
 func (p *Provider) registerGeneratedTypes(mapping map[string]mapper) {
-	p.register_autoscaling(mapping)
-	p.register_ec2(mapping)
-	p.register_elasticache(mapping)
-	p.register_elb(mapping)
-	p.register_iam(mapping)
-	p.register_lambda(mapping)
-	p.register_rds(mapping)
-	p.register_route53(mapping)
-	p.register_sns(mapping)
+	p.registerAutoscaling(mapping)
+	p.registerEc2(mapping)
+	p.registerElasticache(mapping)
+	p.registerElb(mapping)
+	p.registerIam(mapping)
+	p.registerLambda(mapping)
+	p.registerRds(mapping)
+	p.registerRoute53(mapping)
+	p.registerSns(mapping)
 }

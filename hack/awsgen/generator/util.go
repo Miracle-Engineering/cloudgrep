@@ -36,8 +36,8 @@ func linenumbers(in string) string {
 
 // fetchFuncName returns the name of the fetch (aka list) functions for a specific type
 func fetchFuncName(svc config.Service, typ config.Type) string {
-	return fmt.Sprintf(
-		"fetch_%s_%s",
+	return lowerCamelCaseJoin(
+		"fetch",
 		svc.Name,
 		typ.Name,
 	)
@@ -45,8 +45,8 @@ func fetchFuncName(svc config.Service, typ config.Type) string {
 
 // tagFuncName returns the name of the tags function for a specific type
 func tagFuncName(svc config.Service, typ config.Type) string {
-	return fmt.Sprintf(
-		"getTags_%s_%s",
+	return lowerCamelCaseJoin(
+		"getTags",
 		svc.Name,
 		typ.Name,
 	)
@@ -71,5 +71,28 @@ func resourceName(service config.Service, typ config.Type) string {
 
 // registerFuncName returns the name of the Go func that returns type mapping data for a specific service.
 func registerFuncName(svc config.Service) string {
-	return "register_" + svc.Name
+	return lowerCamelCaseJoin(
+		"register",
+		svc.Name,
+	)
+}
+
+// only ASCII supported
+func lowerCamelCaseJoin(parts ...string) string {
+	var out []string
+	for idx, part := range parts {
+		if len(part) == 0 {
+			continue
+		}
+
+		if idx > 0 {
+			firstChar := part[0:1]
+			firstChar = strings.ToUpper(firstChar)
+			part = firstChar + part[1:]
+		}
+
+		out = append(out, part)
+	}
+
+	return strings.Join(out, "")
 }
