@@ -5,6 +5,7 @@ import (
 
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/exp/maps"
 )
 
 func TestResourceFilter_Matches(t *testing.T) {
@@ -297,4 +298,95 @@ func TestResourceFilter_String(t *testing.T) {
 			assert.Equal(t, test.want, actual)
 		})
 	}
+}
+
+func TestResourceFilter_matchers_unqiue(t *testing.T) {
+	names := make(map[string]struct{})
+	f := ResourceFilter{}
+	for _, matcher := range f.matchers() {
+		if _, has := names[matcher.name]; has {
+			t.Errorf("duplicate matcher name: %s", matcher.name)
+		}
+
+		names[matcher.name] = struct{}{}
+	}
+}
+
+func TestResourceFilter_PartialFilter(t *testing.T) {
+	tests := []struct {
+		name      string
+		want      map[string][]string
+		filter    ResourceFilter
+		resources []model.Resource
+	}{
+		{
+			name: "multiple",
+			want: map[string][]string{
+				"AccountId": {"foo"},
+				"Type":      {"foo", "bar"},
+				"Region":    {"bar"},
+			},
+			filter: ResourceFilter{
+				AccountId: "a",
+				Type:      "b",
+				Region:    "c",
+			},
+			resources: []model.Resource{
+				{
+					Id:        "foo",
+					AccountId: "a",
+					Type:      "b",
+					Region:    "d",
+				},
+				{
+					Id:        "bar",
+					AccountId: "e",
+					Type:      "b",
+					Region:    "c",
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			actual := test.filter.PartialFilter(test.resources)
+			actualKeys := maps.Keys(actual)
+			expectedKeys := maps.Keys(test.want)
+
+			assert.ElementsMatch(t, expectedKeys, actualKeys)
+
+			for name, expectedIds := range test.want {
+				actualResources, has := actual[name]
+				if !has {
+					// Already errored on above ElementsMatch
+					continue
+				}
+
+				var actualIds []string
+				for _, resource := range actualResources {
+					actualIds = append(actualIds, resource.Id)
+				}
+
+				assert.ElementsMatchf(t, expectedIds, actualIds, "expected ids on matcher %s to match", name)
+			}
+		})
+	}
+}
+
+func TestResourceFilter_Match_rawDataPanic(t *testing.T) {
+	f := ResourceFilter{
+		RawData: map[string]any{
+			"foo": "bar",
+		},
+	}
+
+	r := model.Resource{
+		Id:      "spam",
+		RawData: []byte("{"),
+	}
+
+	assert.PanicsWithError(t, "cannot parse model.Resource.RawData: spam", func() {
+		f.Matches(r)
+	})
 }

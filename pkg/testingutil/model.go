@@ -1,17 +1,21 @@
 package testingutil
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 )
 
 const TestTag = "test"
 
 // AssertResourceCount asserts that there is a specific number of given resources with the "test" tag.
 // If tagValue is not an empty string, it also filters on resources that have the "test" tag with that value.
-func AssertResourceCount(t testing.TB, resources []model.Resource, tagValue string, count int) {
+func AssertResourceCount(t TestingTB, resources []model.Resource, tagValue string, count int) {
 	t.Helper()
 	if tagValue == "" {
 		resources = ResourceFilterTagKey(resources, TestTag)
@@ -101,12 +105,28 @@ func AssertEqualsTags(t *testing.T, a, b model.Tags) {
 	}
 }
 
-func AssertResourceFilteredCount(t testing.TB, resources []model.Resource, count int, filter ResourceFilter) []model.Resource {
+func AssertResourceFilteredCount(t TestingTB, resources []model.Resource, count int, filter ResourceFilter) []model.Resource {
 	t.Helper()
 
 	filtered := filter.Filter(resources)
 
-	assert.Lenf(t, filtered, count, "expected %d resource(s) with filter %s", count, filter)
+	success := assert.Lenf(t, filtered, count, "expected %d resource(s) with filter %s", count, filter)
+	if !success {
+		partialFiltered := filter.PartialFilter(resources)
+
+		names := maps.Keys(partialFiltered)
+		slices.Sort(names)
+
+		var matches []string
+		for _, name := range names {
+			resources := partialFiltered[name]
+			matches = append(matches,
+				fmt.Sprintf("%s=%d", name, len(resources)),
+			)
+		}
+
+		t.Errorf("filter %s partial matches: %s", filter, strings.Join(matches, ", "))
+	}
 	return filtered
 }
 

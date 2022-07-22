@@ -7,6 +7,7 @@ import (
 
 	"github.com/run-x/cloudgrep/pkg/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAssertResourceCount_keyOnly(t *testing.T) {
@@ -113,4 +114,66 @@ func TestAssertEqualTag(t *testing.T) {
 		Value: "dev-cluster",
 	}
 	AssertEqualsTag(t, &t1, &t2)
+}
+
+func TestAssertResourceFilteredCount_success(t *testing.T) {
+	f := ResourceFilter{
+		AccountId: "foo",
+	}
+
+	in := []model.Resource{
+		{
+			AccountId: "foo",
+			Id:        "spam",
+		},
+		{
+			AccountId: "foo",
+			Id:        "ham",
+		},
+		{
+			AccountId: "bar",
+			Id:        "a",
+		},
+	}
+
+	tb := &FakeTB{}
+
+	filtered := AssertResourceFilteredCount(tb, in, 2, f)
+	assert.False(t, tb.IsFail)
+	assert.ElementsMatch(t, in[0:2], filtered)
+	assert.Empty(t, tb.Logs)
+}
+
+func TestAssertResourceFilteredCount_fail(t *testing.T) {
+	f := ResourceFilter{
+		AccountId: "foo",
+		Region:    "us",
+	}
+
+	in := []model.Resource{
+		{
+			AccountId: "foo",
+			Region:    "us",
+			Id:        "spam",
+		},
+		{
+			AccountId: "foo",
+			Region:    "eu",
+			Id:        "ham",
+		},
+		{
+			AccountId: "bar",
+			Region:    "us",
+			Id:        "a",
+		},
+	}
+
+	tb := &FakeTB{}
+
+	filtered := AssertResourceFilteredCount(tb, in, 2, f)
+	assert.True(t, tb.IsFail)
+	assert.ElementsMatch(t, in[0:1], filtered)
+	require.Len(t, tb.Logs, 2)
+	assert.Contains(t, tb.Logs[0], "expected 2 resource(s) with filter ResourceFilter{AccountId=foo, Region=us}")
+	assert.Equal(t, "filter ResourceFilter{AccountId=foo, Region=us} partial matches: AccountId=2, Region=2", tb.Logs[1])
 }

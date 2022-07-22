@@ -6,31 +6,32 @@ import (
 )
 
 type FakeTB struct {
-	testing.TB
 	IsHelper bool
 	IsFail   bool
 	Logs     []string
 }
 
+var _ TestingTB = &FakeTB{}
+
 func Fake(t testing.TB) *FakeTB {
-	return &FakeTB{
-		TB: t,
-	}
+	return &FakeTB{}
 }
 
 func (t *FakeTB) Helper() {
 	t.IsHelper = true
 }
 
-func (t *FakeTB) Fatal(args ...any) {
-	panic(fmt.Sprint(args...))
-}
-
 func (t *FakeTB) Fatalf(format string, args ...any) {
-	panic(fmt.Errorf(format, args...))
+	t.Errorf(format, args...)
+	t.FailNow()
 }
 
 func (t *FakeTB) Errorf(format string, args ...any) {
 	t.IsFail = true
 	t.Logs = append(t.Logs, fmt.Sprintf(format, args...))
+}
+
+func (t *FakeTB) FailNow() {
+	// We have no way of "aborting", since we don't want to actually fail the test.
+	t.IsFail = true
 }

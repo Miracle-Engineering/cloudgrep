@@ -2,11 +2,10 @@ package testingutil
 
 import (
 	"context"
-	"testing"
 )
 
 // FetchAll pulls all resources from `f` over the passed channel, returning the resources as a slice
-func FetchAll[T any](ctx context.Context, t testing.TB, f func(context.Context, chan<- T) error) ([]T, error) {
+func FetchAll[T any](ctx context.Context, t TestingTB, f func(context.Context, chan<- T) error) ([]T, error) {
 	t.Helper()
 
 	var resources []T
@@ -27,7 +26,7 @@ func FetchAll[T any](ctx context.Context, t testing.TB, f func(context.Context, 
 }
 
 // MustFetchAll is like FetchAll, but fatals the running test if there is an error during fetching
-func MustFetchAll[T any](ctx context.Context, t testing.TB, f func(context.Context, chan<- T) error) []T {
+func MustFetchAll[T any](ctx context.Context, t TestingTB, f func(context.Context, chan<- T) error) []T {
 	t.Helper()
 
 	resources, err := FetchAll(ctx, t, f)
