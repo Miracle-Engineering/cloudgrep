@@ -6,7 +6,7 @@ if err != nil {
 
 {{- define "output" }}
 {{- if .IsLast }}
-if err := resourceconverter.{{ .Data.ConvertCall }}(ctx, output, resourceConverter, {{ .IterVar }}.{{ .Current.Name }} {{- .Data.ConvertTail }}); err != nil {
+if err := resourceconverter.SendAllConverted(ctx, output, resourceConverter, {{ .IterVar }}.{{ .Current.Name }} {{- .Data.ConvertTail }}); err != nil {
 	return err
 }
 {{- else }}
@@ -35,15 +35,25 @@ func (p *{{ .ProviderName}}) {{ .FuncName }}(ctx context.Context, output chan<- 
 
 	resourceConverter := p.converterFor({{ .ResourceName | quote }})
 
-	{{- $convertCall := "SendAllConverted" }}
 	{{- $convertTail := "" }}
 
-	{{- if .TagFuncName }}
-		{{- $convertCall = "SendAllConvertedTags" }}
-		{{- $convertTail = (cat ", p." .TagFuncName) }}
+	{{- if .Transformers }}
+	var transformers resourceconverter.Transformers[{{ .SDKType }}]
+	{{- range .Transformers }}
+	{{- if and .Name .IsGeneric }}
+	transformers.AddNamed({{ .Name | quote }}, {{ .Expression $.SDKType }})
+	{{- else if .Name }}
+	transformers.AddNamedResource({{ .Name | quote }}, {{ .Expression $.SDKType }})
+	{{- else if .IsGeneric }}
+	transformers.Add({{ .Expression $.SDKType }})
+	{{- else }}
+	transformers.AddResource({{ .Expression $.SDKType }})
+	{{- end }}
 	{{- end }}
 
-	{{- quiet (.OutputKey.SetData "ConvertCall" $convertCall) }}
+	{{- $convertTail = ", transformers" }}
+	{{- end }}
+
 	{{- quiet (.OutputKey.SetData "ConvertTail" $convertTail) }}
 
 	{{- if .Paginated }}

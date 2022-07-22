@@ -11,7 +11,6 @@ types:
         pointer: true
     getTagsApi:
       call: ListTagsForResources
-      type: HealthCheck
       inputIDField:
         name: ResourceIds
         sliceType: string
@@ -38,7 +37,6 @@ types:
       displayId: Name
     getTagsApi:
       call: ListTagsForResources
-      type: HostedZone
       inputIDField:
         name: ResourceIds
         sliceType: string

@@ -8,7 +8,8 @@ import (
 
 func TestListAPI_Validate_1(t *testing.T) {
 	api := ListAPI{
-		Call: "foo",
+		Call:    "foo",
+		SDKType: "foo",
 		Tags: &TagField{
 			Style: "struct",
 			Value: "bar",
@@ -17,6 +18,7 @@ func TestListAPI_Validate_1(t *testing.T) {
 	expected := []string{
 		"call is not a valid Go exported identifier: foo",
 		"outputKey cannot be empty",
+		"sdkType is not a valid Go exported identifier: foo",
 		"id: name required",
 		"tags: field cannot be empty",
 		"tags: key required with style=struct",

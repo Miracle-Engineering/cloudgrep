@@ -11,11 +11,12 @@ import (
 )
 
 type ResourceFilter struct {
-	AccountId string
-	Region    string
-	Type      string
-	Tags      model.Tags
-	RawData   map[string]any
+	AccountId       string
+	Region          string
+	Type            string
+	DisplayIdPrefix string
+	Tags            model.Tags
+	RawData         map[string]any
 }
 
 func (f ResourceFilter) String() string {
@@ -120,6 +121,12 @@ func (f ResourceFilter) matchers() []resourceFilterMatcher {
 			present:  p(f.Region != ""),
 			stringer: s("Region=%s", f.Region),
 			match:    func(r model.Resource) bool { return f.Region == r.Region },
+		},
+		{
+			name:     "DisplayIdPrefix",
+			present:  p(f.DisplayIdPrefix != ""),
+			stringer: s("DisplayIdPrefix=%s", f.DisplayIdPrefix),
+			match:    func(r model.Resource) bool { return strings.HasPrefix(r.EffectiveDisplayId(), f.DisplayIdPrefix) },
 		},
 		{
 			name:    "Tags",

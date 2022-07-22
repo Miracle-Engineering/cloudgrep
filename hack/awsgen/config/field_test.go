@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v3"
 )
 
 func TestField_Decoding_string(t *testing.T) {
@@ -13,7 +12,7 @@ func TestField_Decoding_string(t *testing.T) {
 	in := `foo`
 	expected := Field{Name: "foo"}
 
-	err := yaml.Unmarshal([]byte(in), &actual)
+	err := yamlUnmarshal([]byte(in), &actual)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
@@ -23,7 +22,7 @@ func TestField_Decoding_mapping(t *testing.T) {
 	in := `{name: foo, sliceType: string}`
 	expected := Field{Name: "foo", SliceType: "string"}
 
-	err := yaml.Unmarshal([]byte(in), &actual)
+	err := yamlUnmarshal([]byte(in), &actual)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
@@ -31,13 +30,13 @@ func TestField_Decoding_mapping(t *testing.T) {
 func TestField_Decoding_mappingInvalid(t *testing.T) {
 	in := `{name: foo, pointer: string}`
 
-	err := yaml.Unmarshal([]byte(in), &Field{})
+	err := yamlUnmarshal([]byte(in), &Field{})
 	assert.ErrorContains(t, err, "cannot unmarshal !!str `string` into bool")
 }
 
 func TestField_Decoding_sequence(t *testing.T) {
 	in := "- foo\n- bar"
-	err := yaml.Unmarshal([]byte(in), &Field{})
+	err := yamlUnmarshal([]byte(in), &Field{})
 	assert.ErrorContains(t, err, "unexpected node kind")
 }
 
@@ -46,7 +45,7 @@ func TestField_Decoding_noName(t *testing.T) {
 	in := `{sliceType: string}`
 	expected := Field{}
 
-	err := yaml.Unmarshal([]byte(in), &actual)
+	err := yamlUnmarshal([]byte(in), &actual)
 	assert.ErrorContains(t, err, "missing \"name\"")
 	assert.Equal(t, expected, actual)
 }
@@ -82,7 +81,7 @@ func TestNestedField_Decoding_string(t *testing.T) {
 	expected := NestedField{Field{Name: "foo"}}
 
 	var actual NestedField
-	err := yaml.Unmarshal([]byte(in), &actual)
+	err := yamlUnmarshal([]byte(in), &actual)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
@@ -90,7 +89,7 @@ func TestNestedField_Decoding_string(t *testing.T) {
 func TestNestedField_Decoding_map(t *testing.T) {
 	in := "name: foo"
 
-	err := yaml.Unmarshal([]byte(in), &NestedField{})
+	err := yamlUnmarshal([]byte(in), &NestedField{})
 	assert.ErrorContains(t, err, "unexpected node kind")
 }
 
@@ -102,7 +101,7 @@ func TestNestedField_Decoding_list(t *testing.T) {
 	}
 
 	var actual NestedField
-	err := yaml.Unmarshal([]byte(in), &actual)
+	err := yamlUnmarshal([]byte(in), &actual)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }

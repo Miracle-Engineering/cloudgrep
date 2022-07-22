@@ -96,3 +96,11 @@ func lowerCamelCaseJoin(parts ...string) string {
 
 	return strings.Join(out, "")
 }
+
+func sdkType(typ config.Type) string {
+	if typ.ListAPI.SDKType != "" {
+		return typ.ListAPI.SDKType
+	}
+
+	return typ.Name
+}

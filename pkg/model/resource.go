@@ -19,6 +19,16 @@ type Resource struct {
 	UpdatedAt time.Time      `json:"updatedAt"`
 }
 
+// EffectiveDisplayId returns the ID displayed to the user,
+// which is the DisplayId if set, else the Id
+func (r Resource) EffectiveDisplayId() string {
+	if r.DisplayId != "" {
+		return r.DisplayId
+	}
+
+	return r.Id
+}
+
 type Resources []*Resource
 type ResourcesResponse struct {
 	Count       int         `json:"count"`

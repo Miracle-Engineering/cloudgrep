@@ -6,7 +6,6 @@ types:
       id: ARN
       pagination: true
     getTagsApi:
-      type: CacheCluster
       call: ListTagsForResource
       inputIDField:
         name: ResourceName

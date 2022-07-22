@@ -4,11 +4,13 @@ types:
       call: ListFunctions
       pagination: true
       outputKey: Functions
+      sdkType: FunctionConfiguration
       id: FunctionArn
     getTagsApi:
-      type: FunctionConfiguration
       call: GetFunction
       inputIDField: FunctionName
       tags:
         style: map
         field: Tags
+    transformers:
+      - displayIdArnPrefix("function:")

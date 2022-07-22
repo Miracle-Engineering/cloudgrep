@@ -67,8 +67,9 @@ func TestFetchPolicies(t *testing.T) {
 	resources := testprovider.FetchResources(ctx.ctx, t, ctx.p, "iam.Policy")
 
 	testingutil.AssertResourceFilteredCount(t, resources, 1, testingutil.ResourceFilter{
-		Type:   "iam.Policy",
-		Region: globalRegion,
+		Type:            "iam.Policy",
+		Region:          globalRegion,
+		DisplayIdPrefix: "test-0-",
 		Tags: model.Tags{
 			{
 				Key:   testingutil.TestTag,

@@ -39,3 +39,15 @@ func TestClean(t *testing.T) {
 	assert.False(t, r1.UpdatedAt.IsZero())
 	assert.True(t, rs.Clean()[0].UpdatedAt.IsZero())
 }
+
+func TestResource_EffectiveDisplayId(t *testing.T) {
+	r1 := Resource{
+		Id: "foo", DisplayId: "bar",
+	}
+	r2 := Resource{
+		Id: "foo",
+	}
+
+	assert.Equal(t, "bar", r1.EffectiveDisplayId())
+	assert.Equal(t, "foo", r2.EffectiveDisplayId())
+}

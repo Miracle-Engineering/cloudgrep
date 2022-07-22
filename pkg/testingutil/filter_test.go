@@ -180,6 +180,67 @@ func TestResourceFilter_Matches(t *testing.T) {
 				RawData: []byte(`{"foo":"ham"}`),
 			},
 		},
+		{
+			name: "displayIdPrefixMatchNoDisplay",
+			want: true,
+			filter: ResourceFilter{
+				DisplayIdPrefix: "foo-",
+			},
+			resource: model.Resource{
+				Id: "foo-1",
+			},
+		},
+		{
+			name: "displayIdPrefixMismatchNoDisplay",
+			filter: ResourceFilter{
+				DisplayIdPrefix: "bar",
+			},
+			resource: model.Resource{
+				Id: "ba",
+			},
+		},
+		{
+			name: "displayIdPrefixMatch",
+			want: true,
+			filter: ResourceFilter{
+				DisplayIdPrefix: "foo-",
+			},
+			resource: model.Resource{
+				Id:        "bar-1",
+				DisplayId: "foo-2",
+			},
+		},
+		{
+			name: "displayIdPrefixMismatch",
+			filter: ResourceFilter{
+				DisplayIdPrefix: "bar",
+			},
+			resource: model.Resource{
+				Id:        "bar",
+				DisplayId: "foo-2",
+			},
+		},
+		{
+			name: "accountIdMatch",
+			want: true,
+			filter: ResourceFilter{
+				AccountId: "foo",
+			},
+			resource: model.Resource{
+				AccountId: "foo",
+				Id:        "spam",
+			},
+		},
+		{
+			name: "accountIdMismatch",
+			filter: ResourceFilter{
+				AccountId: "foo",
+			},
+			resource: model.Resource{
+				AccountId: "bar",
+				Id:        "spam",
+			},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -273,8 +334,10 @@ func TestResourceFilter_String(t *testing.T) {
 		{
 			name: "full",
 			filter: ResourceFilter{
-				Type:   "A",
-				Region: "B",
+				AccountId:       "TestAccount",
+				Type:            "A",
+				Region:          "B",
+				DisplayIdPrefix: "foo-",
 				Tags: model.Tags{
 					{
 						Key: "Foo",
@@ -289,7 +352,7 @@ func TestResourceFilter_String(t *testing.T) {
 					"fool":  "took",
 				},
 			},
-			want: "ResourceFilter{Type=A, Region=B, Tags[Foo], Tags[Spam]=ham, RawData={apple=1, fool=took}}",
+			want: "ResourceFilter{AccountId=TestAccount, Type=A, Region=B, DisplayIdPrefix=foo-, Tags[Foo], Tags[Spam]=ham, RawData={apple=1, fool=took}}",
 		},
 	}
 	for _, test := range tests {
