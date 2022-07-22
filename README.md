@@ -202,7 +202,7 @@ providers:
 - route53.HealthCheck
 - route53.HostedZone
 - s3.Bucket
-- sns.SNS
+- sns.Topic
 - sqs.Queue
 
 # Development
