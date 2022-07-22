@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"github.com/run-x/cloudgrep/pkg/provider/aws"
 )
 
 //generate the markdown files using the template files
@@ -16,17 +18,7 @@ func main() {
 	//generate the data for the template
 	data := make(map[string]any)
 
-	//read supported resources
-	suportedResourceFile, err := ioutil.ReadFile("./pkg/provider/aws/zz_integration_stats.json")
-	if err != nil {
-		log.Fatal("Error when opening file: ", err)
-	}
-	var supportedResources []string
-	err = json.Unmarshal(suportedResourceFile, &supportedResources)
-	if err != nil {
-		log.Fatal(err)
-	}
-	data["supportedResources"] = supportedResources
+	data["supportedResources"] = supportedResources()
 
 	//add the config yaml file
 	configFile, err := ioutil.ReadFile("./pkg/config/config.yaml")
@@ -56,5 +48,42 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+}
 
+type resourceInfo struct {
+	Type   string
+	Tested bool
+}
+
+func supportedResources() []resourceInfo {
+	allResources := aws.SupportedResources()
+	tested := make(map[string]struct{})
+	for _, resource := range testedResources() {
+		tested[resource] = struct{}{}
+	}
+
+	var out []resourceInfo
+	for _, resource := range allResources {
+		_, isTested := tested[resource]
+		out = append(out, resourceInfo{
+			Type:   resource,
+			Tested: isTested,
+		})
+	}
+
+	return out
+}
+
+func testedResources() []string {
+	suportedResourceFile, err := ioutil.ReadFile("./pkg/provider/aws/zz_integration_stats.json")
+	if err != nil {
+		log.Fatal("Error when opening file: ", err)
+	}
+	var supportedResources []string
+	err = json.Unmarshal(suportedResourceFile, &supportedResources)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return supportedResources
 }

@@ -38,7 +38,7 @@ Cloudgrep is an asset explorer for cloud resources. It shows everything that's b
 ### Why use Cloudgrep?
 Cloudgrep's goal is to help engineering teams ensure every resource follows consistent tagging schema. It helps identify missing tags, misspellings and unowned resources. Consistent tagging leads to better cost attribution and faster incident resolution.
 
-Additionally, Cloudgrep is a great tool to visualize all cloud resources in a single place - across regions, accounts and providers. 
+Additionally, Cloudgrep is a great tool to visualize all cloud resources in a single place - across regions, accounts and providers.
 
 Try it out by downloading the latest [release](https://github.com/run-x/cloudgrep/releases)! For any questions, feel free to join our [Slack workspace](https://join.slack.com/t/cloudgrep/shared_invite/zt-1bl7fewv4-_iwch50U_pP8S3YKBvyyQQ).
 
@@ -127,7 +127,7 @@ Here is the annotated config file, you only need to define this file if you wish
 
 # Supported resources
 {{range .supportedResources}}
-- {{. -}}
+- {{ .Type }}{{ if not .Tested }} *(untested)*{{ end -}}
 {{end}}
 
 # Development

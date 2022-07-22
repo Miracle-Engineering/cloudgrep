@@ -38,7 +38,7 @@ Cloudgrep is an asset explorer for cloud resources. It shows everything that's b
 ### Why use Cloudgrep?
 Cloudgrep's goal is to help engineering teams ensure every resource follows consistent tagging schema. It helps identify missing tags, misspellings and unowned resources. Consistent tagging leads to better cost attribution and faster incident resolution.
 
-Additionally, Cloudgrep is a great tool to visualize all cloud resources in a single place - across regions, accounts and providers. 
+Additionally, Cloudgrep is a great tool to visualize all cloud resources in a single place - across regions, accounts and providers.
 
 Try it out by downloading the latest [release](https://github.com/run-x/cloudgrep/releases)! For any questions, feel free to join our [Slack workspace](https://join.slack.com/t/cloudgrep/shared_invite/zt-1bl7fewv4-_iwch50U_pP8S3YKBvyyQQ).
 
@@ -171,6 +171,10 @@ providers:
 - autoscaling.AutoScalingGroup
 - cloudfront.Distribution
 - ec2.Address
+- ec2.CapacityReservation *(untested)*
+- ec2.ClientVpnEndpoint *(untested)*
+- ec2.Fleet *(untested)*
+- ec2.FlowLogs *(untested)*
 - ec2.Image
 - ec2.Instance
 - ec2.KeyPair
@@ -178,9 +182,11 @@ providers:
 - ec2.NatGateway
 - ec2.NetworkAcl
 - ec2.NetworkInterface
+- ec2.ReservedInstance *(untested)*
 - ec2.RouteTable
 - ec2.SecurityGroup
 - ec2.Snapshot
+- ec2.SpotInstanceRequest *(untested)*
 - ec2.Subnet
 - ec2.Volume
 - ec2.Vpc
@@ -192,6 +198,7 @@ providers:
 - iam.OpenIDConnectProvider
 - iam.Policy
 - iam.Role
+- iam.SAMLProvider *(untested)*
 - iam.User
 - iam.VirtualMFADevice
 - lambda.Function
