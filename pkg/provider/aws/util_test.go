@@ -35,7 +35,7 @@ var integrationAwsAccounts = []string{accountIntegrationDev, accountIntegrationP
 // (they will fail tests if creds aren't available)
 var integrationTestVars = []string{
 	"CLOUD_INTEGRATION_TESTS",
-	"CI",
+	// "CI",
 }
 
 // Cache the checks for credentials so it doesn't run for every test
