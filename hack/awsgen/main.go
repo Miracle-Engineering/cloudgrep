@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/run-x/cloudgrep/hack/awsgen/cmd"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/cmd"
 )
 
 func main() {

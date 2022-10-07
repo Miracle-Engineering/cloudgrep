@@ -12,11 +12,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/datastore/testdata"
-	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/testingutil"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore/testdata"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/testingutil"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 )
@@ -61,7 +61,7 @@ type mockApi struct {
 	engineErr error
 }
 
-//runEngine simulates running the engine by writing resources to the datastore
+// runEngine simulates running the engine by writing resources to the datastore
 func (m *mockApi) runEngine(ctx context.Context) error {
 	err := m.ds.WriteEvent(ctx, model.NewEngineEventStart())
 	if err != nil {

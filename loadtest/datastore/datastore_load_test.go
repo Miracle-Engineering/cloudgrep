@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/datastore/testdata"
-	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore/testdata"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest"
 )

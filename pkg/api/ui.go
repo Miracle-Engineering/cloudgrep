@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/run-x/cloudgrep/static"
+	"github.com/juandiegopalomino/cloudgrep/static"
 	"net/http"
 )
 

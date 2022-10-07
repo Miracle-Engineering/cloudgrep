@@ -3,7 +3,7 @@ package testingutil
 import (
 	"testing"
 
-	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/maps"
 )

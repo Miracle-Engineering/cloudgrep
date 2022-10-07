@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/provider/types"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/provider/types"
 )
 
 // FakeProvider provides mechanisms to test systems that require providers

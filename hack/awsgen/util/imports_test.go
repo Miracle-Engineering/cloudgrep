@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/run-x/cloudgrep/pkg/provider"
+	"github.com/juandiegopalomino/cloudgrep/pkg/provider"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/slices"
@@ -67,7 +67,7 @@ func TestGroupImports(t *testing.T) {
 		{Path: "runtime/debug"},
 		{Path: "foo.com/bar", As: "foo"},
 		{Path: "bar.com/foo"},
-		{Path: "github.com/run-x/cloudgrep/pkg/util"},
+		{Path: "github.com/juandiegopalomino/cloudgrep/pkg/util"},
 	}
 
 	expected := GroupedImports{
@@ -80,7 +80,7 @@ func TestGroupImports(t *testing.T) {
 			{Path: "bar.com/foo"},
 		},
 		Module: []Import{
-			{Path: "github.com/run-x/cloudgrep/pkg/util"},
+			{Path: "github.com/juandiegopalomino/cloudgrep/pkg/util"},
 		},
 	}
 

@@ -9,10 +9,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/version"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/version"
 )
 
 type EngineFunc func(context.Context) error
@@ -99,7 +99,7 @@ func Stats(c *gin.Context) {
 	c.JSON(200, stats)
 }
 
-//EngineStatus returns the status of the engine
+// EngineStatus returns the status of the engine
 func EngineStatus(c *gin.Context) {
 	ds := c.MustGet("datastore").(datastore.Datastore)
 	status, err := ds.EngineStatus(c)
@@ -110,7 +110,7 @@ func EngineStatus(c *gin.Context) {
 	c.JSON(200, status)
 }
 
-//Refresh trigger the engine to fetch the resources
+// Refresh trigger the engine to fetch the resources
 func Refresh(c *gin.Context) {
 
 	ds := c.MustGet("datastore").(datastore.Datastore)

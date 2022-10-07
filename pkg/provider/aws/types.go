@@ -1,8 +1,8 @@
 package aws
 
 import (
-	"github.com/run-x/cloudgrep/pkg/provider/types"
-	"github.com/run-x/cloudgrep/pkg/resourceconverter"
+	"github.com/juandiegopalomino/cloudgrep/pkg/provider/types"
+	"github.com/juandiegopalomino/cloudgrep/pkg/resourceconverter"
 )
 
 type mapper struct {

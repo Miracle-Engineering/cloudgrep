@@ -4,9 +4,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/run-x/cloudgrep/pkg/cli"
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/util"
+	"github.com/juandiegopalomino/cloudgrep/pkg/cli"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/util"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -94,7 +94,7 @@ their cloud accounts.`,
 
 	flags := rootCmd.Flags()
 
-	flags.StringVarP(&rO.config, "config", "c", "", "Config file (default is https://github.com/run-x/cloudgrep/blob/main/pkg/config/config.yaml)")
+	flags.StringVarP(&rO.config, "config", "c", "", "Config file (default is https://github.com/juandiegopalomino/cloudgrep/blob/main/pkg/config/config.yaml)")
 	flags.StringVar(&rO.bind, "bind", "", "Host to bind on")
 	flags.StringSliceVarP(&rO.regions, "regions", "r", []string(nil), "Comma separated list of regions to scan, or \"all\"")
 	flags.StringSliceVar(&rO.profiles, "profiles", []string(nil), "Comma separated list of AWS profiles to scan.")

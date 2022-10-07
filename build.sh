@@ -2,7 +2,7 @@
 
 set -e
 set -x
-export PACKAGE_NAME="github.com/run-x/cloudgrep"
+export PACKAGE_NAME="github.com/juandiegopalomino/cloudgrep"
 export GOLANG_CROSS_VERSION="v1.18.3"
 
 DIR="./bin"

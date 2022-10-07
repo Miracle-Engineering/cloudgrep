@@ -1,4 +1,4 @@
-module github.com/run-x/cloudgrep
+module github.com/juandiegopalomino/cloudgrep
 
 go 1.18
 

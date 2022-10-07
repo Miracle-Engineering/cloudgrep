@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
-	awsutil "github.com/run-x/cloudgrep/pkg/provider/aws/util"
+	awsutil "github.com/juandiegopalomino/cloudgrep/pkg/provider/aws/util"
 )
 
 var officialRegions map[string]endpoints.Region

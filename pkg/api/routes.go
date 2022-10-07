@@ -4,8 +4,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/datastore"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore"
 )
 
 func SetupRoutes(router *gin.Engine, cfg config.Config, logger *zap.Logger, ds datastore.Datastore, engineF EngineFunc) {

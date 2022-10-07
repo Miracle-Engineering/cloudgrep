@@ -15,7 +15,7 @@ var EmbedConfig []byte
 // Config represents all the user-configurable settings for cloudgrep. One such structure is loaded at runtime and
 // is populated through the cli arguments, user-provider config file, or a preset default, with values resolved
 // in that order of precedence. To see the default, please refer to
-// https://github.com/run-x/cloudgrep/blob/main/pkg/config/config.yaml
+// https://github.com/juandiegopalomino/cloudgrep/blob/main/pkg/config/config.yaml
 type Config struct {
 	// Providers represents the providers to be scanned by cloudgrep
 	Providers []Provider `yaml:"providers"`

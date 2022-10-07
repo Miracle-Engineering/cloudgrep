@@ -12,7 +12,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/denisbrodbeck/machineid"
-	"github.com/run-x/cloudgrep/pkg/version"
+	"github.com/juandiegopalomino/cloudgrep/pkg/version"
 
 	"github.com/google/uuid"
 	"github.com/matishsiao/goInfo"

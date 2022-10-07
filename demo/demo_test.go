@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/run-x/cloudgrep/pkg/datastore"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 )

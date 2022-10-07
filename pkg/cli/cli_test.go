@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/util/amplitude"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/util/amplitude"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 )

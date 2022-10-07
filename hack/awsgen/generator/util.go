@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/run-x/cloudgrep/hack/awsgen/config"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/config"
 )
 
 const PackageName = "aws"

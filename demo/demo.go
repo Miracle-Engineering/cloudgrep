@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/run-x/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
 	"gopkg.in/yaml.v2"
 )
 
@@ -15,8 +15,8 @@ var DemoConfig []byte
 //go:embed demo.db
 var DemoDB []byte
 
-//GetDemoConfig returns the demo config - this will copy over the demo file to a temporary file
-//you can cleanup this file by deleting cfg.Datastore.DataSourceName when done
+// GetDemoConfig returns the demo config - this will copy over the demo file to a temporary file
+// you can cleanup this file by deleting cfg.Datastore.DataSourceName when done
 func GetDemoConfig() (config.Config, error) {
 	cfg, err := config.GetDefault()
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/run-x/cloudgrep/pkg/provider/aws"
+	"github.com/juandiegopalomino/cloudgrep/pkg/provider/aws"
 )
 
 //generate the markdown files using the template files

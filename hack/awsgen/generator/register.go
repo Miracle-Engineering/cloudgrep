@@ -1,8 +1,8 @@
 package generator
 
 import (
-	"github.com/run-x/cloudgrep/hack/awsgen/config"
-	"github.com/run-x/cloudgrep/hack/awsgen/template"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/config"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/template"
 )
 
 // generateRegisterFile defines the provider-wide file that calls each service's registration function.

@@ -6,7 +6,7 @@ import (
 	_ "embed"
 	"testing"
 
-	"github.com/run-x/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 )

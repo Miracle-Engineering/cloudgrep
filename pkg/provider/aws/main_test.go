@@ -7,7 +7,7 @@ import (
 	"sort"
 	"testing"
 
-	testprovider "github.com/run-x/cloudgrep/pkg/testingutil/provider"
+	testprovider "github.com/juandiegopalomino/cloudgrep/pkg/testingutil/provider"
 	"golang.org/x/exp/maps"
 )
 

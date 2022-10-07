@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/run-x/cloudgrep/pkg/testingutil"
+	"github.com/juandiegopalomino/cloudgrep/pkg/testingutil"
 	"github.com/stretchr/testify/require"
 )
 

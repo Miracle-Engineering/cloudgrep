@@ -56,7 +56,7 @@ type GroupedImports struct {
 
 // modulePrefix holds the prefix for packages that are considered "in this module".
 // If this module is renamed, this value must be updated.
-const modulePrefix = "github.com/run-x/cloudgrep/"
+const modulePrefix = "github.com/juandiegopalomino/cloudgrep/"
 
 // GroupImports groups the passed imports into a GroupedImports.
 // Each group maintains the relative order of the imports.

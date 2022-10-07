@@ -68,9 +68,9 @@ release:
     - glob: ./bin/cloudgrep_darwin_amd64.dmg
     - glob: ./bin/cloudgrep_darwin_arm64.dmg
   footer: |
-    **Full Changelog**: https://github.com/run-x/cloudgrep/compare/{{ .PreviousTag }}...{{ .Tag }}
+    **Full Changelog**: https://github.com/juandiegopalomino/cloudgrep/compare/{{ .PreviousTag }}...{{ .Tag }}
     ## What to do next?
-    - Read the [documentation](https://github.com/run-x/cloudgrep/)
+    - Read the [documentation](https://github.com/juandiegopalomino/cloudgrep/)
     - Join our [Slack Workspace](https://join.slack.com/t/cloudgrep/shared_invite/zt-1bl7fewv4-_iwch50U_pP8S3YKBvyyQQ)
 brews:
   - tap:
@@ -78,7 +78,7 @@ brews:
       name: homebrew-tap
     folder: Formula
     goamd64: v3
-    homepage:  https://github.com/run-x/cloudgrep
+    homepage:  https://github.com/juandiegopalomino/cloudgrep
     description: Cloudgrep is an asset explorer for cloud resources
     license: Apache
     test: |

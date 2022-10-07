@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/provider/aws"
-	"github.com/run-x/cloudgrep/pkg/provider/types"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/provider/aws"
+	"github.com/juandiegopalomino/cloudgrep/pkg/provider/types"
 	"go.uber.org/zap"
 )
 
