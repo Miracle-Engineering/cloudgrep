@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/run-x/cloudgrep/pkg/version"
+	"github.com/juandiegopalomino/cloudgrep/pkg/version"
 	"github.com/stretchr/testify/assert"
 )
 

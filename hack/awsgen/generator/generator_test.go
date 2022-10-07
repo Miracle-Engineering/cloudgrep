@@ -3,8 +3,8 @@ package generator
 import (
 	"testing"
 
-	"github.com/run-x/cloudgrep/hack/awsgen/config"
-	"github.com/run-x/cloudgrep/hack/awsgen/writer"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/config"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/writer"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -3,9 +3,9 @@ package generator
 import (
 	"strings"
 
-	"github.com/run-x/cloudgrep/hack/awsgen/config"
-	"github.com/run-x/cloudgrep/hack/awsgen/template"
-	"github.com/run-x/cloudgrep/hack/awsgen/util"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/config"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/template"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/util"
 )
 
 // generateService generates the file for a specific resource
@@ -63,7 +63,7 @@ func (g Generator) generateServiceRegister(service config.Service) (string, util
 		})
 
 		if !typ.GetTagsAPI.Tags.Zero() {
-			imports.AddPath("github.com/run-x/cloudgrep/pkg/resourceconverter")
+			imports.AddPath("github.com/juandiegopalomino/cloudgrep/pkg/resourceconverter")
 		}
 	}
 

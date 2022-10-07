@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/a8m/rql"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
 	dynamicstruct "github.com/ompluscator/dynamic-struct"
-	"github.com/run-x/cloudgrep/pkg/model"
 	"go.uber.org/zap"
 	"golang.org/x/exp/slices"
 	"golang.org/x/text/cases"

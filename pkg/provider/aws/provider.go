@@ -6,13 +6,13 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	cfg "github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/model"
-	regionutil "github.com/run-x/cloudgrep/pkg/provider/aws/regions"
-	awsutil "github.com/run-x/cloudgrep/pkg/provider/aws/util"
-	"github.com/run-x/cloudgrep/pkg/provider/types"
-	"github.com/run-x/cloudgrep/pkg/resourceconverter"
-	_ "github.com/run-x/cloudgrep/pkg/util/rlimit"
+	cfg "github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
+	regionutil "github.com/juandiegopalomino/cloudgrep/pkg/provider/aws/regions"
+	awsutil "github.com/juandiegopalomino/cloudgrep/pkg/provider/aws/util"
+	"github.com/juandiegopalomino/cloudgrep/pkg/provider/types"
+	"github.com/juandiegopalomino/cloudgrep/pkg/resourceconverter"
+	_ "github.com/juandiegopalomino/cloudgrep/pkg/util/rlimit"
 	"go.uber.org/zap"
 )
 

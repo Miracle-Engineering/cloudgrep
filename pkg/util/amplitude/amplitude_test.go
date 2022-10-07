@@ -10,7 +10,7 @@ import (
 
 	"github.com/denisbrodbeck/machineid"
 	"github.com/google/uuid"
-	"github.com/run-x/cloudgrep/pkg/version"
+	"github.com/juandiegopalomino/cloudgrep/pkg/version"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

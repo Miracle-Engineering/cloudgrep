@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/provider"
-	"github.com/run-x/cloudgrep/pkg/testingutil"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/provider"
+	"github.com/juandiegopalomino/cloudgrep/pkg/testingutil"
 	"github.com/stretchr/testify/assert"
 )
 

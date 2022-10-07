@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/provider"
-	"github.com/run-x/cloudgrep/pkg/sequencer"
-	"github.com/run-x/cloudgrep/pkg/util/amplitude"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/provider"
+	"github.com/juandiegopalomino/cloudgrep/pkg/sequencer"
+	"github.com/juandiegopalomino/cloudgrep/pkg/util/amplitude"
 	"go.uber.org/zap"
 )
 

@@ -3,7 +3,7 @@ package types
 import (
 	"context"
 
-	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
 )
 
 type FetchFunc func(context.Context, chan<- model.Resource) error

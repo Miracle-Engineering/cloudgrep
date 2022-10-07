@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/run-x/cloudgrep/pkg/version"
+	"github.com/juandiegopalomino/cloudgrep/pkg/version"
 	"io"
 	"text/template"
 

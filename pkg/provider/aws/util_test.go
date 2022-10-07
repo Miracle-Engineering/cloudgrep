@@ -14,8 +14,8 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
 
-	cfg "github.com/run-x/cloudgrep/pkg/config"
-	regionutil "github.com/run-x/cloudgrep/pkg/provider/aws/regions"
+	cfg "github.com/juandiegopalomino/cloudgrep/pkg/config"
+	regionutil "github.com/juandiegopalomino/cloudgrep/pkg/provider/aws/regions"
 )
 
 // Default region to run tests against if AWS_REGION is not set.

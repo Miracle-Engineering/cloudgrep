@@ -3,9 +3,9 @@ package aws
 import (
 	"testing"
 
-	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/testingutil"
-	testprovider "github.com/run-x/cloudgrep/pkg/testingutil/provider"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/testingutil"
+	testprovider "github.com/juandiegopalomino/cloudgrep/pkg/testingutil/provider"
 )
 
 func TestFetchFunctions(t *testing.T) {

@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/run-x/cloudgrep/hack/awsgen/config"
-	"github.com/run-x/cloudgrep/hack/awsgen/generator"
-	"github.com/run-x/cloudgrep/hack/awsgen/writer"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/config"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/generator"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/writer"
 )
 
 func Run(args []string) {

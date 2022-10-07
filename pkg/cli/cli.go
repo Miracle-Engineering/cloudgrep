@@ -10,16 +10,16 @@ import (
 	"syscall"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/util/amplitude"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/util/amplitude"
 
 	"go.uber.org/zap"
 
-	"github.com/run-x/cloudgrep/pkg/api"
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/engine"
-	"github.com/run-x/cloudgrep/pkg/util"
+	"github.com/juandiegopalomino/cloudgrep/pkg/api"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore"
+	"github.com/juandiegopalomino/cloudgrep/pkg/engine"
+	"github.com/juandiegopalomino/cloudgrep/pkg/util"
 )
 
 type cli struct {

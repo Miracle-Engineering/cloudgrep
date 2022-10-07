@@ -3,8 +3,8 @@ package sequencer
 import (
 	"context"
 
-	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/provider"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore"
+	"github.com/juandiegopalomino/cloudgrep/pkg/provider"
 )
 
 type Sequencer interface {

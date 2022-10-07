@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/run-x/cloudgrep/hack/awsgen/config"
-	"github.com/run-x/cloudgrep/hack/awsgen/template"
-	"github.com/run-x/cloudgrep/hack/awsgen/util"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/config"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/template"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/util"
 )
 
 // generateType generates the functions for a specific type
@@ -65,8 +65,8 @@ func (g Generator) generateTypeListFunction(service config.Service, typ config.T
 	imports.AddPath("context")
 	imports.AddPath("fmt")
 	imports.AddPath(awsServicePackage(service.ServicePackage))
-	imports.AddPath("github.com/run-x/cloudgrep/pkg/resourceconverter")
-	imports.AddPath("github.com/run-x/cloudgrep/pkg/model")
+	imports.AddPath("github.com/juandiegopalomino/cloudgrep/pkg/resourceconverter")
+	imports.AddPath("github.com/juandiegopalomino/cloudgrep/pkg/model")
 
 	if typ.GetTagsAPI.Has() {
 		imports.AddPath(awsServicePackage(service.ServicePackage))
@@ -133,7 +133,7 @@ func (g Generator) generateTypeTagFunction(service config.Service, typ config.Ty
 	imports.AddPath("fmt")
 	imports.AddPath(awsServicePackage(service.ServicePackage))
 	imports.AddPath(awsServicePackage(service.ServicePackage, "types"))
-	imports.AddPath("github.com/run-x/cloudgrep/pkg/model")
+	imports.AddPath("github.com/juandiegopalomino/cloudgrep/pkg/model")
 
 	if len(typ.GetTagsAPI.AllowedAPIErrorCodes) > 0 {
 		imports.AddPath("github.com/aws/smithy-go")

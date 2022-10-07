@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/run-x/cloudgrep/pkg/config"
-	providerutil "github.com/run-x/cloudgrep/pkg/testingutil/provider"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	providerutil "github.com/juandiegopalomino/cloudgrep/pkg/testingutil/provider"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 )

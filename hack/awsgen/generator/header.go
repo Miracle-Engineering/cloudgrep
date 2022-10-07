@@ -1,8 +1,8 @@
 package generator
 
 import (
-	"github.com/run-x/cloudgrep/hack/awsgen/template"
-	"github.com/run-x/cloudgrep/hack/awsgen/util"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/template"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/util"
 )
 
 // generateFileHeader returns the package statement and import statement for a single file

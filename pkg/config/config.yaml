@@ -1,5 +1,5 @@
 # This config represents all the user-configurable settings for cloudgrep and their default values
-# https://github.com/run-x/cloudgrep/blob/main/pkg/config/config.yaml
+# https://github.com/juandiegopalomino/cloudgrep/blob/main/pkg/config/config.yaml
 
 # web represents the specs cloudgrep uses for creating the webapp server
 web:

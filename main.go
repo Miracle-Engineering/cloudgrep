@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/run-x/cloudgrep/cmd"
+import "github.com/juandiegopalomino/cloudgrep/cmd"
 
 func main() {
 	cmd.Execute()

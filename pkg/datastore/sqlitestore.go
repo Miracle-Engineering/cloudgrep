@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/model"
-	"github.com/run-x/cloudgrep/pkg/util"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/util"
 	"go.uber.org/zap"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"

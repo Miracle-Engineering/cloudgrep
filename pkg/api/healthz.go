@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/run-x/cloudgrep/pkg/datastore"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore"
 )
 
 func Healthz(c *gin.Context) {

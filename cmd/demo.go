@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/run-x/cloudgrep/demo"
+	"github.com/juandiegopalomino/cloudgrep/demo"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +19,7 @@ func (dO *demoOptions) run(ctx context.Context) error {
 		return err
 	}
 	//clean up the temporary file
-	defer os.Remove(cfg.Datastore.DataSourceName)
+	defer os.RemoveAll(cfg.Datastore.DataSourceName)
 	if dO.bind != "" {
 		cfg.Web.Host = dO.bind
 	}

@@ -42,7 +42,7 @@ make pre-commit
 ```
 
 ## Frontend
-Checkout the frontend development guide [here](https://github.com/run-x/cloudgrep/blob/main/fe/README.md)
+Checkout the frontend development guide [here](https://github.com/juandiegopalomino/cloudgrep/blob/main/fe/README.md)
 
 ### AWS Resource supported
 
@@ -62,7 +62,7 @@ Checkout the frontend development guide [here](https://github.com/run-x/cloudgre
 All of these boxes are implemented as distinct Go packages, except for UI which is a JS app.
 
 ## API
-API design is documented [here](https://github.com/run-x/cloudgrep/blob/main/API.md)
+API design is documented [here](https://github.com/juandiegopalomino/cloudgrep/blob/main/API.md)
 
 ## Configure a new AWS resource
 1. If the resource you are adding is for a new, wholly unsupported service, add a new item in the `services` list in the `pkg/provider/aws/config.yaml` file, and then create a new file with `.yaml` appended to the service name in the same directory.

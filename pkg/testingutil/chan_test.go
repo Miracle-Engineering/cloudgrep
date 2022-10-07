@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/run-x/cloudgrep/pkg/util"
+	"github.com/juandiegopalomino/cloudgrep/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
 

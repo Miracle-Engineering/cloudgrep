@@ -9,5 +9,5 @@ import (
 type testTypeStrType struct{}
 
 func TestTypeStr(t *testing.T) {
-	assert.Equal(t, "github.com/run-x/cloudgrep/pkg/testingutil.testTypeStrType", TypeStr(testTypeStrType{}))
+	assert.Equal(t, "github.com/juandiegopalomino/cloudgrep/pkg/testingutil.testTypeStrType", TypeStr(testTypeStrType{}))
 }

@@ -14,9 +14,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/run-x/cloudgrep/pkg/config"
-	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/config"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )

@@ -4,7 +4,7 @@ GITHUB_SHA ?= $(shell git rev-parse HEAD)
 BUILD_TIME = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n')
 GO_VERSION = $(shell go version | awk {'print $$3'})
 LDFLAGS = -s -w
-PKG = github.com/run-x/cloudgrep
+PKG = github.com/juandiegopalomino/cloudgrep
 
 DOCKER_RELEASE_TAG = "ghcr.io/run-x/cloudgrep:$(VERSION)"
 DOCKER_LATEST_TAG = "ghcr.io/run-x/cloudgrep:main"

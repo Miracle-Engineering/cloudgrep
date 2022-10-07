@@ -4,8 +4,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/run-x/cloudgrep/pkg/datastore"
-	"github.com/run-x/cloudgrep/pkg/model"
+	"github.com/juandiegopalomino/cloudgrep/pkg/datastore"
+	"github.com/juandiegopalomino/cloudgrep/pkg/model"
 )
 
 // Datastore implementation that drops all inserted data, but keeps track of number of resources written (returned via Stats())

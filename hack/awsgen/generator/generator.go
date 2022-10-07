@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"go/format"
 
-	"github.com/run-x/cloudgrep/hack/awsgen/config"
-	"github.com/run-x/cloudgrep/hack/awsgen/writer"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/config"
+	"github.com/juandiegopalomino/cloudgrep/hack/awsgen/writer"
 )
 
 // Generator generates the AWS provider code based on the configuration.

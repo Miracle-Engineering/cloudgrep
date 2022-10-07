@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/run-x/cloudgrep/pkg/provider"
-	"github.com/run-x/cloudgrep/pkg/testingutil/datastore"
-	providerutil "github.com/run-x/cloudgrep/pkg/testingutil/provider"
+	"github.com/juandiegopalomino/cloudgrep/pkg/provider"
+	"github.com/juandiegopalomino/cloudgrep/pkg/testingutil/datastore"
+	providerutil "github.com/juandiegopalomino/cloudgrep/pkg/testingutil/provider"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest"
 )
